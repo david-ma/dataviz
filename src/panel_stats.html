@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Title</title>
+
+	<style>
+
+		body {
+			background-color: #eee;
+		}
+
+		.page {
+			background-color: #fff;
+		}
+
+		header {
+			width: 100%;
+			height: 200px;
+			background: #333e52;
+		}
+		header .blur_background {
+			height: 200px;
+			width: 100%;
+			position: absolute;
+			background: url("/images/unsplash.jpg");
+			background-size: cover;
+			background-position: 50% 60%;
+		}
+		footer {
+			width: 100%;
+			height: 50px;
+			background: #ddd;
+		}
+
+		.mask {
+			height: 100%;
+			background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+		}
+
+		header .container {
+			padding-top: 50px;
+		}
+
+		header h1 {
+			font-size: 60px;
+			color: #eee;
+			margin: 0;
+		}
+		header h2 {
+			font-size: 30px;
+			color: #eee;
+			margin: 0;
+		}
+
+	</style>
+</head>
+<body>
+<header>
+	<div class="blur_background">
+		<div class="mask"></div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<h1>Title</h1>
+				<h2>Subtitle</h2>
+			</div>
+		</div>
+	</div>
+</header>
+
+<div class="container page">
+	<div class="row">
+		<div class="col-xs-12">
+			<h1>
+				Sup?
+			</h1>
+			<p>Hey this is a stupid example index.html</p>
+			<p>Run "npm test example" from the thalia root to develop</p>
+			<p>Except, put the workspace you want in the place of example...</p>
+			<p>Don't forget to npm install, bower install, and gulp build if you're into that stuff.</p>
+		</div>
+	</div>
+
+	<h2>Ok here's some dummy text:</h2>
+	<div class="row">
+		<div class="col-xs-12 col-sm-6" id="chart">
+
+
+
+
+		</div>
+		<div class="col-xs-12 col-sm-6">
+			<p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+		</div>
+	</div>
+</div>
+
+<footer>
+	<div class="container">
+		<div class="row">
+			<p class="col-xs-6">Simple <a href="https://github.com/david-ma/Thalia">Thalia</a> Bootstrap Boilerplate</p>
+			<p class="col-xs-6 text-right">By <a href="https://twitter.com/frostickle">@Frostickle</a> <i class="fa fa-twitter" aria-hidden="true"></i></p>
+		</div>
+	</div>
+</footer>
+<link rel="stylesheet" href="/css/main.css">
+<!--<script src="/js/vendor.min.js"></script>-->
+<!--<script src="/js/scripts.min.js"></script>-->
+<script src="/js/d3v4.js"></script>
+<script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+<script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+
+<script>
+
+var panels = {};
+
+console.log(d3.version);
+
+//d3.tsv("/data/qc/seq_samples.tsv", function(d){
+//	if(d) {
+//	    panels[d.panel] = panels[d.panel] || { pass: [], fail: [] };
+//
+//	    if(d.passfail_flag == "1") {
+//            panels[d.panel].pass.push(d);
+//		} else {
+//            panels[d.panel].fail.push(d);
+//		}
+//	}
+//});
+
+var CCP;
+
+function average( array ) {
+    try {
+        return parseInt(array.reduce((a, b) => a + b) / array.length);
+    } catch (e) {
+        console.error(e);
+        return null;
+	}
+}
+
+d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
+
+    d.forEach(function(run){
+        panels[run.panel] = panels[run.panel] || { pass: [], fail: [], control: [], NTC: [] };
+        if(run.passfail_flag == "1") {
+            panels[run.panel].pass.push(run);
+        } else {
+            panels[run.panel].fail.push(run);
+        }
+
+        if(run.sample_type == "Control") {
+            panels[run.panel].control.push(run);
+		} else if(run.sample_type == "NTC") {
+            panels[run.panel].NTC.push(run);
+		}
+	});
+
+    console.log("Panels: ", panels);
+
+    var controls = panels.Pathology_hyb_CCP_2.control || [];
+
+    CCP = {
+        average: {},
+		samples: []
+	};
+
+
+
+
+
+//    controls.forEach(function(d){
+//        var id = `${d.seqrun}-${d.sample_name}`;
+//
+//        d3.tsv(`/data/qc/${id}.tsv`).then(function(sample){
+////			console.log(sample);
+//
+//            var blob = {
+//                id: id,
+//                rois: {}
+//            };
+//
+//			sample.forEach(function(roi){
+////                CCP.average[roi.Region] = CCP.average[roi.Region] || { min: [], max: [], mean: [] };
+//
+//                if(roi["Mean coverage"]) {
+//					blob.rois[roi.Region] = {
+//                        mean: parseInt(roi["Mean coverage"])
+//					};
+//
+//					if(roi["Max Coverage"]) {
+//                        blob.rois[roi.Region].max = parseInt(roi["Max Coverage"]);
+//					}
+//
+//                    if(roi["Min Coverage"]) {
+//                        blob.rois[roi.Region].min = parseInt(roi["Min Coverage"]);
+//                    }
+//
+//				} else {
+//                    console.warn("No mean coverage..? ", blob);
+//				}
+//			});
+//
+//			CCP.samples.push(blob);
+//
+//		}).catch((d) => console.log("Error", d));
+//	});
+//
+//    console.log("CCP: ", CCP);
+
+    // Calculate average
+//	if(CCP.samples[0]) {
+//	    Object.keys(CCP.samples[0]).forEach(function(roi){
+//	        console.log(roi);
+//		});
+//	} else {
+//	    console.log("what?");
+//	    console.log(CCP.samples[0]);
+//	}
+
+
+
+
+	var promises = [];
+
+    controls.forEach(function(d){
+        var id = `${d.seqrun}-${d.sample_name}`;
+
+        var promise = new Promise(function(resolve, reject){
+			d3.tsv(`/data/qc/${id}.tsv`).then(function(sample){
+                console.log("lol hey", id);
+//			console.log(sample);
+
+                var blob = {
+                    id: id,
+                    rois: {}
+                };
+
+                sample.forEach(function(roi){
+//                CCP.average[roi.Region] = CCP.average[roi.Region] || { min: [], max: [], mean: [] };
+
+                    if(roi["Mean coverage"]) {
+                        blob.rois[roi.Region] = {
+                            mean: parseFloat(roi["Mean coverage"])
+                        };
+
+                        if(roi["Max Coverage"]) {
+                            blob.rois[roi.Region].max = parseFloat(roi["Max Coverage"]);
+                        }
+
+                        if(roi["Min Coverage"]) {
+                            blob.rois[roi.Region].min = parseFloat(roi["Min Coverage"]);
+                        }
+
+                    } else {
+                        console.warn("No mean coverage..? ", blob);
+                    }
+                });
+
+                CCP.samples.push(blob);
+                resolve(blob);
+
+            }).catch((d) => reject(d));
+        });
+
+
+        promises.push(promise);
+	});
+
+    Promise.all(promises).then(function(d){
+        console.log(d);
+        CCP.samples = d;
+        var rois = Object.keys(d[0].rois);
+
+
+
+		rois.forEach(function (roi) {
+			CCP.average[roi] = {
+				mean: average(d.map((sample) => sample.rois[roi].mean).filter(d => typeof d === "number"), roi),
+				max: average(d.map((sample) => sample.rois[roi].max).filter(d => typeof d === "number")),
+				min: average(d.map((sample) => sample.rois[roi].min).filter(d => typeof d === "number"))
+			};
+
+		});
+
+        console.log("hey");
+        console.log(CCP.average["FGF14:13:103053804-103054044"]);
+
+//        console.log(CCP);
+
+
+
+
+	});
+
+
+
+
+
+//
+//    console.log("CCP: ", CCP);
+//
+//     Calculate average
+//	if(CCP.samples[0]) {
+//	    Object.keys(CCP.samples[0]).forEach(function(roi){
+//	        console.log(roi);
+//		});
+//	} else {
+//	    console.log("what?");
+//	    console.log(CCP.samples[0]);
+//	}
+//
+});
+
+
+// From Rob Crocker's simple bar chart
+// https://github.com/david-ma/a_simple_bar_chart/blob/master/chart.js
+class Chart {
+    constructor(opts) {
+
+        this.element = opts.element;
+        this.data = opts.data;
+        this.title = opts.title;
+        this.subtitle = opts.subtitle;
+
+        this.draw();
+
+    }
+
+    draw() {
+
+        // Create the parent SVG
+        this.width = 960;
+        this.height = 600;
+        this.margin = { top: 70, right: 20, bottom: 50, left: 225 };
+
+        // Give your title and axes some space
+        this.innerHeight = this.height - (this.margin.top + this.margin.bottom);
+        this.innerWidth = this.width - (this.margin.right + this.margin.left);
+
+        const svg = d3.select(this.element).append('svg');
+
+        svg
+            .attr('width', this.width)
+            .attr('height', this.height);
+
+        this.plot = svg.append('g')
+            .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+        // Call the necessary functions
+        this.createScales();
+        this.addAxes();
+        this.addTitles();
+        this.addChart();
+    }
+
+    createScales() {
+        // We set the domain to zero to make sure our bars
+        // always start at zero. We don't want to truncate.
+        this.xScale = d3.scaleLinear()
+            .domain([0, d3.max(this.data, d => d.exports)])
+            .range([0, this.innerWidth]);
+
+        // Range relates to pixels
+        // Domain relates to data
+
+        this.yBand = d3.scaleBand()
+            .paddingInner(0.1)
+            .domain(this.data.map(d => d.exporter))
+            .rangeRound([this.innerHeight, 0]);
+
+    }
+
+    addAxes() {
+        // Create axises to be called later
+        const xAxis = d3.axisBottom()
+            .scale(this.xScale);
+
+        const yAxis = d3.axisLeft()
+            .scale(this.yBand);
+
+        // Custom format to clean up tick formattin
+        const siFormat = d3.format(".2s");
+        const customTickFormat = function (d) {
+            return siFormat(d).replace("G", "B");
+        };
+
+        // Call those axis generators
+        this.plot.append("g")
+            .attr("class", "x axis")
+            .attr("transform", `translate(0, ${this.innerHeight})`)
+            .call(
+                xAxis
+                    .ticks(10)
+                    .tickSize(-this.innerHeight)
+                    .tickFormat(customTickFormat));
+
+        // Add y-axis ticks
+        this.plot.append("g")
+            .attr("class", "y axis")
+            .attr("transform", 'translate(0, 0)')
+            .call(yAxis);
+    }
+
+    addTitles() {
+        // Add chart title
+        this.plot.append('text')
+            .attr("class", "chart title")
+            .attr('x', 0)
+            .attr('y', -30)
+            .text(this.title);
+
+        // Add chart subtitle
+        this.plot.append('text')
+            .attr("class", "chart subtitle")
+            .attr('x', 0)
+            .attr('y', -5)
+            .text(this.subtitle);
+
+        // Add x-axis title
+        this.plot.append('text')
+            .attr("class", "x axis title")
+            .attr('x', this.innerWidth)
+            .attr('y', this.innerHeight + 30)
+            .text("EXPORTS (USD)");
+    }
+
+    addChart() {
+        this.plot.selectAll(".bar")
+            .data(this.data)
+            .enter().append("rect")
+            .attr('class', "bar")
+            .attr("x", 0)
+            .attr("y", d => this.yBand(d.exporter))
+            .attr("width", d => this.xScale(d.exports))
+            .attr("height", this.yBand.bandwidth());
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+var chart = new Chart({
+    element: d3.select("chart"),
+    data: [],
+    tilte: "blah",
+    subtitle: "blaaaah"
+});
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
