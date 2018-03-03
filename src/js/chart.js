@@ -13,11 +13,30 @@ class Chart {
 
         this.width  = opts.width || 960;
         this.height = opts.height || 600;
-        this.margin = opts.margin || { top: 70, right: 20, bottom: 50, left: 225 };
+        this.margin = opts.margin || { top: 70, right: 20, bottom: 50, left: 70 };
 
-        this.svg = d3.select(opts.element).append("svg");
+        this.svg = d3.select(`#${opts.element}`).append("svg");
+
+        this.fullscreen = false;
 
         this.draw();
+    }
+
+    toggleFullscreen() {
+        if(this.fullscreen) {
+            console.log("Already fullscreen, minimise!");
+            this.fullscreen = false;
+
+            $(`#big-chart svg`).detach().appendTo(`#${this.element}`);
+            $(`#big-chart`).remove();
+        } else {
+            console.log("Let's make it BIG!");
+            this.fullscreen = true;
+
+            $("<div id='big-chart'></div>").insertBefore("body header");
+            $(`#${this.element} svg`).detach().appendTo("#big-chart");
+
+        }
     }
 
     draw() {
@@ -32,8 +51,19 @@ class Chart {
         const svg = this.svg.attrs({
             viewBox: `0 0 ${this.width} ${this.height}`
         }).styles({
-            background: "red"
+            background: "rgba(0,0,0,0.2)"
         });
+
+
+
+        this.plot = svg.append('g')
+            .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+        // Call the necessary functions
+        this.createScales();
+        this.addAxes();
+        this.addTitles();
+        this.addChart();
 
     }
 
@@ -102,6 +132,7 @@ class Chart {
 
         // Add x-axis title
         this.plot.append('text')
+            .style("text-anchor", "end")
             .attr("class", "x axis title")
             .attr('x', this.innerWidth)
             .attr('y', this.innerHeight + 30)
