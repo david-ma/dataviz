@@ -88,13 +88,8 @@
 
 	<h2>Ok here's some dummy text:</h2>
 	<div class="row">
-		<div class="col-xs-12 col-sm-6" id="chart">
-
-
-
-
-		</div>
-		<div class="col-xs-12 col-sm-6">
+		<div class="col-xs-12 col-sm-8" id="panels-chart"></div>
+		<div class="col-xs-12 col-sm-4">
 			<p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
 		</div>
 	</div>
@@ -131,6 +126,7 @@ console.log(d3.version);
 //});
 
 var CCP;
+var charts = {};
 
 function average( array ) {
     try {
@@ -158,7 +154,19 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 		}
 	});
 
-    console.log("Panels: ", panels);
+    console.log("Panels:", panels);
+
+	charts.panelChart = new Chart({
+        element: "panels-chart",
+        title: "Hybrid Capture Panels at Peter Mac",
+		subtitle: "Subtitle goes here..?",
+		data: Object.keys(panels).map(function(panel) { return {
+            name: panel,
+			labels: ["Pass", "Fail"],
+			values: [panels[panel].pass.length, panels[panel].fail.length]
+		}})
+    }).columnChart();
+
 
     var controls = panels.Pathology_hyb_CCP_2.control || [];
 
@@ -293,7 +301,16 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 
 
 
-	});
+	}).then(function(d){
+
+	    console.log("ok, we're here, with this data", d);
+
+//        var chart = new Chart({
+//            element: "chart",
+//            title: "Who made the most on medicine exports in 2016?"
+//        });
+
+    });
 
 
     //
@@ -319,17 +336,42 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 
 
 
-var chart = new Chart({
-    element: "#chart",
-    data: [],
-    tilte: "blah",
-    subtitle: "blaaaah"
-});
-
-
-
-
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

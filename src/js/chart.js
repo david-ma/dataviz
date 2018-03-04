@@ -14,16 +14,18 @@ class Chart {
 
         this.width  = opts.width || 960;
         this.height = opts.height || 600;
-        this.margin = opts.margin || { top: 70, right: 70, bottom: 50, left: 70 };
+        this.margin = opts.margin || { top: 70, right: 70, bottom: 50, left: 200 };
 
         this.innerHeight = this.height - (this.margin.top + this.margin.bottom);
         this.innerWidth = this.width - (this.margin.right + this.margin.left);
 
-        this.svg = d3.select(`#${opts.element}`).append("svg").attrs({
-            viewBox: `0 0 ${this.width} ${this.height}`
-        }).styles({
-            background: "rgba(0,0,0,0.05)"
-        });
+        this.svg = d3.select(`#${opts.element}`)
+            .classed("chart", true)
+            .append("svg").attrs({
+                viewBox: `0 0 ${this.width} ${this.height}`
+            }).styles({
+                background: "rgba(0,0,0,0.05)"
+            });
 
         this.fullscreen = false;
 
@@ -35,17 +37,25 @@ class Chart {
         this.plot = this.svg.append('g')
             .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
 
+        // Add the background
+        this.plot.append("rect")
+            .attrs({
+                fill: "white",
+                x: 0,
+                y: 0,
+                height: this.innerHeight,
+                width: this.innerWidth
+            });
+
         this.drawNav();
 
-        // this.svg.rect.attrs({
-        //     x:
-        // });
-
-        // Call the necessary functions
-        this.createScales();
-        this.addAxes();
-        this.addTitles();
-        this.addChart();
+        // Add the title
+        this.svg.append('text')
+            .attr('transform', `translate(${this.width / 2},${this.margin.top / 2})`)
+            .attr("class", "chart-title")
+            .attr('x', 0)
+            .attr('y', 0)
+            .text(this.title);
     }
 
     drawNav() {
@@ -57,7 +67,7 @@ class Chart {
             .on("click", this.toggleFullscreen)
             .append("span")
             .classed("expander", true)
-            .append("i").classed("fa fa-expand", true);
+            .append("i").classed("fa fa-lg fa-expand", true);
     }
 
     toggleFullscreen(chart) {
@@ -73,26 +83,51 @@ class Chart {
             console.log("Let's make it BIG!");
             chart.fullscreen = true;
 
-            $("<div id='big-chart'></div>").insertBefore("body header");
+            $("<div id='big-chart' class='chart'></div>").insertBefore("body header");
             $(`#${chart.element} svg`).detach().appendTo("#big-chart");
 
         }
     }
 
-    createScales() {
+    /*
+     * This chart expects:
+     * [{
+     *   column title:
+     * }]
+     */
+    columnChart(d) {
+        console.log("this is d", d);
+        console.log("this is the data", this.data);
+
+        var values = [];
+        this.data.forEach(function(column){
+            values = values.concat(column.values);
+        });
+
+
+        // Call the necessary functions
+        this.createScales(values);
+        this.addAxes();
+        // this.addTitles();
+        this.addChart(values);
+
+        return this;
+    }
+
+    createScales( values ) {
         // We set the domain to zero to make sure our bars
         // always start at zero. We don't want to truncate.
         this.xScale = d3.scaleLinear()
-            .domain([0, d3.max(this.data, d => d.exports)])
+            .domain([0, parseInt(d3.max(values) * 1.1)])
             .range([0, this.innerWidth]);
 
         // Range relates to pixels
         // Domain relates to data
 
         this.yBand = d3.scaleBand()
-            .paddingInner(0.1)
-            .domain(this.data.map(d => d.exporter))
-            .rangeRound([this.innerHeight, 0]);
+            .paddingInner(0.2)
+            .domain(this.data.map(d => d.name))
+            .rangeRound([this.innerHeight - 20, 20]);
 
     }
 
@@ -104,12 +139,6 @@ class Chart {
         const yAxis = d3.axisLeft()
             .scale(this.yBand);
 
-        // Custom format to clean up tick formattin
-        const siFormat = d3.format(".2s");
-        const customTickFormat = function (d) {
-            return siFormat(d).replace("G", "B");
-        };
-
         // Call those axis generators
         this.plot.append("g")
             .attr("class", "x axis")
@@ -118,7 +147,8 @@ class Chart {
                 xAxis
                     .ticks(10)
                     .tickSize(-this.innerHeight)
-                    .tickFormat(customTickFormat));
+                    // .tickFormat(d3.format(".3s"))
+            );
 
         // Add y-axis ticks
         this.plot.append("g")
@@ -152,14 +182,38 @@ class Chart {
     }
 
     addChart() {
+        var that = this;
         this.plot.selectAll(".bar")
             .data(this.data)
-            .enter().append("rect")
-            .attr('class', "bar")
-            .attr("x", 0)
-            .attr("y", d => this.yBand(d.exporter))
-            .attr("width", d => this.xScale(d.exports))
-            .attr("height", this.yBand.bandwidth());
+            .enter()
+            .append("g").classed("bar", true)
+            .each(function(d){
+                var bar = d3.select(this);
+
+                console.log(d);
+
+                bar.append("rect")
+                    .attr("fill", "#e34a33")
+                    .attr("x", 0)
+                    .attr("y", d => that.yBand(d.name))
+                    .attr("width", d => that.xScale(d.values[1]))
+                    .attr("height", that.yBand.bandwidth());
+
+                bar.append("rect")
+                    .attr("fill", "#2ca25f")
+                    .attr("x", d => that.xScale(d.values[1]))
+                    .attr("y", d => that.yBand(d.name))
+                    .attr("width", d => that.xScale(d.values[0]))
+                    .attr("height", that.yBand.bandwidth());
+
+            })
+
+        // append("rect")
+        //     .attr('class', "bar")
+        //     .attr("x", 0)
+        //     .attr("y", d => this.yBand(d.name))
+        //     .attr("width", d => this.xScale(d.exports))
+        //     .attr("height", this.yBand.bandwidth());
     }
 
 }
