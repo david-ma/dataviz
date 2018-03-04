@@ -1,70 +1,82 @@
-
-
-
-// From Rob Crocker's simple bar chart
-// https://github.com/david-ma/a_simple_bar_chart/blob/master/chart.js
+/*
+ * David Ma - March 2018
+ */
 class Chart {
+
+    // Sets variables
     constructor(opts) {
 
-        this.element = opts.element;
+        // Set variables...
+        this.element = opts.element || "chart";
         this.data = opts.data || [];
         this.title = opts.title || "";
         this.subtitle = opts.subtitle || "";
 
         this.width  = opts.width || 960;
         this.height = opts.height || 600;
-        this.margin = opts.margin || { top: 70, right: 20, bottom: 50, left: 70 };
+        this.margin = opts.margin || { top: 70, right: 70, bottom: 50, left: 70 };
 
-        this.svg = d3.select(`#${opts.element}`).append("svg");
+        this.innerHeight = this.height - (this.margin.top + this.margin.bottom);
+        this.innerWidth = this.width - (this.margin.right + this.margin.left);
+
+        this.svg = d3.select(`#${opts.element}`).append("svg").attrs({
+            viewBox: `0 0 ${this.width} ${this.height}`
+        }).styles({
+            background: "rgba(0,0,0,0.05)"
+        });
 
         this.fullscreen = false;
 
         this.draw();
     }
 
-    toggleFullscreen() {
-        if(this.fullscreen) {
-            console.log("Already fullscreen, minimise!");
-            this.fullscreen = false;
-
-            $(`#big-chart svg`).detach().appendTo(`#${this.element}`);
-            $(`#big-chart`).remove();
-        } else {
-            console.log("Let's make it BIG!");
-            this.fullscreen = true;
-
-            $("<div id='big-chart'></div>").insertBefore("body header");
-            $(`#${this.element} svg`).detach().appendTo("#big-chart");
-
-        }
-    }
-
+    // Draws the plot and individual parts of the plot
     draw() {
-
-        // Create the parent SVG
-
-
-        // Give your title and axes some space
-        this.innerHeight = this.height - (this.margin.top + this.margin.bottom);
-        this.innerWidth = this.width - (this.margin.right + this.margin.left);
-
-        const svg = this.svg.attrs({
-            viewBox: `0 0 ${this.width} ${this.height}`
-        }).styles({
-            background: "rgba(0,0,0,0.2)"
-        });
-
-
-
-        this.plot = svg.append('g')
+        this.plot = this.svg.append('g')
             .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+        this.drawNav();
+
+        // this.svg.rect.attrs({
+        //     x:
+        // });
 
         // Call the necessary functions
         this.createScales();
         this.addAxes();
         this.addTitles();
         this.addChart();
+    }
 
+    drawNav() {
+        var svg = d3.select(`#${this.element}`).append("div")
+            .classed("chart-nav", true);
+
+        svg.append("div")
+            .datum(this)
+            .on("click", this.toggleFullscreen)
+            .append("span")
+            .classed("expander", true)
+            .append("i").classed("fa fa-expand", true);
+    }
+
+    toggleFullscreen(chart) {
+        chart = chart || this;
+
+        if(chart.fullscreen) {
+            console.log("Already fullscreen, minimise!");
+            chart.fullscreen = false;
+
+            $(`#big-chart svg`).detach().appendTo(`#${chart.element}`);
+            $(`#big-chart`).remove();
+        } else {
+            console.log("Let's make it BIG!");
+            chart.fullscreen = true;
+
+            $("<div id='big-chart'></div>").insertBefore("body header");
+            $(`#${chart.element} svg`).detach().appendTo("#big-chart");
+
+        }
     }
 
     createScales() {
