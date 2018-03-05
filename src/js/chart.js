@@ -19,6 +19,10 @@ class Chart {
         this.height = opts.height || 600;
         this.margin = opts.margin || { top: 70, right: 70, bottom: 50, left: 70 };
 
+        // Default colours from ColorBrewer 2.0
+        // http://colorbrewer2.org/?type=qualitative&scheme=Dark2&n=8
+        this.colours = opts.colours || ['#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e','#e6ab02','#a6761d','#666666'];
+
         this.innerHeight = this.height - (this.margin.top + this.margin.bottom);
         this.innerWidth = this.width - (this.margin.right + this.margin.left);
 
@@ -38,6 +42,7 @@ class Chart {
     // Draws the plot and individual parts of the plot
     draw() {
         this.plot = this.svg.append('g')
+            .classed("plot", true)
             .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
 
         // Add the background
@@ -204,6 +209,50 @@ class Chart {
 
     addChart() {
         var that = this;
+
+        var legend = that.plot.append("g")
+            .classed("legend", true)
+            .attr("transform", `translate(${this.innerWidth - 200},0)`);
+
+        legend.append("rect").attrs({
+            height: "100px",
+            width: "200px",
+            fill: "white",
+            stroke: "grey"
+        });
+
+        legend.append("text")
+            .attr("transform", `translate(100,24)`)
+            .style("text-anchor", "middle")
+            .style("font-size", "24px")
+            .text("Legend");
+
+        this.data[0].labels.forEach(function(label, i){
+            legend.append("rect").attrs({
+                    x: 20,
+                    y: 38 + 30 * i,
+                    width: 15,
+                    height: 15,
+                    fill: that.colours[i]
+                });
+
+            legend.append("text")
+                .text(label)
+                .attrs({
+                    x: 40,
+                    y: 50 + 30 * i
+                });
+
+            legend.append("text")
+                .classed(`legend-label legend-label-${i}`, true)
+                .text("")
+                .attrs({
+                    x: 100,
+                    y: 50 + 30 * i
+                });
+        });
+
+
         this.plot.selectAll(".bar")
             .data(this.data)
             .enter()
@@ -211,25 +260,40 @@ class Chart {
             .each(function(d){
                 var bar = d3.select(this);
 
-                console.log(d);
+                bar.on('mouseover', function(d){
+                        d.values.forEach(function(data, i){
+                            legend.select(`.legend-label-${i}`)
+                                .text(data);
+                        });
+                    }).on('mouseout', function(d){
+                        legend.selectAll(`.legend-label`).text("");
+                    });
 
-                bar.append("rect")
-                    .attr("fill", "#e34a33")
-                    .attr("x", 0)
-                    .attr("y", d => that.yBand(d.name))
-                    .attr("width", d => that.xScale(d.values[1]))
-                    .attr("height", that.yBand.bandwidth());
-
-                bar.append("rect")
-                    .attr("fill", "#2ca25f")
-                    .attr("x", d => that.xScale(d.values[1]))
-                    .attr("y", d => that.yBand(d.name))
-                    .attr("width", d => that.xScale(d.values[0]))
-                    .attr("height", that.yBand.bandwidth());
-
+                d.values.forEach(function(data, i){
+                    bar.append("rect")
+                        .attrs({
+                            fill: that.colours[i],
+                            x: that.xScale(d.values[i-1]) || 0,
+                            y: that.yBand(d.name),
+                            width: that.xScale(d.values[i]),
+                            height: that.yBand.bandwidth()
+                        });
+                });
             });
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 

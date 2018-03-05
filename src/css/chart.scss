@@ -48,41 +48,41 @@
         shape-rendering: crispEdges;
     }
 
-
-}
-
-
-.chart-nav {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-
-    .expander {
-        cursor: pointer;
-        height: 100%;
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        background: white;
-        padding: 5px;
-        border: solid 1px black;
-        border-radius: 5px;
-        height: 30px;
-        width: 30px;
-        text-align: center;
-        margin: 10px;
-        display: none;
-        &:hover {
-            border: solid 2px black;
-        }
-    }
-
     &:hover {
-        background: linear-gradient(to bottom, rgba(255,255,255,0),rgba(255,255,255,0),rgba(255,255,255,0),rgba(255,255,255,0),rgba(0,0,0,.3));
-        .expander {
-            display: block;
+        .chart-nav {
+            background: linear-gradient(to bottom,rgba(255,255,255,0),rgba(0,0,0,.3));
+            .expander {
+                display: block;
+            }
         }
     }
+
+    .chart-nav {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 50px;
+
+        .expander {
+            cursor: pointer;
+            height: 100%;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            background: white;
+            padding: 5px;
+            border: solid 1px black;
+            border-radius: 5px;
+            height: 30px;
+            width: 30px;
+            text-align: center;
+            margin: 10px;
+            display: none;
+            &:hover {
+                border: solid 2px black;
+            }
+        }
+    }
+
 }

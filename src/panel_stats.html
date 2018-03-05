@@ -162,10 +162,11 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
         title: "Hybrid Capture Panels at Peter Mac",
 		xLabel: "Number of Samples Sequenced",
 		yLabel: "Panels",
+		colours: ["#e34a33", "#2ca25f"],
 		data: Object.keys(panels).map(function(panel) { return {
             name: panel,
-			labels: ["Pass", "Fail"],
-			values: [panels[panel].pass.length, panels[panel].fail.length]
+			labels: ["Fail", "Pass"],
+			values: [panels[panel].fail.length, panels[panel].pass.length]
 		}}),
         margin: { top: 70, right: 70, bottom: 50, left: 200 }
     }).columnChart();
