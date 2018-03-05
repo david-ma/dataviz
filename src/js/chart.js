@@ -14,7 +14,7 @@ class Chart {
 
         this.width  = opts.width || 960;
         this.height = opts.height || 600;
-        this.margin = opts.margin || { top: 70, right: 70, bottom: 50, left: 200 };
+        this.margin = opts.margin || { top: 70, right: 70, bottom: 50, left: 70 };
 
         this.innerHeight = this.height - (this.margin.top + this.margin.bottom);
         this.innerWidth = this.width - (this.margin.right + this.margin.left);
@@ -74,18 +74,34 @@ class Chart {
         chart = chart || this;
 
         if(chart.fullscreen) {
+            shrink();
+        } else {
+            grow();
+        }
+
+        function keydownHandler(e) {
+            if(e && e.keyCode && e.keyCode == 27) {
+                shrink();
+            }
+        }
+
+        function shrink() {
             console.log("Already fullscreen, minimise!");
             chart.fullscreen = false;
 
             $(`#big-chart svg`).detach().appendTo(`#${chart.element}`);
             $(`#big-chart`).remove();
-        } else {
+            $("body").off("keydown.chart", keydownHandler);
+        }
+
+        function grow() {
             console.log("Let's make it BIG!");
             chart.fullscreen = true;
 
             $("<div id='big-chart' class='chart'></div>").insertBefore("body header");
             $(`#${chart.element} svg`).detach().appendTo("#big-chart");
 
+            $("body").on("keydown.chart", keydownHandler);
         }
     }
 

@@ -104,6 +104,7 @@
 	</div>
 </footer>
 <link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/chart.css">
 <script src="/js/vendor.min.js"></script>
 <script src="/js/chart.js"></script>
 
@@ -164,7 +165,8 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
             name: panel,
 			labels: ["Pass", "Fail"],
 			values: [panels[panel].pass.length, panels[panel].fail.length]
-		}})
+		}}),
+        margin: { top: 70, right: 70, bottom: 50, left: 200 }
     }).columnChart();
 
 
