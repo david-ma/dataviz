@@ -160,7 +160,8 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 	charts.panelChart = new Chart({
         element: "panels-chart",
         title: "Hybrid Capture Panels at Peter Mac",
-		subtitle: "Subtitle goes here..?",
+		xLabel: "Number of Samples Sequenced",
+		yLabel: "Panels",
 		data: Object.keys(panels).map(function(panel) { return {
             name: panel,
 			labels: ["Pass", "Fail"],
@@ -176,60 +177,6 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
         average: {},
 		samples: []
 	};
-
-
-
-
-
-//    controls.forEach(function(d){
-//        var id = `${d.seqrun}-${d.sample_name}`;
-//
-//        d3.tsv(`/data/qc/${id}.tsv`).then(function(sample){
-////			console.log(sample);
-//
-//            var blob = {
-//                id: id,
-//                rois: {}
-//            };
-//
-//			sample.forEach(function(roi){
-////                CCP.average[roi.Region] = CCP.average[roi.Region] || { min: [], max: [], mean: [] };
-//
-//                if(roi["Mean coverage"]) {
-//					blob.rois[roi.Region] = {
-//                        mean: parseInt(roi["Mean coverage"])
-//					};
-//
-//					if(roi["Max Coverage"]) {
-//                        blob.rois[roi.Region].max = parseInt(roi["Max Coverage"]);
-//					}
-//
-//                    if(roi["Min Coverage"]) {
-//                        blob.rois[roi.Region].min = parseInt(roi["Min Coverage"]);
-//                    }
-//
-//				} else {
-//                    console.warn("No mean coverage..? ", blob);
-//				}
-//			});
-//
-//			CCP.samples.push(blob);
-//
-//		}).catch((d) => console.log("Error", d));
-//	});
-//
-//    console.log("CCP: ", CCP);
-
-    // Calculate average
-//	if(CCP.samples[0]) {
-//	    Object.keys(CCP.samples[0]).forEach(function(roi){
-//	        console.log(roi);
-//		});
-//	} else {
-//	    console.log("what?");
-//	    console.log(CCP.samples[0]);
-//	}
-
 
 
 

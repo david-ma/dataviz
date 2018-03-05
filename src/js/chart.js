@@ -1,3 +1,5 @@
+// jshint esversion: 6
+
 /*
  * David Ma - March 2018
  */
@@ -10,7 +12,8 @@ class Chart {
         this.element = opts.element || "chart";
         this.data = opts.data || [];
         this.title = opts.title || "";
-        this.subtitle = opts.subtitle || "";
+        this.xLabel = opts.xLabel || "";
+        this.yLabel = opts.yLabel || "";
 
         this.width  = opts.width || 960;
         this.height = opts.height || 600;
@@ -124,7 +127,6 @@ class Chart {
         // Call the necessary functions
         this.createScales(values);
         this.addAxes();
-        // this.addTitles();
         this.addChart(values);
 
         return this;
@@ -161,9 +163,7 @@ class Chart {
             .attr("transform", `translate(0, ${this.innerHeight})`)
             .call(
                 xAxis
-                    .ticks(10)
-                    .tickSize(-this.innerHeight)
-                    // .tickFormat(d3.format(".3s"))
+                .tickSize(-this.innerHeight)
             );
 
         // Add y-axis ticks
@@ -171,30 +171,35 @@ class Chart {
             .attr("class", "y axis")
             .attr("transform", 'translate(0, 0)')
             .call(yAxis);
-    }
 
-    addTitles() {
-        // Add chart title
-        this.plot.append('text')
-            .attr("class", "chart title")
-            .attr('x', 0)
-            .attr('y', -30)
-            .text(this.title);
 
-        // Add chart subtitle
-        this.plot.append('text')
-            .attr("class", "chart subtitle")
-            .attr('x', 0)
-            .attr('y', -5)
-            .text(this.subtitle);
+        // Add axis labels
+        if(this.xLabel) {
+            let x = this.margin.left + (this.innerWidth / 2),
+                y = this.height - 5;
 
-        // Add x-axis title
-        this.plot.append('text')
-            .style("text-anchor", "end")
-            .attr("class", "x axis title")
-            .attr('x', this.innerWidth)
-            .attr('y', this.innerHeight + 30)
-            .text("EXPORTS (USD)");
+            this.svg.append("g")
+                .attrs({
+                    transform: `translate(${x},${y})`
+                }).styles({
+                    "text-anchor": "middle"
+                }).append("text")
+                .text(this.xLabel);
+        }
+
+        if(this.yLabel) {
+            let x = 5,
+                y = this.margin.top + (this.innerHeight / 2);
+
+            this.svg.append("g")
+                .attrs({
+                    transform: `matrix(0,1,-1,0,${x},${y})`
+                }).styles({
+                "text-anchor": "middle"
+            }).append("text")
+                .text(this.yLabel);
+        }
+
     }
 
     addChart() {
@@ -222,14 +227,7 @@ class Chart {
                     .attr("width", d => that.xScale(d.values[0]))
                     .attr("height", that.yBand.bandwidth());
 
-            })
-
-        // append("rect")
-        //     .attr('class', "bar")
-        //     .attr("x", 0)
-        //     .attr("y", d => this.yBand(d.name))
-        //     .attr("width", d => this.xScale(d.exports))
-        //     .attr("height", this.yBand.bandwidth());
+            });
     }
 
 }
