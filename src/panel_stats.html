@@ -72,21 +72,20 @@
 		</div>
 	</div>
 </header>
-
 <div class="container page">
+	<h2>Heading size 2</h2>
 	<div class="row">
-		<div class="col-xs-12">
-			<h1>
-				Sup?
-			</h1>
-			<p>Hey this is a stupid example index.html</p>
-			<p>Run "npm test example" from the thalia root to develop</p>
-			<p>Except, put the workspace you want in the place of example...</p>
-			<p>Don't forget to npm install, bower install, and gulp build if you're into that stuff.</p>
+		<div class="col-xs-12 col-sm-8" id="seqSamples-chart"></div>
+		<div class="col-xs-12 col-sm-4">
+			<p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
 		</div>
 	</div>
+</div>
 
-	<h2>Ok here's some dummy text:</h2>
+
+
+<div class="container page">
+	<h2>Heading size 2</h2>
 	<div class="row">
 		<div class="col-xs-12 col-sm-8" id="panels-chart"></div>
 		<div class="col-xs-12 col-sm-4">
@@ -140,8 +139,10 @@ function average( array ) {
 
 d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 
+    console.log("seq_samples.tsv", d);
+
     d.forEach(function(run){
-        panels[run.panel] = panels[run.panel] || { pass: [], fail: [], control: [], NTC: [] };
+        panels[run.panel] = panels[run.panel] || { pass: [], fail: [], control: [], NTC: [], dates: [] };
         if(run.passfail_flag == "1") {
             panels[run.panel].pass.push(run);
         } else {
@@ -153,23 +154,42 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 		} else if(run.sample_type == "NTC") {
             panels[run.panel].NTC.push(run);
 		}
+
+        panels[run.panel].dates.push(run.run_date)
 	});
 
     console.log("Panels:", panels);
 
-	charts.panelChart = new Chart({
+    charts.seqSamples = new Chart({
+		element: "seqSamples-chart",
+		title: "SeqSamples vs time",
+		data: Object.keys(panels).map(function(panel){
+		    return {
+		        name: panel,
+				values: panels[panel].dates
+			}
+		})
+	}).lineChart();
+
+
+
+
+
+	charts.panels = new Chart({
         element: "panels-chart",
         title: "Hybrid Capture Panels at Peter Mac",
 		xLabel: "Number of Samples Sequenced",
 		yLabel: "Panels",
 		colours: ["#e34a33", "#2ca25f"],
-		data: Object.keys(panels).map(function(panel) { return {
-            name: panel,
-			labels: ["Fail", "Pass"],
-			values: [panels[panel].fail.length, panels[panel].pass.length]
-		}}),
+		data: Object.keys(panels).map(function(panel) {
+		    return {
+				name: panel,
+				labels: ["Fail", "Pass"],
+				values: [panels[panel].fail.length, panels[panel].pass.length]
+			}
+		}),
         margin: { top: 70, right: 70, bottom: 50, left: 200 }
-    }).columnChart();
+    }).barGraph();
 
 
     var controls = panels.Pathology_hyb_CCP_2.control || [];
@@ -188,7 +208,7 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 
         var promise = new Promise(function(resolve, reject){
 			d3.tsv(`/data/qc/${id}.tsv`).then(function(sample){
-                console.log("lol hey", id);
+//                console.log("lol hey", id);
 //			console.log(sample);
 
                 var blob = {
@@ -228,7 +248,7 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 	});
 
     Promise.all(promises).then(function(d){
-        console.log(d);
+//        console.log(d);
         CCP.samples = d;
         var rois = Object.keys(d[0].rois);
 
@@ -243,8 +263,8 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 
 		});
 
-        console.log("hey");
-        console.log(CCP.average["FGF14:13:103053804-103054044"]);
+//        console.log("hey");
+//        console.log(CCP.average["FGF14:13:103053804-103054044"]);
 
 //        console.log(CCP);
 
@@ -253,7 +273,7 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 
 	}).then(function(d){
 
-	    console.log("ok, we're here, with this data", d);
+//	    console.log("ok, we're here, with this data", d);
 
 //        var chart = new Chart({
 //            element: "chart",

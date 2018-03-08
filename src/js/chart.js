@@ -113,19 +113,131 @@ class Chart {
         }
     }
 
+    lineChart() {
+        console.log("Drawing line chart", this.data);
+
+        var all = {
+
+        };
+        this.data.forEach(function(sample){
+            sample.values.forEach(function(d){
+                all[d] = all[d] || 0;
+                all[d]++;
+            });
+        });
+
+        var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
+
+        console.log("here is all", all);
+        console.log("count", Object.keys(all).length);
+        var data = Object.keys(all).map(function(date){
+            var parsedDate = parseTime(date);
+            return {
+                rawDate: date,
+                date: parsedDate,
+                week: d3.timeWeek(parsedDate),
+                month: d3.timeMonth(parsedDate),
+                value: all[date]
+            }
+        });
+
+        data = data.sort((a,b) => a.date - b.date);
+
+        console.log(data);
+
+        // set the ranges
+        var x = d3.scaleTime().range([0, this.innerWidth]);
+        var y = d3.scaleLinear().range([this.innerHeight, 0]);
+
+        // define the line
+        var valueline = d3.line()
+            // .curve(d3.curveBasis)
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.value); });
+
+        // Scale the range of the data
+        x.domain(d3.extent(data, function(d) { return d.date; }));
+        y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+        console.log("Date extent...",d3.extent(data, function(d) { return d.date; }));
+
+        console.log("this is...", this);
+        var months = {};
+        var weeks = {};
+
+        data.forEach(function(point){
+            months[point.month] = months[point.month] || {
+                rawDate: point.rawDate,
+                value: 0
+            };
+            months[point.month].value += point.value;
+
+            weeks[point.week] = weeks[point.week] || {
+                rawDate: point.rawDate,
+                value: 0
+            };
+            weeks[point.week].value += point.value;
+        });
+
+        months = Object.keys(months).map(function(month){
+            return {
+                month: parseTime(months[month].rawDate),
+                value: months[month].value
+            }
+        });
+
+        weeks = Object.keys(weeks).map(function(week){
+            return {
+                week: parseTime(weeks[week].rawDate),
+                value: weeks[week].value
+            }
+        });
+
+        // Add the valueline path.
+        // this.plot.append("path")
+        //     .data([data])
+        //     .attr("class", "line")
+        //     .attr("d", valueline);
+        //
+        // y.domain([0, d3.max(weeks, function(d) { return d.value; })]);
+        // this.plot.append("path")
+        //     .data([weeks])
+        //     .attr("class", "line")
+        //     .style("stroke", "red")
+        //     .attr("d", valueline.x(function(d) { return x(d.week); }));
+
+        y.domain([0, d3.max(months, function(d) { return d.value; })]);
+        this.plot.append("path")
+            .data([months])
+            .attr("class", "line")
+            .style("stroke", "green")
+            .attr("d", valueline.x(function(d) { return x(d.month); }));
+
+
+
+        this.plot.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(0," + this.innerHeight + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the Y Axis
+        this.plot.append("g")
+            .attr("class", "axis")
+            .call(d3.axisLeft(y));
+
+    }
+
+
+
     /*
-     * This chart expects:
-     * [{
-     *   column title:
-     * }]
+     *
      */
-    columnChart(d) {
-        console.log("this is d", d);
-        console.log("this is the data", this.data);
+    barGraph() {
+        // console.log("Drawing bar graph", this.data);
 
         var values = [];
-        this.data.forEach(function(column){
-            values = values.concat(column.values);
+        this.data.forEach(function(bar){
+            values = values.concat(bar.values);
         });
 
 
