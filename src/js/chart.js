@@ -76,6 +76,8 @@ class Chart {
             .append("span")
             .classed("expander", true)
             .append("i").classed("fa fa-lg fa-expand", true);
+
+        $(`#${this.element}`).dblclick(() => this.toggleFullscreen());
     }
 
     toggleFullscreen(chart) {
@@ -119,10 +121,20 @@ class Chart {
         var all = {
 
         };
+
+        var samples = {};
+
         this.data.forEach(function(sample){
+            // console.log(`First pass of: ${sample}`)
+            var sampleName = sample.name;
+            samples[sampleName] = {};
+
             sample.values.forEach(function(d){
                 all[d] = all[d] || 0;
                 all[d]++;
+
+                samples[sampleName][d] = samples[sampleName][d] || 0;
+                samples[sampleName][d]++;
             });
         });
 
@@ -141,9 +153,28 @@ class Chart {
             }
         });
 
-        data = data.sort((a,b) => a.date - b.date);
+        console.log(samples);
+        var sampleData = {};
 
-        console.log(data);
+        Object.keys(samples).forEach(function(sample){
+            console.log(`analysing... ${sample}`);
+            sampleData[sample] = [];
+
+            sampleData[sample] = Object.keys(samples[sample]).map(function(something){
+                console.log(something);
+
+                return {
+                    rawDate: something,
+                    date: d3.timeMonth(parseTime(something)),
+                    value: samples[sample][something]
+                }
+            }).sort((a,b) => a.date - b.date);
+
+        });
+
+        console.log(sampleData);
+
+        data = data.sort((a,b) => a.date - b.date);
 
         // set the ranges
         var x = d3.scaleTime().range([0, this.innerWidth]);
@@ -210,8 +241,43 @@ class Chart {
         this.plot.append("path")
             .data([months])
             .attr("class", "line")
-            .style("stroke", "green")
+            .style("stroke", "black")
             .attr("d", valueline.x(function(d) { return x(d.month); }));
+
+
+        var that = this;
+
+        console.log("Here is our sample data", sampleData);
+
+        Object.keys(sampleData).forEach(function(sample, i){
+            console.log("doing sample...", sample);
+            var data = {};
+
+            sampleData[sample].forEach(function(point){
+                data[point.date] = data[point.date] || {
+                    rawDate: point.rawDate,
+                    value: 0
+                };
+                data[point.date].value += point.value;
+            });
+            console.log(data);
+
+            data = Object.keys(data).map(function(date){
+                return {
+                    date: parseTime(data[date].rawDate),
+                    value: data[date].value
+                }
+            });
+
+            console.log(data);
+
+            that.plot.append("path")
+                .data([data])
+                .attr("class", "line")
+                .style("stroke", that.colours[i])
+                .attr("d", valueline.x(function(d) { return x(d.date); }));
+        });
+
 
 
 
