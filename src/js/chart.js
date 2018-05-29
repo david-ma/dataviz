@@ -440,18 +440,21 @@ class Chart {
             .each(function(d){
                 var bar = d3.select(this);
 
-                bar.on('mouseover', function(d){
-                        d.values.forEach(function(data, i){
-                            legend.select(`.legend-label-${i}`)
-                                .text(data);
-                        });
-                    }).on('mouseout', function(d){
-                        legend.selectAll(`.legend-label`).text("");
-                    });
+                // bar.on('mouseover', function(d){
+                //         d.values.forEach(function(data, i){
+                //             legend.select(`.legend-label-${i}`)
+                //                 .text(data);
+                //         });
+                //     }).on('mouseout', function(d){
+                //         legend.selectAll(`.legend-label`).text("");
+                //     });
 
                 d.values.forEach(function(data, i){
                     bar.append("rect")
                         .attrs({
+                            'data-toggle': "tooltip",
+                            'data-placement': "top",
+                            title: `${d.values[i]} Square Meters per $1,000,000 USD`,
                             fill: that.colours[i],
                             x: that.xScale(d.values[i-1]) || 0,
                             y: that.yBand(d.name),
@@ -460,6 +463,9 @@ class Chart {
                         });
                 });
             });
+
+        $(".bar rect").tooltip();
+
     }
 
 }
