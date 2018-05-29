@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Title</title>
+	<link rel="stylesheet" href="/css/main.css">
+
+
+<style>
+
+body {
+	/*background: url("/images/unsplash.jpg") no-repeat bottom;*/
+	background-size: cover;
+	background-attachment: fixed;
+}
+
+/*.containerfluid {*/
+	/*height: 100%;*/
+	/*padding-bottom: 150px;*/
+	/*background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0));*/
+/*}*/
+
+.message {
+	/*color: white;*/
+	/*position: relative;*/
+	/*padding-top: 15%;*/
+}
+
+.outlined-border {
+	border: solid 5px black;
+	padding: 5px;
+}
+table {
+	border: 1px solid grey;
+	padding: 5px;
+	width: 100%;
+}
+td {
+	padding: 0 5px !important;
+}
+
+td:last-child {
+	text-align: right;
+}
+h2 {
+	font-family: Courier New;
+	font-size: 16px;
+	margin: 0 0 3px 0;
+}
+
+.place {
+	font-family: "Droid Serif", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	weight: 900;
+}
+.camera {
+}
+.date {
+	font-size: 14px;
+}
+
+.footer {
+	margin-top: 30px;
+	/*padding: 0 15px;*/
+	/*position: absolute;*/
+	/*bottom: 0;*/
+}
+
+/*@media print {*/
+	/*.thing {*/
+		/*page-break-after: always !important;*/
+		/*page-break-inside: avoid !important;*/
+		/*page-break-before: always !important;*/
+	/*}*/
+/*}*/
+
+</style>
+
+</head>
+<body>
+
+	<script src="/js/vendor.min.js"></script>
+	<script src="/js/scripts.min.js"></script>
+	<script src="https://d3js.org/d3-array.v1.min.js"></script>
+	<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+
+
+<script>
+	var body = d3.select("body").append("div").classed("containerfluid", true);
+
+
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    var id = getParameterByName("thing") || 0;
+
+
+	d3.csv("/data/gallery.csv", function(d, i){
+	    if(true || id == i) {
+            console.log(d);
+
+            var div = body
+                .append("div")
+                .attr("id", "thing-" + i)
+                .classed("thing row", true)
+                .append("div")
+                .styles({
+                    "page-break-inside": "avoid"
+//				height: "1000px",
+//				float: 'left'
+                })
+                .classed("outlined-border", true)
+                .classed("col-xs-7", true)
+                .styles({
+                    margin: "15px"
+                });
+
+            div.append("h1").text(d.Name).style("margin-top", "10px");
+            div.append("p").html(d.Notes.replace(/\n/g, "<br>"));
+
+            var row = div.append("div")
+                .classed("footer", true)
+                .classed("row", true);
+
+            var left = row.append("div").classed("col-xs-6", true);
+            left.append("h2").text(d.Place)
+                .classed("place", true);
+
+            left.append("h2").text(d.Date)
+                .classed("date", true);
+
+            left.append("h2").text(d.Camera)
+                .classed("camera", true);
+
+            var right = row.append("div").classed("col-xs-6", true);
+//        right.append('h3').text('Framed: $'+d.Price);
+//        right.append('h3').text('Unframed: $'+(d.Price-100));
+//        right.append('h3').text('Small Framed: $'+ (parseInt(100)+parseInt(d.Price/5)));
+//        right.append('h3').text('Small Unframed: $'+d.Price/5);
+
+//		right.append("p").text("Prices");
+
+            var table = right.append('table');
+
+            var tr = table.append("tr");
+            tr.append("td").text("Large Framed");
+            tr.append("td").text("$" + d.Price);
+
+            tr = table.append("tr");
+            tr.append("td").text("Large Unframed");
+            tr.append("td").text("$" + (d.Price - 100));
+
+            tr = table.append("tr");
+            tr.append("td").text("Small Framed");
+            tr.append("td").text("$" + (parseInt(100) + parseInt(d.Price / 5)));
+
+            tr = table.append("tr");
+            tr.append("td").text("Small Unframed");
+            tr.append("td").text("$" + d.Price / 5);
+
+            div.append("p").text("Large prints are limited to an edition of 5. There will be unlimited reprints available in the small size.");
+
+
+//        body.append("p")
+//            .html("&nbsp;")
+//			.styles({
+//				"page-break-before": "always"
+//			});
+
+
+//                <p style="page-break-before: always">&nbsp;</p>
+        }
+	})
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -299,7 +299,7 @@ class Chart {
      *
      */
     barGraph() {
-        // console.log("Drawing bar graph", this.data);
+        console.log("Drawing bar graph", this.data);
 
         var values = [];
         this.data.forEach(function(bar){
@@ -463,6 +463,16 @@ class Chart {
 }
 
 
+
+
+function average( array ) {
+    try {
+        return parseFloat(array.reduce((a, b) => parseFloat(a) + parseFloat(b)) / array.length);
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+}
 
 
 

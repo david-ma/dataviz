@@ -2,7 +2,6 @@ var http = require("http");
 
 exports.config = {
 	data: true,
-	domains: ["www.yourwebsite.com"],
 	services: {
 		"curl": function(incomingResponse, incomingRequest, db, type) {
 
