@@ -101,48 +101,32 @@
 
 <script>
 
-var panels = {};
-
 console.log(d3.version);
-
-//d3.tsv("/data/qc/seq_samples.tsv", function(d){
-//	if(d) {
-//	    panels[d.panel] = panels[d.panel] || { pass: [], fail: [] };
-//
-//	    if(d.passfail_flag == "1") {
-//            panels[d.panel].pass.push(d);
-//		} else {
-//            panels[d.panel].fail.push(d);
-//		}
-//	}
-//});
-
-//var CCP;
-var charts = {};
 
 d3.csv("/data/mm/2018-05-28/real_estate_sqm_for_1m_usd.csv").then(function(d){
 
     console.log("real_estate_sqm_for_1m_usd.csv", d);
 
-    var data = d.map(function(city){return {
+    var data = d.sort((a,b) => b.square_meters - a.square_meters)
+		.map(function(city){return {
         name: city.city,
-		values: [city.square_meters],
-		labels: ["Square Meters"]
+		values: [parseInt(city.square_meters)],
+		labels: ["Square Meters per $1,000,000 USD"]
 	}});
 
-//    console.log("average", average([1,2,3,4,1,2321]));
 
-    //
 //    var treemap = d3.treemap()
 //        .tile(d3.treemapResquarify)
 //        .size([width, height])
 //        .round(true)
 //        .paddingInner(1);
 
-    new Chart({
+    var chart = new Chart({
         element: "treemap",
         title: "The world's most expensive prime property",
-        data: data
+        data: data,
+		legend: false,
+        margin: { top: 70, right: 70, bottom: 50, left: 100 }
     }).barGraph();
 //		.lineChart();
 
@@ -150,161 +134,7 @@ d3.csv("/data/mm/2018-05-28/real_estate_sqm_for_1m_usd.csv").then(function(d){
 
 
 
-    return;
-//
-//    d.forEach(function(run){
-//        panels[run.panel] = panels[run.panel] || { pass: [], fail: [], control: [], NTC: [], dates: [] };
-//        if(run.passfail_flag == "1") {
-//            panels[run.panel].pass.push(run);
-//        } else {
-//            panels[run.panel].fail.push(run);
-//        }
-//
-//        if(run.sample_type == "Control") {
-//            panels[run.panel].control.push(run);
-//		} else if(run.sample_type == "NTC") {
-//            panels[run.panel].NTC.push(run);
-//		}
-//
-//        panels[run.panel].dates.push(run.run_date)
-//	});
-//
-//    console.log("Panels:", panels);
-//
-//
-//    charts.seqSamples = new Chart({
-//		element: "seqSamples-chart",
-//		title: "SeqSamples vs time",
-//		data: Object.keys(panels).map(function(panel){
-//		    return {
-//		        name: panel,
-//				values: panels[panel].dates
-//			}
-//		})
-//	}).lineChart();
-//
-//	charts.panels = new Chart({
-//        element: "panels-chart",
-//        title: "Hybrid Capture Panels at Peter Mac",
-//		xLabel: "Number of Samples Sequenced",
-//		yLabel: "Panels",
-//		colours: ["#e34a33", "#2ca25f"],
-//		data: Object.keys(panels).map(function(panel) {
-//		    return {
-//				name: panel,
-//				labels: ["Fail", "Pass"],
-//				values: [panels[panel].fail.length, panels[panel].pass.length]
-//			}
-//		}),
-//        margin: { top: 70, right: 70, bottom: 50, left: 200 }
-//    }).barGraph();
-//
-//
-//    var controls = panels.Pathology_hyb_CCP_2.control || [];
-//
-//    CCP = {
-//        average: {},
-//		samples: []
-//	};
-//
-//
-//
-//	var promises = [];
-//
-//    controls.forEach(function(d){
-//        var id = `${d.seqrun}-${d.sample_name}`;
-//
-//        var promise = new Promise(function(resolve, reject){
-//			d3.tsv(`/data/qc/${id}.tsv`).then(function(sample){
-////                console.log("lol hey", id);
-////			console.log(sample);
-//
-//                var blob = {
-//                    id: id,
-//                    rois: {}
-//                };
-//
-//                sample.forEach(function(roi){
-////                CCP.average[roi.Region] = CCP.average[roi.Region] || { min: [], max: [], mean: [] };
-//
-//                    if(roi["Mean coverage"]) {
-//                        blob.rois[roi.Region] = {
-//                            mean: parseFloat(roi["Mean coverage"])
-//                        };
-//
-//                        if(roi["Max Coverage"]) {
-//                            blob.rois[roi.Region].max = parseFloat(roi["Max Coverage"]);
-//                        }
-//
-//                        if(roi["Min Coverage"]) {
-//                            blob.rois[roi.Region].min = parseFloat(roi["Min Coverage"]);
-//                        }
-//
-//                    } else {
-//                        console.warn("No mean coverage..? ", blob);
-//                    }
-//                });
-//
-//                CCP.samples.push(blob);
-//                resolve(blob);
-//
-//            }).catch((d) => reject(d));
-//        });
-//
-//
-//        promises.push(promise);
-//	});
-//
-//    Promise.all(promises).then(function(d){
-////        console.log(d);
-//        CCP.samples = d;
-//        var rois = Object.keys(d[0].rois);
-//
-//
-//
-//		rois.forEach(function (roi) {
-//			CCP.average[roi] = {
-//				mean: average(d.map((sample) => sample.rois[roi].mean).filter(d => typeof d === "number"), roi),
-//				max: average(d.map((sample) => sample.rois[roi].max).filter(d => typeof d === "number")),
-//				min: average(d.map((sample) => sample.rois[roi].min).filter(d => typeof d === "number"))
-//			};
-//
-//		});
-//
-////        console.log("hey");
-////        console.log(CCP.average["FGF14:13:103053804-103054044"]);
-//
-////        console.log(CCP);
-//
-//
-//
-//
-//	})
-//		.then(function(d){
-//
-////	    console.log("ok, we're here, with this data", d);
-//
-////        var chart = new Chart({
-////            element: "chart",
-////            title: "Who made the most on medicine exports in 2016?"
-////        });
-//
-//    });
-
-
-    //
-//    console.log("CCP: ", CCP);
-//
-//     Calculate average
-//	if(CCP.samples[0]) {
-//	    Object.keys(CCP.samples[0]).forEach(function(roi){
-//	        console.log(roi);
-//		});
-//	} else {
-//	    console.log("what?");
-//	    console.log(CCP.samples[0]);
-//	}
-//
+    return chart;
 });
 
 
@@ -321,80 +151,8 @@ d3.csv("/data/mm/2018-05-28/real_estate_sqm_for_1m_usd.csv").then(function(d){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

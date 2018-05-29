@@ -150,7 +150,7 @@ class Chart {
                 week: d3.timeWeek(parsedDate),
                 month: d3.timeMonth(parsedDate),
                 value: all[date]
-            }
+            };
         });
 
         console.log(samples);
@@ -221,7 +221,7 @@ class Chart {
             return {
                 week: parseTime(weeks[week].rawDate),
                 value: weeks[week].value
-            }
+            };
         });
 
         // Add the valueline path.
@@ -316,6 +316,8 @@ class Chart {
     }
 
     createScales( values ) {
+        console.log("values for scales", values);
+
         // We set the domain to zero to make sure our bars
         // always start at zero. We don't want to truncate.
         this.xScale = d3.scaleLinear()
@@ -390,11 +392,11 @@ class Chart {
 
         var legend = that.plot.append("g")
             .classed("legend", true)
-            .attr("transform", `translate(${this.innerWidth - 200},0)`);
+            .attr("transform", `translate(${this.innerWidth - 270},0)`);
 
         legend.append("rect").attrs({
             height: "100px",
-            width: "200px",
+            width: "270px",
             fill: "white",
             stroke: "grey"
         });
@@ -407,12 +409,12 @@ class Chart {
 
         this.data[0].labels.forEach(function(label, i){
             legend.append("rect").attrs({
-                    x: 20,
-                    y: 38 + 30 * i,
-                    width: 15,
-                    height: 15,
-                    fill: that.colours[i]
-                });
+                x: 20,
+                y: 38 + 30 * i,
+                width: 15,
+                height: 15,
+                fill: that.colours[i]
+            });
 
             legend.append("text")
                 .text(label)
