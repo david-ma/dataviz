@@ -438,7 +438,7 @@ class Chart {
             .enter()
             .append("g").classed("bar", true)
             .each(function(d){
-                var bar = d3.select(this);
+                let bar = d3.select(this);
 
                 // bar.on('mouseover', function(d){
                 //         d.values.forEach(function(data, i){
@@ -450,17 +450,23 @@ class Chart {
                 //     });
 
                 d.values.forEach(function(data, i){
+                    let text = `${d.values[i]} m\u00B2`;
                     bar.append("rect")
                         .attrs({
                             'data-toggle': "tooltip",
                             'data-placement': "top",
-                            title: `${d.values[i]} Square Meters per $1,000,000 USD`,
+                            title: text,
                             fill: that.colours[i],
                             x: that.xScale(d.values[i-1]) || 0,
                             y: that.yBand(d.name),
                             width: that.xScale(d.values[i]),
                             height: that.yBand.bandwidth()
                         });
+                    bar.append("text")
+                        .attrs({
+                            x: (that.xScale(d.values[i])) + 3,
+                            y: (that.yBand(d.name) + (that.yBand.bandwidth() / 2)) + 3,
+                        }).text(text);
                 });
             });
 
