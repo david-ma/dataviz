@@ -485,12 +485,15 @@ class Chart {
             color = d3.scaleOrdinal(d3.schemeCategory20.map(fader)),
             format = d3.format(",d");
 
+        console.log("this data is....", this.data);
+
         let data = {
             "name": "cluster",
             "children": this.data.map(function (d) {
                 return {
                     name: d.name,
-                    size: parseInt(d.values[0])
+                    size: parseInt(d.values[0]),
+                    blob: d.blob
                 };
             })
         };
@@ -515,10 +518,26 @@ class Chart {
             .attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; });
 
         cell.append("rect")
-            .attr("id", function(d) { return d.data.id; })
-            .attr("width", function(d) { return d.x1 - d.x0; })
-            .attr("height", function(d) { return d.y1 - d.y0; })
+            .attr("id", (d) => `rect-${d.data.id}` )
+            .attr("width", (d) => d.x1 - d.x0)
+            .attr("height", (d) => d.y1 - d.y0)
             .attr("fill", function(d) { return color(d.parent.data.id); });
+
+        cell.append("image")
+            .attr("id", (d) => `image-${d.data.id}` )
+            // .attr("width", (d) => Math.max(d.x1 - d.x0, d.y1 - d.y0))
+            // .attr("height", (d) => Math.max(d.x1 - d.x0, d.y1 - d.y0))
+            .attrs({
+                x: 3,
+                y: 3
+            })
+            .attr("width", (d) => d.x1 - d.x0 - 6)
+            .attr("height", (d) => d.y1 - d.y0 - 6)
+            .attr("preserveAspectRatio", "xMidYMid slice")
+            // .attr("meetOrSlice", "meet")
+            .attr("xlink:href", (d) => `/data/mm/2018-05-28/photos/${d.data.blob.photo}`);
+            // .attr("fill", function(d) { return color(d.parent.data.id); });
+
 
         cell.append("clipPath")
             .attr("id", function(d) { return "clip-" + d.data.id; })
@@ -574,7 +593,6 @@ function sumBySize(d) {
     return d.size;
 }
 
-
 function average( array ) {
     try {
         return parseFloat(array.reduce((a, b) => parseFloat(a) + parseFloat(b)) / array.length);
@@ -583,10 +601,6 @@ function average( array ) {
         return null;
     }
 }
-
-
-
-
 
 
 
