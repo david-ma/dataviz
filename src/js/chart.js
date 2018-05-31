@@ -526,11 +526,11 @@ class Chart {
                 const row = d3.select(this);
 
                 row.on("mouseover", function(){
-                    console.log("hello!");
+                    // console.log("hello!");
                     d3.select(`#circle-${camelize(d.name)}`)
-                        .attr("fill", d3.schemeCategory20[i]);
+                        .attr("fill", d3.schemeCategory10[i % 10]);
                 }).on("mouseout", function(){
-                    console.log("hello!");
+                    // console.log("hello!");
                     d3.select(`#circle-${camelize(d.name)}`)
                         .attr("fill", "rgba(0,0,0,0.05)");
                 });
@@ -541,7 +541,7 @@ class Chart {
                         width: 200,
                         height: blockHeight,
                         stroke: 'black',
-                        fill: d3.schemeCategory20[i]
+                        fill: d3.schemeCategory10[i % 10]
                         // fill: `rgba(${i*2},${255 - i*12},${i*12},0.5)`
                         // x: 10,
                         // y: 15
@@ -602,7 +602,7 @@ class Chart {
             svg = this.plot;
 
         let fader = function(color) { return d3.interpolateRgb(color, "#fff")(0.2); },
-            color = d3.scaleOrdinal(d3.schemeCategory20.map(fader)),
+            color = d3.scaleOrdinal(d3.schemeCategory10.map(fader)),
             format = d3.format(",d");
 
         console.log("this data is....", this.data);
