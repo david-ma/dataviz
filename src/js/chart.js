@@ -522,7 +522,7 @@ class Chart {
             .append("g")
             .attr("transform", (d, i) => `translate(0, ${i * blockHeight})`)
             .each(function(d, i){
-                console.log(d);
+                // console.log(d);
                 const row = d3.select(this);
 
                 row.on("mouseover", function(){
@@ -563,21 +563,118 @@ class Chart {
                         "text-anchor": "end"
                     });
 
+                // console.log("doing stuff...", d);
+
+            });
+
+        return this;
+    }
+
+    squares() {
+        let width = this.innerWidth,
+            height = this.innerHeight,
+            svg = this.plot;
+
+        console.log("Drawing squares...", this.data);
+
+        const x = width * 1 / 3,
+              y = height * 0.05,
+              edge = height * 0.9;
+
+        const ratio = edge / Math.sqrt(173);
+        const blockHeight = edge / 20;
+
+        svg.append("g").selectAll('circle')
+            .data(this.data)
+            .enter()
+            .append("rect")
+            .attrs({
+                id: (d) => `square-${camelize(d.name)}`,
+                stroke: "black",
+                fill: "rgba(0,0,0,0.05)",
+                x: x,
+                y: y,
+                height: (d) => ratio * Math.sqrt(d.values[0]),
+                width: (d) => ratio * Math.sqrt(d.values[0])
+                // cx: x,
+                // cy: (d) => y + radius - ratio * Math.sqrt(d.values[0]),
+                // r: (d) => ratio * Math.sqrt(d.values[0])
+            });
+
+        let table = svg.append("g")
+            .attr("transform", `translate(${this.innerHeight * 0.05} ${this.innerHeight * 0.05})`);
+
+        table.append('rect').attrs({
+            x: 0,
+            y: 0,
+            height: edge,
+            width: 200,
+            fill: 'lightgrey',
+            stroke: 'black'
+        });
+
+        table.selectAll(".row")
+            .data(this.data)
+            .enter()
+            .append("g")
+            .attr("transform", (d, i) => `translate(0, ${i * blockHeight})`)
+            .each(function(d, i){
+                // console.log(d);
+                const row = d3.select(this);
+
+                row.on("mouseover", function(){
+                    // console.log("hello!");
+                    d3.select(`#square-${camelize(d.name)}`)
+                        .attr("fill", d3.schemeCategory10[i % 10]);
+                }).on("mouseout", function(){
+                    // console.log("hello!");
+                    d3.select(`#square-${camelize(d.name)}`)
+                        .attr("fill", "rgba(0,0,0,0.05)");
+                });
+
+                row.append("rect")
+                    // .text(d.name)
+                    .attrs({
+                        width: 200,
+                        height: blockHeight,
+                        stroke: 'black',
+                        fill: d3.schemeCategory10[i % 10]
+                        // fill: `rgba(${i*2},${255 - i*12},${i*12},0.5)`
+                        // x: 10,
+                        // y: 15
+                    });
+
+                row.append("text")
+                    .text(d.name)
+                    .attrs({
+                        x: 10,
+                        y: 15
+                    });
+
+                row.append("text")
+                    .text(`${d.values[0]} m\u00B2`)
+                    .attrs({
+                        x: 190,
+                        y: 15
+                    }).styles({
+                    "text-anchor": "end"
+                });
+
                 console.log("doing stuff...", d);
 
             });
-            // .append("rect")
-            // .attrs({
-            //     id: (d) => `table-${camelize(d.name)}`
-            //
-            //
-            //
-            //     // stroke: "black",
-            //     // fill: "rgba(0,0,0,0.05)",
-            //     // cx: x,
-            //     // cy: (d) => y + radius - ratio * d.values[0],
-            //     // r: (d) => ratio * d.values[0]
-            // });
+        // .append("rect")
+        // .attrs({
+        //     id: (d) => `table-${camelize(d.name)}`
+        //
+        //
+        //
+        //     // stroke: "black",
+        //     // fill: "rgba(0,0,0,0.05)",
+        //     // cx: x,
+        //     // cy: (d) => y + radius - ratio * d.values[0],
+        //     // r: (d) => ratio * d.values[0]
+        // });
 
         //
         // svg.append("circle")
