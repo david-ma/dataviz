@@ -189,10 +189,10 @@ class Chart {
 
 console.log(data);
         // Add the valueline path.
-        this.plot.append("path")
-            .data([data])
-            .attr("class", "line")
-            .attr("d", valueline);
+        // this.plot.append("path")
+        //     .data([data])
+        //     .attr("class", "line")
+        //     .attr("d", valueline);
 
         //
         // y.domain([0, d3.max(weeks, function(d) { return d.value; })]);
@@ -213,33 +213,35 @@ console.log(data);
         // var that = this;
 
         // console.log("Here is our sample data", sampleData);
+        var that = this;
 
-        // Object.keys(authors).forEach(function(author, i){
-        //
-        //     var data = {};
-        //
-        //     authors[author].forEach(function(commit){
-        //         data[commit.date] = data[commit.date] || {
-        //             rawDate: point.rawDate,
-        //             value: 0
-        //         };
-        //         data[point.date].value += point.value;
-        //     });
-        //     console.log(data);
-        //
-        //     data = Object.keys(data).map(function(date){
-        //         return {
-        //             date: date, //parseTime(data[date].rawDate),
-        //             value: data[date].value
-        //         };
-        //     });
-        //
-        //     that.plot.append("path")
-        //         .data([data])
-        //         .attr("class", "line")
-        //         .style("stroke", that.colours[i])
-        //         .attr("d", valueline.x(function(d) { return x(d.date); }));
-        // });
+        Object.keys(authors).forEach(function(author, i){
+
+            var data = {};
+
+            authors[author].forEach(function(commit){
+                data[commit.x] = data[commit.x] || {
+                    date: commit.x,
+                    value: 0
+                };
+                data[commit.x].value++;
+                // data[commit.x].value += commit.value;
+            });
+            console.log(data);
+
+            data = Object.keys(data).map(function(date){
+                return {
+                    date: data[date].date,
+                    value: data[date].value
+                };
+            });
+
+            that.plot.append("path")
+                .data([data])
+                .attr("class", "line")
+                .style("stroke", that.colours[i])
+                .attr("d", valueline.x(function(d) { return x(d.date); }));
+        });
 
         this.plot.append("g")
             .attr("class", "axis")
