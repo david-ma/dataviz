@@ -578,7 +578,7 @@ class Chart {
         console.log("Drawing squares...", this.data);
 
         const x = width * 1 / 3,
-              y = height * 0.05,
+              y = height * 0.95,
               edge = height * 0.9;
 
         const ratio = edge / Math.sqrt(173);
@@ -593,7 +593,7 @@ class Chart {
                 stroke: "black",
                 fill: "rgba(0,0,0,0.05)",
                 x: x,
-                y: y,
+                y: (d) => y - ( ratio * Math.sqrt(d.values[0])),
                 height: (d) => ratio * Math.sqrt(d.values[0]),
                 width: (d) => ratio * Math.sqrt(d.values[0])
                 // cx: x,
@@ -660,7 +660,7 @@ class Chart {
                     "text-anchor": "end"
                 });
 
-                console.log("doing stuff...", d);
+                // console.log("doing stuff...", d);
 
             });
         // .append("rect")
@@ -723,11 +723,13 @@ class Chart {
 
 
         var root = d3.hierarchy(data)
-            .eachBefore(function(d) { d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name; })
+            .eachBefore(function(d) { d.data.id = (d.parent ? d.parent.data.id + "." : "") + camelize(d.data.name); })
             .sum(sumBySize)
             .sort(function(a, b) { return b.height - a.height || b.value - a.value; });
 
         treemap(root);
+
+        console.log("Root leaves are..?", root.leaves());
 
         var cell = svg.selectAll("g")
             .data(root.leaves())
