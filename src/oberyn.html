@@ -88,12 +88,12 @@
 </header>
 
 <div class="container page">
-	<h1>Venn digram</h1>
+	<!--<h1>Venn digram</h1>-->
 	<div class="row">
-		<div class="col-xs-12 col-sm-2">
-			<p>Diagram description goes here?</p>
-		</div>
-		<div class="col-xs-12 col-sm-10" id="venn"></div>
+		<!--<div class="col-xs-12 col-sm-2">-->
+			<!--<p>Diagram description goes here?</p>-->
+		<!--</div>-->
+		<div class="col-xs-12 col-sm-12" id="venn"></div>
 	</div>
 </div>
 
@@ -181,8 +181,13 @@
 			title: "Venn Diagram",
 			data: data,
 			legend: false,
-            margin: { top: 70, right: 70, bottom: 50, left: 100 }
-		}).venn();
+            margin: { top: 70, right: 70, bottom: 50, left: 70 }
+		}).venn({
+			leftKey: "hash",
+			left: "Issues committed",
+			rightKey: "reporter",
+			right: "Jira Issues"
+		});
 	}
 
 </script>

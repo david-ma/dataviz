@@ -800,6 +800,113 @@ class Chart {
 
     }
 
+    venn(options) {
+        const svg = this.plot,
+              data = this.data,
+              width = this.innerWidth,
+              height = this.innerHeight;
+
+        const radius = height * 0.4,
+              midpoint = height * 0.45;
+
+        const leftCenter = width/3,
+            rightCenter = leftCenter * 2;
+
+
+        const left = svg.append("circle")
+            .attrs({
+                cx: leftCenter,
+                cy: midpoint,
+                r: radius,
+                fill: "rgba(100,255,232,0.5)"
+            });
+
+        const right = svg.append("circle")
+            .attrs({
+                cx: rightCenter,
+                cy: midpoint,
+                r: radius,
+                fill: "rgba(255,100,232,0.5)"
+            });
+
+        svg.append("text")
+            .text(options.left)
+            .attrs({
+                x: leftCenter,
+                y: height * 0.9
+            }).styles({
+               'text-anchor': 'middle',
+                'font-size': '24px'
+            });
+
+        svg.append("text")
+            .text(options.right)
+            .attrs({
+                x: rightCenter,
+                y: height * 0.9
+            }).styles({
+                'text-anchor': 'middle',
+                'font-size': '24px'
+            });
+
+        const results = {
+            left: [],
+            both: [],
+            right: []
+        };
+
+        Object.keys(data).forEach(function (key) {
+            if(data[key][options.rightKey]) {
+                if(data[key].hash) {
+                    results.both.push(data[key]);
+                } else {
+                    results.right.push(data[key]);
+                }
+            } else {
+                if(data[key][options.leftKey]) {
+                    results.left.push(data[key]);
+                } else {
+                    console.error(data[key]);
+                    alert("What the hell, this isn't possible", data[key]);
+                }
+            }
+        });
+
+        svg.append("text")
+            .text(results.left.length)
+            .attrs({
+                x: leftCenter - 30,
+                y: midpoint
+            }).styles({
+                'text-anchor': 'middle',
+                'font-size': '36px'
+            });
+
+        svg.append("text")
+            .text(results.both.length)
+            .attrs({
+                x: width/2,
+                y: midpoint
+            }).styles({
+                'text-anchor': 'middle',
+                'font-size': '36px'
+            });
+
+
+        svg.append("text")
+            .text(results.right.length)
+            .attrs({
+                x: rightCenter + 30,
+                y: midpoint
+            }).styles({
+                'text-anchor': 'middle',
+                'font-size': '36px'
+            });
+
+        console.log(results);
+
+    }
+
 }
 
 
