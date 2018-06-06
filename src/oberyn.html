@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Oberyn issues</title>
+
+	<link rel="stylesheet" href="/css/main.css">
+	<link rel="stylesheet" href="/css/chart.css">
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+
+	<style>
+		html {
+			font-size: 16px;
+		}
+		body {
+			background-color: #eee;
+		}
+
+		.page {
+			background-color: #fff;
+			min-height: 100vh;
+		}
+
+		header {
+			/*display: none;*/
+			width: 100%;
+			height: 200px;
+			background: #333e52;
+		}
+		header .blur_background {
+			height: inherit;
+			width: 100%;
+			position: absolute;
+			background: url("/images/unsplash.jpg");
+			background-size: cover;
+			background-position: 50% 60%;
+		}
+		footer {
+			/*display: none;*/
+			width: 100%;
+			height: 50px;
+			background: #ddd;
+		}
+
+		.mask {
+			height: 100%;
+			background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+		}
+
+		header .container {
+			padding-top: 50px;
+		}
+
+		header h1 {
+			font-size: 60px;
+			color: #eee;
+			margin: 0;
+		}
+		header h2 {
+			font-size: 30px;
+			color: #eee;
+			margin: 0;
+		}
+		.page > .row {
+			margin-bottom: 25px;
+		}
+
+	</style>
+</head>
+<body>
+<header>
+	<div class="blur_background">
+		<div class="mask"></div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<h1>Oberyn Issues</h1>
+				<h2>List of stuff that happened in oberyn</h2>
+			</div>
+		</div>
+	</div>
+</header>
+
+<div class="container page">
+	<h1>Venn digram</h1>
+	<div class="row">
+		<div class="col-xs-12 col-sm-2">
+			<p>Diagram description goes here?</p>
+		</div>
+		<div class="col-xs-12 col-sm-10" id="venn"></div>
+	</div>
+</div>
+
+<div class="container-page">
+	<table id="results">
+		<thead><tr></tr></thead>
+		<tbody></tbody>
+	</table>
+
+</div>
+
+<footer>
+	<div class="container">
+		<div class="row">
+			<p class="col-xs-6">Simple <a href="https://github.com/david-ma/Thalia">Thalia</a> Bootstrap Boilerplate</p>
+			<p class="col-xs-6 text-right">By <a href="https://twitter.com/frostickle">@Frostickle</a> <i class="fab fa-twitter" aria-hidden="true"></i></p>
+		</div>
+	</div>
+</footer>
+<script src="/js/vendor.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/chart.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+<script>
+
+    console.log(d3.version);
+
+    const columns = [
+        "key", "hash", "date", "message", "author", "type", "summary", "assignee", "reporter", "status", "resolution"
+    ];
+
+    const headerRow = d3.select("#results thead tr");
+
+    columns.forEach(function(column){
+        headerRow.append("th").text(column);
+    });
+
+
+    const data = {};
+    d3.tsv("/data/all_issues_with_commits.txt", function(row){
+        data[row.key] = data[row.key] || {};
+        Object.keys(row).forEach(function(column){
+            data[row.key][column] = row[column];
+        });
+
+    }).then(function(){
+
+        d3.tsv("/data/oberyn_jira_issues.txt", function(row){
+            data[row.key] = data[row.key] || {};
+            Object.keys(row).forEach(function(column){
+                data[row.key][column] = row[column];
+            });
+        }).then(function(){
+            doNextThing(data);
+        });
+    });
+
+
+
+    function doNextThing(data) {
+        drawVennDiagram(data);
+
+        console.log("here's your data", data);
+
+        const tbody = d3.select("#results tbody");
+
+        Object.keys(data).forEach(function(row){
+            const tr = tbody.append("tr");
+
+            columns.forEach(function(column){
+                const text = data[row][column] || "";
+                tr.append("td").text(text);
+            });
+        });
+
+
+        $("#results").DataTable();
+    }
+
+
+    function drawVennDiagram(data) {
+        const chart = new Chart({
+			element: "venn",
+			title: "Venn Diagram",
+			data: data,
+			legend: false,
+            margin: { top: 70, right: 70, bottom: 50, left: 100 }
+		}).venn();
+	}
+
+</script>
+
+
+<style>
+	#original image {
+		display: none;
+	}
+</style>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
