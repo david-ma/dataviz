@@ -9,6 +9,7 @@ class Chart {
     constructor(opts) {
 
         // Set variables...
+        this.opts = opts;
         this.element = opts.element || "chart";
         this.data = opts.data || [];
         this.title = opts.title || "";
@@ -55,7 +56,10 @@ class Chart {
                 width: this.innerWidth
             });
 
-        this.drawNav();
+        console.log(this.opts);
+        if ( this.opts.nav !== false ) {
+            this.drawNav();
+        }
 
         // Add the title
         this.svg.append('text')
@@ -115,12 +119,144 @@ class Chart {
         }
     }
 
+    cumulativeLineChart() {
+        console.log("Drawing cumulative chart", this.data);
+        const svg = this.plot,
+              data = this.data[0],
+              authors = this.data[1],
+              width = this.innerWidth,
+              height = this.innerHeight;
+
+        // set the ranges
+        const x = d3.scaleTime().range([0, width]);
+        const y = d3.scaleLinear().range([height, 0]);
+
+        // define the line
+        const valueline = d3.line()
+            // .curve(d3.curveBasis)
+            .x((d) => x(d.x))
+            .y((d) => y(d.value));
+
+        // Scale the range of the data
+        x.domain(d3.extent(data, (d) => d.x ));
+        y.domain([0, d3.max(data, (d) => d.value )]);
+
+        //
+        // Object.keys(samples).forEach(function(sample){
+        //     sampleData[sample] = [];
+        //     sampleData[sample] = Object.keys(samples[sample]).map(function(something){
+        //
+        //         return {
+        //             rawDate: something,
+        //             date: d3.timeMonth(parseTime(something)),
+        //             value: samples[sample][something]
+        //         };
+        //     }).sort((a,b) => a.date - b.date);
+        //
+        // });
+
+        // console.log("this is...", this);
+        // var months = {};
+        // var weeks = {};
+        //
+        // data.forEach(function(point){
+        //     months[point.month] = months[point.month] || {
+        //         rawDate: point.rawDate,
+        //         value: 0
+        //     };
+        //     months[point.month].value += point.value;
+        //
+        //     weeks[point.week] = weeks[point.week] || {
+        //         rawDate: point.rawDate,
+        //         value: 0
+        //     };
+        //     weeks[point.week].value += point.value;
+        // });
+
+        // months = Object.keys(months).map(function(month){
+        //     return {
+        //         month: parseTime(months[month].rawDate),
+        //         value: months[month].value
+        //     };
+        // });
+        //
+        // weeks = Object.keys(weeks).map(function(week){
+        //     return {
+        //         week: parseTime(weeks[week].rawDate),
+        //         value: weeks[week].value
+        //     };
+        // });
+
+console.log(data);
+        // Add the valueline path.
+        this.plot.append("path")
+            .data([data])
+            .attr("class", "line")
+            .attr("d", valueline);
+
+        //
+        // y.domain([0, d3.max(weeks, function(d) { return d.value; })]);
+        // this.plot.append("path")
+        //     .data([weeks])
+        //     .attr("class", "line")
+        //     .style("stroke", "red")
+        //     .attr("d", valueline.x(function(d) { return x(d.week); }));
+
+        // y.domain([0, d3.max(months, function(d) { return d.value; })]);
+        // this.plot.append("path")
+        //     .data([months])
+        //     .attr("class", "line")
+        //     .style("stroke", "black")
+        //     .attr("d", valueline.x(function(d) { return x(d.month); }));
+
+
+        // var that = this;
+
+        // console.log("Here is our sample data", sampleData);
+
+        // Object.keys(authors).forEach(function(author, i){
+        //
+        //     var data = {};
+        //
+        //     authors[author].forEach(function(commit){
+        //         data[commit.date] = data[commit.date] || {
+        //             rawDate: point.rawDate,
+        //             value: 0
+        //         };
+        //         data[point.date].value += point.value;
+        //     });
+        //     console.log(data);
+        //
+        //     data = Object.keys(data).map(function(date){
+        //         return {
+        //             date: date, //parseTime(data[date].rawDate),
+        //             value: data[date].value
+        //         };
+        //     });
+        //
+        //     that.plot.append("path")
+        //         .data([data])
+        //         .attr("class", "line")
+        //         .style("stroke", that.colours[i])
+        //         .attr("d", valueline.x(function(d) { return x(d.date); }));
+        // });
+
+        this.plot.append("g")
+            .attr("class", "axis")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x));
+
+        // Add the Y Axis
+        this.plot.append("g")
+            .attr("class", "axis")
+            .call(d3.axisLeft(y));
+
+    }
+
     lineChart() {
         console.log("Drawing line chart", this.data);
 
-        var all = {
-
-        };
+        var all = {};
 
         var samples = {};
 
@@ -157,17 +293,16 @@ class Chart {
         var sampleData = {};
 
         Object.keys(samples).forEach(function(sample){
-            console.log(`analysing... ${sample}`);
+
             sampleData[sample] = [];
 
             sampleData[sample] = Object.keys(samples[sample]).map(function(something){
-                console.log(something);
 
                 return {
                     rawDate: something,
                     date: d3.timeMonth(parseTime(something)),
                     value: samples[sample][something]
-                }
+                };
             }).sort((a,b) => a.date - b.date);
 
         });
@@ -214,7 +349,7 @@ class Chart {
             return {
                 month: parseTime(months[month].rawDate),
                 value: months[month].value
-            }
+            };
         });
 
         weeks = Object.keys(weeks).map(function(week){
@@ -266,10 +401,8 @@ class Chart {
                 return {
                     date: parseTime(data[date].rawDate),
                     value: data[date].value
-                }
+                };
             });
-
-            console.log(data);
 
             that.plot.append("path")
                 .data([data])
@@ -277,9 +410,6 @@ class Chart {
                 .style("stroke", that.colours[i])
                 .attr("d", valueline.x(function(d) { return x(d.date); }));
         });
-
-
-
 
         this.plot.append("g")
             .attr("class", "axis")

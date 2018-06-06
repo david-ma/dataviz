@@ -22,7 +22,7 @@
 
 		.page {
 			background-color: #fff;
-			min-height: 100vh;
+			/*min-height: 100vh;*/
 		}
 
 		header {
@@ -86,14 +86,15 @@
 		</div>
 	</div>
 </header>
-
 <div class="container page">
+    <br>
 	<!--<h1>Venn digram</h1>-->
 	<div class="row">
 		<!--<div class="col-xs-12 col-sm-2">-->
 			<!--<p>Diagram description goes here?</p>-->
 		<!--</div>-->
-		<div class="col-xs-12 col-sm-12" id="venn"></div>
+		<div class="col-xs-12 col-sm-6" id="venn"></div>
+		<div class="col-xs-12 col-sm-6" id="line"></div>
 	</div>
 </div>
 
@@ -156,6 +157,7 @@
 
     function doNextThing(data) {
         drawVennDiagram(data);
+        drawLineGraph(data);
 
         console.log("here's your data", data);
 
@@ -171,15 +173,33 @@
         });
 
 
-        $("#results").DataTable();
+        $("#results").DataTable({
+            paging: false,
+            columns: [
+                {"data":"key"},
+                {"data":"hash"},
+                {
+                    "data":"date",
+					"visible": false
+				},
+                {"data":"message"},
+                {"data":"author"},
+                {"data":"type"},
+                {"data":"summary"},
+                {"data":"assignee"},
+                {"data":"reporter"},
+                {"data":"status"},
+                {"data":"resolution"}
+            ]
+        });
     }
-
 
     function drawVennDiagram(data) {
         const chart = new Chart({
 			element: "venn",
 			title: "Venn Diagram",
 			data: data,
+			nav: false,
 			legend: false,
             margin: { top: 70, right: 70, bottom: 50, left: 70 }
 		}).venn({
@@ -188,7 +208,50 @@
 			rightKey: "reporter",
 			right: "Jira Issues"
 		});
+        return chart;
 	}
+
+	function drawLineGraph(data) {
+        const authors = {};
+        const parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
+//        const parseTime = d3.isoParse;
+
+//        "2018-03-21T06:46:20.000Z"
+
+        d3.tsv("/data/duplicate_issues_with_commits.txt", function(d){
+            authors[d.author] = authors[d.author] || [];
+//            d.x = d3.timeMonth(d3.timeParse(d.date));
+
+			d.iso = new Date(d.date).toISOString();
+			d.x = d3.timeMonth(parseTime(d.iso));
+
+            authors[d.author].push(d);
+//            authors[d.author]++;
+            d.value = authors[d.author].length;
+//            d.date = d3.timeParse(d.date);
+            return d;
+		}).then(function(allIssues){
+            allIssues = allIssues.sort((a,b) => new Date(b.x) - new Date(a.x));
+            Object.keys(authors).forEach(function(author){
+                authors[author] = authors[author].sort((a,b) => new Date(b.x) - new Date(a.x));
+			});
+
+//            console.log("blah???", allIssues);
+			console.log(Object.keys(authors));
+
+            const chart = new Chart({
+                element: "line",
+                title: "Line Graph",
+                data: [allIssues, authors],
+                nav: false,
+                legend: false,
+                margin: { top: 70, right: 70, bottom: 50, left: 70 }
+            }).cumulativeLineChart();
+            return chart;
+		});
+	}
+
+
 
 </script>
 
