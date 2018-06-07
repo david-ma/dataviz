@@ -69,6 +69,18 @@
 			margin-bottom: 25px;
 		}
 
+		#results tr {
+			line-height: 1em;
+		}
+		#results tr td {
+			padding: 2px;
+			font-size: 14px;
+			border: 1px solid rgba(0,0,0,0.2);
+		}
+		#results tr td:first-child {
+			white-space: nowrap;
+		}
+
 	</style>
 </head>
 <body>
@@ -118,6 +130,37 @@
 <script src="/js/bootstrap.bundle.min.js"></script>
 <script src="/js/chart.js"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script>
+    jQuery.extend( jQuery.fn.dataTableExt.oSort, {
+        "jira-pre": function ( a ) {
+//            console.log("hey");
+//			console.log(a);
+			let result = null;
+
+            const pathos = a.match(/PATHOS-(\d+)"/);
+            const other = a.match(/untagged-(\d+)"/);
+
+            if (pathos) {
+                result = 100 * parseInt(pathos[0]);
+			} else if (other) {
+                result = parseInt(other[0]);
+			}
+
+            return result;
+        },
+
+        "jira-asc": function ( a, b ) {
+            return a - b;
+//            return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+        },
+
+        "jira-desc": function ( a, b ) {
+            return b - a;
+//            return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+        }
+    } );
+</script>
+
 
 <script>
 
@@ -135,13 +178,26 @@
 
 
     const data = {};
-    d3.tsv("/data/all_issues_with_commits.txt", function(row){
+    d3.tsv("/data/all_oberyn_commits.tsv", function(row, i){
+        const regex = /(PATHOS-\d+)/;
+        let key = `untagged-${i}`;
+
+        let result = row.message.match(regex);
+
+        if(result) {
+			key = result[0];
+		}
+		row.key = key;
+
         data[row.key] = data[row.key] || {};
         Object.keys(row).forEach(function(column){
             data[row.key][column] = row[column];
         });
 
-    }).then(function(){
+        return data[row.key];
+
+    }).then(function(d){
+        console.log("Here are all your commits..?", d);
 
         d3.tsv("/data/oberyn_jira_issues.txt", function(row){
             data[row.key] = data[row.key] || {};
@@ -176,7 +232,15 @@
         $("#results").DataTable({
             paging: false,
             columns: [
-                {"data":"key"},
+                {
+                    "data":"key",
+                    "render": function ( data, type, row, meta ) {
+                        return `<a target="_blank" href="https://atlassian.petermac.org.au/jira/browse/${data}">${data}</a>`;
+                    },
+//					I don't know how to do custom sorting...
+//					"type": "jira",
+//					"targets": 0
+                },
                 {"data":"hash"},
                 {
                     "data":"date",
