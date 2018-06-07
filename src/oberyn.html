@@ -102,12 +102,13 @@
     <br>
 	<!--<h1>Venn digram</h1>-->
 	<div class="row">
-		<!--<div class="col-xs-12 col-sm-2">-->
-			<!--<p>Diagram description goes here?</p>-->
-		<!--</div>-->
 		<div class="col-xs-12 col-sm-6" id="venn"></div>
 		<div class="col-xs-12 col-sm-6" id="line"></div>
 	</div>
+	<!--<div class="row">-->
+
+		<!--<div class="col-xs-12 col-sm-6" id="test"></div>-->
+	<!--</div>-->
 </div>
 
 <div class="container-page">
@@ -268,7 +269,7 @@
             margin: { top: 70, right: 70, bottom: 50, left: 70 }
 		}).venn({
 			leftKey: "hash",
-			left: "Issues committed",
+			left: "Tagged commits",
 			rightKey: "reporter",
 			right: "Jira Issues"
 		});
@@ -316,6 +317,12 @@
 	}
 
 
+    const chart = new Chart({
+        element: "test",
+        nav: false,
+        legend: false,
+        margin: { top: 70, right: 70, bottom: 50, left: 70 }
+    }).test();
 
 </script>
 

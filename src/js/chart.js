@@ -944,22 +944,77 @@ console.log(data);
         const leftCenter = width/3,
             rightCenter = leftCenter * 2;
 
+        svg.classed("vennDiagram", true);
 
-        const left = svg.append("circle")
+        // colours
+        const c = [
+            [
+                "hsl(0, 100%, 60%)",
+                "hsl(0, 100%, 70%)"
+            ],
+            [
+                "hsl(300, 66%, 40%)",
+                "hsl(300, 66%, 50%)"
+            ],
+            [
+                "hsl(220, 100%, 60%)",
+                "hsl(220, 100%, 70%)"
+            ]
+        ];
+
+
+        const left = svg
+            .append("circle")
+            .classed("activeShape", true)
             .attrs({
                 cx: leftCenter,
                 cy: midpoint,
                 r: radius,
-                fill: "rgba(100,255,232,0.5)"
+                // fill: "rgba(255,63,45,1)"
+                fill: c[0][0]
             });
 
-        const right = svg.append("circle")
+        const right = svg
+            .append("circle")
+            .classed("activeShape", true)
             .attrs({
                 cx: rightCenter,
                 cy: midpoint,
                 r: radius,
-                fill: "rgba(255,100,232,0.5)"
+                // fill: "rgba(59,121,255,1)"
+                fill: c[2][0]
+
             });
+
+        const arcx = width/2,
+              dx = arcx - leftCenter,
+              dy = Math.sqrt( radius * radius - dx * dx ),
+              arcy1 = midpoint - dy,
+              arcy2 = midpoint + dy;
+
+        const center = svg
+            .append("g")
+            .attrs({
+                fill: 'none',
+                stroke: 'black'
+            })
+            .append("path")
+            .classed("activeShape", true)
+            .attr("d",
+                `M ${arcx} ${arcy1}
+                 A ${radius} ${radius}, 0, 0, 0, ${arcx} ${arcy2}
+                 A ${radius} ${radius}, 0, 0, 0, ${arcx} ${arcy1}`
+            ).attrs({
+                // stroke: "black",
+                'stroke-width': 3,
+                // fill: "rgba(181,36,162,1)"
+                fill: c[1][0]
+            });
+
+
+
+
+
 
         svg.append("text")
             .text(options.left)
