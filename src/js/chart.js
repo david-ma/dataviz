@@ -946,43 +946,50 @@ console.log(data);
 
         svg.classed("vennDiagram", true);
 
-        // colours
-        const c = [
-            [
-                "hsl(0, 100%, 60%)",
-                "hsl(0, 100%, 70%)"
-            ],
-            [
-                "hsl(300, 66%, 40%)",
-                "hsl(300, 66%, 50%)"
-            ],
-            [
-                "hsl(220, 100%, 60%)",
-                "hsl(220, 100%, 70%)"
-            ]
-        ];
+
+        // // colours
+        // const c = [
+        //     [
+        //         "hsl(0, 100%, 60%)",
+        //         "hsl(0, 100%, 70%)"
+        //     ],
+        //     [
+        //         "hsl(300, 66%, 40%)",
+        //         "hsl(300, 66%, 50%)"
+        //     ],
+        //     [
+        //         "hsl(220, 100%, 60%)",
+        //         "hsl(220, 100%, 70%)"
+        //     ]
+        // ];
 
 
         const left = svg
-            .append("circle")
-            .classed("activeShape", true)
+            .append("g")
+            .classed("left", true)
+            .classed("activeShape", true);
+
+        left.append("circle")
             .attrs({
                 cx: leftCenter,
                 cy: midpoint,
-                r: radius,
+                r: radius
                 // fill: "rgba(255,63,45,1)"
-                fill: c[0][0]
+                // fill: c[0][0]
             });
 
         const right = svg
-            .append("circle")
-            .classed("activeShape", true)
+            .append("g")
+            .classed("right", true)
+            .classed("activeShape", true);
+
+        right.append("circle")
             .attrs({
                 cx: rightCenter,
                 cy: midpoint,
-                r: radius,
+                r: radius
                 // fill: "rgba(59,121,255,1)"
-                fill: c[2][0]
+                // fill: c[2][0]
 
             });
 
@@ -992,28 +999,22 @@ console.log(data);
               arcy1 = midpoint - dy,
               arcy2 = midpoint + dy;
 
-        const center = svg
+        const mid = svg
             .append("g")
-            .attrs({
-                fill: 'none',
-                stroke: 'black'
-            })
-            .append("path")
-            .classed("activeShape", true)
+            .classed("mid", true)
+            .classed("activeShape", true);
+
+        mid.append("path")
             .attr("d",
                 `M ${arcx} ${arcy1}
                  A ${radius} ${radius}, 0, 0, 0, ${arcx} ${arcy2}
                  A ${radius} ${radius}, 0, 0, 0, ${arcx} ${arcy1}`
-            ).attrs({
-                // stroke: "black",
-                'stroke-width': 3,
-                // fill: "rgba(181,36,162,1)"
-                fill: c[1][0]
-            });
+            );
 
-
-
-
+        $(".activeShape").on("click", function(d){
+            console.log("CLICK");
+            $(this).toggleClass("selected");
+        });
 
 
         svg.append("text")
@@ -1059,7 +1060,7 @@ console.log(data);
             }
         });
 
-        svg.append("text")
+        left.append("text")
             .text(results.left.length)
             .attrs({
                 x: leftCenter - 30,
@@ -1069,7 +1070,7 @@ console.log(data);
                 'font-size': '36px'
             });
 
-        svg.append("text")
+        mid.append("text")
             .text(results.both.length)
             .attrs({
                 x: width/2,
@@ -1080,7 +1081,7 @@ console.log(data);
             });
 
 
-        svg.append("text")
+        right.append("text")
             .text(results.right.length)
             .attrs({
                 x: rightCenter + 30,

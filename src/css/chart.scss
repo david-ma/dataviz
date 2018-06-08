@@ -91,15 +91,54 @@
         }
     }
 
-    $venn-left: "hsl(0, 100%, 60%)";
-    $venn-mid: "hsl(300, 66%, 40%)";
-    $venn-right: "hsl(220, 100%, 60%)";
+    $venn-left: hsl(0, 100%, 60%);
+    $venn-mid: hsl(300, 40%, 40%);
+    $venn-right: hsl(220, 100%, 60%);
+
+    //$venn-left: rgba(255,63,45,1);
+    //$venn-mid: rgba(181,36,162,1);
+    //$venn-right: rgba(59,121,255,1);
+
+
+
+
 
     .vennDiagram {
+        .activeShape {
+            cursor: pointer;
+            text {
+                fill: black;
+            }
+        }
+        .left {
+            fill: $venn-left;
+            &.selected {
+                fill: darken( $venn-left, 15% );
+            }
+            &:hover {
+                fill: lighten( $venn-left, 15% );
+            }
+        }
+        .mid {
+            fill: $venn-mid;
+            &.selected {
+                fill: darken( $venn-mid, 15% );
+            }
+            &:hover {
+                fill: lighten( $venn-mid, 15% );
+            }
+        }
+        .right {
+            fill: $venn-right;
+            &.selected {
+                fill: darken( $venn-right, 15% );
+            }
+            &:hover {
+                fill: lighten( $venn-right, 15% );
+            }
+        }
 
     }
-
-    //lighten()
 
 
 
