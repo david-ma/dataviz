@@ -81,6 +81,10 @@
 			white-space: nowrap;
 		}
 
+		#results tr.hidden {
+			display: none;
+		}
+
 	</style>
 </head>
 <body>
@@ -223,6 +227,16 @@
         Object.keys(data).forEach(function(row){
             const tr = tbody.append("tr");
 
+            if(data[row].hash) {
+                if (data[row].status) {
+                    tr.classed("both", true);
+				} else {
+                    tr.classed("commit", true);
+				}
+			} else {
+                tr.classed("jira", true);
+			}
+
             columns.forEach(function(column){
                 const text = data[row][column] || "";
                 tr.append("td").text(text);
@@ -271,7 +285,40 @@
 			leftKey: "hash",
 			left: "Tagged commits",
 			rightKey: "reporter",
-			right: "Jira Issues"
+			right: "Jira Issues",
+			leftAction: function(d){
+			    const el = $(this);
+
+			    if(el.hasClass("selected")) {
+			        d3.selectAll(".commit")
+						.classed("hidden", false);
+				} else {
+			        d3.selectAll(".commit")
+						.classed("hidden", true);
+				}
+			},
+            midAction: function(d){
+                const el = $(this);
+
+                if(el.hasClass("selected")) {
+                    d3.selectAll(".both")
+                        .classed("hidden", false);
+                } else {
+                    d3.selectAll(".both")
+                        .classed("hidden", true);
+                }
+            },
+            rightAction: function(d){
+                const el = $(this);
+
+                if(el.hasClass("selected")) {
+                    d3.selectAll(".jira")
+                        .classed("hidden", false);
+                } else {
+                    d3.selectAll(".jira")
+                        .classed("hidden", true);
+                }
+            }
 		});
         return chart;
 	}
@@ -317,12 +364,12 @@
 	}
 
 
-    const chart = new Chart({
-        element: "test",
-        nav: false,
-        legend: false,
-        margin: { top: 70, right: 70, bottom: 50, left: 70 }
-    }).test();
+//    const chart = new Chart({
+//        element: "test",
+//        nav: false,
+//        legend: false,
+//        margin: { top: 70, right: 70, bottom: 50, left: 70 }
+//    }).test();
 
 </script>
 

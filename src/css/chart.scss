@@ -111,7 +111,7 @@
             }
         }
         .left {
-            fill: $venn-left;
+            fill: lighten($venn-left, 30%);
             &.selected {
                 fill: darken( $venn-left, 15% );
             }
@@ -120,7 +120,7 @@
             }
         }
         .mid {
-            fill: $venn-mid;
+            fill: lighten($venn-mid, 30%);
             &.selected {
                 fill: darken( $venn-mid, 15% );
             }
@@ -129,7 +129,7 @@
             }
         }
         .right {
-            fill: $venn-right;
+            fill: lighten($venn-right, 30%);
             &.selected {
                 fill: darken( $venn-right, 15% );
             }

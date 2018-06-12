@@ -1011,10 +1011,17 @@ console.log(data);
                  A ${radius} ${radius}, 0, 0, 0, ${arcx} ${arcy1}`
             );
 
-        $(".activeShape").on("click", function(d){
-            console.log("CLICK");
-            $(this).toggleClass("selected");
-        });
+        $(".activeShape")
+            .addClass("selected")
+            .on("click", function(d){
+                const el = $(this);
+                el.toggleClass("selected");
+
+                if (el.hasClass("left")) el.on("click", options.leftAction);
+                if (el.hasClass("mid")) el.on("click", options.midAction);
+                if (el.hasClass("right")) el.on("click", options.rightAction);
+
+            });
 
 
         svg.append("text")
