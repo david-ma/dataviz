@@ -146,6 +146,11 @@
 
 
 .dataviz-page {
+    section {
+        padding-bottom: 40px;
+        border-bottom: 1px solid lightgrey;
+        margin-bottom: 20px;
+    }
 
     #dataset table tbody {
         line-height: 1em;
@@ -172,12 +177,12 @@
 
     h1 {
         font-size: 30px;
-        +h2 {
-            margin-top: 0;
-        }
     }
     h2 {
         font-size: 20px;
+    }
+    h1+h2, h2+h2 {
+        margin-top: 0;
     }
 
     blockquote p{
