@@ -145,33 +145,43 @@
 }
 
 
+.dataviz-page {
 
+    #dataset table tbody {
+        line-height: 1em;
+        font-size: 12px;
+        font-family: "Source Code Pro", Monaco, Menlo, Consolas, "Courier New", monospace;
 
-#data table tbody {
-    line-height: 1em;
-    font-size: 12px;
-    font-family: "Source Code Pro", Monaco, Menlo, Consolas, "Courier New", monospace;
+        tr:nth-child(even) {
+            //background: #edd4fa;
+        }
+        tr:hover {
+            background: #ddd;
+        }
 
-    tr:nth-child(even) {
-        //background: #edd4fa;
+        td {
+            padding: 2px 3px;
+            border: 1px solid #eee;
+        }
+
     }
-    tr:hover {
-        background: #ddd;
+
+    img {
+        width: 100%;
     }
 
-    td {
-        padding: 2px 3px;
-        border: 1px solid #eee;
+    h1 {
+        font-size: 30px;
+        +h2 {
+            margin-top: 0;
+        }
     }
+    h2 {
+        font-size: 20px;
+    }
+
 
 }
-
-
-
-
-
-
-
 
 
 

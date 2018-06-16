@@ -26,21 +26,23 @@ footer {
   background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.3), rgba(0,0,0,0.5));
 }
 
-header .container {
-  padding-top: 30px;
+header {
+  .container {
+    padding-top: 30px;
+  }
+  h1 {
+    font-size: 60px;
+    font-weight: 900;
+    color: #eee;
+    margin: 0;
+  }
+  h2 {
+    font-size: 30px;
+    color: #eee;
+    margin: 0;
+  }
 }
 
-header h1 {
-  font-size: 60px;
-  font-weight: 900;
-  color: #eee;
-  margin: 0;
-}
-header h2 {
-  font-size: 30px;
-  color: #eee;
-  margin: 0;
-}
 .page > .row {
   margin-bottom: 25px;
 }

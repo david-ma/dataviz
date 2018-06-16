@@ -27,14 +27,11 @@
 		</div>
 	</div>
 </header>
-<div class="container page">
+<div class="container page dataviz-page">
 
-	<div class="row">
-		<div class="col-xs-12 col-sm-6" id="info">
-			<h1>Hello</h1>
-			<p>This is the makeover monday stuff</p>
-		</div>
-		<div class="col-xs-12 col-sm-6" id="data">
+	<div class="row" id="dataset">
+		<div class="col-xs-12 col-sm-6"></div>
+		<div class="col-xs-12 col-sm-6">
 			<table>
 				<thead><tr></tr></thead>
 				<tbody></tbody>
@@ -43,9 +40,15 @@
 		</div>
 	</div>
 
-</div>
+	<div class="row" id="eliza">
+		<div class="col-xs-12 col-sm-6"></div>
+		<div class="col-xs-12 col-sm-6">
+			<a target="_blank" href="/mm/2018-06-11/ElizaSavov.png"><img src="/mm/2018-06-11/ElizaSavov.png"></a>
+			<span>Viz by <a target="_blank" href="https://data.world/elisavova">@Eliza Savov</a></span>
+		</div>
+	</div>
 
-<div class="container-page"></div>
+</div>
 
 <footer>
 	<div class="container">
@@ -58,7 +61,7 @@
 <script src="/js/vendor.min.js"></script>
 <script src="/js/chart.js"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-
+<script src="//cdn.rawgit.com/showdownjs/showdown/1.8.6/dist/showdown.min.js"></script>
 
 <script>
     const data = [];
@@ -67,8 +70,9 @@
         return d;
     }).then(function(results){
         console.log(results);
+        const table = d3.select("#dataset table");
 
-        d3.select("#data table tbody")
+        table.select("tbody")
             .selectAll("tr")
             .data(results)
             .enter()
@@ -80,18 +84,40 @@
                 })
             });
 
-        const headerRow = d3.select("#data table thead tr");
+        const headerRow = table.select("thead tr");
         results.columns.forEach(function(column){
             headerRow.append("th").text(column);
         });
 
-        $("#data table").dataTable({
+        $("#dataset table").dataTable({
             paging: false,
             searching: false,
             bFilter: false,
             bInfo: false
         });
     });
+
+    const md = new showdown.Converter({
+        openLinksInNewWindow: true
+    });
+
+    $("#dataset>div:first-child").html(md.makeHtml(`
+# MakeoverMonday
+
+This dataset is...
+
+    `));
+
+	$("#eliza>div:first-child").html(md.makeHtml(`
+# Tourism Density Contrasts
+## by [@Eliza Savov](https://data.world/elisavova)
+
+This is the makeover monday stuff
+
+`));
+
+
+
 
 </script>
 
