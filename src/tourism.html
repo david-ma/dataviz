@@ -131,7 +131,7 @@
 
             const 	gap = 10,
                     margin = 20,
-                    bh = height * 0.8,			// box height & box width
+                    bh = height * 0.75,			// box height & box width
                     bw = ((width - (margin * 2)) / data.length) - gap,
                     top = height * 0.1;
 
@@ -152,6 +152,7 @@
                             fill: "grey"
                         });
 
+//                     Percent Locals and Percent Tourists
 					const pl = d.Locals / d.Total,
 						  pt = d.Tourists / d.Total;
 
@@ -179,16 +180,20 @@
 							stroke: "white"
 						});
 
+
+                    // Options for drawing the tourist box
+                    let options = {
+                        x: bw / 2,
+                        y: 12,
+                        'text-anchor': 'middle',
+                        'font-size': '10px',
+                        fill: 'white'
+                    };
+
+                    // If the tourist box is too small to add text...
                     if ( bh * pt < 16) {
-                        g.append("text")
-                            .attrs({
-                                x: bw / 2,
-                                y: - 12,
-                                'text-anchor': 'middle',
-                                'font-size': '10px',
-                                fill: '#c2185b'
-                            })
-                            .text(`${Math.round(pt * 100)}%`);
+                        options.y = -12;
+                        options.fill = '#c2185b';
 
                         g.append("line")
                             .attrs({
@@ -198,28 +203,48 @@
                                 y2: 0,
                                 stroke: "grey"
                             });
-
-                    } else {
-                        g.append("text")
-                            .attrs({
-                                x: bw / 2,
-                                y: 12,
-                                'text-anchor': 'middle',
-                                'font-size': '10px',
-                                fill: 'white'
-                            })
-                            .text(`${Math.round(pt * 100)}%`);
-					}
+                    }
 
                     g.append("text")
-						.attrs({
-							x: bw / 2,
-							y: bh * pt + 12,
-							'text-anchor': 'middle',
-							'font-size': '10px',
-							fill: 'white'
-						})
+                        .attrs(options)
+                        .text(`${Math.round(pt * 100)}%`);
+
+                    // Now do the same for the population box...
+                    options = {
+                        x: bw / 2,
+                        y: bh * pt + 12,
+                        'text-anchor': 'middle',
+                        'font-size': '10px',
+                        fill: 'white'
+                    };
+
+                    // If the tourist box is too small to add text...
+                    if ( bh * pl < 16) {
+                        options.y = bh + 20;
+                        options.fill = '#3949ab';
+
+                        g.append("line")
+                            .attrs({
+                                x1: bw / 2,
+                                y1: bh,
+                                x2: bw / 2,
+                                y2: bh + 10,
+                                stroke: "grey"
+                            });
+                    }
+
+                    g.append("text")
+						.attrs(options)
 						.text(`${Math.round(pl * 100)}%`);
+
+                    g.append("text")
+                        .attrs({
+                            x: bw / 2,
+                            y: bh + 34 + (14 * (i % 2)),
+                            'text-anchor': 'middle',
+                            'font-size': '12px',
+                            fill: 'darkgrey'
+                        }).text(d.Country);
 
                 });
         });
