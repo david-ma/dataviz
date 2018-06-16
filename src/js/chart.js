@@ -932,6 +932,10 @@ console.log(data);
 
     }
 
+    scratchpad(callback){
+        callback(this);
+    }
+
     venn(options) {
         const svg = this.plot,
               data = this.data,

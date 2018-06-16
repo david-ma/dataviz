@@ -44,8 +44,12 @@
 		<div class="col-xs-12 col-sm-6"></div>
 		<div class="col-xs-12 col-sm-6">
 			<a target="_blank" href="/mm/2018-06-11/ElizaSavov.png"><img src="/mm/2018-06-11/ElizaSavov.png"></a>
-			<span>Viz by <a target="_blank" href="https://data.world/elisavova">@Eliza Savov</a></span>
+			<span>Viz by <a target="_blank" href="https://data.world/elisavova">Eliza Savov</a></span>
 		</div>
+	</div>
+
+	<div class="row" id="eliza_remake">
+		<div class="col-xs-12"></div>
 	</div>
 
 </div>
@@ -64,28 +68,25 @@
 <script src="//cdn.rawgit.com/showdownjs/showdown/1.8.6/dist/showdown.min.js"></script>
 
 <script>
-    const data = [];
     d3.csv("/mm/2018-06-11/tourism.csv", function(d){
-        data.push(d);
         return d;
-    }).then(function(results){
-        console.log(results);
+    }).then(function(data){
         const table = d3.select("#dataset table");
 
         table.select("tbody")
             .selectAll("tr")
-            .data(results)
+            .data(data)
             .enter()
             .append("tr")
             .each(function(d){
                 const tr = d3.select(this);
-                results.columns.forEach(function(col){
+                data.columns.forEach(function(col){
                     tr.append("td").text(d[col]);
                 })
             });
 
         const headerRow = table.select("thead tr");
-        results.columns.forEach(function(column){
+        data.columns.forEach(function(column){
             headerRow.append("th").text(column);
         });
 
@@ -95,11 +96,64 @@
             bFilter: false,
             bInfo: false
         });
-    });
+
+        return data;
+    }).then(function(data){
+
+        const eliza_remake = new Chart({
+            element: "eliza_remake",
+            data: data,
+			width: 1000,
+			height: 400,
+			margin: {
+                top: 20,
+				bottom: 20,
+				left: 20,
+				right: 20
+			}
+        }).scratchpad(function(c){
+            console.log(c);
+
+            const svg = c.plot,
+                width = c.innerWidth,
+                height = c.innerHeight,
+                data = c.data;
+
+            console.log(data);
+
+
+            const 	gap = 10,
+					margin = 20,
+					bh = height * 0.8,			// box height & box width
+				  	bw = ((width - (margin * 2)) / data.length) - gap,
+					top = height * 0.1;
+
+            svg.selectAll(".country")
+                .data(data)
+				.enter()
+                .append("g")
+                .classed("country", true)
+                .attr("id", (d) => `erg-${camelize(d.Country)}`) // Eliza Remake Group
+                .each(function(d, i){
+                    const g = d3.select(this);
+                    g.attr("transform", `translate(${margin + i * (bw + gap)}, ${top})`);
+
+                    g.append("rect")
+						.attrs({
+							height: bh,
+							width: bw,
+							fill: "grey"
+						});
+
+                    console.log(d);
+                });
+        });
+	});
 
     const md = new showdown.Converter({
         openLinksInNewWindow: true
     });
+
 
     $("#dataset>div:first-child").html(md.makeHtml(`
 # MakeoverMonday
@@ -108,12 +162,19 @@ This dataset is...
 
     `));
 
-	$("#eliza>div:first-child").html(md.makeHtml(`
+
+    $("#eliza>div:first-child").html(md.makeHtml(`
 # Tourism Density Contrasts
-## by [@Eliza Savov](https://data.world/elisavova)
+## by [@Eliza Savov](//data.world/elisavova) - [original](//datastudio.google.com/reporting/1lBu43kf6_2PU0M1EN97t3XJY_j43utNO/page/sSFT)
 
-This is the makeover monday stuff
+Countries in which the local <span style="color:#3949ab; font-weight: 900;">population</span> is vastly outnumbered by <span style="color:#c2185b; font-weight: 900;">tourists</span> suffer from _overtourism_. At the other end of the spectrum are destinations in which tourists account for up to 9% of all people in the country, and where [Intrepid](//www.intrepidtravel.com/au/adventure-index) focuses their promotional efforts to overcome _undertourism_.
 
+
+> **Source:** World Tourism Organization (2018), Compendium of Tourism Statistics dataset [Electronic], UNWTO, Madrid, data updated on 15/01/2018.
+>
+> **Original viz:** [Intrepid Travel](//intrepidgroup.bynder.com/transfer/bdd0abcac448329ed4c9057327b6ca660742e4b5ea16f18bd5a343b2c6d0d0c8)
+>
+> **Created by:** Eliza Savov in Data Studio for [#MakeoverMonday](http://makeovermonday.co.uk/)
 `));
 
 
