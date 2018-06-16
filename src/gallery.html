@@ -2,78 +2,78 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="x-ua-compatible" content="ie=edge">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>Title</title>
-	<link rel="stylesheet" href="/css/main.css">
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/main.css">
 
 
 <style>
 
 body {
-	/*background: url("/images/unsplash.jpg") no-repeat bottom;*/
-	background-size: cover;
-	background-attachment: fixed;
+    /*background: url("/images/unsplash.jpg") no-repeat bottom;*/
+    background-size: cover;
+    background-attachment: fixed;
 }
 
 /*.containerfluid {*/
-	/*height: 100%;*/
-	/*padding-bottom: 150px;*/
-	/*background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0));*/
+    /*height: 100%;*/
+    /*padding-bottom: 150px;*/
+    /*background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0));*/
 /*}*/
 
 .message {
-	/*color: white;*/
-	/*position: relative;*/
-	/*padding-top: 15%;*/
+    /*color: white;*/
+    /*position: relative;*/
+    /*padding-top: 15%;*/
 }
 
 .outlined-border {
-	border: solid 5px black;
-	padding: 5px;
+    border: solid 5px black;
+    padding: 5px;
 }
 table {
-	border: 1px solid grey;
-	padding: 5px;
-	width: 100%;
+    border: 1px solid grey;
+    padding: 5px;
+    width: 100%;
 }
 td {
-	padding: 0 5px !important;
+    padding: 0 5px !important;
 }
 
 td:last-child {
-	text-align: right;
+    text-align: right;
 }
 h2 {
-	font-family: Courier New;
-	font-size: 16px;
-	margin: 0 0 3px 0;
+    font-family: Courier New;
+    font-size: 16px;
+    margin: 0 0 3px 0;
 }
 
 .place {
-	font-family: "Droid Serif", "Helvetica Neue", Helvetica, Arial, sans-serif;
-	weight: 900;
+    font-family: "Droid Serif", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    weight: 900;
 }
 .camera {
 }
 .date {
-	font-size: 14px;
+    font-size: 14px;
 }
 
 .footer {
-	margin-top: 30px;
-	/*padding: 0 15px;*/
-	/*position: absolute;*/
-	/*bottom: 0;*/
+    margin-top: 30px;
+    /*padding: 0 15px;*/
+    /*position: absolute;*/
+    /*bottom: 0;*/
 }
 
 /*@media print {*/
-	/*.thing {*/
-		/*page-break-after: always !important;*/
-		/*page-break-inside: avoid !important;*/
-		/*page-break-before: always !important;*/
-	/*}*/
+    /*.thing {*/
+        /*page-break-after: always !important;*/
+        /*page-break-inside: avoid !important;*/
+        /*page-break-before: always !important;*/
+    /*}*/
 /*}*/
 
 </style>
@@ -81,14 +81,14 @@ h2 {
 </head>
 <body>
 
-	<script src="/js/vendor.min.js"></script>
-	<script src="/js/scripts.min.js"></script>
-	<script src="https://d3js.org/d3-array.v1.min.js"></script>
-	<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+    <script src="/js/vendor.min.js"></script>
+    <script src="/js/scripts.min.js"></script>
+    <script src="https://d3js.org/d3-array.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
 
 
 <script>
-	var body = d3.select("body").append("div").classed("containerfluid", true);
+    var body = d3.select("body").append("div").classed("containerfluid", true);
 
 
     function getParameterByName(name, url) {
@@ -104,8 +104,8 @@ h2 {
     var id = getParameterByName("thing") || 0;
 
 
-	d3.csv("/data/gallery.csv", function(d, i){
-	    if(true || id == i) {
+    d3.csv("/data/gallery.csv", function(d, i){
+        if(true || id == i) {
             console.log(d);
 
             var div = body
@@ -179,7 +179,7 @@ h2 {
 
 //                <p style="page-break-before: always">&nbsp;</p>
         }
-	})
+    })
 </script>
 
 

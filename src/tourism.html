@@ -2,65 +2,65 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="x-ua-compatible" content="ie=edge">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>Tourism</title>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Tourism</title>
 
-	<link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
-	<link rel="stylesheet" href="/css/main.css">
-	<link rel="stylesheet" href="/css/chart.css">
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/chart.css">
 
 </head>
 <body>
 <header>
-	<div class="blur_background">
-		<div class="mask"></div>
-	</div>
+    <div class="blur_background">
+        <div class="mask"></div>
+    </div>
 
-	<div class="container">
-		<div class="row">
-			<div class="col-xs-12">
-				<h1>Tourism Statistics</h1>
-				<h2>#MakeoverMonday from 2018-06-11</h2>
-			</div>
-		</div>
-	</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>Tourism Statistics</h1>
+                <h2>#MakeoverMonday from 2018-06-11</h2>
+            </div>
+        </div>
+    </div>
 </header>
 <div class="container page dataviz-page">
 
-	<div class="row" id="dataset">
-		<div class="col-xs-12 col-sm-6"></div>
-		<div class="col-xs-12 col-sm-6">
-			<table>
-				<thead><tr></tr></thead>
-				<tbody></tbody>
-			</table>
-			<a style="float: right;" target="_blank" href="/mm/2018-06-11/tourism.csv">Download CSV</a>
-		</div>
-	</div>
+    <div class="row" id="dataset">
+        <div class="col-xs-12 col-sm-6"></div>
+        <div class="col-xs-12 col-sm-6">
+            <table>
+                <thead><tr></tr></thead>
+                <tbody></tbody>
+            </table>
+            <a style="float: right;" target="_blank" href="/mm/2018-06-11/tourism.csv">Download CSV</a>
+        </div>
+    </div>
 
-	<div class="row" id="eliza">
-		<div class="col-xs-12 col-sm-6"></div>
-		<div class="col-xs-12 col-sm-6">
-			<a target="_blank" href="/mm/2018-06-11/ElizaSavov.png"><img src="/mm/2018-06-11/ElizaSavov.png"></a>
-			<span>Viz by <a target="_blank" href="https://data.world/elisavova">Eliza Savov</a></span>
-		</div>
-	</div>
+    <div class="row" id="eliza">
+        <div class="col-xs-12 col-sm-6"></div>
+        <div class="col-xs-12 col-sm-6">
+            <a target="_blank" href="/mm/2018-06-11/ElizaSavov.png"><img src="/mm/2018-06-11/ElizaSavov.png"></a>
+            <span>Viz by <a target="_blank" href="https://data.world/elisavova">Eliza Savov</a></span>
+        </div>
+    </div>
 
-	<div class="row" id="eliza_remake">
-		<div class="col-xs-12"></div>
-	</div>
+    <div class="row" id="eliza_remake">
+        <div class="col-xs-12"></div>
+    </div>
 
 </div>
 
 <footer>
-	<div class="container">
-		<div class="row">
-			<p class="col-xs-6">Simple <a href="https://github.com/david-ma/Thalia">Thalia</a> Bootstrap Boilerplate</p>
-			<p class="col-xs-6 text-right">By <a href="https://twitter.com/frostickle">@Frostickle</a> <i class="fab fa-twitter" aria-hidden="true"></i></p>
-		</div>
-	</div>
+    <div class="container">
+        <div class="row">
+            <p class="col-xs-6">Simple <a href="https://github.com/david-ma/Thalia">Thalia</a> Bootstrap Boilerplate</p>
+            <p class="col-xs-6 text-right">By <a href="https://twitter.com/frostickle">@Frostickle</a> <i class="fab fa-twitter" aria-hidden="true"></i></p>
+        </div>
+    </div>
 </footer>
 <script src="/js/vendor.min.js"></script>
 <script src="/js/chart.js"></script>
@@ -103,14 +103,14 @@
         const eliza_remake = new Chart({
             element: "eliza_remake",
             data: data,
-			width: 1000,
-			height: 400,
-			margin: {
+            width: 1000,
+            height: 400,
+            margin: {
                 top: 20,
-				bottom: 20,
-				left: 20,
-				right: 20
-			}
+                bottom: 20,
+                left: 20,
+                right: 20
+            }
         }).scratchpad(function(c){
             console.log(c);
 
@@ -123,14 +123,14 @@
 
 
             const 	gap = 10,
-					margin = 20,
-					bh = height * 0.8,			// box height & box width
-				  	bw = ((width - (margin * 2)) / data.length) - gap,
-					top = height * 0.1;
+                    margin = 20,
+                    bh = height * 0.8,			// box height & box width
+                    bw = ((width - (margin * 2)) / data.length) - gap,
+                    top = height * 0.1;
 
             svg.selectAll(".country")
                 .data(data)
-				.enter()
+                .enter()
                 .append("g")
                 .classed("country", true)
                 .attr("id", (d) => `erg-${camelize(d.Country)}`) // Eliza Remake Group
@@ -139,16 +139,16 @@
                     g.attr("transform", `translate(${margin + i * (bw + gap)}, ${top})`);
 
                     g.append("rect")
-						.attrs({
-							height: bh,
-							width: bw,
-							fill: "grey"
-						});
+                        .attrs({
+                            height: bh,
+                            width: bw,
+                            fill: "grey"
+                        });
 
                     console.log(d);
                 });
         });
-	});
+    });
 
     const md = new showdown.Converter({
         openLinksInNewWindow: true

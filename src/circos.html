@@ -2,703 +2,703 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="x-ua-compatible" content="ie=edge">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>d3.js sandbox</title>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>d3.js sandbox</title>
 
 <style>
 
 body {
-	background-color: #eee;
+    background-color: #eee;
 }
 
 .page {
-	background-color: #fff;
+    background-color: #fff;
 }
 
 header {
-	width: 100%;
-	height: 200px;
-	background: #333e52;
+    width: 100%;
+    height: 200px;
+    background: #333e52;
 }
 
 footer {
-	width: 100%;
-	height: 50px;
-	background: #ddd;
-	position: fixed;
-	bottom: 0;
+    width: 100%;
+    height: 50px;
+    background: #ddd;
+    position: fixed;
+    bottom: 0;
 }
 
 .mask {
-	height: 100%;
-	background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+    height: 100%;
+    background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.3), rgba(0,0,0,0.5));
 }
 
 header .container {
-	padding-top: 30px;
+    padding-top: 30px;
 }
 
 header h1 {
-	font-size: 60px;
-	color: #eee;
-	margin: 0;
+    font-size: 60px;
+    color: #eee;
+    margin: 0;
 }
 header h2 {
-	font-size: 30px;
-	color: #eee;
-	margin: 0;
+    font-size: 30px;
+    color: #eee;
+    margin: 0;
 }
 
 #d3stuff {
-	background: lightgrey;
+    background: lightgrey;
 }
 
 #heatmap svg {
-	width: 100%;
-	text-anchor: end;
+    width: 100%;
+    text-anchor: end;
 }
 
 #heatmap svg rect.bordered {
-	stroke: #E6E6E6;
-	stroke-width: 1px;
+    stroke: #E6E6E6;
+    stroke-width: 1px;
 }
 
 line {
-	fill: none;
-	stroke: black;
-	stroke-width: 5;
-	shape-rendering: crispEdges;
-	cursor: ew-resize;
+    fill: none;
+    stroke: black;
+    stroke-width: 5;
+    shape-rendering: crispEdges;
+    cursor: ew-resize;
 }
 
 .mdl-card__supporting-text {
-	width: 100%
+    width: 100%
 }
 
 .fusions {
-	transform: scale(0.6);
-	color: black;
-	stroke: rgba(0,0,0,0.5);
-	fill: white;
+    transform: scale(0.6);
+    color: black;
+    stroke: rgba(0,0,0,0.5);
+    fill: white;
 }
 div.tooltip {
-	position: absolute;
-	text-align: center;
-	padding: 5px 10px;
-	background: #111111;
-	color: white;
-	border: 0px;
-	pointer-events: none;
+    position: absolute;
+    text-align: center;
+    padding: 5px 10px;
+    background: #111111;
+    color: white;
+    border: 0px;
+    pointer-events: none;
 }
 
 </style>
 
 </head>
 <body>
-	<header>
-		<div class="blur_background">
-			<div class="mask"></div>
-		</div>
-		<div class="container">
-			<div class="row">
-				<div class="col-xs-12">
-					<h1>Simple Circos Plot</h1>
-					<h2>Workspace for playing with d3.js</h2>
-				</div>
-			</div>
-		</div>
-	</header>
+    <header>
+        <div class="blur_background">
+            <div class="mask"></div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1>Simple Circos Plot</h1>
+                    <h2>Workspace for playing with d3.js</h2>
+                </div>
+            </div>
+        </div>
+    </header>
 
 
-	<div class="container page">
-		<div class="row">
-			<div class="col-xs-12">
-				<h1>
-					Circos plot
-				</h1>
-			</div>
-		</div>
-		<div id="highlightChart" class="mdl-card__supporting-text"></div>
+    <div class="container page">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>
+                    Circos plot
+                </h1>
+            </div>
+        </div>
+        <div id="highlightChart" class="mdl-card__supporting-text"></div>
 
-		<div id="heatmap"></div>
-	</div>
+        <div id="heatmap"></div>
+    </div>
 
-	<link rel="stylesheet" href="css/main.css">
-	<script src="js/pathos.js"></script>
-	<script src="js/scripts.min.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/pathos.js"></script>
+    <script src="js/scripts.min.js"></script>
 
-	<!--Uncomment if you want the latest d3.js-->
-	<script src="https://d3js.org/d3.v4.min.js"></script>
+    <!--Uncomment if you want the latest d3.js-->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
 
-	<script>
-		console.log("Making Circos plot");
+    <script>
+        console.log("Making Circos plot");
 
 
-		var width = document.getElementsByClassName('mdl-card__supporting-text')[0].offsetWidth;
-		var circosHighlight = new Circos({
-			container: '#highlightChart',
-			width: width,
-			height: width
-		});
+        var width = document.getElementsByClassName('mdl-card__supporting-text')[0].offsetWidth;
+        var circosHighlight = new Circos({
+            container: '#highlightChart',
+            width: width,
+            height: width
+        });
 
-		var gieStainColor = {
-			gpos100: 'rgb(0,0,0)',
-			gpos: 'rgb(0,0,0)',
-			gpos75: 'rgb(130,130,130)',
-			gpos66: 'rgb(160,160,160)',
-			gpos50: 'rgb(200,200,200)',
-			gpos33: 'rgb(210,210,210)',
-			gpos25: 'rgb(200,200,200)',
-			gvar: 'rgb(220,220,220)',
-			gneg: 'rgb(255,255,255)',
-			acen: 'rgb(217,47,39)',
-			stalk: 'rgb(100,127,164)',
-			select: 'rgb(135,177,255)'
-		};
+        var gieStainColor = {
+            gpos100: 'rgb(0,0,0)',
+            gpos: 'rgb(0,0,0)',
+            gpos75: 'rgb(130,130,130)',
+            gpos66: 'rgb(160,160,160)',
+            gpos50: 'rgb(200,200,200)',
+            gpos33: 'rgb(210,210,210)',
+            gpos25: 'rgb(200,200,200)',
+            gvar: 'rgb(220,220,220)',
+            gneg: 'rgb(255,255,255)',
+            acen: 'rgb(217,47,39)',
+            stalk: 'rgb(100,127,164)',
+            select: 'rgb(135,177,255)'
+        };
 
-		var drawCircos = function (error, GRCh37, cytobands, snvs, indels, deletions, amps, fusions) {
-			console.log("Drawing!");
-			console.log(GRCh37);
+        var drawCircos = function (error, GRCh37, cytobands, snvs, indels, deletions, amps, fusions) {
+            console.log("Drawing!");
+            console.log(GRCh37);
 
-			var radius = width / 2;
+            var radius = width / 2;
 
-			cytobands = cytobands.map(function (d) {
-				return {
-					block_id: d.chrom,
-					start: parseInt(d.chromStart),
-					end: parseInt(d.chromEnd),
-					gieStain: d.gieStain
-				}
-			});
+            cytobands = cytobands.map(function (d) {
+                return {
+                    block_id: d.chrom,
+                    start: parseInt(d.chromStart),
+                    end: parseInt(d.chromEnd),
+                    gieStain: d.gieStain
+                }
+            });
 
-			snvs = snvs.map(function (d){
-				return {
-					block_id: d.chrom.replace("hs","chr"),
-					start: parseInt(d.chromStart),
-					end: parseInt(d.chromEnd),
-					name: "this is a name: " +d.chrom
-				}
-			});
+            snvs = snvs.map(function (d){
+                return {
+                    block_id: d.chrom.replace("hs","chr"),
+                    start: parseInt(d.chromStart),
+                    end: parseInt(d.chromEnd),
+                    name: "this is a name: " +d.chrom
+                }
+            });
 
 console.log(snvs);
 
-			indels = indels.map(function (d){
-				return {
-					block_id: d.chrom.replace("hs","chr"),
-					start: parseInt(d.chromStart),
-					end: parseInt(d.chromEnd),
-					name: d.chrom
-				}
-			});
+            indels = indels.map(function (d){
+                return {
+                    block_id: d.chrom.replace("hs","chr"),
+                    start: parseInt(d.chromStart),
+                    end: parseInt(d.chromEnd),
+                    name: d.chrom
+                }
+            });
 
-			deletions = deletions.map(function (d){
-				return {
-					block_id: d.chrom.replace("hs","chr"),
-					start: parseInt(d.chromStart),
-					end: parseInt(d.chromEnd),
-					name: d.chrom.replace("hs","chr"),
-					value: d.value
-				}
-			});
+            deletions = deletions.map(function (d){
+                return {
+                    block_id: d.chrom.replace("hs","chr"),
+                    start: parseInt(d.chromStart),
+                    end: parseInt(d.chromEnd),
+                    name: d.chrom.replace("hs","chr"),
+                    value: d.value
+                }
+            });
 
-			amps = amps.map(function (d){
-				return {
-					block_id: d.chrom.replace("hs","chr"),
-					start: parseInt(d.chromStart),
-					end: parseInt(d.chromEnd),
-					name: d.chrom.replace("hs","chr"),
-					value: d.value
-				}
-			});
+            amps = amps.map(function (d){
+                return {
+                    block_id: d.chrom.replace("hs","chr"),
+                    start: parseInt(d.chromStart),
+                    end: parseInt(d.chromEnd),
+                    name: d.chrom.replace("hs","chr"),
+                    value: d.value
+                }
+            });
 
 
-			fusions = fusions.map(function (d) {
-				return {
-					source: {
-						id: d.sourceId,
-						start: parseInt(d.sourceStart) - 2000000,
-						end: parseInt(d.sourceEnd) + 2000000
-					},
-					target: {
-						id: d.targetId,
-						start: parseInt(d.targetStart) - 2000000,
-						end: parseInt(d.targetEnd) + 2000000
-					}
-				}
-			});
+            fusions = fusions.map(function (d) {
+                return {
+                    source: {
+                        id: d.sourceId,
+                        start: parseInt(d.sourceStart) - 2000000,
+                        end: parseInt(d.sourceEnd) + 2000000
+                    },
+                    target: {
+                        id: d.targetId,
+                        start: parseInt(d.targetStart) - 2000000,
+                        end: parseInt(d.targetEnd) + 2000000
+                    }
+                }
+            });
 
 
 // Manipulate data into correct shape for Circos plot
 // Set the layout
 // Add the different layers
 
-			circosHighlight
-				.layout(
-					GRCh37,
-					{
-						innerRadius: radius - 60,
-						outerRadius: radius - 50,
-						labels: {display: true},
-						ticks: {display: false}
-					}
-				)
-				.highlight('cytobands', cytobands, {
-					innerRadius: radius - 60,
-					outerRadius: radius - 50,
-					opacity: 0.5,
-					color: function (d) {
-						return gieStainColor[d.gieStain]
-					}
-				})
+            circosHighlight
+                .layout(
+                    GRCh37,
+                    {
+                        innerRadius: radius - 60,
+                        outerRadius: radius - 50,
+                        labels: {display: true},
+                        ticks: {display: false}
+                    }
+                )
+                .highlight('cytobands', cytobands, {
+                    innerRadius: radius - 60,
+                    outerRadius: radius - 50,
+                    opacity: 0.5,
+                    color: function (d) {
+                        return gieStainColor[d.gieStain]
+                    }
+                })
 
-				.highlight('snvs', snvs, {
-					innerRadius: radius - 100,
-					outerRadius: radius - 70,
-					strokeWidth: 1,
-					strokeColor: 'black',
-					tooltipContent: function(d){
-						return d.name
-					}
-				})
+                .highlight('snvs', snvs, {
+                    innerRadius: radius - 100,
+                    outerRadius: radius - 70,
+                    strokeWidth: 1,
+                    strokeColor: 'black',
+                    tooltipContent: function(d){
+                        return d.name
+                    }
+                })
 
-				.highlight('indels', indels, {
-					innerRadius: radius - 100,
-					outerRadius: radius - 70,
-					strokeWidth: 1,
-					strokeColor: 'blue',
-					tooltipContent: function(d) {
-						return "indel at: " + d.start
-					}
-				})
+                .highlight('indels', indels, {
+                    innerRadius: radius - 100,
+                    outerRadius: radius - 70,
+                    strokeWidth: 1,
+                    strokeColor: 'blue',
+                    tooltipContent: function(d) {
+                        return "indel at: " + d.start
+                    }
+                })
 
-				.highlight('deletions', deletions, {
-					innerRadius: function(d){
-						return radius - 150 + (20 * d.value);
-					},
-					outerRadius: radius - 150,
-					color: 'blue',
-					opacity: 0.2,
-					tooltipContent: function(d){
-						return "This is an deletion of "+ d.value+" in: " +d.name
-					}
-				})
+                .highlight('deletions', deletions, {
+                    innerRadius: function(d){
+                        return radius - 150 + (20 * d.value);
+                    },
+                    outerRadius: radius - 150,
+                    color: 'blue',
+                    opacity: 0.2,
+                    tooltipContent: function(d){
+                        return "This is an deletion of "+ d.value+" in: " +d.name
+                    }
+                })
 
-				.highlight('amps', amps, {
-					innerRadius: radius - 150,
-					outerRadius: function(d){
-						return radius - 150 + (20 * d.value);
-					},
-					color: 'red',
-					opacity: 0.2,
-					tooltipContent: function(d){
-						return "This is an amplification of "+ d.value+" in: " +d.name
-					}
-				})
+                .highlight('amps', amps, {
+                    innerRadius: radius - 150,
+                    outerRadius: function(d){
+                        return radius - 150 + (20 * d.value);
+                    },
+                    color: 'red',
+                    opacity: 0.2,
+                    tooltipContent: function(d){
+                        return "This is an amplification of "+ d.value+" in: " +d.name
+                    }
+                })
 
-				.chords('fusions', fusions, {
-						color: function(d){
-							console.log(this);
-							console.log(d);
-							d3.select(this)
-								.classed(d.source.id, true)
-								.classed(d.target.id, true);
-							return 'rgba(0,0,0,0)';
-						},
-						opacity: 0.7,
-						zIndex: 1,
-						tooltipContent: function(d){
-							return "This is a fusion, write your info here"
-						},
-						min: null,
-						max: null,
-						logScale: false,
-						logScaleBase: Math.E
-					}
-				)
-				.render();
+                .chords('fusions', fusions, {
+                        color: function(d){
+                            console.log(this);
+                            console.log(d);
+                            d3.select(this)
+                                .classed(d.source.id, true)
+                                .classed(d.target.id, true);
+                            return 'rgba(0,0,0,0)';
+                        },
+                        opacity: 0.7,
+                        zIndex: 1,
+                        tooltipContent: function(d){
+                            return "This is a fusion, write your info here"
+                        },
+                        min: null,
+                        max: null,
+                        logScale: false,
+                        logScaleBase: Math.E
+                    }
+                )
+                .render();
 
-			d3.selectAll('.cytobands .block')
-				.on('mouseover', function(d){
-					console.log(d);
-					d3.selectAll(".chord").style("display", "none");
-					d3.selectAll("."+ d.key).style("display", "block");
-				})
-				.on('mouseout', function(d){
-					d3.selectAll(".chord").style("display", "block");
-				});
+            d3.selectAll('.cytobands .block')
+                .on('mouseover', function(d){
+                    console.log(d);
+                    d3.selectAll(".chord").style("display", "none");
+                    d3.selectAll("."+ d.key).style("display", "block");
+                })
+                .on('mouseout', function(d){
+                    d3.selectAll(".chord").style("display", "block");
+                });
 
-		};
-
-
-
-		d3.queue()
-			.defer(d3.json, './data/circos/GRCh37.json')
-			.defer(d3.csv, './data/circos/cytobands.csv')
-			.defer(d3.csv, './data/circos/snvs.hq.tier1.v1.annotated.compact.tsv')
-			.defer(d3.csv, './data/circos/indels.hq.tier1.v1.annotated.compact.tsv')
-			.defer(d3.csv, './data/circos/deletions.txt')
-			.defer(d3.csv, './data/circos/focalAmps.txt')
-			.defer(d3.csv, './data/circos/CandidateSvCodingFusions.txt')
-			.await(drawCircos);
+        };
 
 
 
-		var heatmapTsvLoc = 'data/a.tsv';
+        d3.queue()
+            .defer(d3.json, './data/circos/GRCh37.json')
+            .defer(d3.csv, './data/circos/cytobands.csv')
+            .defer(d3.csv, './data/circos/snvs.hq.tier1.v1.annotated.compact.tsv')
+            .defer(d3.csv, './data/circos/indels.hq.tier1.v1.annotated.compact.tsv')
+            .defer(d3.csv, './data/circos/deletions.txt')
+            .defer(d3.csv, './data/circos/focalAmps.txt')
+            .defer(d3.csv, './data/circos/CandidateSvCodingFusions.txt')
+            .await(drawCircos);
+
+
+
+        var heatmapTsvLoc = 'data/a.tsv';
 
 //		console.log("hey");
 
-		//		makeHeatmap();
+        //		makeHeatmap();
 
-		function makeHeatmap() {
-			var samples = [],
-				amplicons = [],
-				min = Number.MAX_SAFE_INTEGER,
-				max = 0,
-				buckets = [],
-				labelHeight = 150,
-				labelWidth = 240,
-				blockSize = 15,
-				bucketIndex = 1,
-				colorScale = null;
+        function makeHeatmap() {
+            var samples = [],
+                amplicons = [],
+                min = Number.MAX_SAFE_INTEGER,
+                max = 0,
+                buckets = [],
+                labelHeight = 150,
+                labelWidth = 240,
+                blockSize = 15,
+                bucketIndex = 1,
+                colorScale = null;
 
 
 
-			/*
-			 *  In this function we take:
-			 *    1. The heatmap location
-			 *    2. Process it line by line
-			 *    3. Then draw the heatmap from the data
-			 */
-			d3.tsv(heatmapTsvLoc,
-				function (d) {
+            /*
+             *  In this function we take:
+             *    1. The heatmap location
+             *    2. Process it line by line
+             *    3. Then draw the heatmap from the data
+             */
+            d3.tsv(heatmapTsvLoc,
+                function (d) {
 // This gets called on every row
 
-					var obj = {
-						amplicon: d.amplicon,
-						readsout: parseInt(d.readsout),
-						sample_name: d.sample_name
-					};
+                    var obj = {
+                        amplicon: d.amplicon,
+                        readsout: parseInt(d.readsout),
+                        sample_name: d.sample_name
+                    };
 
-					samples[d.sample_name] = samples[d.sample_name] || [];
-					samples[d.sample_name].push(obj);
+                    samples[d.sample_name] = samples[d.sample_name] || [];
+                    samples[d.sample_name].push(obj);
 
-					amplicons[d.amplicon] = amplicons[d.amplicon] || [];
-					amplicons[d.amplicon].push(obj);
+                    amplicons[d.amplicon] = amplicons[d.amplicon] || [];
+                    amplicons[d.amplicon].push(obj);
 
-					if (obj.readsout > max) {
-						max = obj.readsout;
-					}
-					if (obj.readsout < min) {
-						min = obj.readsout;
-					}
+                    if (obj.readsout > max) {
+                        max = obj.readsout;
+                    }
+                    if (obj.readsout < min) {
+                        min = obj.readsout;
+                    }
 
-					return obj;
-				},
-				function (error, data) {
+                    return obj;
+                },
+                function (error, data) {
 // This gets called after each row is examined
-					if(!error) {
+                    if(!error) {
 
 // calculate buckets here...
-						bucketIndex = (max * blockSize) / labelWidth;
-						data.forEach(function(d){
-							var item = Math.floor(d.readsout / bucketIndex);
-							buckets[item] = buckets[item] + 1 || 1;
-						});
-						// House keeping, clean up the bucket array.
-						for(i = 0; i < buckets.length; i++ ) {
-							buckets[i] = buckets[i] || 1;
-						}
-						console.log(data.length);
-						var total = data.length,
-							sum = 0,
-							first = 0,
-							last = 0,
-							modifier = 5;
+                        bucketIndex = (max * blockSize) / labelWidth;
+                        data.forEach(function(d){
+                            var item = Math.floor(d.readsout / bucketIndex);
+                            buckets[item] = buckets[item] + 1 || 1;
+                        });
+                        // House keeping, clean up the bucket array.
+                        for(i = 0; i < buckets.length; i++ ) {
+                            buckets[i] = buckets[i] || 1;
+                        }
+                        console.log(data.length);
+                        var total = data.length,
+                            sum = 0,
+                            first = 0,
+                            last = 0,
+                            modifier = 5;
 
-						buckets.forEach(function(d, i){
-							sum += d;
-							if( sum < (total / modifier) ) first = i+1;
-							if( sum < ((modifier - 1) * total) / modifier) last = i+2;
-						});
-
-
-						var colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"];
-
-						colorScale = d3.scaleQuantile()
-							.domain([min, max])
-							.range(colors);
-
-						var heatmapHeight = blockSize * (Object.keys(amplicons).length),
-							svgHeight = heatmapHeight + labelHeight + blockSize,
-							heatmapWidth = blockSize * (Object.keys(samples).length),
-							svgWidth = heatmapWidth + labelWidth + blockSize;
-
-						var svg = d3.select("#heatmap").append("svg").attrs({
-							id: "heatmap-svg",
-							height: svgHeight,
-							width: svgWidth,
-							viewBox: "0 0 " + svgWidth + " " + svgHeight
-						});
-
-						// This is the grey background of the heatmap
-						svg.append("rect").attrs({
-							x: 0,
-							y: 0,
-							height: svgHeight,
-							width: svgWidth,
-							fill: 'rgba(0,0,0,0.2)'
-						});
-						// This is the actual heatmap chart
-						var chart = svg.append("g").attrs({
-							id: 'heatmap-chart',
-							x: 0,
-							y: 0
-						}).style(
-								'transform', 'matrix(1, 0, 0, 1, '+labelWidth+', '+labelHeight+')'
-						);
+                        buckets.forEach(function(d, i){
+                            sum += d;
+                            if( sum < (total / modifier) ) first = i+1;
+                            if( sum < ((modifier - 1) * total) / modifier) last = i+2;
+                        });
 
 
-						var slider = svg.append("g").attrs({
-							id: 'headmap-slider',
-							x: 0,
-							y: 0
-						}).style(
-							'transform', 'matrix(0.9, 0, 0, 0.9, 5, 5)'
-						);
+                        var colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"];
+
+                        colorScale = d3.scaleQuantile()
+                            .domain([min, max])
+                            .range(colors);
+
+                        var heatmapHeight = blockSize * (Object.keys(amplicons).length),
+                            svgHeight = heatmapHeight + labelHeight + blockSize,
+                            heatmapWidth = blockSize * (Object.keys(samples).length),
+                            svgWidth = heatmapWidth + labelWidth + blockSize;
+
+                        var svg = d3.select("#heatmap").append("svg").attrs({
+                            id: "heatmap-svg",
+                            height: svgHeight,
+                            width: svgWidth,
+                            viewBox: "0 0 " + svgWidth + " " + svgHeight
+                        });
+
+                        // This is the grey background of the heatmap
+                        svg.append("rect").attrs({
+                            x: 0,
+                            y: 0,
+                            height: svgHeight,
+                            width: svgWidth,
+                            fill: 'rgba(0,0,0,0.2)'
+                        });
+                        // This is the actual heatmap chart
+                        var chart = svg.append("g").attrs({
+                            id: 'heatmap-chart',
+                            x: 0,
+                            y: 0
+                        }).style(
+                                'transform', 'matrix(1, 0, 0, 1, '+labelWidth+', '+labelHeight+')'
+                        );
+
+
+                        var slider = svg.append("g").attrs({
+                            id: 'headmap-slider',
+                            x: 0,
+                            y: 0
+                        }).style(
+                            'transform', 'matrix(0.9, 0, 0, 0.9, 5, 5)'
+                        );
 
 //							Slider Background
-						slider.append('rect').attrs({
-							width: labelWidth,
-							height: labelHeight,
-							fill: 'rgba(0,0,0,0.1)'
-						});
+                        slider.append('rect').attrs({
+                            width: labelWidth,
+                            height: labelHeight,
+                            fill: 'rgba(0,0,0,0.1)'
+                        });
 
-						var blahIndex = (Math.max.apply(null, buckets) * blockSize) / labelHeight;
+                        var blahIndex = (Math.max.apply(null, buckets) * blockSize) / labelHeight;
 
-						// Weird off by one error...
-						buckets.pop();
+                        // Weird off by one error...
+                        buckets.pop();
 
-						slider.selectAll('g').data(buckets).enter()
-							.append('g').each(function(d, i){
+                        slider.selectAll('g').data(buckets).enter()
+                            .append('g').each(function(d, i){
 
-							var thing = d3.select(this);
+                            var thing = d3.select(this);
 
-							var squares = Math.ceil(d / blahIndex);
+                            var squares = Math.ceil(d / blahIndex);
 
-							for(var j = 0; j < squares; j++ ){
-								thing.append("rect").attrs({
-									class: "slider-block",
-									height: blockSize,
-									width: blockSize,
-									x: i * blockSize,
-									y: labelHeight - ((j+1) * blockSize),
-									fill: colorScale(i * bucketIndex)
-								}).datum(i * bucketIndex);
-							}
+                            for(var j = 0; j < squares; j++ ){
+                                thing.append("rect").attrs({
+                                    class: "slider-block",
+                                    height: blockSize,
+                                    width: blockSize,
+                                    x: i * blockSize,
+                                    y: labelHeight - ((j+1) * blockSize),
+                                    fill: colorScale(i * bucketIndex)
+                                }).datum(i * bucketIndex);
+                            }
 
-						});
+                        });
 
-						var overlay = slider.append("g");
+                        var overlay = slider.append("g");
 
-						var leftBound = first * blockSize,
-							rightBound = last * blockSize;
-
-
-						function init_drag(){
-							leftBound  = parseInt($("#left").attr('x1'));
-							rightBound = parseInt($("#right").attr('x1'));
-						}
-
-						overlay.append("rect").attrs({
-							id: 'middle',
-							x: 0,
-							y: 0,
-							height: labelHeight,
-							width: labelWidth,
-							fill: 'rgba(0,0,0,0)'
-						}).style("cursor", "pointer").call(d3.drag()
-							.on("start", init_drag)
-							.on("drag", function(d){
-
-								var x = d3.event.x;
-
-								if(0 < x && x < labelWidth) {
-									rightBound += d3.event.dx;
-									leftBound += d3.event.dx;
-
-									if( leftBound < 0 ) leftBound = 0;
-									if( rightBound > labelWidth ) rightBound = labelWidth;
-
-									d3.select("#right").attrs({
-										x1: rightBound,
-										x2: rightBound
-									});
-
-									d3.select("#left").attrs({
-										x1: leftBound,
-										x2: leftBound
-									});
+                        var leftBound = first * blockSize,
+                            rightBound = last * blockSize;
 
 
-									updateHeatmap();
-								}
-							}));
+                        function init_drag(){
+                            leftBound  = parseInt($("#left").attr('x1'));
+                            rightBound = parseInt($("#right").attr('x1'));
+                        }
+
+                        overlay.append("rect").attrs({
+                            id: 'middle',
+                            x: 0,
+                            y: 0,
+                            height: labelHeight,
+                            width: labelWidth,
+                            fill: 'rgba(0,0,0,0)'
+                        }).style("cursor", "pointer").call(d3.drag()
+                            .on("start", init_drag)
+                            .on("drag", function(d){
+
+                                var x = d3.event.x;
+
+                                if(0 < x && x < labelWidth) {
+                                    rightBound += d3.event.dx;
+                                    leftBound += d3.event.dx;
+
+                                    if( leftBound < 0 ) leftBound = 0;
+                                    if( rightBound > labelWidth ) rightBound = labelWidth;
+
+                                    d3.select("#right").attrs({
+                                        x1: rightBound,
+                                        x2: rightBound
+                                    });
+
+                                    d3.select("#left").attrs({
+                                        x1: leftBound,
+                                        x2: leftBound
+                                    });
 
 
-
-						overlay.append("line").attrs({
-							id: 'left',
-							x1: leftBound,
-							y1: 0,
-							x2: leftBound,
-							y2: labelHeight
-						}).call(d3.drag()
-							.on("start", init_drag)
-							.on("drag", function(d){
-								var x = d3.event.x;
-								if(0 < x && x < labelWidth) {
-									d3.select("#left").attrs({
-										x1: x,
-										x2: x
-									});
-									updateHeatmap();
-								}
-							}));
-
-						overlay.append("line").attrs({
-							id: 'right',
-							x1: rightBound,
-							y1: 0,
-							x2: rightBound,
-							y2: labelHeight
-						}).call(d3.drag()
-							.on("start", init_drag)
-							.on("drag", function(d){
-								var x = d3.event.x;
-								if(0 < x && x < labelWidth) {
-									d3.select("#right").attrs({
-										x1: x,
-										x2: x
-									});
-									updateHeatmap();
-								}
-							}));
-
-						paintHeatmap(data, {
-							blockSize: blockSize,
-							svg: svg,
-							chart: chart,
-							labelHeight: labelHeight,
-							labelWidth: labelWidth
-						});
-						updateHeatmap();
-					}
-				}
-			);
-
-
-			function updateHeatmap(){
+                                    updateHeatmap();
+                                }
+                            }));
 
 
 
-				var a = $("#left").attr("x1") * (max / labelWidth),
-					b = $("#right").attr("x1") * (max / labelWidth);
+                        overlay.append("line").attrs({
+                            id: 'left',
+                            x1: leftBound,
+                            y1: 0,
+                            x2: leftBound,
+                            y2: labelHeight
+                        }).call(d3.drag()
+                            .on("start", init_drag)
+                            .on("drag", function(d){
+                                var x = d3.event.x;
+                                if(0 < x && x < labelWidth) {
+                                    d3.select("#left").attrs({
+                                        x1: x,
+                                        x2: x
+                                    });
+                                    updateHeatmap();
+                                }
+                            }));
+
+                        overlay.append("line").attrs({
+                            id: 'right',
+                            x1: rightBound,
+                            y1: 0,
+                            x2: rightBound,
+                            y2: labelHeight
+                        }).call(d3.drag()
+                            .on("start", init_drag)
+                            .on("drag", function(d){
+                                var x = d3.event.x;
+                                if(0 < x && x < labelWidth) {
+                                    d3.select("#right").attrs({
+                                        x1: x,
+                                        x2: x
+                                    });
+                                    updateHeatmap();
+                                }
+                            }));
+
+                        paintHeatmap(data, {
+                            blockSize: blockSize,
+                            svg: svg,
+                            chart: chart,
+                            labelHeight: labelHeight,
+                            labelWidth: labelWidth
+                        });
+                        updateHeatmap();
+                    }
+                }
+            );
+
+
+            function updateHeatmap(){
+
+
+
+                var a = $("#left").attr("x1") * (max / labelWidth),
+                    b = $("#right").attr("x1") * (max / labelWidth);
 
 
 //				console.log(a)
 
-				colorScale.domain([ a, b ]);
+                colorScale.domain([ a, b ]);
 
 //				console.log("hey");
-				d3.selectAll(".slider-block").attr("fill", function(d){
-					return colorScale(d);
-				});
+                d3.selectAll(".slider-block").attr("fill", function(d){
+                    return colorScale(d);
+                });
 
-				d3.selectAll(".heatmap-block").attr("fill", function(d){
-					return colorScale(d.readsout);
-				});
-			}
+                d3.selectAll(".heatmap-block").attr("fill", function(d){
+                    return colorScale(d.readsout);
+                });
+            }
 
-			function paintHeatmap(data, config){
-				var blockSize = config.blockSize,
-					svg = config.svg,
-					chart = config.chart,
-					labelHeight = config.labelHeight,
-					labelWidth = config.labelWidth;
+            function paintHeatmap(data, config){
+                var blockSize = config.blockSize,
+                    svg = config.svg,
+                    chart = config.chart,
+                    labelHeight = config.labelHeight,
+                    labelWidth = config.labelWidth;
 
-				// Draw labels and axis
-				// Then go row by row and draw boxes
+                // Draw labels and axis
+                // Then go row by row and draw boxes
 
-				labelX = labelWidth;
-				labelY = labelHeight;
-				stupidShit = labelY;
+                labelX = labelWidth;
+                labelY = labelHeight;
+                stupidShit = labelY;
 
-				var xLabels = svg.append("g").attr("id", "heatmap-x-labels");
-				var yLabels = svg.append("g").attr("id", "heatmap-y-labels");
+                var xLabels = svg.append("g").attr("id", "heatmap-x-labels");
+                var yLabels = svg.append("g").attr("id", "heatmap-y-labels");
 
-				// Draw the x-axis
-				Object.keys(samples).forEach(function (sample) {
-					// I don't understand matrix transforms OKAY?!??!
-					// I don't know why this works, but it does.
-					stupidX = labelX + labelHeight;
-					stupidY = stupidShit - labelWidth - 10;
+                // Draw the x-axis
+                Object.keys(samples).forEach(function (sample) {
+                    // I don't understand matrix transforms OKAY?!??!
+                    // I don't know why this works, but it does.
+                    stupidX = labelX + labelHeight;
+                    stupidY = stupidShit - labelWidth - 10;
 
-					yLabels.append("text").text(sample).attrs({
-						dx: labelX,
-						dy: labelY,
-						class: 'heatmap-y-label'
-					}).style(
-						'transform',
-						'matrix(0, 1, -1, 0, ' + stupidX + ', ' + stupidY+')'
-					);
+                    yLabels.append("text").text(sample).attrs({
+                        dx: labelX,
+                        dy: labelY,
+                        class: 'heatmap-y-label'
+                    }).style(
+                        'transform',
+                        'matrix(0, 1, -1, 0, ' + stupidX + ', ' + stupidY+')'
+                    );
 
-					labelX += blockSize;
-					stupidShit = stupidShit - blockSize;
-				});
+                    labelX += blockSize;
+                    stupidShit = stupidShit - blockSize;
+                });
 
-				labelY = labelHeight;
-				labelX = labelWidth;
+                labelY = labelHeight;
+                labelX = labelWidth;
 
-				// Draw the y-axis and the rows
-				Object.keys(amplicons).forEach(function (amplicon) {
+                // Draw the y-axis and the rows
+                Object.keys(amplicons).forEach(function (amplicon) {
 
-					// y-axis
-					xLabels.append("text").text(amplicon).attrs({
-						x: labelX - 10,
-						y: labelY + 10,
-						class: 'heatmap-x-label'
-					});
-					labelX = labelWidth;
-					labelY += blockSize;
-				});
+                    // y-axis
+                    xLabels.append("text").text(amplicon).attrs({
+                        x: labelX - 10,
+                        y: labelY + 10,
+                        class: 'heatmap-x-label'
+                    });
+                    labelX = labelWidth;
+                    labelY += blockSize;
+                });
 
-				chart.selectAll(".row").data(Object.keys(amplicons))
-						.enter()
-						.append("g")
-						.classed("row", true)
-						.attr("id", function(d){return "row-"+d})
-						.datum(function(d){
-							return amplicons[d];
-						}).each(function(d, i){
-					d3.select(this)
-							.selectAll("rect")
-							.data(d).enter()
-							.append("rect").attrs({
-						class: 'bordered heatmap-block',
-						x: function(d, i){ return i * blockSize; },
-						y: i * blockSize,
-						rx: 2,
-						ry: 2,
-						height: blockSize,
-						width: blockSize,
-						fill: function(d){
-							return colorScale(d.readsout);
-						}
-					});
+                chart.selectAll(".row").data(Object.keys(amplicons))
+                        .enter()
+                        .append("g")
+                        .classed("row", true)
+                        .attr("id", function(d){return "row-"+d})
+                        .datum(function(d){
+                            return amplicons[d];
+                        }).each(function(d, i){
+                    d3.select(this)
+                            .selectAll("rect")
+                            .data(d).enter()
+                            .append("rect").attrs({
+                        class: 'bordered heatmap-block',
+                        x: function(d, i){ return i * blockSize; },
+                        y: i * blockSize,
+                        rx: 2,
+                        ry: 2,
+                        height: blockSize,
+                        width: blockSize,
+                        fill: function(d){
+                            return colorScale(d.readsout);
+                        }
+                    });
 
-				});
+                });
 
 
 //                .enter()
@@ -731,17 +731,17 @@ console.log(snvs);
 //            labelX = labelWidth;
 //            labelY += boxSize;
 //        });
-			}
+            }
 
 
 
 
-		}
+        }
 
 
 
 
-	</script>
+    </script>
 
 
 </body>
