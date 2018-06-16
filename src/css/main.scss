@@ -1,0 +1,47 @@
+header {
+  /*display: none;*/
+  width: 100%;
+  height: 200px;
+  background: #333e52;
+
+  .blur_background {
+    height: inherit;
+    width: 100%;
+    position: absolute;
+    background: url("/images/unsplash.jpg");
+    background-size: cover;
+    background-position: 50% 60%;
+  }
+}
+
+footer {
+  display: none;
+  width: 100%;
+  height: 50px;
+  background: #ddd;
+}
+
+.mask {
+  height: 100%;
+  background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+}
+
+header .container {
+  padding-top: 30px;
+}
+
+header h1 {
+  font-size: 60px;
+  font-weight: 900;
+  color: #eee;
+  margin: 0;
+}
+header h2 {
+  font-size: 30px;
+  color: #eee;
+  margin: 0;
+}
+.page > .row {
+  margin-bottom: 25px;
+}
+
