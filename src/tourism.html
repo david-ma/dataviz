@@ -48,8 +48,8 @@
         </div>
     </div>
 
-    <div class="row" id="eliza_remake">
-        <div class="col-xs-12"></div>
+    <div class="row">
+        <div class="col-xs-12" id="eliza_remake"></div>
     </div>
 
 </div>
@@ -69,6 +69,11 @@
 
 <script>
     d3.csv("/mm/2018-06-11/tourism.csv", function(d){
+        d.Locals = parseInt(d.Locals.replace(/[^0-9]/g, ''));
+        d.Tourists = parseInt(d.Tourists.replace(/[^0-9]/g, ''));
+        d.Total = d.Locals + d.Tourists;
+        d.Ratio = d.Tourists / d.Total;
+
         return d;
     }).then(function(data){
         const table = d3.select("#dataset table");
@@ -81,7 +86,11 @@
             .each(function(d){
                 const tr = d3.select(this);
                 data.columns.forEach(function(col){
-                    tr.append("td").text(d[col]);
+                    let text = d[col];
+                    if( col == "Tourists" || col == "Locals" ){
+                        text = d3.format(",")(text);
+					}
+                    tr.append("td").text(text);
                 })
             });
 
@@ -105,6 +114,7 @@
             data: data,
             width: 1000,
             height: 400,
+			nav: false,
             margin: {
                 top: 20,
                 bottom: 20,
@@ -117,10 +127,7 @@
             const svg = c.plot,
                 width = c.innerWidth,
                 height = c.innerHeight,
-                data = c.data;
-
-            console.log(data);
-
+                data = c.data.sort((a,b) => b.Ratio - a.Ratio);
 
             const 	gap = 10,
                     margin = 20,
@@ -145,7 +152,75 @@
                             fill: "grey"
                         });
 
-                    console.log(d);
+					const pl = d.Locals / d.Total,
+						  pt = d.Tourists / d.Total;
+
+                    g.append("rect")
+                        .attrs({
+							fill: '#c2185b',
+							height: bh * pt,
+							width: bw
+                        });
+
+                    g.append("rect")
+                        .attrs({
+							fill: '#3949ab',
+							y: bh * pt,
+                            height: bh * pl,
+                            width: bw
+                        });
+
+                    g.append("line")
+						.attrs({
+							x1: 0,
+							y1: bh * pt,
+							x2: bw,
+							y2: bh * pt,
+							stroke: "white"
+						});
+
+                    if ( bh * pt < 16) {
+                        g.append("text")
+                            .attrs({
+                                x: bw / 2,
+                                y: - 12,
+                                'text-anchor': 'middle',
+                                'font-size': '10px',
+                                fill: '#c2185b'
+                            })
+                            .text(`${Math.round(pt * 100)}%`);
+
+                        g.append("line")
+                            .attrs({
+                                x1: bw / 2,
+                                y1: -10,
+                                x2: bw / 2,
+                                y2: 0,
+                                stroke: "grey"
+                            });
+
+                    } else {
+                        g.append("text")
+                            .attrs({
+                                x: bw / 2,
+                                y: 12,
+                                'text-anchor': 'middle',
+                                'font-size': '10px',
+                                fill: 'white'
+                            })
+                            .text(`${Math.round(pt * 100)}%`);
+					}
+
+                    g.append("text")
+						.attrs({
+							x: bw / 2,
+							y: bh * pt + 12,
+							'text-anchor': 'middle',
+							'font-size': '10px',
+							fill: 'white'
+						})
+						.text(`${Math.round(pl * 100)}%`);
+
                 });
         });
     });
