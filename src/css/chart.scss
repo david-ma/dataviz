@@ -147,7 +147,24 @@
 
 
 
+#data table tbody {
+    line-height: 1em;
+    font-size: 12px;
+    font-family: "Source Code Pro", Monaco, Menlo, Consolas, "Courier New", monospace;
 
+    tr:nth-child(even) {
+        //background: #edd4fa;
+    }
+    tr:hover {
+        background: #ddd;
+    }
+
+    td {
+        padding: 2px 3px;
+        border: 1px solid #eee;
+    }
+
+}
 
 
 
