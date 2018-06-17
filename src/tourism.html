@@ -78,11 +78,16 @@
     </div>
 </footer>
 <script src="/js/vendor.min.js"></script>
+<script src="/js/topojson.js"></script>
+<script src="/js/d3-geo-projection.v2.min.js"></script>
+
 <script src="/js/chart.js"></script>
 <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="//cdn.rawgit.com/showdownjs/showdown/1.8.6/dist/showdown.min.js"></script>
 
 <script>
+    const charts = [];
+
     d3.csv("/mm/2018-06-11/tourism.csv", function(d){
         d.Locals = parseInt(d.Locals.replace(/[^0-9]/g, ''));
         d.Tourists = parseInt(d.Tourists.replace(/[^0-9]/g, ''));
@@ -101,11 +106,18 @@
             .each(function(d){
                 const tr = d3.select(this);
                 data.columns.forEach(function(col){
+                    const td = tr.append("td");
                     let text = d[col];
+
+                    td.style("text-align", "center");
+
                     if( col == "Tourists" || col == "Locals" ){
                         text = d3.format(",")(text);
+//                        text = d3.format(".2s")(text);
+                        td.attr("data-order", d[col]);
+                        td.style("text-align", "right");
 					}
-                    tr.append("td").text(text);
+                    td.text(text);
                 })
             });
 
@@ -137,8 +149,6 @@
                 right: 10
             }
         }).scratchpad(function(c){
-            console.log(c);
-
             const svg = c.plot,
                 width = c.innerWidth,
                 height = c.innerHeight,
@@ -264,8 +274,10 @@
                 });
         });
 
+        charts.push(eliza_remake);
         return data;
     }).then(function(data){
+
         const lewis_remake = new Chart({
             element: "lewis_remake",
             data: data,
@@ -278,9 +290,77 @@
                 left: 10,
                 right: 10
             }
-        })
+        }).scratchpad(function(c){
+            const svg = c.plot,
+                width = c.innerWidth,
+                height = c.innerHeight,
+                data = c.data;
+
+            var labelSize = 30;
+
+            var projection = d3.geoFahey()
+                .scale(width / 4 / Math.PI)
+                .translate([width / 4, height / 4]);
+
+            var path = d3.geoPath().projection(projection);
+            var center = { x: (width / 2), y: (height / 2)};
+
+            d3.json("/world-50m.json")
+                .then(function(world) {
+
+                    world = topojson.presimplify(world);
+
+                    renderMap(svg.append("g"),
+                        0.001, "yellow");
+                    renderMap(svg.append("g").attr("transform", "translate(" +  center.x + ",0)"),
+                        5, "gold");
+                    renderMap(svg.append("g").attr("transform", "translate(0," + center.y + ")"),
+                        10, "orange");
+                    renderMap(svg.append("g").attr("transform", "translate(" + center.x + ","+ center.y +")"),
+                        50, "tomato");
+
+                    function renderMap(container, minWeight, color) {
+                        var geo = topojson.simplify(world, minWeight);
+                        var countries = topojson.feature(geo, world.objects.countries).features;
+                        container
+                            .append("g")
+                            .selectAll("path", ".country")
+                            .data(countries).enter()
+                            .append("path")
+                            .attr("class", "country")
+                            .attr("d", path)
+                            .styles({
+                                fill: color,
+                                stroke: 'grey'
+                            });
+
+                        container
+                            .append("rect")
+                            .attr("height", labelSize)
+                            .attr("y", (center.y - 	labelSize) / 2)
+                            .attr("width", center.x);
+
+                        container
+                            .append("text")
+                            .styles({
+                                fill: "white",
+                                'text-anchor': 'middle'
+                            })
+                            .text("minWeight = " + minWeight)
+                            .attr("transform", "translate(" + (center.x / 2) + "," + (center.y / 2) + ")");
+                    }
+                });
 
 
+
+
+
+
+
+        });
+
+        charts.push(lewis_remake);
+        return data;
     });
 
     const md = new showdown.Converter({

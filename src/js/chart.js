@@ -56,7 +56,6 @@ class Chart {
                 width: this.innerWidth
             });
 
-        console.log(this.opts);
         if ( this.opts.nav !== false ) {
             this.drawNav();
         }
