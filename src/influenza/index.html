@@ -42,30 +42,17 @@
         </div>
     </section>
 
-    <section class="hidden">
-        <div class="row" id="eliza">
-            <div class="col-xs-12 col-sm-6"></div>
-            <div class="col-xs-12 col-sm-6">
-                <a target="_blank" href="/mm/2018-06-11/ElizaSavov.png"><img src="/mm/2018-06-11/ElizaSavov.png"></a>
-                <span>Viz by <a target="_blank" href="https://data.world/elisavova">Eliza Savov</a></span>
+    <section>
+        <div class="row" id="andy">
+            <div class="col-xs-12 col-md-6"></div>
+            <div class="col-xs-12 col-md-6">
+                <a target="_blank" href="AndyKriebel.jpg"><img src="AndyKriebel.jpg"></a>
+                <span>Viz by <a target="_blank" href="//twitter.com/VizWizBI">Andy Kriebel</a></span>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-xs-12" id="eliza_remake"></div>
-        </div>
-    </section>
-    <section class="hidden">
-        <div class="row" id="lewis">
-            <div class="col-xs-12 col-sm-6"></div>
-            <div class="col-xs-12 col-sm-6">
-                <a target="_blank" href="/mm/2018-06-11/LewisWilliams.png"><img src="/mm/2018-06-11/LewisWilliams.png"></a>
-                <span>Viz by <a target="_blank" href="https://twitter.com/_LewisWilliams">@Lewis Williams</a></span>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-xs-12" id="lewis_remake"></div>
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2" id="andy_remake"></div>
         </div>
     </section>
 
@@ -89,16 +76,32 @@
 
 <script>
     const charts = [];
+    let data = [];
+    const seasons = {};
 
     d3.csv("/influenza/US_Influenza_Surveillance_Report.csv", function(d){
-//        d.Locals = parseInt(d.Locals.replace(/[^0-9]/g, ''));
-//        d.Tourists = parseInt(d.Tourists.replace(/[^0-9]/g, ''));
-//        d.Total = d.Locals + d.Tourists;
-//        d.Ratio = d.Tourists / d.Total;
+        const season = d.SEASON;
 
+        // List of which fields are integers...
+        const integers = ["AGE 0-4", "AGE 5-24", "AGE 25-49", "AGE 25-64", "AGE 50-64", "AGE 65", "ILITOTAL", "TOTAL PATIENTS", "NUM. OF PROVIDERS", "WEEK"];
+        integers.forEach(function(field){
+            d[field] = parseInt(d[field]);
+        });
+
+        const floats = ["%UNWEIGHTED ILI", "% WEIGHTED ILI"];
+        floats.forEach(function(field){
+            d[field] = parseFloat(d[field]);
+        });
+
+        seasons[season] = seasons[season] || [];
+        seasons[season].push(d);
         return d;
-    }).then(function(data){
+    }).then(function(dataset){
+        data = dataset;
         const table = d3.select("#dataset table");
+
+// hack to skip the long data load....
+        if(window.location.hash !== "#andy_remake") {
 
         table.select("tbody")
             .selectAll("tr")
@@ -120,13 +123,126 @@
 
         $("#dataset table").dataTable({
             pageLength: 25
-//            paging: false,
-//            searching: false,
-//            bFilter: false
-//            bInfo: false
         });
 
+
+        }
+
         return data;
+    }).then(function(data){
+        // OK.. let's do a viz
+        console.log(data);
+
+        const andy_remake = new Chart({
+            element: "andy_remake",
+            data: data,
+            width: 600,
+            height: 400,
+            nav: false,
+            title: "Influenza-like Illness (ILI) in 2017-2018",
+            xLabel: "Week",
+            yLabel: "Number Reported of ILI Cases",
+            margin: {
+                top: 50,
+                bottom: 70,
+                left: 70,
+                right: 50
+            }
+        }).scratchpad(function(c){
+            const   svg = c.plot,
+                    width = c.innerWidth,
+                    height = c.innerHeight,
+                    data = seasons['2017-18'];
+//                            .sort((a,b) => a.WEEK - b.WEEK);
+
+            console.log("Just looking at 2017-18", data);
+
+            // Set the ranges
+            const x = d3.scaleLinear().range([0, width]);
+            const y = d3.scaleLinear().range([height, 0]);
+
+            // Define the line
+            var line = d3.line()
+                .x(function(d, i) { return x(i); })
+                .y(function(d) { return y(d.ILITOTAL); });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, (d, i) => i));
+            y.domain([0, d3.max(data, (d) => d.ILITOTAL)]);
+
+
+
+            // Add the line path.
+             svg.append("path")
+                 .data([data])
+                 .attr("class", "line")
+                 .attr("d", line);
+
+            // Add the X Axis
+//            svg.append("g")
+//                .attr("class", "axis")
+//                .attr("transform", `translate(0, ${height})`)
+//                .call(d3.axisBottom(x));
+
+
+            // Add the Y Axis
+            svg.append("g")
+                .attr("class", "axis")
+                .call(d3.axisLeft(y));
+
+
+
+
+             return;
+            // y.domain([0, d3.max(weeks, function(d) { return d.value; })]);
+            // this.plot.append("path")
+            //     .data([weeks])
+            //     .attr("class", "line")
+            //     .style("stroke", "red")
+            //     .attr("d", valueline.x(function(d) { return x(d.week); }));
+
+            y.domain([0, d3.max(months, function(d) { return d.value; })]);
+            this.plot.append("path")
+                .data([months])
+                .attr("class", "line")
+                .style("stroke", "black")
+                .attr("d", valueline.x(function(d) { return x(d.month); }));
+
+
+            var that = this;
+
+            console.log("Here is our sample data", sampleData);
+
+            Object.keys(sampleData).forEach(function(sample, i){
+                console.log("doing sample...", sample);
+                var data = {};
+
+                sampleData[sample].forEach(function(point){
+                    data[point.date] = data[point.date] || {
+                        rawDate: point.rawDate,
+                        value: 0
+                    };
+                    data[point.date].value += point.value;
+                });
+                console.log(data);
+
+                data = Object.keys(data).map(function(date){
+                    return {
+                        date: parseTime(data[date].rawDate),
+                        value: data[date].value
+                    };
+                });
+
+                that.plot.append("path")
+                    .data([data])
+                    .attr("class", "line")
+                    .style("stroke", that.colours[i])
+                    .attr("d", valueline.x(function(d) { return x(d.date); }));
+            });
+
+
+        });
+        charts.push(andy_remake);
     });
 
 
@@ -140,50 +256,25 @@
 
 
     $("#dataset>div:first-child").html(md.makeHtml(`
-# MakeoverMonday
+# Influenza Dataset
 
-All #MakeoverMonday datasets can be found [here](http://www.makeovermonday.co.uk/data/),
+All #MakeoverMonday datasets can be found [here](http://www.makeovermonday.co.uk/data/)
 
-The blogpost is [here](http://www.makeovermonday.co.uk/week-24-2018/);
+
+[//]: # (The blogpost is [here](http://www.makeovermonday.co.uk/week-24-2018/);)
+
+> **Report:** [U.S. Influenza Surveilance Report](https://www.cdc.gov/flu/weekly/#S11)
+>
+> **Source:** [CDC](https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html)
 
     `));
 
+    $("#andy>div:first-child").html(md.makeHtml(`
+# Percentage of Visits for Influenza-like Illness (ILI)
+## by [@Andy Kriebel](//twitter.com/VizWizBI) - [original](https://twitter.com/VizWizBI/status/1008344778696687618)
 
-
-
-
-
-
-    $("#eliza>div:first-child").html(md.makeHtml(`
-# Tourism Density Contrasts
-## by [@Eliza Savov](//data.world/elisavova) - [original](//datastudio.google.com/reporting/1lBu43kf6_2PU0M1EN97t3XJY_j43utNO/page/sSFT)
-
-Countries in which the local <span style="color:#3949ab; font-weight: 900;">population</span> is vastly outnumbered by <span style="color:#c2185b; font-weight: 900;">tourists</span> suffer from _overtourism_. At the other end of the spectrum are destinations in which tourists account for up to 9% of all people in the country, and where [Intrepid](//www.intrepidtravel.com/au/adventure-index) focuses their promotional efforts to overcome _undertourism_.
-
-
-> **Source:** World Tourism Organization (2018), Compendium of Tourism Statistics dataset [Electronic], UNWTO, Madrid, data updated on 15/01/2018.
->
-> **Original viz:** [Intrepid Travel](//intrepidgroup.bynder.com/transfer/bdd0abcac448329ed4c9057327b6ca660742e4b5ea16f18bd5a343b2c6d0d0c8)
->
-> **Created by:** Eliza Savov in Data Studio for [#MakeoverMonday](http://makeovermonday.co.uk/)
+Reported by the U.S. Outpatient Influenza-like Illness Surveillance Network (ILINet), Weekly National Summary, 2017-2018 and Selected Previous Seasons
 `));
-
-
-    $("#lewis>div:first-child").html(md.makeHtml(`
-# ARRIVALS \\ DEPARTURES
-## Tourism Density Index
-## by [@Lewis Williams](https://twitter.com/_LewisWilliams) - [original](https://public.tableau.com/profile/lewis.williams#!/vizhome/MakeiverMondayWk24TravalDensityIndex/TourismDensityIndex?publish=yes)
-
-
-
-<span style="color: #b68e26; font-weight: 900;">Overtourism</span>, When visitors outweigh locals, it can become an issue for their cost of living and therefore quality of life. In Iceland, there are almost 1.9 million visitors and just 334,000 permanent residents. There's arguably an issue of <span style="color: #31a1b3; font-weight: 900;">Undertourism</span> in places like Papua New Guinea where total visitor arrivals make up just 2.45% of their permanent population. Other destinations open to sustainable tourism include Tanzania where visitors make up 2.31% of its population.
-
-
-> **Author:** [@_LewisWilliams](https://twitter.com/_LewisWilliams)
->
-> **Data:** [Intrepid Travel](//intrepidgroup.bynder.com/transfer/bdd0abcac448329ed4c9057327b6ca660742e4b5ea16f18bd5a343b2c6d0d0c8)
-`));
-
 
 
 

@@ -37,6 +37,14 @@ class Chart {
 
         this.fullscreen = false;
 
+        if(this.xLabel) {
+            this.addxLabel();
+        }
+
+        if(this.yLabel) {
+            this.addyLabel();
+        }
+
         this.draw();
     }
 
@@ -488,34 +496,32 @@ console.log(data);
             .attr("transform", 'translate(0, 0)')
             .call(yAxis);
 
+    }
 
-        // Add axis labels
-        if(this.xLabel) {
-            let x = this.margin.left + (this.innerWidth / 2),
-                y = this.height - 5;
+    addxLabel() {
+        let x = this.margin.left + (this.innerWidth / 2),
+            y = this.height - 5;
 
-            this.svg.append("g")
-                .attrs({
-                    transform: `translate(${x},${y})`
-                }).styles({
-                    "text-anchor": "middle"
-                }).append("text")
-                .text(this.xLabel);
-        }
+        this.svg.append("g")
+            .attrs({
+                transform: `translate(${x},${y})`
+            }).styles({
+            "text-anchor": "middle"
+        }).append("text")
+            .text(this.xLabel);
+    }
 
-        if(this.yLabel) {
-            let x = 5,
-                y = this.margin.top + (this.innerHeight / 2);
+    addyLabel() {
+        let x = 5,
+            y = this.margin.top + (this.innerHeight / 2);
 
-            this.svg.append("g")
-                .attrs({
-                    transform: `matrix(0,1,-1,0,${x},${y})`
-                }).styles({
-                "text-anchor": "middle"
-            }).append("text")
-                .text(this.yLabel);
-        }
-
+        this.svg.append("g")
+            .attrs({
+                transform: `matrix(0,1,-1,0,${x},${y})`
+            }).styles({
+            "text-anchor": "middle"
+        }).append("text")
+            .text(this.yLabel);
     }
 
     addChart() {
@@ -1109,6 +1115,10 @@ console.log(data);
 
 
 
+
+// I'm dumping utility functions here...
+// These are probably available from underscore or jquery or whatever
+
 function sumByCount(d) {
     return d.children ? 0 : 1;
 }
@@ -1138,6 +1148,9 @@ function injectStyles(rule) {
         html: '&shy;<style>' + rule + '</style>'
     }).appendTo("body");
 }
+
+
+
 
 
 
