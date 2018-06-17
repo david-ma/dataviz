@@ -360,8 +360,6 @@
                     mapping["Tanzania"] = "TZA";
                     mapping["Singapore"] = "MYS";
 
-
-
                     const colors = {
                         Overtourism: "#b68e26",
                         Undertourism: "#31a1b3"
@@ -374,9 +372,7 @@
                     });
 
                     data.forEach(function(country){
-
                         const code = mapping[country.Country];
-
                         d3.select(`#map-${code}`)
                             .classed(country.Category, true)
                             .attrs({
@@ -392,9 +388,93 @@
 
                 })
                 .then(function(){
-                    svg.append("g").attrs({
+                    const space = svg
+                        .append("g")
+                        .attrs({
+                            class: "barcharts"
+                        });
 
-                    })
+                    // hardcoded... we should grab these or pass them in from the map...
+                    const   width = 300,
+                            height = 600,
+                            marginLeft = 50,
+                            boxWidth = (width * 0.9) - marginLeft,
+                            gap = 15,
+                            boxHeight = (height / (data.length * 0.9)) - gap;
+
+                    space.append("line")
+                        .attrs({
+                            x1: (width * 0.05) + marginLeft,
+                            x2: (width * 0.05) + marginLeft,
+                            y1: height * 0.05 - 10,
+                            y2: height * 0.05 + (data.length * (boxHeight + gap)),
+                            stroke: 'grey',
+                            'stroke-width': 0.5
+                        });
+
+                    space.selectAll(".country")
+                        .data(data)
+                        .enter()
+                        .append("g")
+                        .attr("transform", (d,i) => `translate(${(width * 0.05) + marginLeft}, ${height * 0.05 + (i * (boxHeight + gap))})`)
+                        .each(function(d){
+                            const   g = d3.select(this),
+                                    ratio = boxWidth / d.Total,
+                                    barHeight = boxHeight / 3;
+                            console.log(d);
+                            console.log(g);
+
+                            g.append("rect").attrs({
+                                width: boxWidth,
+                                height: barHeight * 2,
+                                y: barHeight,
+                                fill: "none",
+                                stroke: 'grey',
+                                'stroke-width': 0.5
+                            });
+
+                            g.append("rect").attrs({
+                                width: ratio * d.Locals,
+                                height: barHeight,
+                                y: barHeight,
+                                fill: '#31a1b3'
+                            });
+
+                            g.append("text").attrs({
+                                'text-anchor': 'end',
+                                'font-size': '6px',
+                                x: -5,
+                                y: barHeight * 2,
+                                fill: 'grey'
+                            }).text("Locals");
+
+
+                            g.append("rect").attrs({
+                                width: ratio * d.Tourists,
+                                height: barHeight,
+                                y: barHeight * 2,
+                                fill: '#b68e26'
+                            });
+
+                            g.append("text").attrs({
+                                'text-anchor': 'end',
+                                'font-size': '6px',
+                                x: -5,
+                                y: barHeight * 3,
+                                fill: 'grey'
+                            }).text("Tourists");
+
+                            g.append('text')
+                                .attrs({
+                                    x: boxWidth / 2,
+                                    y: 4,
+                                    'text-anchor': 'middle',
+                                    'font-size': '10px'
+                                })
+                                .text(d.Country);
+
+                        });
+
                 });
 
         });
