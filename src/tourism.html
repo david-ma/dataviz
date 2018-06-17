@@ -297,12 +297,9 @@
                 height = c.innerHeight,
                 data = c.data;
 
-            const projection = d3.geoNaturalEarth1()
-                .scale(width / 2 / Math.PI);
-//                .translate([width / 2, height / 2]);
-
-
-
+            const projection = d3.geoMercator()
+                .center([43, 34])
+                .clipExtent([[130,100],[810,480]]);
 
             var path = d3.geoPath().projection(projection);
             var graticule = d3.geoGraticule();
@@ -318,9 +315,11 @@
                     const   geo = topojson.simplify(world, minWeight);
                     const   countries = topojson.feature(geo, world.objects.countries).features;
 
-                    container
+                    const map = container
                         .append("g")
-                        .selectAll("path", ".country")
+                        .attr("transform", "translate(170,-100)")
+
+                    map.selectAll("path", ".country")
                         .data(countries)
                         .enter()
                         .append("path")
@@ -335,18 +334,19 @@
                             console.log(d);
                         });
 
-                    container.append("path")
+                    map.append("path")
                         .datum(graticule)
                         .attr("class", "graticule")
                         .attr("d", path);
 
-                    container.append("path")
+                    map.append("path")
                         .datum({type: "Sphere"})
                         .attr("class", "boundary")
                         .attr("d", path);
 
                     return countries;
-                }).then(function(countries){
+                })
+                .then(function(countries){
 
                     const mapping = {"Croatia":"HRV","Iceland":"ISL","Hungary":"HUN","Denmark":"DNK","France":"FRA","Czech Republic":"CZE","Cyprus":"CYP","Greece":"GRC","Spain":"ESP","China":"CHN","Sri Lanka":"LKA","Colombia":"COL","Iran":"IRN","Mozambique":"MOZ","Egypt":"EGY","Indonesia":"IDN","Kenya":"KEN","Papua New Guinea":"PNG","Tanzania":"TZA","Singapore":"MYS"};
 
@@ -380,10 +380,6 @@
 
                         $(`#map-${code}`).tooltip();
                     });
-
-
-
-
 
                 });
 
