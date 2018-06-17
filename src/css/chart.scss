@@ -150,27 +150,57 @@
         padding-bottom: 40px;
         border-bottom: 1px solid lightgrey;
         margin-bottom: 20px;
+
+        &.hidden {
+            display: none;
+        }
     }
 
-    #dataset table tbody {
-        line-height: 1em;
-        font-size: 12px;
-        font-family: "Source Code Pro", Monaco, Menlo, Consolas, "Courier New", monospace;
-
-        tr:nth-child(even) {
-            //background: #edd4fa;
-        }
-        tr:hover {
-            background: #ddd;
+    #dataset {
+        .largeTable {
+            overflow: scroll;
+            border: 1px solid grey;
+            border-radius: 3px;
+            margin-top: 10px;
+            padding: 10px;
         }
 
-        td {
-            padding: 2px 3px;
-            border: 1px solid #eee;
-            white-space: nowrap;
+        table tbody {
+            line-height: 1em;
+            font-size: 12px;
+            font-family: "Source Code Pro", Monaco, Menlo, Consolas, "Courier New", monospace;
+
+            tr:nth-child(even) {
+                //background: #edd4fa;
+            }
+            tr:hover {
+                background: #ddd;
+            }
+
+            td {
+                padding: 2px 3px;
+                border: 1px solid #eee;
+                white-space: nowrap;
+            }
         }
 
+        .dataTables_wrapper {
+            width: 100vw;
+        }
+        .dataTables_info, .dataTables_length, .download_csv_link {
+            position: sticky;
+            left: 10px;
+        }
+        .dataTables_paginate {
+            position: sticky;
+            right: 0;
+        }
+        .dataTables_filter {
+            position: sticky;
+            right: 10px;
+        }
     }
+
 
     img {
         width: 100%;

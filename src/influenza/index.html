@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Tourism</title>
+
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/chart.css">
+
+</head>
+<body>
+<header>
+    <div class="blur_background">
+        <div class="mask"></div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>Influenza</h1>
+                <h2>#MakeoverMonday from 2018-06-17</h2>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container-fluid dataviz-page">
+    <section>
+        <div class="row" id="dataset">
+            <div class="col-xs-12 col-md-4"></div>
+            <div class="col-xs-12 col-md-8 largeTable">
+                <table>
+                    <thead><tr></tr></thead>
+                    <tbody></tbody>
+                </table>
+                <div class="download_csv_link"><a target="_blank" href="/influenza/US_Influenza_Surveillance_Report.csv">Download CSV</a></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="hidden">
+        <div class="row" id="eliza">
+            <div class="col-xs-12 col-sm-6"></div>
+            <div class="col-xs-12 col-sm-6">
+                <a target="_blank" href="/mm/2018-06-11/ElizaSavov.png"><img src="/mm/2018-06-11/ElizaSavov.png"></a>
+                <span>Viz by <a target="_blank" href="https://data.world/elisavova">Eliza Savov</a></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12" id="eliza_remake"></div>
+        </div>
+    </section>
+    <section class="hidden">
+        <div class="row" id="lewis">
+            <div class="col-xs-12 col-sm-6"></div>
+            <div class="col-xs-12 col-sm-6">
+                <a target="_blank" href="/mm/2018-06-11/LewisWilliams.png"><img src="/mm/2018-06-11/LewisWilliams.png"></a>
+                <span>Viz by <a target="_blank" href="https://twitter.com/_LewisWilliams">@Lewis Williams</a></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12" id="lewis_remake"></div>
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <p class="col-xs-6">Simple <a href="https://github.com/david-ma/Thalia">Thalia</a> Bootstrap Boilerplate</p>
+            <p class="col-xs-6 text-right">By <a href="https://twitter.com/frostickle">@Frostickle</a> <i class="fab fa-twitter" aria-hidden="true"></i></p>
+        </div>
+    </div>
+</footer>
+<script src="/js/vendor.min.js"></script>
+<script src="/js/topojson.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+
+<script src="/js/chart.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.rawgit.com/showdownjs/showdown/1.8.6/dist/showdown.min.js"></script>
+
+<script>
+    const charts = [];
+
+    d3.csv("/influenza/US_Influenza_Surveillance_Report.csv", function(d){
+//        d.Locals = parseInt(d.Locals.replace(/[^0-9]/g, ''));
+//        d.Tourists = parseInt(d.Tourists.replace(/[^0-9]/g, ''));
+//        d.Total = d.Locals + d.Tourists;
+//        d.Ratio = d.Tourists / d.Total;
+
+        return d;
+    }).then(function(data){
+        const table = d3.select("#dataset table");
+
+        table.select("tbody")
+            .selectAll("tr")
+            .data(data)
+            .enter()
+            .append("tr")
+            .each(function(d){
+                const tr = d3.select(this);
+                data.columns.forEach(function(col){
+                    const td = tr.append("td");
+                    td.text(d[col]);
+                })
+            });
+
+        const headerRow = table.select("thead tr");
+        data.columns.forEach(function(column){
+            headerRow.append("th").text(column);
+        });
+
+        $("#dataset table").dataTable({
+            pageLength: 25
+//            paging: false,
+//            searching: false,
+//            bFilter: false
+//            bInfo: false
+        });
+
+        return data;
+    });
+
+
+
+/**
+ * Markdown stuff goes here...
+ */
+    const md = new showdown.Converter({
+        openLinksInNewWindow: true
+    });
+
+
+    $("#dataset>div:first-child").html(md.makeHtml(`
+# MakeoverMonday
+
+All #MakeoverMonday datasets can be found [here](http://www.makeovermonday.co.uk/data/),
+
+The blogpost is [here](http://www.makeovermonday.co.uk/week-24-2018/);
+
+    `));
+
+
+
+
+
+
+
+    $("#eliza>div:first-child").html(md.makeHtml(`
+# Tourism Density Contrasts
+## by [@Eliza Savov](//data.world/elisavova) - [original](//datastudio.google.com/reporting/1lBu43kf6_2PU0M1EN97t3XJY_j43utNO/page/sSFT)
+
+Countries in which the local <span style="color:#3949ab; font-weight: 900;">population</span> is vastly outnumbered by <span style="color:#c2185b; font-weight: 900;">tourists</span> suffer from _overtourism_. At the other end of the spectrum are destinations in which tourists account for up to 9% of all people in the country, and where [Intrepid](//www.intrepidtravel.com/au/adventure-index) focuses their promotional efforts to overcome _undertourism_.
+
+
+> **Source:** World Tourism Organization (2018), Compendium of Tourism Statistics dataset [Electronic], UNWTO, Madrid, data updated on 15/01/2018.
+>
+> **Original viz:** [Intrepid Travel](//intrepidgroup.bynder.com/transfer/bdd0abcac448329ed4c9057327b6ca660742e4b5ea16f18bd5a343b2c6d0d0c8)
+>
+> **Created by:** Eliza Savov in Data Studio for [#MakeoverMonday](http://makeovermonday.co.uk/)
+`));
+
+
+    $("#lewis>div:first-child").html(md.makeHtml(`
+# ARRIVALS \\ DEPARTURES
+## Tourism Density Index
+## by [@Lewis Williams](https://twitter.com/_LewisWilliams) - [original](https://public.tableau.com/profile/lewis.williams#!/vizhome/MakeiverMondayWk24TravalDensityIndex/TourismDensityIndex?publish=yes)
+
+
+
+<span style="color: #b68e26; font-weight: 900;">Overtourism</span>, When visitors outweigh locals, it can become an issue for their cost of living and therefore quality of life. In Iceland, there are almost 1.9 million visitors and just 334,000 permanent residents. There's arguably an issue of <span style="color: #31a1b3; font-weight: 900;">Undertourism</span> in places like Papua New Guinea where total visitor arrivals make up just 2.45% of their permanent population. Other destinations open to sustainable tourism include Tanzania where visitors make up 2.31% of its population.
+
+
+> **Author:** [@_LewisWilliams](https://twitter.com/_LewisWilliams)
+>
+> **Data:** [Intrepid Travel](//intrepidgroup.bynder.com/transfer/bdd0abcac448329ed4c9057327b6ca660742e4b5ea16f18bd5a343b2c6d0d0c8)
+`));
+
+
+
+
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
