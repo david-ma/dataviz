@@ -8,9 +8,9 @@
     <title>Tourism</title>
 
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/chart.css">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
 
 </head>
 <body>
@@ -307,6 +307,7 @@
 
             d3.json("/world.json")
                 .then(function(world) {
+                    // Draw the map
 
                     world = topojson.presimplify(world);
                     const   container = svg.append('g'),
@@ -315,9 +316,11 @@
                     const   geo = topojson.simplify(world, minWeight);
                     const   countries = topojson.feature(geo, world.objects.countries).features;
 
+                    // Position the map... this should actually be done in the next section, dynamically.
                     const map = container
                         .append("g")
-                        .attr("transform", "translate(170,-100)")
+                        .classed("world-map", true)
+                        .attr("transform", "translate(170,-100)");
 
                     map.selectAll("path", ".country")
                         .data(countries)
@@ -325,14 +328,7 @@
                         .append("path")
                         .attr("id", (d) => `map-${d.id}`)
                         .attr("class", "country")
-                        .attr("d", path)
-                        .styles({
-                            fill: 'lightgrey',
-                            stroke: 'darkgrey'
-                        }).on("mouseover", function(d){
-//                            console.log("HEY");
-                            console.log(d);
-                        });
+                        .attr("d", path);
 
                     map.append("path")
                         .datum(graticule)
@@ -347,12 +343,13 @@
                     return countries;
                 })
                 .then(function(countries){
+                    // Annotate the map with tooltips
 
-                    const mapping = {"Croatia":"HRV","Iceland":"ISL","Hungary":"HUN","Denmark":"DNK","France":"FRA","Czech Republic":"CZE","Cyprus":"CYP","Greece":"GRC","Spain":"ESP","China":"CHN","Sri Lanka":"LKA","Colombia":"COL","Iran":"IRN","Mozambique":"MOZ","Egypt":"EGY","Indonesia":"IDN","Kenya":"KEN","Papua New Guinea":"PNG","Tanzania":"TZA","Singapore":"MYS"};
+// If you want to hardcode everything, just use this...
+// Tanzania is wrong and there is no Singapore, so we might as well hardcode it :/
+// const mapping = {"Croatia":"HRV","Iceland":"ISL","Hungary":"HUN","Denmark":"DNK","France":"FRA","Czech Republic":"CZE","Cyprus":"CYP","Greece":"GRC","Spain":"ESP","China":"CHN","Sri Lanka":"LKA","Colombia":"COL","Iran":"IRN","Mozambique":"MOZ","Egypt":"EGY","Indonesia":"IDN","Kenya":"KEN","Papua New Guinea":"PNG","Tanzania":"TZA","Singapore":"MYS"};
 
-                // This is how you look up the country codes...
-                // But Tanzania is wrong and there is no Singapore, so we might as well hardcode it :/
-                /*
+                    const mapping = {};
                     data.forEach(function(d){
                         countries.forEach(function(feature){
                             if(feature.properties.name == d.Country) {
@@ -360,27 +357,44 @@
                             }
                         })
                     });
-                */
+                    mapping["Tanzania"] = "TZA";
+                    mapping["Singapore"] = "MYS";
+
+
+
                     const colors = {
                         Overtourism: "#b68e26",
                         Undertourism: "#31a1b3"
                     };
 
+                    Object.keys(colors).forEach(function(type){
+                        injectStyles(`.world-map path.country.${type} { fill: ${colors[type]}; }`);
+                        injectStyles(`div.tooltip.${type} div.tooltip-inner { background-color: ${colors[type]}; }`);
+                        injectStyles(`div.tooltip.${type} div.arrow:before { border-top-color: ${colors[type]}; }`);
+                    });
+
                     data.forEach(function(country){
 
                         const code = mapping[country.Country];
 
-                        d3.select(`#map-${code}`).styles({
-                            fill: colors[country.Category]
-                        }).attrs({
+                        d3.select(`#map-${code}`)
+                            .classed(country.Category, true)
+                            .attrs({
                             'data-toggle': "tooltip",
                             'data-placement': "top",
                             title: `${country.Country} has ${country.Category}`
                         });
 
-                        $(`#map-${code}`).tooltip();
+                        $(`#map-${code}`).tooltip({
+                            template: `<div class="tooltip ${country.Category}" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>`
+                        });
                     });
 
+                })
+                .then(function(){
+                    svg.append("g").attrs({
+
+                    })
                 });
 
         });

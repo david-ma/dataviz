@@ -191,17 +191,24 @@
         font-size: 0.8em;
     }
 
-    .graticule {
-        fill: none;
-        stroke: #777;
-        stroke-width: .5px;
-        stroke-opacity: .5;
-    }
+    .world-map {
+        path.country {
+            fill: lightgrey;
+            stroke: darkgrey;
+        }
 
-    .boundary {
-        fill: none;
-        stroke: #000;
-        stroke-width: 3px;
+        .graticule {
+            fill: none;
+            stroke: #777;
+            stroke-width: .5px;
+            stroke-opacity: .5;
+        }
+
+        .boundary {
+            fill: none;
+            stroke: #000;
+            stroke-width: 3px;
+        }
     }
 
 
