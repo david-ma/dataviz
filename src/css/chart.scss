@@ -191,6 +191,20 @@
         font-size: 0.8em;
     }
 
+    .graticule {
+        fill: none;
+        stroke: #777;
+        stroke-width: .5px;
+        stroke-opacity: .5;
+    }
+
+    .boundary {
+        fill: none;
+        stroke: #000;
+        stroke-width: 3px;
+    }
+
+
 }
 
 

@@ -297,11 +297,21 @@
                 height = c.innerHeight,
                 data = c.data;
 
-            var projection = d3.geoFahey()
-                .scale(width / 2 / Math.PI)
-                .translate([width / 2, height / 2]);
+//            var projection = d3.geoFahey()
+//                .scale(width / 2 / Math.PI)
+//                .translate([width / 2, height / 2]);
+
+            const projection = d3.geoNaturalEarth1()
+                .scale(width / 2 / Math.PI);
+//                .translate([width / 2, height / 2]);
+
+
+
 
             var path = d3.geoPath().projection(projection);
+            var graticule = d3.geoGraticule();
+            var bounds = d3.geoBounds();
+
 
             d3.json("/world-50m.json")
                 .then(function(world) {
@@ -317,7 +327,8 @@
                     container
                         .append("g")
                         .selectAll("path", ".country")
-                        .data(countries).enter()
+                        .data(countries)
+                        .enter()
                         .append("path")
                         .attr("class", "country")
                         .attr("d", path)
@@ -325,6 +336,18 @@
                             fill: color,
                             stroke: 'grey'
                         });
+
+                    container.append("path")
+                        .datum(graticule)
+                        .attr("class", "graticule")
+                        .attr("d", path);
+
+                    container.append("path")
+                        .datum({type: "Sphere"})
+                        .attr("class", "boundary")
+                        .attr("d", path);
+
+
 
                 });
 
