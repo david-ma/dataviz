@@ -383,6 +383,8 @@
 
                         $(`#map-${code}`).tooltip({
                             template: `<div class="tooltip ${country.Category}" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>`
+                        }).on("show.bs.tooltip", function(d){
+                            console.log(d);
                         });
                     });
 
@@ -416,13 +418,25 @@
                         .data(data)
                         .enter()
                         .append("g")
-                        .attr("transform", (d,i) => `translate(${(width * 0.05) + marginLeft}, ${height * 0.05 + (i * (boxHeight + gap))})`)
+                        .attrs({
+                            transform: (d,i) => `translate(${(width * 0.05) + marginLeft}, ${height * 0.05 + (i * (boxHeight + gap))})`,
+                            'data-toggle': "tooltip",
+                            title: (d) => `${d.Country} has ${d.Category}`,
+                            class: 'country'
+                        })
                         .each(function(d){
                             const   g = d3.select(this),
                                     ratio = boxWidth / d.Total,
                                     barHeight = boxHeight / 3;
                             console.log(d);
                             console.log(g);
+
+                            g.append('rect').attrs({
+                                width: boxWidth + 50,
+                                height: boxHeight,
+                                x: -50,
+                                fill: "rgba(0,0,0,0)"
+                            });
 
                             g.append("rect").attrs({
                                 width: boxWidth,
@@ -472,8 +486,10 @@
                                     'font-size': '10px'
                                 })
                                 .text(d.Country);
-
                         });
+
+
+                        $(".barcharts .country").tooltip();
 
                 });
 
