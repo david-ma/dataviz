@@ -79,59 +79,50 @@
     let data = [];
     const seasons = {};
 
-    d3.csv("/influenza/US_Influenza_Surveillance_Report.csv", function(d){
+    log("Calling csv stuff");
+    d3.csv("/influenza/US_Influenza_Surveillance_Report.csv", function(d, i, columns){
         const season = d.SEASON;
 
         // List of which fields are integers...
-        const integers = ["AGE 0-4", "AGE 5-24", "AGE 25-49", "AGE 25-64", "AGE 50-64", "AGE 65", "ILITOTAL", "TOTAL PATIENTS", "NUM. OF PROVIDERS", "WEEK"];
+        const integers = ["AGE 0-4", "AGE 5-24", "AGE 25-49", "AGE 25-64", "AGE 50-64", "AGE 65", "ILITOTAL", "TOTAL PATIENTS", "NUMBER OF PROVIDERS", "WEEK"];
         integers.forEach(function(field){
-            d[field] = parseInt(d[field]);
+            d[field] = parseInt(d[field]) || "";
         });
 
         const floats = ["%UNWEIGHTED ILI", "% WEIGHTED ILI"];
         floats.forEach(function(field){
-            d[field] = parseFloat(d[field]);
+            d[field] = parseFloat(d[field]) || "";
         });
 
         seasons[season] = seasons[season] || [];
         seasons[season].push(d);
+
         return d;
     }).then(function(dataset){
-        data = dataset;
-        const table = d3.select("#dataset table");
+        log("Start async stuff");
+        decorateTable(dataset);
+        drawChart(dataset);
+        log("Finish async stuff");
+    });
 
-// hack to skip the long data load....
-        if(window.location.hash !== "#andy_remake") {
-
-        table.select("tbody")
-            .selectAll("tr")
-            .data(data)
-            .enter()
-            .append("tr")
-            .each(function(d){
-                const tr = d3.select(this);
-                data.columns.forEach(function(col){
-                    const td = tr.append("td");
-                    td.text(d[col]);
-                })
-            });
-
-        const headerRow = table.select("thead tr");
-        data.columns.forEach(function(column){
-            headerRow.append("th").text(column);
-        });
-
+    function decorateTable(dataset) {
+        log("Start decorating table");
         $("#dataset table").dataTable({
-            pageLength: 25
+            data: dataset,
+            pageLength: 25,
+            columns: dataset.columns.map(function(d){ return {
+                title: d,
+                data: d
+            };})
         });
 
+        log("Finished decorating table");
+    }
 
-        }
-
-        return data;
-    }).then(function(data){
+    function drawChart(data){
+        log("Start drawing chart");
         // OK.. let's do a viz
-        console.log(data);
+//        console.log(data);
 
         const andy_remake = new Chart({
             element: "andy_remake",
@@ -155,7 +146,7 @@
                     data = seasons['2017-18'];
 //                            .sort((a,b) => a.WEEK - b.WEEK);
 
-            console.log("Just looking at 2017-18", data);
+//            console.log("Just looking at 2017-18", data);
 
             // Set the ranges
             const x = d3.scaleLinear().range([0, width]);
@@ -243,7 +234,8 @@
 
         });
         charts.push(andy_remake);
-    });
+        log("Finish drawing chart");
+    }
 
 
 
