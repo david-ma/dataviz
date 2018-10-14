@@ -138,6 +138,10 @@
             const   svg = c.plot,
                     width = c.innerWidth,
                     height = c.innerHeight;
+
+            const dataset = data["All races, total"].map((d) => [d['Year'],d['All cancers (%)']]);
+            console.log("dataset is:", dataset);
+
 //                    data = seasons['2017-18'];
 
 
@@ -146,37 +150,37 @@
 ////            console.log("Just looking at 2017-18", data);
 //
 //            // Set the ranges
-//            const x = d3.scaleLinear().range([0, width]);
-//            const y = d3.scaleLinear().range([height, 0]);
+            const x = d3.scaleLinear().range([0, width]);
+            const y = d3.scaleLinear().range([height, 0]);
 //
 //            // Define the line
-//            var line = d3.line()
-//                .x(function(d, i) { return x(i); })
-//                .y(function(d) { return y(d.ILITOTAL); });
+            var line = d3.line()
+                .x(function(d) { return x(d[0]); })
+                .y(function(d) { return y(d[1]); });
 //
 //            // Scale the range of the data
-//            x.domain(d3.extent(data, (d, i) => i));
-//            y.domain([0, d3.max(data, (d) => d.ILITOTAL)]);
+            x.domain(d3.extent(dataset, (d) => d[0]));
+            y.domain([0, 100]);
 //
 //
 //
 //            // Add the line path.
-//             svg.append("path")
-//                 .data([data])
-//                 .attr("class", "line")
-//                 .attr("d", line);
+             svg.append("path")
+                 .data([dataset])
+                 .attr("class", "line")
+                 .attr("d", line);
 //
 //            // Add the X Axis
-////            svg.append("g")
-////                .attr("class", "axis")
-////                .attr("transform", `translate(0, ${height})`)
-////                .call(d3.axisBottom(x));
+            svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", `translate(0, ${height})`)
+                .call(d3.axisBottom(x));
 //
 //
 //            // Add the Y Axis
-//            svg.append("g")
-//                .attr("class", "axis")
-//                .call(d3.axisLeft(y));
+            svg.append("g")
+                .attr("class", "axis")
+                .call(d3.axisLeft(y));
 //
 //
 //
