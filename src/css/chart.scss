@@ -179,6 +179,10 @@
                 position: sticky;
                 right: 10px;
             }
+
+            &.hidden {
+                display: none;
+            }
         }
 
         table tbody {
