@@ -75,32 +75,28 @@
 
 <script>
     const charts = [];
-//    let data = [];
-//    const seasons = {};
+
+    const data = {"All races, females":[],"All races, males":[],"All races, total":[],"Black, females":[],"Black, males":[],"Black, total":[],"White, females":[],"White, males":[],"White, total":[]};
 
     log("Calling csv stuff");
     d3.csv("/mm/2018-10-08/five-year-cancer-survival-in-usa.csv", function(d, i, columns){
-//        const season = d.SEASON;
-//
-//        // List of which fields are integers...
-//        const integers = ["AGE 0-4", "AGE 5-24", "AGE 25-49", "AGE 25-64", "AGE 50-64", "AGE 65", "ILITOTAL", "TOTAL PATIENTS", "NUMBER OF PROVIDERS", "WEEK"];
-//        integers.forEach(function(field){
-//            d[field] = parseInt(d[field]) || "";
-//        });
-//
-//        const floats = ["%UNWEIGHTED ILI", "% WEIGHTED ILI"];
-//        floats.forEach(function(field){
-//            d[field] = parseFloat(d[field]) || "";
-//        });
-//
-//        seasons[season] = seasons[season] || [];
-//        seasons[season].push(d);
 
+        const integers = ["Year"];
+        const floats = ["All cancers (%)", "Bladder (%)", "Brain and nervous system (%)", "Breast (%)", "Cervix uteri (%)", "Colon and rectum (%)", "Esophagus  (%)", "Leukemia (%)", "Liver (%)", "Lung and bronchus (%)", "Myeloma (%)", "Ovary (%)", "Pancreas (%)", "Prostate (%)", "Skin (%)", "Stomach (%)", "Thyroid (%)"];
+
+        integers.forEach(function(field){
+            d[field] = parseInt(d[field]) || "";
+        });
+        floats.forEach(function(field){
+            d[field] = parseFloat(d[field]) || "";
+        });
+
+        data[d.Entity].push(d);
         return d;
     }).then(function(dataset){
         log("Start async stuff");
         decorateTable(dataset);
-        drawChart(dataset);
+        drawChart(data);
         log("Finish async stuff");
     });
 
@@ -244,9 +240,9 @@
 /**
  * Markdown stuff goes here...
  */
-    const md = new showdown.Converter({
-        openLinksInNewWindow: true
-    });
+//    const md = new showdown.Converter({
+//        openLinksInNewWindow: true
+//    });
 
 
 //
