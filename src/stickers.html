@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Title</title>
+<style>
+
+body {
+    background-color: #eee;
+}
+
+.page {
+    background-color: #fff;
+}
+
+</style>
+
+</head>
+<body>
+
+    <div class="container page">
+        <div class="row">
+            <div class="col-xs-10 offset-xs-1" id="box">
+                Welcome!
+
+                Would you like to upload a new photo, or annotate an existing photo?
+
+                <form id="myform" name="myform" action="/upload" method="post">
+                    <input name="myform" id="fileInput" type="file">
+                    <button name="myform" type="submit">submit</button>
+                </form>
+
+                <button onclick="upload()">send package</button>
+            </div>
+        </div>
+
+        <div id="output"></div>
+
+    </div>
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/chart.css">
+<script src="/js/vendor.min.js"></script>
+<script src="/js/chart.js"></script>
+
+
+<script>
+    var reader = new FileReader();
+
+    reader.addEventListener("load", function(d){
+        console.log("reader has loaded something");
+        console.log(d);
+    });
+
+
+//    var data = reader.readAsDataURL();
+
+//    console.log(data);
+
+    $('input').on("change", readFile);
+    function readFile(e) {
+        console.log("change!");
+        console.log(e);
+        try {
+
+            var selectedFile = e.target.files[0];
+            reader.readAsDataURL(selectedFile);
+
+//            console.log(data);
+
+
+
+//            img.onload = function() {
+//
+//            }
+
+// easy way...
+            var img = new Image();
+            img.src = URL.createObjectURL(selectedFile);
+            $("#output").append(img);
+        } catch (e) {
+            console.log('error', e);
+        }
+    }
+
+
+
+
+    function upload() {
+    var package = {
+        hello: 'world'
+    };
+
+    $.ajax({
+        type: "POST",
+        url: "/upload",
+        complete: function(d){
+            console.log("Finished!", d);
+        },
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: JSON.stringify(package)
+    });
+}
+
+
+</script>
+
+<style>
+table {
+    width: 100%;
+}
+td {
+    padding: 2px;
+    border: solid 1px black;
+}
+</style>
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
