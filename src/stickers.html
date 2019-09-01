@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Title</title>
+    <title>Stuck On You</title>
 <style>
 
 body {
@@ -15,12 +15,58 @@ body {
 .page {
     background-color: #fff;
 }
+img {
+    width: 100%;
+}
+
+header {
+    width: 100%;
+    height: 500px;
+    background: #333e52;
+}
+header .blur_background {
+    height: 500px;
+    width: 100%;
+    position: absolute;
+    background: url("/images/laptop.jpg") !important;
+    background-size: cover !important;
+    background-position: 50% 60% !important;
+}
+.sticker-annotation-form {
+    border: 1px solid grey;
+    margin: 5px;
+    padding: 2px;
+}
+#annotationBox svg {
+    position: absolute;
+    color: #0b2e1355;
+}
+#annotations {
+    overflow: scroll;
+    background: grey;
+}
+    #annotations table {
+        background: white;
+    }
+
 
 </style>
 
 </head>
 <body>
-
+    <header>
+        <div class="blur_background">
+            <div class="mask"></div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1>Stuck On You</h1>
+                    <h2>A catalog for your stickers</h2>
+                </div>
+            </div>
+        </div>
+    </header>
     <div class="container page">
         <div class="row">
             <div class="col-xs-10 offset-xs-1" id="box">
@@ -30,11 +76,17 @@ body {
 
                 <form id="myform" name="myform" action="/upload" method="post">
                     <input name="myform" id="fileInput" type="file">
-                    <button name="myform" type="submit">submit</button>
+                    <button style="display:none;" name="myform" type="submit">submit</button>
                 </form>
 
-                <button onclick="upload()">send package</button>
+
             </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-8" id="annotationBox">
+                <svg></svg>
+            </div>
+            <div class="col-xs-4" id="annotations"></div>
         </div>
 
         <div id="output"></div>
@@ -51,7 +103,57 @@ body {
 
     reader.addEventListener("load", function(d){
         console.log("reader has loaded something");
-        console.log(d);
+        var pic = d.target.result;
+//        console.log("Picture!", pic);
+
+        var annotations = d3.select("#annotations");
+        var pic = d3.select("#annotationBox").append("img")
+            .attr('src', pic);
+
+        window.setTimeout(function(){
+            var imgHeight = $('#annotationBox img').height(),
+                imgWidth = $('#annotationBox img').width();
+
+            d3.select("#annotations").style("height", imgHeight+'px');
+
+            d3.select("#annotationBox svg")
+                .attrs({
+                    width: imgWidth,
+                    height: imgHeight
+                })
+                .on('click', function(d, i){
+                    console.log("Image has been clicked!", i);
+
+                    console.log(d3.event);
+                    var x = d3.event.offsetX;
+                    var y = d3.event.offsetY;
+
+                    d3.select("#annotationBox svg").append("circle").attrs({
+                        cx: x,
+                        cy: y,
+                        r: 25,
+                        fill: 'red'
+                    });
+
+
+
+                    var box = annotations.append("div").attrs({
+                        class: 'sticker-annotation-form'
+                    });
+                    var table = box.append("table");
+                    var tr = table.append("tr");
+                    tr.append('td').text("Title");
+                    tr.append('td').append('input');
+                    tr = table.append("tr");
+                    tr.append('td').text("Description");
+                    tr.append('td').append('textarea');
+                    tr = table.append("tr");
+                    tr.append('td').text("URL");
+                    tr.append('td').append('input');
+                });
+        }, 100);
+
+//        console.log(d.target.result);
     });
 
 
@@ -77,14 +179,24 @@ body {
 //            }
 
 // easy way...
-            var img = new Image();
-            img.src = URL.createObjectURL(selectedFile);
-            $("#output").append(img);
+//            var img = new Image();
+//            img.src = URL.createObjectURL(selectedFile);
+//            $("#output").append(img);
+
+            initAnnotation();
         } catch (e) {
             console.log('error', e);
         }
     }
 
+    function initAnnotation() {
+        d3.select('img').on('click', function(e){
+//            console.log(e);
+//            console.log(d3.event);
+            console.log(d3.event.offsetX);
+            console.log(d3.event.offsetY);
+        });
+    }
 
 
 
