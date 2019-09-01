@@ -121,6 +121,78 @@ header .blur_background {
 
     var blobs = JSON.parse(localStorage.blobs);
 
+    blobs.forEach(function(blob, j){
+        var box = d3.select("#blobs").append("div");
+        var left = box.append("div")
+            .attrs({
+                class: "col-xs-8"
+            });
+
+        var svg = left.append('svg').style('position', 'absolute');
+        left.append('img')
+            .attr('id', "imageBlob-"+j)
+            .attr('src', blob.photo);
+
+        var right = box.append('div')
+            .attrs({
+                class: 'col-xs-4'
+            });
+        right.append("h2").text(blob.user);
+        right.append("h3").text(blob.twitter);
+        var ul = right.append("ul");
+
+        setTimeout(function(){
+            var height = $("#imageBlob-"+j).height(),
+                width = $("#imageBlob-"+j).width();
+
+            blob.stickers.forEach(function(sticker, i){
+                console.log(sticker);
+                var circle = svg.append('circle').attrs({
+                    cx: width * sticker.x,
+                    cy: height * sticker.y,
+                    r: 25,
+                    fill: 'rgba(155,255,324,0.5)'
+                });
+
+                var label = ul.append('li').text(sticker.label);
+                label.append("p").text(sticker.text);
+
+                function expand() {
+                    label.styles({
+                        border: "solid 1px red"
+                    });
+                    circle.styles({
+                        stroke: "red"
+                    });
+
+                }
+                function shrink() {
+                    label.styles({
+                        border: ""
+                    });
+                    circle.styles({
+                        stroke: ""
+                    });
+
+                }
+
+                circle.on('mouseover', expand)
+                    .on('mouseout', shrink);
+                label.on('mouseover', expand)
+                    .on('mouseout', shrink);
+
+                console.log(stickers);
+
+            });
+
+        }, 300);
+
+    });
+
+
+
+
+
     function draw(picData) {
 
         var annotations = d3.select("#annotations");
