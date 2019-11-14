@@ -86,12 +86,16 @@ function Variant ( data ) {
 	}
 }
 
-let variants = [];
+var variants = [];
 const columnNames = ['variant', 'hgvsGVariant', 'chr', 'gene', 'hgvsC', 'hgvsG', 'hgvsP', 'refSeq', 'assembly', 'varDepth', 'varFreq', 'varcaller'];
-const columns = columnNames.map( function(d){return { name: d, title: d}});
+//const columns = columnNames.map( function(d){return { data: d, name: d, title: d}});
+
+const columns = columnNames.map( d => ({ data: d, name: d, title: d}));
 
 
-$.ajax("/anomaly.json", {
+
+$.ajax("http://www.monetiseyourwebsite.com/cors/http://115.146.84.85/v1/annotate/vcf/08new_10", {
+//$.ajax("/anomaly.json", {
 	success: function(d){
 		console.log(d);
 		stuff = d;
@@ -105,13 +109,9 @@ $.ajax("/anomaly.json", {
 			}
 		});
 
-		console.log(variants);
-
 		$("#myTable").DataTable({
 			data: variants,
-			columns: [
-				{ name: 'variant' }
-			]
+			columns: columns
 		})
 
 	}
