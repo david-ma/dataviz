@@ -119,7 +119,8 @@ header .blur_background {
 //    For debugging, don't need to select a pic each time.
 //    draw(localStorage.pic);
 
-    var blobs = JSON.parse(localStorage.blobs);
+    var blobs = JSON.parse(localStorage.blobs) || [];
+    var files = JSON.parse(localStorage.files) || [];
 
     blobs.forEach(function(blob, j){
         var box = d3.select("#blobs").append("div");
@@ -343,7 +344,12 @@ header .blur_background {
             stickers.push(d);
         });
 
+        var rand = Math.floor(Math.random() * 100000);
+        files.push(`sticker-${rand}.json`);
+        localStorage.files = JSON.stringify(files);
+
         var blob = {
+            filename: `sticker-${rand}.json`,
             user: user,
             twitter: twitter,
             email: email,
@@ -351,8 +357,27 @@ header .blur_background {
             photo: d3.select("#uploadedPic").attr("src")
         };
 
+
+//            var package = {
+//                hello: 'world'
+//            };
+
+        console.log(blob)
+
+        $.ajax({
+            type: "POST",
+            url: "/upload",
+            complete: function(d){
+                console.log("Finished!", d);
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify(blob)
+        });
+
         blobs.push(blob);
         localStorage.blobs = JSON.stringify(blobs);
+        console.log("saving!");
     }
 //    var data = reader.readAsDataURL();
 
@@ -382,22 +407,6 @@ header .blur_background {
 
 
 
-    function upload() {
-    var package = {
-        hello: 'world'
-    };
-
-    $.ajax({
-        type: "POST",
-        url: "/upload",
-        complete: function(d){
-            console.log("Finished!", d);
-        },
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        data: JSON.stringify(package)
-    });
-}
 
 
 </script>

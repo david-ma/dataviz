@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>PathOS Search</title>
+<style>
+
+body {
+    background-color: #eee;
+}
+
+.page {
+    background-color: #fff;
+}
+
+</style>
+</head>
+<body>
+
+    <div class="container page">
+        <h1>Searches done in PathOS v1.5.1</h1>
+        <div class="row">
+            <div class="col-xs-10 offset-xs-1" id="box">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-5 offset-xs-1" id="other">
+                <h2>Other</h2>
+            </div>
+            <div class="col-xs-5 offset-xs-1" id="otherNoResult">
+                <h2>Other (no result)</h2>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/chart.css">
+<script src="/js/vendor.min.js"></script>
+<script src="/js/chart.js"></script>
+
+
+<script>
+    var buckets = {
+        seqSample: [],
+//        oldSeqSample: [],
+        seqrun: [],
+        otherNoResult: [],
+        hgvs: [],
+        panel: [],
+        other: []
+    };
+
+    var otherSuccess = [];
+    var otherFail = [];
+
+
+    d3.tsv('/data/pathos_search_151.tsv', function(d, i){
+//    d3.tsv('/data/pathos_searches_all.tsv', function(d, i){
+
+        if ( i < 5 ){
+            console.log(d);
+        }
+
+        if (d.query.match(/^\d{8}$/)) {
+            buckets.seqSample.push(d);
+        } else if (d.query.match(/^\d{2}\w\d{4}$/)) {
+//            buckets.oldSeqSample.push(d);
+            buckets.seqSample.push(d);
+        } else if (d.query.match(/^\d{6}_.*/)) {
+            buckets.seqrun.push(d);
+        } else if (d.query.match(/.*--.*/)) {
+            buckets.seqSample.push(d);
+        } else if (d.query.match(/.*_.*/)) {
+            buckets.panel.push(d);
+        } else if (d.query.match(/.*[gGcC]\.\d.*/)) {
+            buckets.hgvs.push(d);
+        } else {
+            if(d.number_of_results > 0) {
+                buckets.other.push(d);
+//                console.log(d.query);
+                otherSuccess.push(d.query);
+            } else {
+                buckets.otherNoResult.push(d);
+                otherFail.push(d.query);
+            }
+        }
+
+        return d;
+    }).then(function(d){
+        console.log(d);
+        console.log(buckets);
+
+        var things = ['seqSample', 'seqrun', 'hgvs', 'panel', 'other', 'other (no result)'];
+        var total = buckets.seqSample.length + buckets.seqrun.length + buckets.hgvs.length + buckets.panel.length + buckets.other.length + buckets.otherNoResult.length;
+
+        var table = d3.select("#box").append("table");
+
+        table.append('thead').append("tr").selectAll('th')
+            .data(['Type of search','Number of searches','% of searches are this type'])
+            .enter()
+            .append('th').text((d)=>d);
+
+        table.append('tbody').selectAll("tr")
+            .data([
+                buckets.seqSample,
+                buckets.seqrun,
+                buckets.hgvs,
+                buckets.panel,
+                buckets.other,
+                buckets.otherNoResult
+            ]).enter()
+            .append('tr')
+            .each(function(d, i){
+                var tr = d3.select(this);
+                tr.append('td').text(things[i]);
+                tr.append('td').text(d.length);
+                tr.append('td').text(Math.floor(10000 * d.length / total)/100 + '%');
+            });
+
+        d3.select("#other").append('div').html(otherSuccess.join("<br>"));
+        d3.select("#otherNoResult").append('div').html(otherFail.join("<br>"));
+
+    });
+
+
+
+
+
+</script>
+
+<style>
+table {
+    width: 100%;
+}
+td, th {
+    padding: 2px;
+    border: solid 1px black;
+}
+</style>
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

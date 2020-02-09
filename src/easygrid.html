@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Title</title>
+
+<style>
+
+body {
+    background-color: #eee;
+}
+
+.page {
+    background-color: #fff;
+}
+
+header {
+    width: 100%;
+    height: 500px;
+    background: #333e52;
+}
+header .blur_background {
+    height: 500px;
+    width: 100%;
+    position: absolute;
+    background: url("/images/unsplash.jpg");
+    background-size: cover;
+    background-position: 50% 60%;
+/* Depending on your photo, you might need to blur the background.
+  -webkit-filter: blur(1px);
+  -moz-filter: blur(1px);
+  -o-filter: blur(1px);
+  -ms-filter: blur(1px);
+  filter: blur(1px);
+ */
+}
+footer {
+    width: 100%;
+    height: 50px;
+    background: #ddd;
+}
+
+.mask {
+    height: 100%;
+    background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+}
+
+header .container {
+    padding-top: 300px;
+}
+
+header h1 {
+    font-size: 60px;
+    color: #eee;
+    margin: 0;
+}
+header h2 {
+    font-size: 30px;
+    color: #eee;
+    margin: 0;
+}
+
+
+</style>
+</head>
+<body>
+    <header>
+        <div class="blur_background">
+            <div class="mask"></div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1>Title</h1>
+                    <h2>Subtitle</h2>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container page">
+        <div class="row">
+            <div class="col-xs-12">
+                <ul id="list"></ul>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <p class="col-xs-6">Simple <a href="https://github.com/david-ma/Thalia">Thalia</a> Bootstrap Boilerplate</p>
+                <p class="col-xs-6 text-right">By <a href="https://twitter.com/frostickle">@Frostickle</a> <i class="fab fa-twitter" aria-hidden="true"></i></p>
+            </div>
+        </div>
+    </footer>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/chart.css">
+    <script src="/js/vendor.min.js"></script>
+    <script src="/js/chart.js"></script>
+
+
+<script>
+    
+var cols = ["Curation Record ID", "seqVariant.curated_evd.label", "Id", "Edit", "Filter Flags", "Report", "Curate", "Current Context Curated Variant", "All Curated Variants", "Sample", "Gene", "HGVSg", "HGVSc", "HGVSp", "Consequences", "Homo- polymer", "Zygosity", "Variant Caller", "Amplicon Count", "Amplicon Bias", "Amplicons", "Variant Frequency", "Variant Depth", "Read Depth", "Panel Var %", "Panel Var %", "dbSNP", "GMAF %", "ESP %", "gnomAD %", "COSMIC Occurs", "External Evidence", "Exon", "Cytoband", "Google", "IGV", "Alamut", "CADD Raw", "CADD Scaled", "Mut. Taste", "Sift", "Polyphen", "Clinvar Category", "LRT", "Mut. Assess", "FathMM", "Meta SVM", "Meta LR", "Mut. Taste Value", "Sift Value", "Polyphen Value", "LRT Value", "Mut. Assess Value", "FathMM Value", "MetaSVM Value", "MetaLR Value", "Clinvar Value", "Clinical Sig.", "Pubmed Ids", "Ensembl Transcript", "Ensembl Gene", "Ensembl Protein", "Ensembl Canonical", "RefSeq mRNA", "RefSeq protein", "Accessions", "Domains", "Gene Description", "OMIM Ids", "Biotype", "Vep HGVSg", "Vep HGVSc", "Vep HGVSp", "Mutalyzer Status", "Mutalyzer Error", "Tags"];
+    
+d3.select("#list")
+    .selectAll("li")
+    .data(cols)
+    .enter()
+    .append('li')
+    .text((d, i) => i + ' - ' + d);
+
+var standout = new Array(76).fill(0);
+var distances = new Array(76).fill([]);
+
+var worthLookingAt = [];
+
+d3.tsv("easygrid.tsv", function(d){
+//    console.log(d);
+    var blob = {
+        user: d.username,
+        cols: d.column_order_remap.split(',').map((d) => parseInt(d))
+    };
+    var score = 0;
+    var out = [];  //number of different things... not super useful after a single insert...
+    var pos = -1;
+    var prev = -1;
+    blob.cols.forEach(function(d, i){
+        if(d != i) {
+            score++;
+            out.push(d);
+//            console.log(out);
+            if(pos == -1) {
+                pos = i;
+            }
+            distances[i].push(d-i);
+        }
+
+        if (d - 1 != prev) {
+            standout[prev]++;
+        }
+        prev = d;
+
+
+//        console.log(i);
+    });
+
+    console.log(`${cols[out[0]]}\t\t${pos}\t${out.length}\t${d.username}`);
+
+    return blob;
+}).then(function(data){
+    console.log("data is:", data);
+    console.log("standout is:", standout);
+//    cols.forEach((d, i) => console.log(`${standout[i]} ${d}`));
+
+    cols.forEach(function(d,i){
+        if(standout[i] > 1) {
+
+//            var average = distances[i].reduce((total, num) => total + (Math.abs(num)))/distances[i].length;
+//            console.log(`${standout[i]} ${average} ${d}`);
+
+//            console.log(`${standout[i]} ${d}`);
+            var places = [];
+            var people = [];
+
+            data.forEach(function(person){
+                var pos = person.cols.indexOf(parseInt(i));
+                if (Math.abs(pos - i) > 3) {
+                    places.push(pos);
+                    people.push(person.user);
+                }
+            });
+//            console.log(places);
+
+            if(places.length > 3) {
+                worthLookingAt.push({
+                    id: i,
+                    name: d,
+                    count: places.length,
+                    places: places.sort((a,b) => a-b),
+                    people: people
+                });
+            }
+
+        }
+    });
+    worthLookingAt.sort((a,b) => b.count - a.count);
+    console.log("Worth looking at", worthLookingAt);
+
+
+//    var table = d3.select("#table1");
+//
+//    let tr = table.append("tr")
+//        .selectAll('th')
+//        .data(cols)
+//        .enter()
+//        .append("th")
+//        .text((d) => d);
+//
+//    tr = table.append("tr")
+//        .selectAll('td')
+//        .data(standout)
+//        .enter()
+//        .append("td")
+//        .text((d) => d);
+});
+
+
+//
+//var alignment = {
+//    sequence: []
+//};
+//
+//
+//d3.tsv("easygrid.tsv", function(d) {
+//    var blob = {
+//        user: d.username,
+//        cols: d.column_order_remap.split(',')
+//    };
+//
+//    return {
+//        sequence: blob.cols.map((d) => {d:d, weight: 1})
+//    };
+//}).then(function(alignments){
+//
+//
+//});
+//
+//
+//
+//function align() {
+//
+//}
+
+
+</script>
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Tourism</title>
+
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/chart.css">
+
+</head>
+<body>
+<header>
+    <div class="blur_background">
+        <div class="mask"></div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>Influenza</h1>
+                <h2>#MakeoverMonday from 2018-06-17</h2>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container-fluid dataviz-page">
+    <section>
+        <div class="row" id="dataset">
+            <div class="col-xs-12 col-md-4"></div>
+            <div class="col-xs-12 col-md-8 largeTable">
+                <table>
+                    <thead><tr></tr></thead>
+                    <tbody></tbody>
+                </table>
+                <div class="download_csv_link"><a target="_blank" href="/influenza/US_Influenza_Surveillance_Report.csv">Download CSV</a></div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="row" id="andy">
+            <div class="col-xs-12 col-md-6"></div>
+            <div class="col-xs-12 col-md-6">
+                <a target="_blank" href="AndyKriebel.jpg"><img src="AndyKriebel.jpg"></a>
+                <span>U.S. Influenza Surveilance Report by <a target="_blank" href="https://www.cdc.gov/flu/weekly/#S11">CDC</a></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-sm-offset-2" id="andy_remake"></div>
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <p class="col-xs-6">Simple <a href="https://github.com/david-ma/Thalia">Thalia</a> Bootstrap Boilerplate</p>
+            <p class="col-xs-6 text-right">By <a href="https://twitter.com/frostickle">@Frostickle</a> <i class="fab fa-twitter" aria-hidden="true"></i></p>
+        </div>
+    </div>
+</footer>
+<script src="/js/vendor.min.js"></script>
+<script src="/js/topojson.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+
+<script src="/js/chart.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.rawgit.com/showdownjs/showdown/1.8.6/dist/showdown.min.js"></script>
+
+<script>
+    const charts = [];
+    let data = [];
+    const seasons = {};
+
+    log("Calling csv stuff");
+    d3.csv("/influenza/US_Influenza_Surveillance_Report.csv", function(d, i, columns){
+        const season = d.SEASON;
+
+        // List of which fields are integers...
+        const integers = ["AGE 0-4", "AGE 5-24", "AGE 25-49", "AGE 25-64", "AGE 50-64", "AGE 65", "ILITOTAL", "TOTAL PATIENTS", "NUMBER OF PROVIDERS", "WEEK"];
+        integers.forEach(function(field){
+            d[field] = parseInt(d[field]) || "";
+        });
+
+        const floats = ["%UNWEIGHTED ILI", "% WEIGHTED ILI"];
+        floats.forEach(function(field){
+            d[field] = parseFloat(d[field]) || "";
+        });
+
+        seasons[season] = seasons[season] || [];
+        seasons[season].push(d);
+
+        return d;
+    }).then(function(dataset){
+        log("Start async stuff");
+        decorateTable(dataset);
+        drawChart(dataset);
+        log("Finish async stuff");
+    });
+
+    function decorateTable(dataset) {
+        log("Start decorating table");
+        $("#dataset table").dataTable({
+            data: dataset,
+            pageLength: 25,
+            columns: dataset.columns.map(function(d){ return {
+                title: d,
+                data: d
+            };})
+        });
+
+        log("Finished decorating table");
+    }
+
+    function drawChart(data){
+        log("Start drawing chart");
+        // OK.. let's do a viz
+//        console.log(data);
+
+        const andy_remake = new Chart({
+            element: "andy_remake",
+            data: data,
+            width: 600,
+            height: 400,
+            nav: false,
+            title: "Influenza-like Illness (ILI) in 2017-2018",
+            xLabel: "Week",
+            yLabel: "Number Reported of ILI Cases",
+            margin: {
+                top: 50,
+                bottom: 70,
+                left: 70,
+                right: 50
+            }
+        }).scratchpad(function(c){
+            const   svg = c.plot,
+                    width = c.innerWidth,
+                    height = c.innerHeight,
+                    data = seasons['2017-18'];
+//                            .sort((a,b) => a.WEEK - b.WEEK);
+
+//            console.log("Just looking at 2017-18", data);
+
+            // Set the ranges
+            const x = d3.scaleLinear().range([0, width]);
+            const y = d3.scaleLinear().range([height, 0]);
+
+            // Define the line
+            var line = d3.line()
+                .x(function(d, i) { return x(i); })
+                .y(function(d) { return y(d.ILITOTAL); });
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, (d, i) => i));
+            y.domain([0, d3.max(data, (d) => d.ILITOTAL)]);
+
+
+
+            // Add the line path.
+             svg.append("path")
+                 .data([data])
+                 .attr("class", "line")
+                 .attr("d", line);
+
+            // Add the X Axis
+//            svg.append("g")
+//                .attr("class", "axis")
+//                .attr("transform", `translate(0, ${height})`)
+//                .call(d3.axisBottom(x));
+
+
+            // Add the Y Axis
+            svg.append("g")
+                .attr("class", "axis")
+                .call(d3.axisLeft(y));
+
+
+
+
+             return;
+            // y.domain([0, d3.max(weeks, function(d) { return d.value; })]);
+            // this.plot.append("path")
+            //     .data([weeks])
+            //     .attr("class", "line")
+            //     .style("stroke", "red")
+            //     .attr("d", valueline.x(function(d) { return x(d.week); }));
+
+            y.domain([0, d3.max(months, function(d) { return d.value; })]);
+            this.plot.append("path")
+                .data([months])
+                .attr("class", "line")
+                .style("stroke", "black")
+                .attr("d", valueline.x(function(d) { return x(d.month); }));
+
+
+            var that = this;
+
+            console.log("Here is our sample data", sampleData);
+
+            Object.keys(sampleData).forEach(function(sample, i){
+                console.log("doing sample...", sample);
+                var data = {};
+
+                sampleData[sample].forEach(function(point){
+                    data[point.date] = data[point.date] || {
+                        rawDate: point.rawDate,
+                        value: 0
+                    };
+                    data[point.date].value += point.value;
+                });
+                console.log(data);
+
+                data = Object.keys(data).map(function(date){
+                    return {
+                        date: parseTime(data[date].rawDate),
+                        value: data[date].value
+                    };
+                });
+
+                that.plot.append("path")
+                    .data([data])
+                    .attr("class", "line")
+                    .style("stroke", that.colours[i])
+                    .attr("d", valueline.x(function(d) { return x(d.date); }));
+            });
+
+
+        });
+        charts.push(andy_remake);
+        log("Finish drawing chart");
+    }
+
+
+
+/**
+ * Markdown stuff goes here...
+ */
+    const md = new showdown.Converter({
+        openLinksInNewWindow: true
+    });
+
+
+    $("#dataset>div:first-child").html(md.makeHtml(`
+# Influenza Dataset
+
+All #MakeoverMonday datasets can be found [here](http://www.makeovermonday.co.uk/data/)
+
+
+[//]: # (The blogpost is [here](http://www.makeovermonday.co.uk/week-24-2018/);)
+
+> **Report:** [U.S. Influenza Surveilance Report](https://www.cdc.gov/flu/weekly/#S11)
+>
+> **Source:** [CDC](https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html)
+
+    `));
+
+    $("#andy>div:first-child").html(md.makeHtml(`
+# Percentage of Visits for Influenza-like Illness (ILI)
+## from [CDC](https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html) - [original](https://www.cdc.gov/flu/weekly/#S11)
+
+Reported by the U.S. Outpatient Influenza-like Illness Surveillance Network (ILINet), Weekly National Summary, 2017-2018 and Selected Previous Seasons
+
+> **Report:** [U.S. Influenza Surveilance Report](https://www.cdc.gov/flu/weekly/#S11)
+>
+> **Source:** [CDC](https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html)
+
+`));
+
+
+
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

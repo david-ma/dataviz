@@ -6,14 +6,39 @@ exports.config = {
 	services: {
 		"upload": function(res, req, db, type){
 			const uploadFolder = "websites/dataviz/data/campjs";
-try {
+		try {
 			console.log("hey, a request???");
+			let data = "";
+
+			req.on('data', (chunk) => {
+				data += chunk;
+			});
+
+			req.on('end', () => {
+				// let data = JSON.parse(data);
+				// console.log(data);
+				// console.log(data.filename);
+				// console.log(data.email);
+
+                // fs.writeFileSync(`${uploadFolder}/${data.filename}`, data);
+			});
 
 			// var file = new File()
 			// file.
-			console.log(Object.keys(req));
-var buffer = req._readableState.buffer;
-console.log(buffer);
+			//console.log(Object.keys(res));
+			//console.log("body", res.body);
+// var buffer = req._readableState.buffer;
+// console.log(buffer.head.data.toString());
+// console.log(buffer);
+
+// console.log(buffer.toString());
+//     console.log("buffer", buffer.head.toString());
+
+    // console.log(JSON.stringify(buffer));
+	// var aaa = "ggg";
+
+
+
 // 	console.log(req);
 // 	console.log('method', req.method);
 	// console.log(req.connection.parser[2]());
@@ -22,7 +47,8 @@ console.log(buffer);
 
 			// fs.write();
 			// fs.read();
-    fs.writeFileSync(`${uploadFolder}/aaa.txt`, buffer);
+
+    //fs.writeFileSync(`${uploadFolder}/aaa.txt`, buffer.head.data.toString());
 
     // fs.writeFileSync(`${uploadFolder}/aaa.txt`, JSON.stringify(req._readableState.buffer));
     // fs.writeFileSync(`${uploadFolder}/bbb.txt`, req._readableState.buffer.head.data);

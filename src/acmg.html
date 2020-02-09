@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Title</title>
+<style>
+
+body {
+    background-color: #eee;
+}
+
+.page {
+    background-color: #fff;
+}
+
+</style>
+</head>
+<body>
+
+    <div class="container page">
+        <div class="row">
+            <div class="col-xs-10 offset-xs-1" id="box">
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/chart.css">
+<script src="/js/vendor.min.js"></script>
+<script src="/js/chart.js"></script>
+
+
+<script>
+
+    const values = ['Stand Alone', 'Very Strong', 'Strong', 'Moderate', 'Supporting'];
+    let criteria = {
+        PVS1: [0,0,0,0,0],
+        PS1: [0,0,0,0,0],
+        PS2: [0,0,0,0,0],
+        PS3: [0,0,0,0,0],
+        PS4: [0,0,0,0,0],
+        PM1: [0,0,0,0,0],
+        PM2: [0,0,0,0,0],
+        PM3: [0,0,0,0,0],
+        PM4: [0,0,0,0,0],
+        PM5: [0,0,0,0,0],
+        PM6: [0,0,0,0,0],
+        PP1: [0,0,0,0,0],
+        PP2: [0,0,0,0,0],
+        PP3: [0,0,0,0,0],
+        PP4: [0,0,0,0,0],
+        PP5: [0,0,0,0,0],
+        BA1: [0,0,0,0,0],
+        BS1: [0,0,0,0,0],
+        BS2: [0,0,0,0,0],
+        BS3: [0,0,0,0,0],
+        BS4: [0,0,0,0,0],
+        BP1: [0,0,0,0,0],
+        BP2: [0,0,0,0,0],
+        BP3: [0,0,0,0,0],
+        BP4: [0,0,0,0,0],
+        BP5: [0,0,0,0,0],
+        BP6: [0,0,0,0,0],
+        BP7: [0,0,0,0,0]
+    };
+
+
+
+    var errors = [];
+
+    d3.tsv('/data/acmg.tsv', function(d){
+//        console.log(d);
+        let blob = d;
+//
+//        if(d.acmg_justification) {
+            try {
+                d.json = JSON.parse(d.acmg_justification);
+            } catch(e) {
+//                console.log("");
+//                console.log("error", d);
+//                console.log(e);
+//                console.log(d.acmg_justification);
+//                console.log(`error ${d.id}`);
+//                console.log(d.acmg_justification);
+//                console.log(d.id);
+                errors.push(d.id);
+
+                d = null;
+            }
+//        }
+//console.log(d["'acmg_justification'"]);
+        if( d &&
+            d.json &&
+            d.json.dropdowns
+        ) {
+            Object.keys(d.json.dropdowns).forEach(function(dropdown) {
+                if(d[dropdown.toLowerCase()] == 'yes') {
+                    criteria[dropdown][values.indexOf(d.json.dropdowns[dropdown])]++;
+                }
+            });
+//            console.log(d.json.dropdowns.BP6);
+//            if (d.json.dropdowns.BP6 == 'Stand Alone') {
+//                console.log(d.id);
+//            }
+        }
+
+        return d;
+    }).then(function(d){
+        console.log(d);
+        console.log(criteria);
+
+        var table = d3.select('#box').append("table");
+
+        var tr = table.append('thead').append('tr')
+            .selectAll('td')
+            .data(["Criteria"].concat(values))
+            .enter()
+            .append("td")
+            .text((d) => d);
+
+        table.append('tbody')
+            .selectAll('tr')
+            .data(Object.keys(criteria))
+            .enter()
+            .append("tr")
+            .selectAll("td")
+            .data((d) => [d].concat(criteria[d]))
+            .enter()
+            .append("td")
+            .text((d) => d || "");
+    });
+
+
+
+
+
+</script>
+
+<style>
+table {
+    width: 100%;
+}
+td {
+    padding: 2px;
+    border: solid 1px black;
+}
+</style>
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

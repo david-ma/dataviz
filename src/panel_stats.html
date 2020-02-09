@@ -160,7 +160,8 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
 
     console.log("Panels:", panels);
 
-    charts.seqSamples = new Chart({
+    console.log("here's what lineChart needs...");
+    var stuff = {
         element: "seqSamples-chart",
         title: "SeqSamples vs time",
         data: Object.keys(panels).map(function(panel){
@@ -169,7 +170,10 @@ d3.tsv("/data/qc/seq_samples.tsv").then(function(d){
                 values: panels[panel].dates
             }
         })
-    }).lineChart();
+    };
+    console.log(stuff);
+
+    charts.seqSamples = new Chart(stuff).lineChart();
 
 
 

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Title</title>
+<style>
+
+body {
+    background-color: #eee;
+}
+
+.page {
+    background-color: #fff;
+}
+svg {
+    width: 1000px;
+    height: 500px;
+    /*background: red;*/
+}
+svg image {
+    width: 100%;
+    height: 100%;
+}
+
+</style>
+</head>
+<body>
+
+    <div class="container page">
+        <div class="row">
+            <div class="col-xs-10 offset-xs-1" id="box">
+                Here's a photo you uploaded earlier!
+
+                <svg>
+                    <image src="/data/campjs/laptop.jpg"></image>
+
+                </svg>
+            </div>
+        </div>
+
+    </div>
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/chart.css">
+<script src="/js/vendor.min.js"></script>
+<script src="/js/chart.js"></script>
+
+
+<script>
+function upload() {
+    var package = {
+        hello: 'world'
+    };
+
+    $.ajax({
+        type: "POST",
+        url: "/upload",
+        complete: function(d){
+            console.log("Finished!", d);
+        },
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: JSON.stringify(package)
+    });
+}
+
+
+</script>
+
+<style>
+table {
+    width: 100%;
+}
+td {
+    padding: 2px;
+    border: solid 1px black;
+}
+</style>
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
