@@ -15,15 +15,6 @@ body {
 .page {
     background-color: #fff;
 }
-svg {
-    width: 1000px;
-    height: 500px;
-    /*background: red;*/
-}
-svg image {
-    width: 100%;
-    height: 100%;
-}
 
 </style>
 </head>
@@ -32,12 +23,16 @@ svg image {
     <div class="container page">
         <div class="row">
             <div class="col-xs-10 offset-xs-1" id="box">
-                Here's a photo you uploaded earlier!
+                testing hello
+                <form action="/upload" target="_blank">
+                    File name:<br>
+                    <input type="text" name="filename" value="filenameGoesHere"><br>
 
-                <svg>
-                    <image src="/data/campjs/laptop.jpg"></image>
-
-                </svg>
+<br>
+                    <input type="file" name="file">
+<br>
+                    <input type="submit" value="Submit">
+                </form>
             </div>
         </div>
 

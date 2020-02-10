@@ -2,7 +2,6 @@ var http = require("http");
 var fs = require('fs');
 
 exports.config = {
-	data: true,
 	services: {
 		"upload": function(res, req, db, type){
 			const uploadFolder = "websites/dataviz/data/campjs";
@@ -20,7 +19,7 @@ exports.config = {
 				// console.log(data.filename);
 				// console.log(data.email);
 
-                // fs.writeFileSync(`${uploadFolder}/${data.filename}`, data);
+                fs.writeFileSync(`${uploadFolder}/${data.filename}`, data);
 			});
 
 			// var file = new File()
