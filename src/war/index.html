@@ -14,29 +14,16 @@
 
 </head>
 <body>
-<header>
-    <div class="blur_background">
-        <div class="mask"></div>
-    </div>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12">
-                <h1>Influenza</h1>
-                <h2>#MakeoverMonday from 2018-06-17</h2>
-            </div>
-        </div>
-    </div>
-</header>
+<br>
 <div class="container-fluid dataviz-page">
     <section>
         <div class="row" id="dataset">
             <div class="col-xs-12 col-md-4">
 
-                <br>
+                <div id="explain"></div>
                 <input id="birthyear" placeholder="1905">
                 <input type="button" value="Update birth year" onclick="drawPieChart()">
-
+                <div id="explain2"></div>
 
                 <table style="border: solid 1px grey; margin: 5px 0;">
                     <thead><tr></tr></thead>
@@ -96,7 +83,11 @@
 
 
 
-
+    $("#birthyear").on('keyup', function (e) {
+        if (e.keyCode === 13) {
+            drawPieChart();
+        }
+    });
 
     function drawChart(data) {
         const birth = 1905;
@@ -206,8 +197,8 @@ console.log("Data is", data);
         warChart = new Chart({
             element: "war_chart",
             data: data,
-            nav: false,
-            title: "Number of years USA was at war, during your lifetime"
+            nav: false
+//            title: "Number of years USA was at war, during your lifetime"
         }).scratchpad(function(c){
             const   svg = c.plot.append("g").attr("transform","translate(370,250)"),
                 width = c.innerWidth,
@@ -363,7 +354,27 @@ console.log(data_ready);
     }
 
 
+    const md = new showdown.Converter({
+        openLinksInNewWindow: true
+    });
 
+    $("#explain").html(md.makeHtml(`
+# Number of years USA was at war, during your lifetime
+## Originally on [The Washington Post](https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/) by [@pbump](https://twitter.com/pbump)
+
+I redrew Philip Bump's diagram from his article "Nearly a quarter of Americans have never experienced the U.S. in a time of peace" as an exercise to practice d3.js.
+
+Simply enter your birth year here & it will recalculate the diagram.`));
+
+
+$("#explain2").html(md.makeHtml(`Note that the "start" & "end" years reflect USA's involvement in the war, not the total length of each war.
+
+And yes, I know that you're supposed to improve the diagram for #makeovermonday, but I'm just doing this as a warmup exercise. Maybe next week I'll change the diagram more.
+
+Todo:
+ * Give the user a slider?
+ * Better labels, e.g. Years each war started
+ * Use better words`));
 
 </script>
 
