@@ -1154,7 +1154,7 @@ function log(message){
     message = message ? ` - ${message}` : "";
     const   formatTime = d3.timeFormat("%H:%M:%S"),
             date = new Date();
-    console.info(`${formatTime(date)}${message}`);
+    // console.info(`${formatTime(date)}${message}`);
 }
 
 
