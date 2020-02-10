@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Tourism</title>
+
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/chart.css">
+
+</head>
+<body>
+<header>
+    <div class="blur_background">
+        <div class="mask"></div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>Influenza</h1>
+                <h2>#MakeoverMonday from 2018-06-17</h2>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container-fluid dataviz-page">
+    <section>
+        <div class="row" id="dataset">
+            <div class="col-xs-12 col-md-4">
+
+                <br>
+                <input id="birthyear" placeholder="1905">
+                <input type="button" value="Update birth year" onclick="drawPieChart()">
+
+
+                <table style="border: solid 1px grey; margin: 5px 0;">
+                    <thead><tr></tr></thead>
+                    <tbody></tbody>
+                </table>
+                <div class="download_csv_link"><a target="_blank" href="/war/AmericanWars.csv">Download CSV</a></div>
+
+
+            </div>
+            <div class="col-xs-12 col-md-offset-2 col-md-8" id="war_chart"></div>
+
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <p class="col-xs-6">Simple <a href="https://github.com/david-ma/Thalia">Thalia</a> Bootstrap Boilerplate</p>
+            <p class="col-xs-6 text-right">By <a href="https://twitter.com/frostickle">@Frostickle</a> <i class="fab fa-twitter" aria-hidden="true"></i></p>
+        </div>
+    </div>
+</footer>
+<script src="/js/vendor.min.js"></script>
+<script src="/js/topojson.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+
+<script src="/js/chart.js"></script>
+<script src="/js/jquery.dataTables.min.js"></script>
+<script src="/js/showdown.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+<script>
+    const charts = [];
+    let data = [];
+    const seasons = {};
+    let dataset = null;
+
+    log("Calling csv stuff");
+    d3.csv("/war/AmericanWars.csv", function(d, i, columns){
+        console.log(d);
+        d.start = parseInt(d.start);
+        d.end = parseInt(d.end) || "";
+        d.length = (d.end || 2020) - d.start;
+
+        return d;
+    }).then(function(data){
+        console.log(data);
+        dataset = data;
+//        dataset.columns.push("length");
+        log("Start async stuff");
+        decorateTable(dataset);
+        drawPieChart(dataset);
+//        log("Finish async stuff");
+    });
+
+
+
+
+
+    function drawChart(data) {
+        const birth = 1905;
+        const current = 2020;
+        const age = current - birth;
+
+
+        console.log(age);
+
+        const war = new Chart({
+            element: "war_chart",
+            data: data,
+            nav: false,
+            title: "Years of life spent at war"
+        }).scratchpad(function(c){
+            const   svg = c.plot,
+                    width = c.innerWidth,
+                    height = c.innerHeight;
+
+
+            svg.append("line").attrs({
+                x1: width * .15,
+                x2: width * .85,
+                y1: height * .5,
+                y2: height * .5
+            }).styles({
+                stroke: 'black',
+                'stroke-width': '2px'
+            });
+
+            var graphLength = width * .7,
+                marginLeft = width * .15;
+
+            data.forEach(function(d){
+                console.log(d);
+                var startPercent = (d.start - birth) / age,
+                    x = marginLeft + (graphLength * startPercent),
+                    endPercent = d.length / age,
+                    width = graphLength * endPercent;
+console.log(endPercent);
+console.log(graphLength);
+console.log(width);
+                svg.append("rect")
+                    .datum(d)
+                    .attrs({
+                        x: x,
+                        y: height * .55,
+                        width: width,
+                        height: '20'
+                    });
+            });
+
+        });
+
+    }
+
+    let warChart = null;
+
+    function drawPieChart() {
+//        if(warChart) warChart.remove();
+        d3.select("#war_chart svg").remove();
+
+        const birth = parseInt($("#birthyear").val()) || 1905;
+        const current = 2020;
+        const age = current - birth;
+        let peaceStart = birth;
+        let longestWar = 0;
+
+        var data = {};
+        var totals = {
+            peace: 0,
+            war: 0
+        };
+        var totalYears = 0;
+
+        dataset.forEach(function(war,i){
+            if(war.start - peaceStart > 0 || birth < (war.end || 2020)) {
+                var peacetime = {
+                    name: `peace-${i}`,
+                    start: peaceStart,
+                    end: war.start,
+                    length: war.start - peaceStart
+                };
+
+
+
+                data[(2*i)+1] = war;
+
+                if (birth > war.start && birth < war.end) data[(2*i)+1].length = war.end - birth;
+
+                if(war.length > longestWar) longestWar = war.length;
+                peaceStart = war.end;
+
+                if (peacetime.length > 0) {
+                    data[2*i] = peacetime;
+                    totals.peace += peacetime.length;
+                    totalYears += peacetime.length;
+                }
+
+
+                totals.war += data[(2*i)+1].length;
+                totalYears += data[(2*i)+1].length;
+            }
+        });
+console.log("Data is", data);
+
+        warChart = new Chart({
+            element: "war_chart",
+            data: data,
+            nav: false,
+            title: "Number of years USA was at war, during your lifetime"
+        }).scratchpad(function(c){
+            const   svg = c.plot.append("g").attr("transform","translate(370,250)"),
+                width = c.innerWidth,
+                height = c.innerHeight;
+
+
+            var radius = height / 2.5;
+
+// Compute the position of each group on the pie:
+            var pie = d3.pie()
+                .sort(null) // Do not sort group by size
+                .value(function(d) {return d.value.length; })
+            var data_ready = pie(d3.entries(data).reverse())
+console.log(data_ready);
+
+// The arc generator
+            var arc = d3.arc()
+                .innerRadius(radius * 0.7)         // This is the size of the donut hole
+                .outerRadius(radius * 0.8)
+
+// Another arc that won't be drawn. Just for labels positioning
+            var outerArc = d3.arc()
+                .innerRadius(radius * 0.9)
+                .outerRadius(radius * 0.9)
+
+// Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+            svg
+                .selectAll('allSlices')
+                .data(data_ready)
+                .enter()
+                .append('path')
+//                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
+                .attr('d', arc)
+                .attr('fill', 'red')
+                .attr('fill', 'black')
+                .attr("stroke", "white")
+                .style("stroke-width", "2px")
+                .style("opacity", (d) => d.index % 2 == 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3)
+
+// Add the polylines between chart and labels:
+            svg
+                .selectAll('allPolylines')
+                .data(data_ready)
+                .enter()
+                .append('polyline')
+                .style("display", (d) => d.index % 2 == 1 ? "none" : '')
+                .attr("stroke", "black")
+                .style("fill", "none")
+                .attr("stroke-width", 1)
+                .attr('points', function(d) {
+                    var posA = arc.centroid(d) // line insertion in the slice
+                    var posB = outerArc.centroid(d) // line break: we use the other arc generator that has been built only for that
+                    var posC = outerArc.centroid(d); // Label position = almost the same as posB
+                    var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2 // we need the angle to see if the X position will be at the extreme right or extreme left
+                    posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
+                    return [posA, posB, posC]
+                })
+
+// Add the polylines between chart and labels:
+            svg
+                .selectAll('allLabels')
+                .data(data_ready)
+                .enter()
+                .append('text')
+                .style("display", (d) => d.index % 2 == 1 ? "none" : '')
+                .text( (d) => data[d.data.key].name )
+                .attr('transform', function(d) {
+                    var pos = outerArc.centroid(d);
+                    var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                    pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
+                    return 'translate(' + pos + ')';
+                })
+                .style('text-anchor', function(d) {
+                    var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                    return (midangle < Math.PI ? 'start' : 'end')
+                })
+
+
+            var innerData = pie
+                .value((d) => d.value)
+                (d3.entries(totals).reverse());
+
+// The arc generator
+//            var arc = d3.arc()
+            arc.innerRadius(radius * 0)
+                .outerRadius(radius * 0.65);
+
+
+// Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+            svg
+                .selectAll('innerSlices')
+                .data(innerData)
+                .enter()
+                .append('path')
+                //                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
+                .attr('d', arc)
+                .attr('fill', 'maroon')
+                .attr("stroke", "white")
+                .style("stroke-width", "2px")
+                .style("opacity", (d) => d.index % 2 == 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3);
+
+
+            console.log("drawing legend...");
+
+            var legend = c.plot.append("g").attr("transform", "translate(220,0)");
+                legend.selectAll('.legendLabel')
+                    .data(innerData)
+                    .enter()
+                    .append("g")
+                    .classed("legendLabel", true)
+                    .append('rect').attrs(function(d, i){
+                        console.log(d);
+                        console.log(i);
+                        return {
+                            x: 50,
+                            y: 20 + (30*i),
+                            height: 20,
+                            width: 20,
+                            fill: 'maroon'
+                        }
+                    }).style("opacity", (d) => d.index % 2 == 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3);
+
+                d3.selectAll('.legendLabel')
+                    .append("text")
+                    .attrs(function(d,i) {
+                        return {
+                            x: 75,
+                            y: 35 + (30*i)
+                        }
+                    }).text((d) => `${d.value} years of ${d.index % 2 == 1 ? 'peace' : 'war'}: ${d3.format(".0%")(d.value / totalYears)}`);
+
+        });
+    }
+
+
+    function decorateTable(dataset) {
+        console.log('dataset', dataset);
+        log("Start decorating table");
+        $("#dataset table").dataTable({
+            "bInfo" : false,
+            "bPaginate": false,
+            "bFilter": false,
+            data: dataset,
+            pageLength: 25,
+            order: [[1, 'asc']],
+            columns: dataset.columns.map(function(d){ return {
+                title: d,
+                data: d
+            };})
+        });
+
+        log("Finished decorating table");
+    }
+
+
+
+
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
