@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Influenza</title>
+    <title>Git</title>
 
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -22,8 +22,8 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <h1>Influenza</h1>
-                <h2>#MakeoverMonday from 2018-06-17</h2>
+                <h1>Git</h1>
+                <h2>PATHOS issues from v1.4.7 to v1.5.0</h2>
             </div>
         </div>
     </div>
@@ -31,13 +31,13 @@
 <div class="container-fluid dataviz-page">
     <section>
         <div class="row" id="dataset">
-            <div class="col-xs-12 col-md-4"></div>
-            <div class="col-xs-12 col-md-8 largeTable">
+<!--             <div class="col-xs-12 col-md-4"></div> -->
+            <div class="col-xs-12 largeTable">
                 <table>
                     <thead><tr></tr></thead>
                     <tbody></tbody>
                 </table>
-                <div class="download_csv_link"><a target="_blank" href="/influenza/US_Influenza_Surveillance_Report.csv">Download CSV</a></div>
+                <div class="download_csv_link"><a target="_blank" href="/pmac/git.tsv">Download CSV</a></div>
             </div>
         </div>
     </section>
@@ -46,8 +46,8 @@
         <div class="row" id="andy">
             <div class="col-xs-12 col-md-6"></div>
             <div class="col-xs-12 col-md-6">
-                <a target="_blank" href="AndyKriebel.jpg"><img src="AndyKriebel.jpg"></a>
-                <span>U.S. Influenza Surveilance Report by <a target="_blank" href="https://www.cdc.gov/flu/weekly/#S11">CDC</a></span>
+<!--                 <a target="_blank" href="AndyKriebel.jpg"><img src="AndyKriebel.jpg"></a> -->
+<!--                 <span>U.S. Influenza Surveilance Report by <a target="_blank" href="https://www.cdc.gov/flu/weekly/#S11">CDC</a></span> -->
             </div>
         </div>
 
@@ -80,7 +80,7 @@
     const seasons = {};
 
     log("Calling csv stuff");
-    d3.csv("/influenza/US_Influenza_Surveillance_Report.csv", function(d, i, columns){
+    d3.csv("/pmac/jira.csv", function(d, i, columns){
         const season = d.SEASON;
 
         // List of which fields are integers...
