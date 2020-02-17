@@ -48,22 +48,44 @@
         </div>
     </div>
 </footer>
+
 <script src="/js/vendor.min.js"></script>
-<script src="/js/topojson.js"></script>
 <script src="/js/bootstrap.bundle.min.js"></script>
 
-<script src="/js/chart.js"></script>
-<script src="/js/jquery.dataTables.min.js"></script>
 <script src="/js/showdown.min.js"></script>
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="/js/require.js"></script>
 
 <script>
+    require.config({
+        enforceDefine: true,
+        paths: {
+            'd3': '/js/vendor/d3.min',
+            'jquery': '/js/vendor/jquery.min',
+            'chart': "/js/chart"
+        }
+        ,shim: {
+            chart: {
+                exports: "Chart"
+            }
+        }
+    });
+
+    require(['chart',
+        '/js/jquery.dataTables.min.js'
+    ], function(_chart){
+
+
+        console.log(_chart);
+        let Chart = _chart.Chart;
+
+
     const charts = [];
     let data = [];
     const seasons = {};
     let dataset = null;
 
-    log("Calling csv stuff");
+    console.log("Calling csv stuff");
     d3.csv("/war/AmericanWars.csv", function(d, i, columns){
         console.log(d);
         d.start = parseInt(d.start);
@@ -75,7 +97,7 @@
         console.log(data);
         dataset = data;
 //        dataset.columns.push("length");
-        log("Start async stuff");
+        console.log("Start async stuff");
         decorateTable(dataset);
         drawPieChart(dataset);
 //        log("Finish async stuff");
@@ -89,60 +111,65 @@
         }
     });
 
-    function drawChart(data) {
-        const birth = 1905;
-        const current = 2020;
-        const age = current - birth;
 
+/*
+//  bar chart version
+//    function drawChart(data) {
+//        const birth = 1905;
+//        const current = 2020;
+//        const age = current - birth;
+//
+//
+//        console.log(age);
+//
+//        const war = new Chart({
+//            element: "war_chart",
+//            data: data,
+//            nav: false,
+//            title: "Years of life spent at war"
+//        }).scratchpad(function(c){
+//            const   svg = c.plot,
+//                    width = c.innerWidth,
+//                    height = c.innerHeight;
+//
+//
+//            svg.append("line").attrs({
+//                x1: width * .15,
+//                x2: width * .85,
+//                y1: height * .5,
+//                y2: height * .5
+//            }).styles({
+//                stroke: 'black',
+//                'stroke-width': '2px'
+//            });
+//
+//            var graphLength = width * .7,
+//                marginLeft = width * .15;
+//
+//            data.forEach(function(d){
+//                console.log(d);
+//                var startPercent = (d.start - birth) / age,
+//                    x = marginLeft + (graphLength * startPercent),
+//                    endPercent = d.length / age,
+//                    width = graphLength * endPercent;
+//console.log(endPercent);
+//console.log(graphLength);
+//console.log(width);
+//                svg.append("rect")
+//                    .datum(d)
+//                    .attrs({
+//                        x: x,
+//                        y: height * .55,
+//                        width: width,
+//                        height: '20'
+//                    });
+//            });
+//
+//        });
+//
+//    }
+*/
 
-        console.log(age);
-
-        const war = new Chart({
-            element: "war_chart",
-            data: data,
-            nav: false,
-            title: "Years of life spent at war"
-        }).scratchpad(function(c){
-            const   svg = c.plot,
-                    width = c.innerWidth,
-                    height = c.innerHeight;
-
-
-            svg.append("line").attrs({
-                x1: width * .15,
-                x2: width * .85,
-                y1: height * .5,
-                y2: height * .5
-            }).styles({
-                stroke: 'black',
-                'stroke-width': '2px'
-            });
-
-            var graphLength = width * .7,
-                marginLeft = width * .15;
-
-            data.forEach(function(d){
-                console.log(d);
-                var startPercent = (d.start - birth) / age,
-                    x = marginLeft + (graphLength * startPercent),
-                    endPercent = d.length / age,
-                    width = graphLength * endPercent;
-console.log(endPercent);
-console.log(graphLength);
-console.log(width);
-                svg.append("rect")
-                    .datum(d)
-                    .attrs({
-                        x: x,
-                        y: height * .55,
-                        width: width,
-                        height: '20'
-                    });
-            });
-
-        });
-
-    }
 
     let warChart = null;
 
@@ -153,6 +180,8 @@ console.log(width);
         const birth = parseInt($("#birthyear").val()) || 1905;
         const current = 2020;
         const age = current - birth;
+//        const death = 1950;
+//        const age = death - birth;
         let peaceStart = birth;
         let longestWar = 0;
 
@@ -164,7 +193,9 @@ console.log(width);
         var totalYears = 0;
 
         dataset.forEach(function(war,i){
-            if(war.start - peaceStart > 0 || birth < (war.end || 2020)) {
+//            if(death < (war.end || 2020)) {
+//            } else if(war.start - peaceStart > 0 || birth < (war.end || 2020)) {
+                if(war.start - peaceStart > 0 || birth < (war.end || 2020)) {
                 var peacetime = {
                     name: `peace-${i}`,
                     start: peaceStart,
@@ -191,6 +222,7 @@ console.log(width);
                 totals.war += data[(2*i)+1].length;
                 totalYears += data[(2*i)+1].length;
             }
+
         });
 console.log("Data is", data);
 
@@ -309,26 +341,19 @@ console.log(data_ready);
                     .enter()
                     .append("g")
                     .classed("legendLabel", true)
-                    .append('rect').attrs(function(d, i){
-                        console.log(d);
-                        console.log(i);
-                        return {
-                            x: 50,
-                            y: 20 + (30*i),
-                            height: 20,
-                            width: 20,
-                            fill: 'maroon'
-                        }
-                    }).style("opacity", (d) => d.index % 2 == 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3);
+                    .append('rect')
+                    .attr('x', 50)
+                    .attr('y', (d,i) => 20+(30*i))
+                    .attr('height', 20)
+                    .attr('width', 20)
+                    .attr('fill', 'maroon')
+                    .style("opacity", (d) => d.index % 2 == 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3);
 
                 d3.selectAll('.legendLabel')
                     .append("text")
-                    .attrs(function(d,i) {
-                        return {
-                            x: 75,
-                            y: 35 + (30*i)
-                        }
-                    }).text((d) => `${d.value} years of ${d.index % 2 == 1 ? 'peace' : 'war'}: ${d3.format(".0%")(d.value / totalYears)}`);
+                    .attr('x', 75)
+                    .attr('y', (d,i) => 35+(30*i))
+                    .text((d) => `${d.value} years of ${d.index % 2 == 1 ? 'peace' : 'war'}: ${d3.format(".0%")(d.value / totalYears)}`);
 
         });
     }
@@ -336,7 +361,7 @@ console.log(data_ready);
 
     function decorateTable(dataset) {
         console.log('dataset', dataset);
-        log("Start decorating table");
+        console.log("Start decorating table");
         $("#dataset table").dataTable({
             "bInfo" : false,
             "bPaginate": false,
@@ -350,7 +375,7 @@ console.log(data_ready);
             };})
         });
 
-        log("Finished decorating table");
+        console.log("Finished decorating table");
     }
 
 
@@ -378,7 +403,7 @@ Todo:
  * Use better words
  * Add more wars & death date option, perhaps add historic figures? E.g. "What % of Theodore Roosevelt's life was the US at war?"
  `));
-
+});
 </script>
 
 

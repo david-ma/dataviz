@@ -1,9 +1,30 @@
 // jshint esversion: 6
 
+import * as d3 from 'd3';
+import $ from 'jquery';
+
 /*
  * David Ma - March 2018
  */
 class Chart {
+    opts    : any;
+    element : string;
+    data    : Array<any>;
+    title   : string;
+    xLabel  : string;
+    yLabel  : string;
+    width   : number;
+    height  : number;
+    margin  : {top : number, right: number, bottom: number, left: number};
+    colours : Array<string>;
+    innerHeight : number;
+    innerWidth  : number;
+    fullscreen  : boolean;
+
+    svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
+    plot: any;
+    xScale: d3.ScaleLinear<number, number>;
+    yBand: d3.ScaleBand<string>;
 
     // Sets variables
     constructor(opts) {
@@ -29,11 +50,11 @@ class Chart {
 
         this.svg = d3.select(`#${opts.element}`)
             .classed("chart", true)
-            .append("svg").attrs({
-                viewBox: `0 0 ${this.width} ${this.height}`
-            }).styles({
-                background: "rgba(0,0,0,0.05)"
-            });
+            .append("svg").attr(
+                'viewBox', `0 0 ${this.width} ${this.height}`
+            ).style(
+                'background', "rgba(0,0,0,0.05)"
+            );
 
         this.fullscreen = false;
 
@@ -56,13 +77,18 @@ class Chart {
 
         // Add the background
         this.plot.append("rect")
-            .attrs({
-                fill: "white",
-                x: 0,
-                y: 0,
-                height: this.innerHeight,
-                width: this.innerWidth
-            });
+            .attr('fill', 'white')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('height', this.innerHeight)
+            .attr('width', this.innerWidth);
+            // .attrs({
+            //     fill: "white",
+            //     x: 0,
+            //     y: 0,
+            //     height: this.innerHeight,
+            //     width: this.innerWidth
+            // });
 
         if ( this.opts.nav !== false ) {
             this.drawNav();
@@ -91,7 +117,7 @@ class Chart {
         $(`#${this.element}`).dblclick(() => this.toggleFullscreen());
     }
 
-    toggleFullscreen(chart) {
+    toggleFullscreen(chart?) {
         chart = chart || this;
 
         if(chart.fullscreen) {
@@ -128,11 +154,11 @@ class Chart {
 
     cumulativeLineChart() {
         console.log("Drawing cumulative chart", this.data);
-        const svg = this.plot,
-              data = this.data[0],
-              authors = this.data[1],
-              width = this.innerWidth,
-              height = this.innerHeight;
+        const svg       : any    = this.plot,
+              data      : string = this.data[0],
+              authors   : string = this.data[1],
+              width     : number = this.innerWidth,
+              height    : number = this.innerHeight;
 
         // set the ranges
         const x = d3.scaleTime().range([0, width]);
@@ -141,12 +167,12 @@ class Chart {
         // define the line
         const valueline = d3.line()
             // .curve(d3.curveBasis)
-            .x((d) => x(d.x))
-            .y((d) => y(d.value));
+            .x((d:any) => x(d.x))
+            .y((d:any) => y(d.value));
 
         // Scale the range of the data
-        x.domain(d3.extent(data, (d) => d.x ));
-        y.domain([0, d3.max(data, (d) => d.value )]);
+        x.domain(d3.extent(data, (d:any) => d.x ));
+        y.domain([0, d3.max(data, (d:any) => d.value )]);
 
         //
         // Object.keys(samples).forEach(function(sample){
@@ -247,7 +273,7 @@ console.log(data);
                 .data([data])
                 .attr("class", "line")
                 .style("stroke", that.colours[i])
-                .attr("d", valueline.x(function(d) { return x(d.date); }));
+                .attr("d", valueline.x(function(d:any) { return x(d.date); }));
         });
 
         this.plot.append("g")
@@ -312,13 +338,13 @@ console.log(data);
                     date: d3.timeMonth(parseTime(something)),
                     value: samples[sample][something]
                 };
-            }).sort((a,b) => a.date - b.date);
+            }).sort((a,b) => (a.date as any) - (b.date as any));
 
         });
 
         console.log(sampleData);
 
-        data = data.sort((a,b) => a.date - b.date);
+        data = data.sort((a,b) => (a.date as any) - (b.date as any));
 
         // set the ranges
         var x = d3.scaleTime().range([0, this.innerWidth]);
@@ -327,8 +353,8 @@ console.log(data);
         // define the line
         var valueline = d3.line()
             // .curve(d3.curveBasis)
-            .x(function(d) { return x(d.date); })
-            .y(function(d) { return y(d.value); });
+            .x(function(d:any) { return x(d.date); })
+            .y(function(d:any) { return y(d.value); });
 
         // Scale the range of the data
         x.domain(d3.extent(data, function(d) { return d.date; }));
@@ -337,15 +363,15 @@ console.log(data);
         console.log("Date extent...",d3.extent(data, function(d) { return d.date; }));
 
         console.log("this is...", this);
-        var months = {};
-        var weeks = {};
+        var monthSet  : any = {};
+        var weeks   : any = {};
 
-        data.forEach(function(point){
-            months[point.month] = months[point.month] || {
+        data.forEach(function(point:any){
+            monthSet[point.month] = monthSet[point.month] || {
                 rawDate: point.rawDate,
                 value: 0
             };
-            months[point.month].value += point.value;
+            monthSet[point.month].value += point.value;
 
             weeks[point.week] = weeks[point.week] || {
                 rawDate: point.rawDate,
@@ -354,10 +380,10 @@ console.log(data);
             weeks[point.week].value += point.value;
         });
 
-        months = Object.keys(months).map(function(month){
+        var months:Array<any> = Object.keys(monthSet).map(function(month){
             return {
-                month: parseTime(months[month].rawDate),
-                value: months[month].value
+                month: parseTime(monthSet[month].rawDate),
+                value: monthSet[month].value
             };
         });
 
@@ -381,12 +407,12 @@ console.log(data);
         //     .style("stroke", "red")
         //     .attr("d", valueline.x(function(d) { return x(d.week); }));
 
-        y.domain([0, d3.max(months, function(d) { return d.value; })]);
+        y.domain([0, d3.max(months, function(d:any) { return d.value; })]);
         this.plot.append("path")
             .data([months])
             .attr("class", "line")
             .style("stroke", "black")
-            .attr("d", valueline.x(function(d) { return x(d.month); }));
+            .attr("d", valueline.x(function(d:any) { return x(d.month); }));
 
 
         var that = this;
@@ -417,7 +443,7 @@ console.log(data);
                 .data([data])
                 .attr("class", "line")
                 .style("stroke", that.colours[i])
-                .attr("d", valueline.x(function(d) { return x(d.date); }));
+                .attr("d", valueline.x(function(d:any) { return x(d.date); }));
         });
 
         this.plot.append("g")
@@ -440,7 +466,7 @@ console.log(data);
     barGraph() {
         console.log("Drawing bar graph", this.data);
 
-        var values = [];
+        var values:Array<any> = [];
         this.data.forEach(function(bar){
             values = values.concat(bar.values);
         });
@@ -449,18 +475,18 @@ console.log(data);
         // Call the necessary functions
         this.createScales(values);
         this.addAxes();
-        this.addChart(values);
+        this.addChart();
 
         return this;
     }
 
-    createScales( values ) {
+    createScales( values:Array<any> ) {
         console.log("values for scales", values);
 
         // We set the domain to zero to make sure our bars
         // always start at zero. We don't want to truncate.
         this.xScale = d3.scaleLinear()
-            .domain([0, parseInt(d3.max(values) * 1.1)])
+            .domain([0, parseInt(d3.max(values)) * 1.1])
             .range([0, this.innerWidth]);
 
         // Range relates to pixels
@@ -475,10 +501,10 @@ console.log(data);
 
     addAxes() {
         // Create axises to be called later
-        const xAxis = d3.axisBottom()
+        const xAxis = d3.axisBottom(this.xScale)
             .scale(this.xScale);
 
-        const yAxis = d3.axisLeft()
+        const yAxis = d3.axisLeft(this.yBand)
             .scale(this.yBand);
 
         // Call those axis generators
@@ -503,11 +529,11 @@ console.log(data);
             y = this.height - 5;
 
         this.svg.append("g")
-            .attrs({
-                transform: `translate(${x},${y})`
-            }).styles({
-            "text-anchor": "middle"
-        }).append("text")
+            .attr(
+                'transform', `translate(${x},${y})`
+            ).style(
+                "text-anchor","middle"
+            ).append("text")
             .text(this.xLabel);
     }
 
@@ -516,11 +542,9 @@ console.log(data);
             y = this.margin.top + (this.innerHeight / 2);
 
         this.svg.append("g")
-            .attrs({
-                transform: `matrix(0,1,-1,0,${x},${y})`
-            }).styles({
-            "text-anchor": "middle"
-        }).append("text")
+            .attr('transform', `matrix(0,1,-1,0,${x},${y})`)
+            .style("text-anchor", "middle")
+            .append("text")
             .text(this.yLabel);
     }
 
@@ -531,12 +555,17 @@ console.log(data);
             .classed("legend", true)
             .attr("transform", `translate(${this.innerWidth - 270},0)`);
 
-        legend.append("rect").attrs({
-            height: "100px",
-            width: "270px",
-            fill: "white",
-            stroke: "grey"
-        });
+        legend.append("rect")
+            .attr('height', '100px')
+            .attr('width', '270px')
+            .attr('fill', 'white')
+            .attr('stroke', 'grey');
+        // .attrs({
+        //     height: "100px",
+        //     width: "270px",
+        //     fill: "white",
+        //     stroke: "grey"
+        // });
 
         legend.append("text")
             .attr("transform", `translate(100,24)`)
@@ -545,28 +574,32 @@ console.log(data);
             .text("Legend");
 
         this.data[0].labels.forEach(function(label, i){
-            legend.append("rect").attrs({
-                x: 20,
-                y: 38 + 30 * i,
-                width: 15,
-                height: 15,
-                fill: that.colours[i]
-            });
+            legend.append("rect")
+                .attr('x', 20)
+                .attr('y', 38 + (30*i))
+                .attr('width', 15)
+                .attr('height', 15)
+                .attr('fill', that.colours[i]);
+            
+            // .attrs({
+            //     x: 20,
+            //     y: 38 + 30 * i,
+            //     width: 15,
+            //     height: 15,
+            //     fill: that.colours[i]
+            // });
 
             legend.append("text")
                 .text(label)
-                .attrs({
-                    x: 40,
-                    y: 50 + 30 * i
-                });
+                .attr('x', 40)
+                .attr('y', 50 + (30*i));
 
             legend.append("text")
                 .classed(`legend-label legend-label-${i}`, true)
                 .text("")
-                .attrs({
-                    x: 100,
-                    y: 50 + 30 * i
-                });
+                .attr('x', 100)
+                .attr('y', 50 + (30 * i));
+
         });
 
 
@@ -589,25 +622,26 @@ console.log(data);
                 d.values.forEach(function(data, i){
                     let text = `${d.values[i]} m\u00B2`;
                     bar.append("rect")
-                        .attrs({
-                            'data-toggle': "tooltip",
-                            'data-placement': "top",
-                            title: text,
-                            fill: that.colours[i],
-                            x: that.xScale(d.values[i-1]) || 0,
-                            y: that.yBand(d.name),
-                            width: that.xScale(d.values[i]),
-                            height: that.yBand.bandwidth()
-                        });
+                        .attr('data-toggle', 'tooltip')
+                        .attr('data-placement', 'top')
+                        .attr('title', text)
+                        .attr('fill', that.colours[i])
+                        .attr('x', that.xScale(d.values[i-1]) || 0)
+                        .attr('y', that.yBand(d.name))
+                        .attr('width', that.xScale(d.values[i]))
+                        .attr('height',that.yBand.bandwidth());
+
                     bar.append("text")
-                        .attrs({
-                            x: (that.xScale(d.values[i])) + 3,
-                            y: (that.yBand(d.name) + (that.yBand.bandwidth() / 2)) + 3,
-                        }).text(text);
+                        .attr('x', (that.xScale(d.values[i])) + 3)
+                        .attr('y', (that.yBand(d.name) + (that.yBand.bandwidth() / 2)) + 3)
+                        .text(text);
                 });
             });
 
-        $(".bar rect").tooltip();
+
+        // Um. This is a dumb typescript error workaround. Please import "tooltip" type definition.
+        var blah:any = $(".bar rect");
+        blah.tooltip();
 
     }
 
@@ -632,26 +666,23 @@ console.log(data);
             .data(this.data)
             .enter()
             .append("circle")
-            .attrs({
-                id: (d) => `circle-${camelize(d.name)}`,
-                stroke: "black",
-                fill: "rgba(0,0,0,0.05)",
-                cx: x,
-                cy: (d) => y + radius - ratio * Math.sqrt(d.values[0]),
-                r: (d) => ratio * Math.sqrt(d.values[0])
-            });
+            .attr('id',  (d) => `circle-${camelize(d.name)}`)
+            .attr('stroke',  "black")
+            .attr('fill',  "rgba(0,0,0,0.05)")
+            .attr('cx',  x)
+            .attr('cy',  (d) => y + radius - ratio * Math.sqrt(d.values[0]))
+            .attr('r',  (d) => ratio * Math.sqrt(d.values[0]));
 
         let table = svg.append("g")
             .attr("transform", `translate(${this.innerHeight * 0.05} ${this.innerHeight * 0.05})`);
 
-        table.append('rect').attrs({
-            x: 0,
-            y: 0,
-            height: radius * 2,
-            width: 200,
-            fill: 'lightgrey',
-            stroke: 'black'
-        });
+        table.append('rect')
+            .attr('x',  0)
+            .attr('y',  0)
+            .attr('height',  radius * 2)
+            .attr('width',  200)
+            .attr('fill',  'lightgrey')
+            .attr('stroke',  'black');
 
         table.selectAll(".row")
             .data(this.data)
@@ -673,32 +704,21 @@ console.log(data);
                 });
 
                 row.append("rect")
-                    // .text(d.name)
-                    .attrs({
-                        width: 200,
-                        height: blockHeight,
-                        stroke: 'black',
-                        fill: d3.schemeCategory10[i % 10]
-                        // fill: `rgba(${i*2},${255 - i*12},${i*12},0.5)`
-                        // x: 10,
-                        // y: 15
-                    });
+                    .attr('width',  200)
+                    .attr('height',  blockHeight)
+                    .attr('stroke',  'black')
+                    .attr('fill',  d3.schemeCategory10[i % 10]);
 
                 row.append("text")
                     .text(d.name)
-                    .attrs({
-                        x: 10,
-                        y: 15
-                    });
+                    .attr('x',  10)
+                    .attr('y',  15);
 
                 row.append("text")
                     .text(`${d.values[0]} m\u00B2`)
-                    .attrs({
-                        x: 190,
-                        y: 15
-                    }).styles({
-                        "text-anchor": "end"
-                    });
+                    .attr('x',  190)
+                    .attr('y',  15)
+                    .style('text-anchor',  "end")
 
                 // console.log("doing stuff...", d);
 
@@ -725,30 +745,24 @@ console.log(data);
             .data(this.data)
             .enter()
             .append("rect")
-            .attrs({
-                id: (d) => `square-${camelize(d.name)}`,
-                stroke: "black",
-                fill: "rgba(0,0,0,0.05)",
-                x: x,
-                y: (d) => y - ( ratio * Math.sqrt(d.values[0])),
-                height: (d) => ratio * Math.sqrt(d.values[0]),
-                width: (d) => ratio * Math.sqrt(d.values[0])
-                // cx: x,
-                // cy: (d) => y + radius - ratio * Math.sqrt(d.values[0]),
-                // r: (d) => ratio * Math.sqrt(d.values[0])
-            });
+            .attr('id', (d) => `square-${camelize(d.name)}`)
+            .attr('stroke', "black")
+            .attr('fill', "rgba(0,0,0,0.05)")
+            .attr('x', x)
+            .attr('y', (d) => y - ( ratio * Math.sqrt(d.values[0])))
+            .attr('height', (d) => ratio * Math.sqrt(d.values[0]))
+            .attr('width', (d) => ratio * Math.sqrt(d.values[0]));
 
         let table = svg.append("g")
             .attr("transform", `translate(${this.innerHeight * 0.05} ${this.innerHeight * 0.05})`);
 
-        table.append('rect').attrs({
-            x: 0,
-            y: 0,
-            height: edge,
-            width: 200,
-            fill: 'lightgrey',
-            stroke: 'black'
-        });
+        table.append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('height', edge)
+            .attr('width', 200)
+            .attr('fill', 'lightgrey')
+            .attr('stroke', 'black')
 
         table.selectAll(".row")
             .data(this.data)
@@ -770,32 +784,21 @@ console.log(data);
                 });
 
                 row.append("rect")
-                    // .text(d.name)
-                    .attrs({
-                        width: 200,
-                        height: blockHeight,
-                        stroke: 'black',
-                        fill: d3.schemeCategory10[i % 10]
-                        // fill: `rgba(${i*2},${255 - i*12},${i*12},0.5)`
-                        // x: 10,
-                        // y: 15
-                    });
+                    .attr('width', 200)
+                    .attr('height', blockHeight)
+                    .attr('stroke', 'black')
+                    .attr('fill', d3.schemeCategory10[i % 10]);
 
                 row.append("text")
                     .text(d.name)
-                    .attrs({
-                        x: 10,
-                        y: 15
-                    });
+                    .attr('x', 10)
+                    .attr('y', 15);
 
                 row.append("text")
                     .text(`${d.values[0]} m\u00B2`)
-                    .attrs({
-                        x: 190,
-                        y: 15
-                    }).styles({
-                    "text-anchor": "end"
-                });
+                    .attr('x', 190)
+                    .attr('y', 15)
+                    .style('text-anchor', 'end');
 
                 // console.log("doing stuff...", d);
 
@@ -860,7 +863,7 @@ console.log(data);
 
 
         var root = d3.hierarchy(data)
-            .eachBefore(function(d) { d.data.id = (d.parent ? d.parent.data.id + "." : "") + camelize(d.data.name); })
+            .eachBefore(function(d:any) { d.data.id = (d.parent ? d.parent.data.id + "." : "") + camelize(d.data.name); })
             .sum(sumBySize)
             .sort(function(a, b) { return b.height - a.height || b.value - a.value; });
 
@@ -881,12 +884,10 @@ console.log(data);
 
         cell.append("image")
             .attr("id", (d) => `image-${d.data.id}` )
+            .attr('x', 3)
+            .attr('y', 3)
             // .attr("width", (d) => Math.max(d.x1 - d.x0, d.y1 - d.y0))
             // .attr("height", (d) => Math.max(d.x1 - d.x0, d.y1 - d.y0))
-            .attrs({
-                x: 3,
-                y: 3
-            })
             .attr("width", (d) => d.x1 - d.x0 - 6)
             .attr("height", (d) => d.y1 - d.y0 - 6)
             .attr("preserveAspectRatio", "xMidYMid slice")
@@ -913,7 +914,8 @@ console.log(data);
             .text(function(d) { return d.data.id + "\n" + format(d.value); });
 
         d3.selectAll("input")
-            .data([sumBySize, sumByCount], function(d) { return d ? d.name : this.value; })
+            .data([sumBySize, sumByCount], function(d:any) { return d.name })
+        // .data([sumBySize, sumByCount], function(d) { return d ? d.name : this.value; })
             .on("change", changed);
 
         var timeout = d3.timeout(function() {
@@ -979,13 +981,9 @@ console.log(data);
             .classed("activeShape", true);
 
         left.append("circle")
-            .attrs({
-                cx: leftCenter,
-                cy: midpoint,
-                r: radius
-                // fill: "rgba(255,63,45,1)"
-                // fill: c[0][0]
-            });
+            .attr('cx', leftCenter)
+            .attr('cy', midpoint)
+            .attr('r', radius);
 
         const right = svg
             .append("g")
@@ -993,14 +991,9 @@ console.log(data);
             .classed("activeShape", true);
 
         right.append("circle")
-            .attrs({
-                cx: rightCenter,
-                cy: midpoint,
-                r: radius
-                // fill: "rgba(59,121,255,1)"
-                // fill: c[2][0]
-
-            });
+            .attr('cx', rightCenter)
+            .attr('cy', midpoint)
+            .attr('r', radius);
 
         const arcx = width/2,
               dx = arcx - leftCenter,
@@ -1035,23 +1028,17 @@ console.log(data);
 
         svg.append("text")
             .text(options.left)
-            .attrs({
-                x: leftCenter,
-                y: height * 0.9
-            }).styles({
-               'text-anchor': 'middle',
-                'font-size': '24px'
-            });
+            .attr('x', leftCenter)
+            .attr('y', height * 0.9)
+            .style('text-anchor', 'middle')
+            .style('font-size', '24px');
 
         svg.append("text")
             .text(options.right)
-            .attrs({
-                x: rightCenter,
-                y: height * 0.9
-            }).styles({
-                'text-anchor': 'middle',
-                'font-size': '24px'
-            });
+            .attr('x', rightCenter)
+            .attr('y', height * 0.9)
+            .style('text-anchor', 'middle')
+            .style('font-size', '24px');
 
         const results = {
             left: [],
@@ -1071,41 +1058,32 @@ console.log(data);
                     results.left.push(data[key]);
                 } else {
                     console.error(data[key]);
-                    alert("What the hell, this isn't possible", data[key]);
+                    alert("What the hell, this isn't possible");
                 }
             }
         });
 
         left.append("text")
             .text(results.left.length)
-            .attrs({
-                x: leftCenter - 30,
-                y: midpoint
-            }).styles({
-                'text-anchor': 'middle',
-                'font-size': '36px'
-            });
+            .attr('x', leftCenter - 30)
+            .attr('y', midpoint)
+            .style('text-anchor', 'middle')
+            .style('font-size', '36px');
 
         mid.append("text")
             .text(results.both.length)
-            .attrs({
-                x: width/2,
-                y: midpoint
-            }).styles({
-                'text-anchor': 'middle',
-                'font-size': '36px'
-            });
+            .attr('x', width/2)
+            .attr('y', midpoint)
+            .style('text-anchor', 'middle')
+            .style('font-size', '36px');
 
 
         right.append("text")
             .text(results.right.length)
-            .attrs({
-                x: rightCenter + 30,
-                y: midpoint
-            }).styles({
-                'text-anchor': 'middle',
-                'font-size': '36px'
-            });
+            .attr('x', rightCenter + 30)
+            .attr('y', midpoint)
+            .style('text-anchor', 'middle')
+            .style('font-size', '36px');
 
         console.log(results);
 
@@ -1127,9 +1105,9 @@ function sumBySize(d) {
     return d.size;
 }
 
-function average( array ) {
+function average( array:Array<any> ) {
     try {
-        return parseFloat(array.reduce((a, b) => parseFloat(a) + parseFloat(b)) / array.length);
+        return array.reduce((a, b) => parseFloat(a) + parseFloat(b)) / array.length;
     } catch (e) {
         console.error(e);
         return null;
@@ -1158,8 +1136,6 @@ function log(message){
 }
 
 
-
-
-
+export { Chart };
 
 
