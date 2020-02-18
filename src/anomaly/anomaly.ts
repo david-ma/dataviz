@@ -1,5 +1,5 @@
-// import $ = require("jquery");
-declare var $: any;
+import $ from 'jquery';
+import 'datatables.net';
 declare var jsonPath: any;
 
 let stuff = [];
@@ -47,7 +47,6 @@ $.ajax("/08007755.json", {
 
     }
 });
-
 
 
 
