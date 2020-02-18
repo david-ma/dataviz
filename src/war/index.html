@@ -58,15 +58,16 @@
 
 <script>
     require.config({
+        baseUrl: '/js/vendor',
         enforceDefine: true,
         paths: {
-            'd3': '/js/vendor/d3.min',
-            'jquery': '/js/vendor/jquery.min',
-            'chart': "/js/chart"
+            'chart': "/js/chart",
+            'datatables.net': "/js/datatables.min"
         }
         ,shim: {
             chart: {
-                exports: "Chart"
+                exports: "Chart",
+                deps: ['d3', 'd3-selection-multi']
             }
         }
     });

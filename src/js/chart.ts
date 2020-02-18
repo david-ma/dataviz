@@ -1,7 +1,10 @@
 // jshint esversion: 6
 
 import * as d3 from 'd3';
+import 'd3-selection-multi';
+
 import $ from 'jquery';
+import 'datatables.net';
 
 /*
  * David Ma - March 2018
