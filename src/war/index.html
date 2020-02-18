@@ -17,7 +17,7 @@
 <br>
 <div class="container-fluid dataviz-page">
     <section>
-        <div class="row" id="dataset">
+        <div class="row" id="AmericanWars">
             <div class="col-xs-12 col-md-4">
 
                 <div id="explain"></div>
@@ -84,7 +84,7 @@
     const charts = [];
     let data = [];
     const seasons = {};
-    let dataset = null;
+    let AmericanWars = null;
 
     console.log("Calling csv stuff");
     d3.csv("/war/AmericanWars.csv", function(d, i, columns){
@@ -96,17 +96,17 @@
         return d;
     }).then(function(data){
         console.log(data);
-        dataset = data;
-//        dataset.columns.push("length");
+        AmericanWars = data;
+//        AmericanWars.columns.push("length");
         console.log("Start async stuff");
-        _chart.decorateTable(dataset, {
+        _chart.decorateTable(AmericanWars, {
             order:[1, 'asc'],
             titles: ['War', 'Start', 'End']
         });
 
         console.log('um. wtf');
 
-        drawPieChart(dataset);
+        drawPieChart(AmericanWars);
 //        log("Finish async stuff");
     });
 
@@ -186,9 +186,11 @@
         const birth = parseInt($("#birthyear").val()) || 1905;
         const current = 2020;
         const age = current - birth;
-//        const death = 1950;
-//        const age = death - birth;
-        let peaceStart = birth;
+
+        // const death = 1940;
+        // const age = death - birth;
+
+        let peaceStart = birth; // assuming that you were born during peacetime.
         let longestWar = 0;
 
         var data = {};
@@ -198,39 +200,50 @@
         };
         var totalYears = 0;
 
-        dataset.forEach(function(war,i){
-//            if(death < (war.end || 2020)) {
-//            } else if(war.start - peaceStart > 0 || birth < (war.end || 2020)) {
-                if(war.start - peaceStart > 0 || birth < (war.end || 2020)) {
+// Get a list of peacetime & wars for the person's life.
+        AmericanWars.forEach(function(war, i){
+            if(!war.end) war.end = current;
+
+            // If you were born during peacetime.. and your birth is after the war starts.
+            // then add a peacetime & war to the stack.
+            if(war.end > birth) {
+                // personal experience of the war. Person may be born after the war starts, or die before it ends.
+                var thisWar = war;
+
+                // Create a peacetime block
                 var peacetime = {
                     name: `peace-${i}`,
                     start: peaceStart,
-                    end: war.start,
-                    length: war.start - peaceStart
+                    end: thisWar.start,
+                    length: thisWar.start - peaceStart
                 };
 
+                // if you were born during the war... change the lengths of the peacetime & the war
+                if (birth > war.start && birth < war.end) {
+                    peacetime.length = 0;
+                    thisWar.length = war.end - birth;
+                }
 
+                // update other helper variables
+                if(thisWar.length > longestWar) longestWar = thisWar.length;
+                peaceStart = thisWar.end;
 
-                data[(2*i)+1] = war;
+                totals.war += thisWar.length;
+                totalYears += thisWar.length;
 
-                if (birth > war.start && birth < war.end) data[(2*i)+1].length = war.end - birth;
-
-                if(war.length > longestWar) longestWar = war.length;
-                peaceStart = war.end;
-
+                // add the peacetime & war to the stack.
                 if (peacetime.length > 0) {
                     data[2*i] = peacetime;
                     totals.peace += peacetime.length;
                     totalYears += peacetime.length;
                 }
-
-
-                totals.war += data[(2*i)+1].length;
-                totalYears += data[(2*i)+1].length;
+                data[(2*i)+1] = thisWar;
             }
 
         });
-console.log("Data is", data);
+
+
+        console.log("Data is", data);
 
         warChart = new Chart({
             element: "war_chart",
@@ -365,17 +378,17 @@ console.log(data_ready);
     }
 
 
-    // function decorateTable(dataset) {
-    //     console.log('dataset', dataset);
+    // function decorateTable(AmericanWars) {
+    //     console.log('AmericanWars', AmericanWars);
     //     console.log("Start decorating table");
-    //     $("#dataset table").dataTable({
+    //     $("#AmericanWars table").dataTable({
     //         "bInfo" : false,
     //         "bPaginate": false,
     //         "bFilter": false,
-    //         data: dataset,
+    //         data: AmericanWars,
     //         pageLength: 25,
     //         order: [[1, 'asc']],
-    //         columns: dataset.columns.map(function(d){ return {
+    //         columns: AmericanWars.columns.map(function(d){ return {
     //             title: d,
     //             data: d
     //         };})
