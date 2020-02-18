@@ -1,6 +1,8 @@
 // jshint esversion: 6
 
 import * as d3 from 'd3';
+import 'd3-selection';
+import 'd3-transition';
 import 'd3-selection-multi';
 
 import $ from 'jquery';
@@ -1137,6 +1139,32 @@ function log(message){
             date = new Date();
     // console.info(`${formatTime(date)}${message}`);
 }
+
+
+
+
+export function decorateTable(dataset:{columns:[]}, newOptions?:{}) {
+    var options:{} = {
+        info: false,
+        paging: false,
+        search: false,
+        searching: false,
+        data: dataset,
+        pageLength: 25,
+        order: [[0, 'desc']],
+        columns: dataset.columns.map(function(d){ return {
+            title: d,
+            data: d
+        };})
+    };
+    if (newOptions) {
+        Object.keys(newOptions).forEach(function(key) {
+            options[key] = newOptions[key];
+        });
+    }
+    $("#dataset table").DataTable(options);
+}
+
 
 
 export { Chart };

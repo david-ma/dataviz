@@ -1,19 +1,25 @@
-import * as _chart from '../js/chart';
+// import * as _chart from '../chart';
 import * as d3 from 'd3';
+import 'd3-selection-multi';
 
 import $ from 'jquery';
 import 'datatables.net';
 
+// import * as _chart from '../js/chart';
 console.log("Running WorldWealth.ts");
+
+// console.log(_chart);
+// let Chart = _chart.Chart;
 
 const charts = [];
 let data = [];
 const seasons = {};
 let dataset = null;
 
+let Chart = require('/js/chart');
+
 console.log("Calling csv stuff");
 d3.csv("/wealth/WorldWealth.csv", function(d:any, i, columns){
-    console.log(d);
     if(!d.wealth_b) d.wealth_b = 0;
     if(d.region) {
         return d;
@@ -28,33 +34,76 @@ d3.csv("/wealth/WorldWealth.csv", function(d:any, i, columns){
     console.log("Start async stuff");
     decorateTable(dataset);
 
+    drawChart(dataset);
+
 
 });
 
 
+   function drawChart(data) {
+    //    const birth = 1905;
+    //    const current = 2020;
+    //    const age = current - birth;
 
 
-let warChart = null;
+console.log("Hey,,,,");
+console.log(data);
+
+    //    console.log(age);
+
+       const war = new Chart({
+           element: "chart",
+           data: data,
+           nav: false,
+           title: "Years of life spent at war"
+       }).scratchpad(function(c){
+console.log('scratch..');
+
+        const   svg = c.plot,
+                   width = c.innerWidth,
+                   height = c.innerHeight;
 
 
-function decorateTable(dataset:{columns:[]}, newOptions?:{}) {
-    var options:{} = {
-        info: false,
-        paging: false,
-        search: false,
-        searching: false,
-        data: dataset,
-        pageLength: 25,
-        order: [[2, 'desc']],
-        columns: dataset.columns.map(function(d){ return {
-            title: d,
-            data: d
-        };})
-    };
-    if (newOptions) {
-        Object.keys(newOptions).forEach(function(key) {
-            options[key] = newOptions[key];
-        });
-    }
-    $("#dataset table").DataTable(options);
-}
+           svg.append("line").attrs({
+               x1: width * .15,
+               x2: width * .85,
+               y1: height * .5,
+               y2: height * .5
+           }).styles({
+               stroke: 'black',
+               'stroke-width': '2px'
+           });
+
+           console.log('heyyy');
+
+           var graphLength = width * .7,
+               marginLeft = width * .15;
+
+//            data.forEach(function(d){
+//                console.log(d);
+//                var startPercent = (d.start - birth) / age,
+//                    x = marginLeft + (graphLength * startPercent),
+//                    endPercent = d.length / age,
+//                    width = graphLength * endPercent;
+// console.log(endPercent);
+// console.log(graphLength);
+// console.log(width);
+//                svg.append("rect")
+//                    .datum(d)
+//                    .attrs({
+//                        x: x,
+//                        y: height * .55,
+//                        width: width,
+//                        height: '20'
+//                    });
+//            });
+
+       });
+
+   }
+
+
+
+
+
+
