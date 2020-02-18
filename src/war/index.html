@@ -21,8 +21,10 @@
             <div class="col-xs-12 col-md-4">
 
                 <div id="explain"></div>
-                <input id="birthyear" placeholder="1905">
-                <input type="button" value="Update birth year" onclick="drawPieChart()">
+                <span>Birth: <input id="birthyear" placeholder="1905"></span>
+                <br>
+                <span>Death: <input id="deathyear" placeholder="N/A"></span>
+                <input type="button" value="Update birth/death year" onclick="drawPieChart()">
                 <div id="explain2"></div>
 
                 <table style="border: solid 1px grey; margin: 5px 0;">
@@ -33,7 +35,16 @@
 
 
             </div>
-            <div class="col-xs-12 col-md-offset-2 col-md-8" id="war_chart"></div>
+            <div class="col-xs-12 col-md-offset-2 col-md-8">
+                <div id="war_chart"></div>
+                <div>
+                    <input type="button" value="George Washington" onclick="celebrity(1732,1799)">
+                    <input type="button" value="John F. Kennedy" onclick="celebrity(1917,1963)">
+                    <input type="button" value="Alexander Hamilton" onclick="celebrity(1757,1804)">
+                    <input type="button" value="Elvis Presley" onclick="celebrity(1935,1977)">
+                    <input type="button" value="Abraham Lincoln" onclick="celebrity(1809,1865)">
+                </div>
+        </div>
 
         </div>
     </section>
@@ -57,6 +68,14 @@
 <script src="/js/require.js"></script>
 
 <script>
+    var drawPieChart;
+
+    function celebrity(birth, death) {
+        $("#birthyear").val(birth);
+        $("#deathyear").val(death);
+        drawPieChart();
+    }
+
     require.config({
         baseUrl: '/js/vendor',
         enforceDefine: true,
@@ -75,20 +94,16 @@
     require(['chart',
         '/js/jquery.dataTables.min.js'
     ], function(_chart){
-
-
         console.log(_chart);
-        let Chart = _chart.Chart;
+        const Chart = _chart.Chart;
 
-
-    const charts = [];
-    let data = [];
-    const seasons = {};
-    let AmericanWars = null;
+        const charts = [];
+        let data = [];
+        const seasons = {};
+        let AmericanWars = null;
 
     console.log("Calling csv stuff");
     d3.csv("/war/AmericanWars.csv", function(d, i, columns){
-        console.log(d);
         d.start = parseInt(d.start);
         d.end = parseInt(d.end) || "";
         d.length = (d.end || 2020) - d.start;
@@ -97,15 +112,13 @@
     }).then(function(data){
         console.log(data);
         AmericanWars = data;
-//        AmericanWars.columns.push("length");
+    //    AmericanWars.columns.push("length");
         console.log("Start async stuff");
         _chart.decorateTable(AmericanWars, {
             element: "#AmericanWars table",
             order:[1, 'asc'],
             titles: ['War', 'Start', 'End']
         });
-
-        console.log('um. wtf');
 
         drawPieChart(AmericanWars);
 //        log("Finish async stuff");
@@ -180,16 +193,21 @@
 
     let warChart = null;
 
-    function drawPieChart() {
+    drawPieChart = function() {
 //        if(warChart) warChart.remove();
         d3.select("#war_chart svg").remove();
 
         const birth = parseInt($("#birthyear").val()) || 1905;
         const current = 2020;
-        const age = current - birth;
 
-        // const death = 1940;
-        // const age = death - birth;
+        const death = parseInt($("#deathyear").val()) || current;
+        const age = death - birth;
+
+        if ( birth > current) {
+            alert("You haven't been born yet.");
+        } else if (death < birth) {
+            alert("You died before you were born???");
+        }
 
         let peaceStart = birth; // assuming that you were born during peacetime.
         let longestWar = 0;
@@ -203,13 +221,14 @@
 
 // Get a list of peacetime & wars for the person's life.
         AmericanWars.forEach(function(war, i){
+            
             if(!war.end) war.end = current;
 
             // If you were born during peacetime.. and your birth is after the war starts.
             // then add a peacetime & war to the stack.
             if(war.end > birth) {
-                // personal experience of the war. Person may be born after the war starts, or die before it ends.
-                var thisWar = war;
+                // Personal experience of the war. Person may be born after the war starts, or die before it ends.
+                let thisWar = JSON.parse(JSON.stringify(war)); // Very stupid way to clone an object.
 
                 // Create a peacetime block
                 var peacetime = {
@@ -225,6 +244,19 @@
                     thisWar.length = war.end - birth;
                 }
 
+                if (death < thisWar.end) {
+                    thisWar.end = death;
+                    thisWar.length = thisWar.end - thisWar.start;
+
+                    if (death < thisWar.start) {
+                        thisWar.length = 0;
+                        peacetime.end = death;
+                        peacetime.length = peacetime.end - peacetime.start;
+                    }
+                }
+
+
+
                 // update other helper variables
                 if(thisWar.length > longestWar) longestWar = thisWar.length;
                 peaceStart = thisWar.end;
@@ -238,10 +270,14 @@
                     totals.peace += peacetime.length;
                     totalYears += peacetime.length;
                 }
-                data[(2*i)+1] = thisWar;
+                if (thisWar.length > 0) {
+                    data[(2*i)+1] = thisWar;
+                }
             }
 
         });
+
+        console.log("stack", data);
 
 
         console.log("Data is", data);
@@ -288,7 +324,7 @@ console.log(data_ready);
                 .attr('fill', 'black')
                 .attr("stroke", "white")
                 .style("stroke-width", "2px")
-                .style("opacity", (d) => d.index % 2 == 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3)
+                .style("opacity", (d) => data[d.data.key].name.indexOf("peace") == 0 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3)
 
 // Add the polylines between chart and labels:
             svg
@@ -296,7 +332,7 @@ console.log(data_ready);
                 .data(data_ready)
                 .enter()
                 .append('polyline')
-                .style("display", (d) => d.index % 2 == 1 ? "none" : '')
+                .style("display", (d) => data[d.data.key].name.indexOf("peace") == 0 ? "none" : '')
                 .attr("stroke", "black")
                 .style("fill", "none")
                 .attr("stroke-width", 1)
@@ -315,7 +351,7 @@ console.log(data_ready);
                 .data(data_ready)
                 .enter()
                 .append('text')
-                .style("display", (d) => d.index % 2 == 1 ? "none" : '')
+                .style("display", (d) => data[d.data.key].name.indexOf("peace") == 0 ? "none" : '')
                 .text( (d) => data[d.data.key].name )
                 .attr('transform', function(d) {
                     var pos = outerArc.centroid(d);
@@ -417,11 +453,8 @@ $("#explain2").html(md.makeHtml(`Note that the "start" & "end" years reflect USA
 And yes, I know that you're supposed to improve the diagram for [#makeovermonday](https://www.makeovermonday.co.uk/), but I'm just doing this as a warmup exercise. Maybe next week I'll change the diagram more.
 
 Todo:
- * Give the user a slider instead of text box?
  * Better labels, e.g. Years each war started
  * Hoverover for labels?
- * Use better words
- * Add more wars & death date option, perhaps add historic figures? E.g. "What % of Theodore Roosevelt's life was the US at war?"
  `));
 });
 </script>
