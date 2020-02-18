@@ -99,11 +99,16 @@
         dataset = data;
 //        dataset.columns.push("length");
         console.log("Start async stuff");
-        decorateTable(dataset);
+        _chart.decorateTable(dataset, {
+            order:[1, 'asc'],
+            titles: ['War', 'Start', 'End']
+        });
+
+        console.log('um. wtf');
+
         drawPieChart(dataset);
 //        log("Finish async stuff");
     });
-
 
 
     $("#birthyear").on('keyup', function (e) {
@@ -360,24 +365,24 @@ console.log(data_ready);
     }
 
 
-    function decorateTable(dataset) {
-        console.log('dataset', dataset);
-        console.log("Start decorating table");
-        $("#dataset table").dataTable({
-            "bInfo" : false,
-            "bPaginate": false,
-            "bFilter": false,
-            data: dataset,
-            pageLength: 25,
-            order: [[1, 'asc']],
-            columns: dataset.columns.map(function(d){ return {
-                title: d,
-                data: d
-            };})
-        });
+    // function decorateTable(dataset) {
+    //     console.log('dataset', dataset);
+    //     console.log("Start decorating table");
+    //     $("#dataset table").dataTable({
+    //         "bInfo" : false,
+    //         "bPaginate": false,
+    //         "bFilter": false,
+    //         data: dataset,
+    //         pageLength: 25,
+    //         order: [[1, 'asc']],
+    //         columns: dataset.columns.map(function(d){ return {
+    //             title: d,
+    //             data: d
+    //         };})
+    //     });
 
-        console.log("Finished decorating table");
-    }
+    //     console.log("Finished decorating table");
+    // }
 
 
     const md = new showdown.Converter({
