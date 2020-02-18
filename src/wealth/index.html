@@ -65,7 +65,8 @@ require.config({
     },
     shim: {
         chart: ['d3-selection-multi'],
-        'd3-selection-multi': ['d3', 'd3-selection', 'd3-transition']
+        'd3-selection-multi': ['d3', 'd3-selection', 'd3-transition'],
+        'datatables.net': ['jquery']
     }
 });
 
@@ -93,26 +94,29 @@ d3.csv("/wealth/WorldWealth.csv", function(d, i, columns){
     }
 
 }).then(function(data){
+    console.log("Start async stuff");
     console.log(data);
     dataset = data;
 
-    console.log("Start async stuff");
-    decorateTable(dataset);
+    decorateTable(dataset, {
+        order:[2, 'desc'],
+        titles: ['Country', 'Region', 'Wealth (Billion $)'],
+        render: function(data, type, row, meta) {
+            switch(meta.col) {
+                case 2:
+                    return d3.format("($,")(data);
+                    break;
+                default:
+                    return data;
+            }
+        }
+    });
 
     drawChart(dataset);
 });
 
 
    function drawChart(data) {
-    //    const birth = 1905;
-    //    const current = 2020;
-    //    const age = current - birth;
-
-
-console.log("Hey,,,,");
-console.log(data);
-
-    //    console.log(age);
 
        const war = new Chart({
            element: "chart",

@@ -1143,8 +1143,8 @@ function log(message){
 
 
 
-export function decorateTable(dataset:{columns:[]}, newOptions?:{}) {
-    var options:{} = {
+export function decorateTable(dataset:any, newOptions?:any) {
+    var options: DataTables.Settings = {
         info: false,
         paging: false,
         search: false,
@@ -1161,8 +1161,14 @@ export function decorateTable(dataset:{columns:[]}, newOptions?:{}) {
         Object.keys(newOptions).forEach(function(key) {
             options[key] = newOptions[key];
         });
+        if(newOptions.titles) {
+            newOptions.titles.forEach((d,i) => options.columns[i].title = d );
+        }
+        if(newOptions.render) {
+            options.columns.forEach((d) => d.render = newOptions.render );
+        }
     }
-    $("#dataset table").DataTable(options);
+    return $("#dataset table").DataTable(options);
 }
 
 
