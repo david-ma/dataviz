@@ -55,6 +55,35 @@
 <script src="/js/require.js"></script>
 
 <script>
+
+require.config({
+	baseUrl: '/js/vendor',
+	enforceDefine: true,
+	paths: {
+		wealth: '/wealth/WorldWealth',
+		'datatables.net': "/js/datatables.min"
+    },
+    shim: {
+        wealth: {
+            deps: ['d3', 'jquery']
+        }
+    }
+});
+
+require(['wealth'], function(){
+	console.log("Hello!");
+
+});
+
+
+</script>
+
+
+
+
+
+<!-- 
+<script>
 require.config({
     baseUrl: '/js/vendor',
     enforceDefine: true,
@@ -338,7 +367,7 @@ const md = new showdown.Converter({
 
 
 </script>
-
+ -->
 
 </body>
 </html>
