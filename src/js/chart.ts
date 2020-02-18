@@ -1141,9 +1141,9 @@ function log(message){
 }
 
 
+function decorateTable(dataset:any, newOptions?:any) {
+    const element = newOptions ? newOptions.element : "#dataset table";
 
-
-export function decorateTable(dataset:any, newOptions?:any) {
     var options: DataTables.Settings = {
         info: false,
         paging: false,
@@ -1168,11 +1168,11 @@ export function decorateTable(dataset:any, newOptions?:any) {
             options.columns.forEach((d) => d.render = newOptions.render );
         }
     }
-    return $("#dataset table").DataTable(options);
+    $(element).DataTable(options);
 }
 
 
 
-export { Chart };
+export { Chart, decorateTable };
 
 
