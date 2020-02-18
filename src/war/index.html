@@ -68,6 +68,7 @@
 <script src="/js/require.js"></script>
 
 <script>
+    const currentYear = new Date().getFullYear();;
     var drawPieChart;
 
     function celebrity(birth, death) {
@@ -106,7 +107,7 @@
     d3.csv("/war/AmericanWars.csv", function(d, i, columns){
         d.start = parseInt(d.start);
         d.end = parseInt(d.end) || "";
-        d.length = (d.end || 2020) - d.start;
+        d.length = (d.end || currentYear) - d.start;
 
         return d;
     }).then(function(data){
@@ -132,65 +133,6 @@
     });
 
 
-/*
-//  bar chart version
-//    function drawChart(data) {
-//        const birth = 1905;
-//        const current = 2020;
-//        const age = current - birth;
-//
-//
-//        console.log(age);
-//
-//        const war = new Chart({
-//            element: "war_chart",
-//            data: data,
-//            nav: false,
-//            title: "Years of life spent at war"
-//        }).scratchpad(function(c){
-//            const   svg = c.plot,
-//                    width = c.innerWidth,
-//                    height = c.innerHeight;
-//
-//
-//            svg.append("line").attrs({
-//                x1: width * .15,
-//                x2: width * .85,
-//                y1: height * .5,
-//                y2: height * .5
-//            }).styles({
-//                stroke: 'black',
-//                'stroke-width': '2px'
-//            });
-//
-//            var graphLength = width * .7,
-//                marginLeft = width * .15;
-//
-//            data.forEach(function(d){
-//                console.log(d);
-//                var startPercent = (d.start - birth) / age,
-//                    x = marginLeft + (graphLength * startPercent),
-//                    endPercent = d.length / age,
-//                    width = graphLength * endPercent;
-//console.log(endPercent);
-//console.log(graphLength);
-//console.log(width);
-//                svg.append("rect")
-//                    .datum(d)
-//                    .attrs({
-//                        x: x,
-//                        y: height * .55,
-//                        width: width,
-//                        height: '20'
-//                    });
-//            });
-//
-//        });
-//
-//    }
-*/
-
-
     let warChart = null;
 
     drawPieChart = function() {
@@ -198,12 +140,11 @@
         d3.select("#war_chart svg").remove();
 
         const birth = parseInt($("#birthyear").val()) || 1905;
-        const current = 2020;
 
-        const death = parseInt($("#deathyear").val()) || current;
+        const death = parseInt($("#deathyear").val()) || currentYear;
         const age = death - birth;
 
-        if ( birth > current) {
+        if ( birth > currentYear) {
             alert("You haven't been born yet.");
         } else if (death < birth) {
             alert("You died before you were born???");
@@ -222,7 +163,7 @@
 // Get a list of peacetime & wars for the person's life.
         AmericanWars.forEach(function(war, i){
             
-            if(!war.end) war.end = current;
+            if(!war.end) war.end = currentYear;
 
             // If you were born during peacetime.. and your birth is after the war starts.
             // then add a peacetime & war to the stack.
