@@ -37,8 +37,8 @@ d3.csv("/wealth/WorldWealth.csv", function(d:any, i, columns){
 let warChart = null;
 
 
-function decorateTable(dataset) {
-    $("#dataset table").DataTable({
+function decorateTable(dataset:{columns:[]}, newOptions?:{}) {
+    var options:{} = {
         info: false,
         paging: false,
         search: false,
@@ -50,31 +50,11 @@ function decorateTable(dataset) {
             title: d,
             data: d
         };})
-    });
+    };
+    if (newOptions) {
+        Object.keys(newOptions).forEach(function(key) {
+            options[key] = newOptions[key];
+        });
+    }
+    $("#dataset table").DataTable(options);
 }
-
-
-// const md = new showdown.Converter({
-//     openLinksInNewWindow: true
-// });
-
-//     $("#explain").html(md.makeHtml(`
-// # Number of years USA was at war, during your lifetime
-// ## Originally on [The Washington Post](https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/) by [@pbump](https://twitter.com/pbump)
-
-// I redrew Philip Bump's diagram from his article "Nearly a quarter of Americans have never experienced the U.S. in a time of peace" as an exercise to practice d3.js.
-
-// Simply enter your birth year here & it will recalculate the diagram.`));
-
-
-// $("#explain2").html(md.makeHtml(`Note that the "start" & "end" years reflect USA's involvement in the war, not the total length of each war.
-
-// And yes, I know that you're supposed to improve the diagram for [#makeovermonday](https://www.makeovermonday.co.uk/), but I'm just doing this as a warmup exercise. Maybe next week I'll change the diagram more.
-
-// Todo:
-//  * Give the user a slider instead of text box?
-//  * Better labels, e.g. Years each war started
-//  * Hoverover for labels?
-//  * Use better words
-//  * Add more wars & death date option, perhaps add historic figures? E.g. "What % of Theodore Roosevelt's life was the US at war?"
-//  `));
