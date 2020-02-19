@@ -18,7 +18,7 @@
 <div class="container-fluid dataviz-page">
     <section>
         <div class="row" id="dataset">
-            <div class="col-xs-12 col-md-4">
+            <div class="col-xs-12 col-md-12">
 
                 <div id="explain"></div>
 
@@ -30,7 +30,7 @@
 
 
             </div>
-            <div class="col-xs-12 col-md-offset-2 col-md-8" id="chart"></div>
+            <div class="col-xs-12 col-md-12" id="chart"></div>
 
         </div>
     </section>
@@ -84,10 +84,35 @@ let data = [];
 const seasons = {};
 let dataset = null;
 
+let regions = [];
+let treemapData = {
+    children: [],
+    name: "Wealth"
+}
+
 console.log("Calling csv stuff");
 d3.csv("/wealth/WorldWealth.csv", function(d, i, columns){
     if(!d.wealth_b) d.wealth_b = 0;
+
     if(d.region) {
+        if (regions.indexOf(d.region) == -1) {
+            regions.push(d.region);
+            treemapData.children[regions.indexOf(d.region)] = {
+                name: d.region,
+                children: [
+                    {
+                        name: d.country,
+                        value: d.wealth_b
+                    }
+                ]
+            };
+        } else {
+            treemapData.children[regions.indexOf(d.region)].children.push({
+                name: d.country,
+                value: d.wealth_b
+            });
+        }
+
         return d;
     } else {
         return null;
@@ -112,61 +137,101 @@ d3.csv("/wealth/WorldWealth.csv", function(d, i, columns){
         }
     });
 
-    drawChart(dataset);
+    drawTreemap(dataset);
 });
 
 
-   function drawChart(data) {
+function drawTreemap(data) {
 
-       const war = new Chart({
-           element: "chart",
-           data: data,
-           nav: false,
-           title: "Years of life spent at war"
-       }).scratchpad(function(c){
-console.log('scratch..');
+    const war = new Chart({
+        element: "chart",
+        data: data,
+        width: 2880,
+        height: 1800,
+        nav: false,
+        title: "World Wealth 2019, Billions of $"
+    }).scratchpad(function(c){
 
         const   svg = c.plot,
-                   width = c.innerWidth,
-                   height = c.innerHeight;
+                width = c.innerWidth,
+                height = c.innerHeight;
+console.log(treemapData);
+        // Here the size of each leave is given in the 'value' field in input data
+        var root = d3.hierarchy(treemapData).sum(function(d){ return d.value});
 
-        svg.append("line")
-            .attr('x1', width * .15)
-            .attr('x2', width * .85)
-            .attr('y1', height * .5)
-            .attr('y2', height * .5)
-            .style('stroke', 'black')
-            .style('stroke-width', '2px');
+        d3.treemap()
+            .size([width, height])
+            .paddingTop(28)
+            .paddingRight(7)
+            .paddingInner(3)      // Padding between each rectangle
+            //.paddingOuter(6)
+            //.padding(20)
+            (root)
 
-           console.log('heyyy');
+  // prepare a color scale
+  var color = d3.scaleOrdinal()
+    .domain(regions)
+    .range(['#d53e4f','#fc8d59','#fee08b','#ffffbf','#e6f598','#99d594','#3288bd'])
 
-           var graphLength = width * .7,
-               marginLeft = width * .15;
+  // And a opacity scale
+  var opacity = d3.scaleLinear()
+    .domain([10, 30])
+    .range([.5,1])
 
+  // use this information to add rectangles:
+  svg
+    .selectAll("rect.region")
+    .data(root.leaves())
+    .enter()
+    .append("rect")
+        .classed("region", true)
+        .attr('x', function (d) { return d.x0; })
+        .attr('y', function (d) { return d.y0; })
+        .attr('width', function (d) { return d.x1 - d.x0; })
+        .attr('height', function (d) { return d.y1 - d.y0; })
+        .style("stroke", "black")
+        .style("fill", function(d){ return color(d.parent.data.name)} )
+        .style("opacity", function(d){ return opacity(d.data.value)})
 
+  // and to add the text labels
+  svg
+    .selectAll("text")
+    .data(root.leaves())
+    .enter()
+    .append("text")
+      .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
+      .attr("y", function(d){ return d.y0+20})    // +20 to adjust position (lower)
+      .text(function(d){ return d.data.name.replace('mister_','') })
+      .attr("font-size", "19px")
+      .attr("fill", "white")
 
-//            data.forEach(function(d){
-//                console.log(d);
-//                var startPercent = (d.start - birth) / age,
-//                    x = marginLeft + (graphLength * startPercent),
-//                    endPercent = d.length / age,
-//                    width = graphLength * endPercent;
-// console.log(endPercent);
-// console.log(graphLength);
-// console.log(width);
-//                svg.append("rect")
-//                    .datum(d)
-//                    .attrs({
-//                        x: x,
-//                        y: height * .55,
-//                        width: width,
-//                        height: '20'
-//                    });
-//            });
+  // and to add the text labels
+  svg
+    .selectAll("vals")
+    .data(root.leaves())
+    .enter()
+    .append("text")
+      .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
+      .attr("y", function(d){ return d.y0+35})    // +20 to adjust position (lower)
+      .text(function(d){ return d.data.value })
+      .attr("font-size", "11px")
+      .attr("fill", "black")
 
-       });
+  // Add title for the 3 groups
+  svg
+    .selectAll("titles")
+    .data(root.descendants().filter(function(d){return d.depth==1}))
+    .enter()
+    .append("text")
+      .attr("x", function(d){ return d.x0})
+      .attr("y", function(d){ return d.y0+21})
+      .text(function(d){ return d.data.name })
+      .attr("font-size", "19px")
+      .attr("fill",  function(d){ return color(d.data.name)} )
 
-   }
+        });
+
+    }
 
 
 

@@ -14,7 +14,7 @@ import 'datatables.net';
 class Chart {
     opts    : any;
     element : string;
-    data    : Array<any>;
+    data    : any;
     title   : string;
     xLabel  : string;
     yLabel  : string;
