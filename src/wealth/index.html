@@ -59,7 +59,7 @@ require.config({
 	baseUrl: '/js/vendor',
 	enforceDefine: true,
 	paths: {
-		wealth: '/wealth/WorldWealth',
+        wealth: '/wealth/WorldWealth',
         'datatables.net': "/js/datatables.min",
         chart: "/js/chart"
     },
@@ -87,18 +87,22 @@ let dataset = null;
 let regions = [];
 let treemapData = {
     children: [],
+    total: 0,
     name: "Wealth"
 }
 
 console.log("Calling csv stuff");
 d3.csv("/wealth/WorldWealth.csv", function(d, i, columns){
     if(!d.wealth_b) d.wealth_b = 0;
+    d.wealth_b = parseInt(d.wealth_b);
+    // d.wealth_b = Math.sqrt(d.wealth_b * 1000000000)
 
     if(d.region) {
         if (regions.indexOf(d.region) == -1) {
             regions.push(d.region);
             treemapData.children[regions.indexOf(d.region)] = {
                 name: d.region,
+                total: d.wealth_b,
                 children: [
                     {
                         name: d.country,
@@ -111,7 +115,9 @@ d3.csv("/wealth/WorldWealth.csv", function(d, i, columns){
                 name: d.country,
                 value: d.wealth_b
             });
+            treemapData.children[regions.indexOf(d.region)].total += d.wealth_b;
         }
+        treemapData.total += d.wealth_b;
 
         return d;
     } else {
@@ -171,11 +177,13 @@ console.log(treemapData);
   // prepare a color scale
   var color = d3.scaleOrdinal()
     .domain(regions)
-    .range(['#d53e4f','#fc8d59','#fee08b','#ffffbf','#e6f598','#99d594','#3288bd'])
+    .range(c.colours)
+    // .range(['#d53e4f','#fc8d59','#fee08b','#ffffbf','#e6f598','#99d594','#3288bd'])
 
+    console.log(Math.max(...treemapData.children.map(d => d.total)));
   // And a opacity scale
   var opacity = d3.scaleLinear()
-    .domain([10, 30])
+    .domain([10, Math.max(...treemapData.children.map(d => d.total))])
     .range([.5,1])
 
   // use this information to add rectangles:
@@ -191,7 +199,7 @@ console.log(treemapData);
         .attr('height', function (d) { return d.y1 - d.y0; })
         .style("stroke", "black")
         .style("fill", function(d){ return color(d.parent.data.name)} )
-        .style("opacity", function(d){ return opacity(d.data.value)})
+        .style("opacity", function(d){ return opacity.domain(10,d.parent.total)(d.data.value)})
 
   // and to add the text labels
   svg
