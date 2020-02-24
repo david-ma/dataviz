@@ -143,6 +143,13 @@ d3.csv("/wealth/WorldWealth.csv", function(d, i, columns){
         }
     });
 
+    treemapData.children[0].children[0].children = [
+        {
+            name: 'california',
+            value: 20000
+        }
+    ]
+
     drawTreemap(dataset);
 });
 
