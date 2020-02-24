@@ -1,8 +1,14 @@
 var http = require("http");
 var fs = require('fs');
+var seq = require(`models/index`)
+
 
 exports.config = {
 	services: {
+		"camera": function(res, req, db, type){
+			console.log("Request for a camera..");
+
+		},
 		"upload": function(res, req, db, type){
 			const uploadFolder = "websites/dataviz/data/campjs";
 		try {
