@@ -2,13 +2,15 @@
 console.log();
 
 const seq = require(`${__dirname}/models/index`);
-const Brand = seq.Brand = require(`${__dirname}/models`).Brand;
 const Camera = seq.Camera = require(`${__dirname}/models`).Camera;
+const Scrape = seq.Scrape = require(`${__dirname}/models`).Scrape;
+const Detail = seq.Detail = require(`${__dirname}/models`).Detail;
 
+// rebuild entire database & reload data..?
+if(false) {
 
-// const newUser = await User.create(body);
 seq.sequelize.sync({
-    force: true
+    // force: true
 }).then(function(d){
 
     Brand.create({ name: 'Olympus' }).then(function(newBrand){
@@ -29,7 +31,16 @@ seq.sequelize.sync({
             // camera.addBrand(newBrand)
             // camera.setProperties({Brand: newBrand});
 
-            console.log(camera.dataValues);
+            // console.log(camera.dataValues);
+
+
+
+// Camera.findAll({
+//     where: {
+//         name: 'OMD'
+//     }
+// }).then(d => console.log("Found camera!", d.dataValues));
+
 
 
         });
@@ -40,6 +51,8 @@ seq.sequelize.sync({
     });
     
 });
+
+}
 /*
 Camera.create({
     name: "700d",

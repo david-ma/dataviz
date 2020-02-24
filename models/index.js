@@ -11,6 +11,7 @@ const db = {};
 let sequelize;
 
 delete config.operatorsAliases;
+config.logging = false;
 config.define = {
   // timestamps: false,
   underscored: true
