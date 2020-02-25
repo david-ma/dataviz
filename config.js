@@ -23,6 +23,8 @@ async function asyncForEach(array, limit, callback) {
 			});
 		}
 	}
+
+	return 1;
 }
 
 function sanitise(string) {
@@ -33,7 +35,7 @@ const base = 'https://david-ma.net/';
 
 exports.config = {
 	services: {
-		"s": function(res, req, db, type) {
+		"scrapeAllCameras": function(res, req, db, type) {
 
 			db.Scrape.findAll({
 				where: {
@@ -165,49 +167,52 @@ exports.config = {
 				}).catch(e => res.end("fail"));
 			});
 		},
-		"x": function(res, req, db, type) {
+		"scrapeAllBrands": function(res, req, db, type) {
+			const brands = ['canon', 'fujifilm', 'leica', 'nikon', 'olympus', 'panasonic', 'pentax', 'ricoh', 'samsung', 'sony', 'zeiss'];
 
-		// to scrape, set brand & number of pages.
-		const brand = "panasonic"
-		const pages = 0;
-// you can get xray to automatically stop... but I didn't bother to figure it out.
-		for(var i = 1; i < pages; i++) {
+			asyncForEach(brands, 1, function(brand, iterator, brands, done){
+				let lastPageReached = false;
+				let i = 0;
 
-			request.get(`${base}/cameras/${brand}/${i}/`, function(err, response, html){
-			// request.get('https://david-ma.net', function(err, response, html){
-					if(err) {
-					return PromiseRejectionEvent(err);
+// the lastPageReached thing doesn't work... because it loops through all 20 requests before the first one finishes.
+				while(!lastPageReached && i < 20) {
+					i++;
+					console.log(`Scrapeing Page ${i} of ${brand}`)
+					request.get(`${base}cameras/${brand}/${i}/`, function(err, response, html){
+							if(err) {
+							return PromiseRejectionEvent(err);
+						}
+						if (response.statusCode >= 400) {
+							return PromiseRejectionEvent(new Error('400 error'));
+						}
+
+						xray(html, '.newest_div', [{
+							img: 'img@src',
+							title: 'a.newest',
+							link: 'a.newest@href',
+							year: 'span.font_smaller'
+						}])
+						.then(function(stuff){
+							console.log(stuff);
+							if(stuff.length == 0) lastPageReached = true;
+		
+							stuff.forEach(function(camera){
+								camera.title = camera.title.trim();
+								camera.brand = brand;
+								camera.year = camera.year.substr(1,4);
+								db.Scrape.create(camera)
+									.catch(e => {/* dev/null */});
+							})
+		
+						}).catch(err => console.log("ok error..",err));
+					});
 				}
-				if (response.statusCode >= 400) {
-					return PromiseRejectionEvent(new Error('400 error'));
-				}
-				// xray(body, '.newest@href')(function(err, stuff){
-
-				xray(html, '.newest_div', [{
-					img: 'img@src',
-					title: 'a.newest',
-					link: 'a.newest@href',
-					year: 'span.font_smaller'
-				}]).paginate("#pagination li:last-child a@href")
-				// .throttle(1, 2000)
-				.abort(d => false)
-				.limit(14)
-				.then(function(stuff){
-					console.log(stuff);
-
-					stuff.forEach(function(camera){
-						camera.title = camera.title.trim();
-						camera.brand = brand;
-						camera.year = camera.year.substr(1,4);
-						db.Scrape.create(camera)
-							.catch(e => {/* dev/null */});
-					})
-
-					// res.end("hey");
-				}).catch(err => console.log("ok error..",err));
-
+				done();
+			}).then(function(d){
+				console.log("hello? "+d);
+				res.end("done?");
 			});
-		}
+
 
 		},
 		"camera": function(res, req, db, type) {
