@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Title</title>
+
+<style>
+
+body {
+	background-color: #eee;
+}
+
+.page {
+	background-color: #fff;
+}
+
+header {
+	width: 100%;
+	height: 100px;
+	background: #333e52;
+}
+header .blur_background {
+	height: 100px;
+	width: 100%;
+	position: absolute;
+    background: url("/images/unsplash.jpg");
+    background-size: cover;
+	background-position: 50% 60%;
+}
+footer {
+	width: 100%;
+	height: 50px;
+	background: #ddd;
+    position: fixed;
+    bottom: 0;
+}
+
+.mask {
+	height: 100%;
+	background: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+}
+
+header .container {
+	padding-top: 300px;
+}
+
+header h1 {
+	font-size: 60px;
+	color: #eee;
+	margin: 0;
+}
+header h2 {
+	font-size: 30px;
+	color: #eee;
+	margin: 0;
+}
+
+</style>
+</head>
+<body>
+	<header>
+		<div class="blur_background">
+			<div class="mask"></div>
+		</div>
+	</header>
+
+	<div class="container page">
+		<div class="row">
+			<div class="col-xs-12">
+				<input id="box">
+				
+				<h1>{{model}}</span>
+            </div>
+		</div>
+	</div>
+
+	<footer>
+		<div class="container">
+			<div class="row">
+				<p class="col-xs-6">Simple <a href="https://github.com/david-ma/Thalia">Thalia</a> Bootstrap Boilerplate</p>
+				<p class="col-xs-6 text-right">By <a href="https://twitter.com/frostickle">@Frostickle</a> <i class="fab fa-twitter" aria-hidden="true"></i></p>
+			</div>
+		</div>
+	</footer>
+	<link rel="stylesheet" href="/css/camera.css">
+	<script src="/js/vendor.min.js"></script>
+    <script src="/js/scripts.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  
+
+
+
+	<script>
+        $( function() {
+                    $( "#box" ).autocomplete({
+                        source: {{{allCameras}}}
+                    });
+            // $.ajax("/all-cameras", {
+            //     success: function(data){
+			// 		var allCameras = eval(data);
+			// 		console.log(`Number of cameras: ${allCameras.length}`);
+            //         $( "#box" ).autocomplete({
+            //             source: eval(allCameras)
+            //         });
+            //     }
+            // })
+        })
+    </script>
+</body>
+</html>

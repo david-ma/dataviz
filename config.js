@@ -1,12 +1,10 @@
 var http = require("http");
 var fs = require('fs');
-// var seq = require(`models/index`)
-
-var scraper = require('table-scraper');
 var xray = require('x-ray')();
 var request = require('request');
 var tabletojson = require('tabletojson');
-// var async = require("async");
+var fsPromise = fs.promises;
+var mustache = require('mustache');
 
 
 
@@ -172,7 +170,7 @@ exports.config = {
 		// to scrape, set brand & number of pages.
 		const brand = "panasonic"
 		const pages = 0;
-
+// you can get xray to automatically stop... but I didn't bother to figure it out.
 		for(var i = 1; i < pages; i++) {
 
 			request.get(`${base}/cameras/${brand}/${i}/`, function(err, response, html){
@@ -205,52 +203,66 @@ exports.config = {
 							.catch(e => {/* dev/null */});
 					})
 
-
-
 					// res.end("hey");
 				}).catch(err => console.log("ok error..",err));
 
-
-/*
-				xray(html, 'body@background')(function(err, stuff){
-						console.log(stuff);
-
-					res.end("hey");
-				})
-*/
 			});
 		}
 
-
-/*
-			try {
-			xray('http://xibing.su/', 'body')
-				.then(function(d){
-					
-					console.log(d);
-					res.end("Hey");
-
-				}).catch(e => {
-					console.log("error");
-					console.log(e);
-					res.end("broken");
-				});
-
-			// res.end("hi");
-			} catch(e) {
-				console.log(e);
-				res.end("fail");
-			}
-*/
 		},
-		"scrape": function(res, req, db, type){
-			scraper.get(`${base}/cameras/olympus/2/`)
-				.then(function(data){
-					console.log(data);
-					res.end(JSON.stringify(data));
-				});
+		"camera": function(res, req, db, type) {
+			const promises = [];
+			const brand = type.split("_")[0];
+			const model = type.split("_")[1].replace(/-/g, " ");
+
+			promises.push(
+				fsPromise.readFile(`${__dirname}/views/camera.mustache`, {
+					encoding: 'utf8'
+				})
+			);
+
+			promises.push(
+				db.Camera.findAll({
+					attributes: ['brand', 'model', 'year'],
+					where: {
+						year: {
+							[db.Sequelize.Op.gt]: 2010
+						}
+					}
+				})
+			);
+
+			promises.push(
+				db.Camera.findOne({
+					where: {
+						brand: brand,
+						model: model
+					}
+				})
+			);
+
+			Promise.all(promises).then(function([template, allCameras, data]){
+				data.allCameras = JSON.stringify(allCameras.map(d => `${d.brand} ${d.model} (${d.year})`))
+				
+
+				// console.log(model.dataValues);
+
+				var output = mustache.render(template, data);
+				res.end(output);
+			});
 		},
-		"camera": function(res, req, db, type){
+		"all-cameras": function(res, req, db, type) {
+			// res.end("hello");
+			db.Camera.findAll({
+				attributes: ['brand', 'model', 'year'],
+				where: {
+					year: {
+						[db.Sequelize.Op.gt]: 2010
+					}
+				}
+			}).then(d => res.end(JSON.stringify(d.map(d => `${d.brand} ${d.model} (${d.year})`))));
+		},
+		"fetchCamera": function(res, req, db, type){
 			console.log("Request for a camera..");
 // console.log(db);
 			// console.log(db.Camera);
