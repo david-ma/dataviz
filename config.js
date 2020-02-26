@@ -31,42 +31,42 @@ function sanitise(string) {
 	return string.replace(/\W+/g, " ").trim().replace(/\W/g, "_").toLowerCase();
 }
 
-function loadMustacheTemplates(promises, template) {
 
-	// Load the mustache template
-	promises.push(
-		fsPromise.readFile(`${__dirname}/views/${template}`, {
-			encoding: 'utf8'
-		})
-	);
+// Todo: handle rejection & errors?
+async function loadMustacheTemplates(template) {
+	return new Promise((resolve, reject) => {
+		// Load the mustache partials
+		const promises = [];
+		const filenames = ['template'];
 
-	// Load the mustache partials
-	const partialsPromises = [];
-	const partialsFilenames = [];
-	promises.push(
-		new Promise((resolve, reject) => {
-			fsPromise.readdir(`${__dirname}/views/partials/`)
-			.then( function(d){
-				d.forEach(function(filename){
-					if(filename.indexOf(".mustache" > 0)) {
-						partialsFilenames.push(filename.split(".mustache")[0]);
-						partialsPromises.push(
-							fsPromise.readFile(`${__dirname}/views/partials/${filename}`, {
-								encoding: 'utf8'
-							})
-						);
-					}
-				});
-
-				Promise.all(partialsPromises).then(function(array){
-					const results = {};
-					partialsFilenames.forEach((filename, i) => results[filename] = array[i])
-
-					resolve(results);
-				});
+		// Load the mustache template
+		promises.push(
+			fsPromise.readFile(`${__dirname}/views/${template}`, {
+				encoding: 'utf8'
 			})
-		})
-	)
+		);
+
+		fsPromise.readdir(`${__dirname}/views/partials/`)
+		.then( function(d){
+			d.forEach(function(filename){
+				if(filename.indexOf(".mustache" > 0)) {
+					filenames.push(filename.split(".mustache")[0]);
+					promises.push(
+						fsPromise.readFile(`${__dirname}/views/partials/${filename}`, {
+							encoding: 'utf8'
+						})
+					);
+				}
+			});
+
+			Promise.all(promises).then(function(array){
+				const results = {};
+				filenames.forEach((filename, i) => results[filename] = array[i]);
+
+				resolve(results);
+			});
+		});
+	});
 }
 
 // const base = 'https://www.digicamdb.com/';
@@ -260,7 +260,7 @@ exports.config = {
 			const brand = type.split("_")[0];
 			const model = type.split("_")[1].replace(/-/g, " ");
 
-			loadMustacheTemplates(promises, 'camera.mustache');
+			promises.push(loadMustacheTemplates('camera.mustache'));
 
 // Get the data from the database
 			promises.push(
@@ -294,7 +294,7 @@ exports.config = {
 			)
 
 			Promise.all(promises)
-				.then(function([template, partials, allCameras, model, scrape]){
+				.then(function([views, allCameras, model, scrape]){
 				const data = {
 					model: model.dataValues,
 					scrape: scrape.dataValues,
@@ -302,7 +302,7 @@ exports.config = {
 					allCameras: JSON.stringify(allCameras.map(d => `${d.brand} ${d.model} (${d.year})`))
 				}
 
-				var output = mustache.render(template, data, partials);
+				var output = mustache.render(views.template, data, views);
 				res.end(output);
 			});
 		},
