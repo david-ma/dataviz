@@ -1,12 +1,17 @@
 var http = require("http");
 var fs = require('fs');
-var xray = require('x-ray')();
-var request = require('request');
-var tabletojson = require('tabletojson');
 var fsPromise = fs.promises;
 var mustache = require('mustache');
 
 
+// These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.
+var xray, request, tabletojson;
+var loadWebsiteScrapingTools = false;
+if (loadWebsiteScrapingTools) {
+	xray = require('x-ray')();
+	request = require('request');
+	tabletojson = require('tabletojson');
+}
 
 // Asynchronous for each, doing a limited number of things at a time.
 async function asyncForEach(array, limit, callback) {
@@ -181,11 +186,11 @@ exports.config = {
 
 
 		},
-		"camera": function(res, req, db, type) {
+		"camera": function(res, req, db, type = "") {
 			const Op = db.Sequelize.Op;
 			const promises = [];
-			const brand = type.split("_")[0];
-			const model = type.split("_")[1].replace(/-/g, " ");
+			const brand = type.indexOf("_") > 0 ? type.split("_")[0] : "";
+			const model = type.indexOf("_") > 0 ? type.split("_")[1].replace(/-/g, " ") : "";
 
 			promises.push(loadMustacheTemplates('camera.mustache'));
 
@@ -220,17 +225,20 @@ exports.config = {
 				})
 			)
 
-			Promise.all(promises)
-				.then(function([views, allCameras, model, scrape]){
-				const data = {
-					model: model.dataValues,
-					scrape: scrape.dataValues,
-					cameraData: JSON.stringify(model.dataValues),
-					allCameras: JSON.stringify(allCameras.map(d => `${d.brand} ${d.model} (${d.year})`))
-				}
+			Promise.all(promises).then(function([views, allCameras, model, scrape]){
+				if(model) {
+					const data = {
+						model: model.dataValues,
+						scrape: scrape.dataValues,
+						cameraData: JSON.stringify(model.dataValues),
+						allCameras: JSON.stringify(allCameras.map(d => `${d.brand} ${d.model} (${d.year})`))
+					}
 
-				var output = mustache.render(views.template, data, views);
-				res.end(output);
+					var output = mustache.render(views.template, data, views);
+					res.end(output);
+				} else {
+					res.end("No model found");
+				}
 			});
 		},
 		"all-cameras": function(res, req, db, type) {
