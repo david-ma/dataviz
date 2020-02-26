@@ -2,7 +2,6 @@
 const seq = require(`${__dirname}/models/index`);
 const Camera = seq.Camera = require(`${__dirname}/models`).Camera;
 const Scrape = seq.Scrape = require(`${__dirname}/models`).Scrape;
-const Detail = seq.Detail = require(`${__dirname}/models`).Detail;
 
 // rebuild entire database & reload data..?
 if(false) {

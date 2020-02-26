@@ -32,7 +32,7 @@ function sanitise(string) {
 }
 
 
-// Todo: handle rejection & errors?
+// TODO: handle rejection & errors?
 async function loadMustacheTemplates(template) {
 	return new Promise((resolve, reject) => {
 		// Load the mustache partials
@@ -69,8 +69,7 @@ async function loadMustacheTemplates(template) {
 	});
 }
 
-// const base = 'https://www.digicamdb.com/';
-const base = 'https://david-ma.net/';
+const base = 'https://www.digicamdb.com/';
 
 exports.config = {
 	services: {
@@ -134,78 +133,6 @@ exports.config = {
 			});
 
 		},
-
-// Check a random entry, to see what fields the table had.
-		"a": function(res, req, db, type){
-			var total = 2553;
-			var id = Math.floor(Math.random() * total);
-
-			db.Scrape.findOne({
-				where: {
-					id: id
-				}
-			}).then(function(d){
-				if(d && d.dataValues) {
-					console.log(d.dataValues.link);
-					var target = d.dataValues.link;
-					var title = d.dataValues.title;
-					var brand = d.dataValues.brand;
-
-					request.get(base+target, function(err, response, html){
-						xray(html, '.table_specs@html').then((d) => {
-							// console.log(d);
-							d = d.replace(/<span class="yes"><\/span>/g, 'Yes')
-							  .replace(/<span class="no"><\/span>/g, 'No');
-
-							var data = tabletojson.convert(`<table>${d}</table>`, {
-								stripHtmlFromCells: false,
-								stripHtmlFromHeadings: false,
-								stripHtml: false
-							})[0];
-
-							console.log(data.length);
-							// console.log(data);
-
-							data.forEach(function(detail){
-								db.Detail.create({
-									detail: detail[0].replace(/:$/,""),
-									camera: title,
-									brand: brand
-								})
-								// console.log(detail[1]);
-								if(detail[1]) {
-									console.log(`${sanitise(detail[0])} - ${detail[1]}`);
-								}
-							});
-
-							var result = data.reduce((obj, detail) => {
-								obj[sanitise(detail[0])] = detail[1];
-								return obj;
-							}, {});
-
-							console.log("result: ",result);
-		
-							res.end(`${data.length} ${title}`);
-						}).catch(e => res.end("fail??? " + JSON.stringify(e.message)));
-					});
-				} else {
-					res.end("fail");
-				}
-			});
-		},
-		"c": function(res, req, db, type){
-			const target = 'specs/olympus_om-d-e-m5-iii/'
-
-			request.get(base+target, function(err, response, html){
-				xray(html, '.table_specs@html').then((d) => {
-					var data = tabletojson.convert(`<table>${d}</table>`)[0];
-
-					console.log(data.length);
-
-					res.end("ok");
-				}).catch(e => res.end("fail"));
-			});
-		},
 		"scrapeAllBrands": function(res, req, db, type) {
 			const brands = ['canon', 'fujifilm', 'leica', 'nikon', 'olympus', 'panasonic', 'pentax', 'ricoh', 'samsung', 'sony', 'zeiss'];
 
@@ -213,7 +140,7 @@ exports.config = {
 				let lastPageReached = false;
 				let i = 0;
 
-// the lastPageReached thing doesn't work... because it loops through all 20 requests before the first one finishes.
+// TODO: the lastPageReached thing doesn't work... because it loops through all 20 requests before the first one finishes.
 				while(!lastPageReached && i < 20) {
 					i++;
 					console.log(`Scrapeing Page ${i} of ${brand}`)
