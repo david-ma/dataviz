@@ -274,19 +274,6 @@ exports.config = {
 			// return 200;
 			// res.end("Requesting camera...");
 		},
-		"experiment": function(res, req, db, type) {
-			const promises = [loadMustacheTemplates('upload_experiment.mustache')];
-
-
-			Promise.all(promises).then(function([views]){		
-				const data = {
-					
-				}
-
-				var output = mustache.render(views.template, data, views);
-				res.end(output);
-			});
-		},
 		"upload": function(res, req, db, type){
 			const uploadFolder = "websites/dataviz/data/campjs";
 		try {
@@ -372,5 +359,22 @@ exports.config = {
 			req.end();
 
 		}
+	},
+	controller: {
+		"experiment": function(router) {
+			const promises = [loadMustacheTemplates('upload_experiment.mustache')];
+
+			console.log(router.path);
+			console.log(router.req.url);
+
+			Promise.all(promises).then(function([views]){		
+				const data = {
+					
+				}
+
+				var output = mustache.render(views.template, data, views);
+				router.res.end(output);
+			});
+		},
 	}
 };
