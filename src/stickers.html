@@ -119,8 +119,8 @@ header .blur_background {
 //    For debugging, don't need to select a pic each time.
 //    draw(localStorage.pic);
 
-    var blobs = JSON.parse(localStorage.blobs) || [];
-    var files = JSON.parse(localStorage.files) || [];
+    var blobs = localStorage.blobs ? JSON.parse(localStorage.blobs) : [];
+    var files = localStorage.files ? JSON.parse(localStorage.files) : [];
 
     blobs.forEach(function(blob, j){
         var box = d3.select("#blobs").append("div");
@@ -349,7 +349,7 @@ header .blur_background {
         localStorage.files = JSON.stringify(files);
 
         var blob = {
-            filename: `sticker-${rand}.json`,
+            filename: $("#fileInput")[0].files[0].name,
             user: user,
             twitter: twitter,
             email: email,

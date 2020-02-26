@@ -17,6 +17,13 @@
 			
 			hello world
 
+<form id="testform" action="/upload" method="post" enctype="multipart/form-data"> Select image to upload:
+	<input name="hello" value="world">
+	<input type="file" name="fileToUpload" id="fileToUpload">
+	<input type="submit" value="submit">
+</form>
+
+
             </div>
 		</div>
 	</div>
@@ -29,9 +36,23 @@
 
 	<script>
 
-        $( function() {
+		$("form#testform").submit(function(e) {
+			e.preventDefault();
+			var formData = new FormData(this);
 
-        })
+			$.ajax({
+				url: '/upload',
+				type: 'POST',
+				data: formData,
+				success: function (data) {
+					alert(data)
+				},
+				cache: false,
+				contentType: false,
+				processData: false
+			});
+		});
+
     </script>
 </body>
 </html>
