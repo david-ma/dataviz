@@ -216,22 +216,59 @@ exports.config = {
 
 		},
 		"camera": function(res, req, db, type) {
+			const Op = db.Sequelize.Op;
 			const promises = [];
 			const brand = type.split("_")[0];
 			const model = type.split("_")[1].replace(/-/g, " ");
 
+
+// Load the mustache template
 			promises.push(
 				fsPromise.readFile(`${__dirname}/views/camera.mustache`, {
 					encoding: 'utf8'
 				})
 			);
 
+// Load the mustache partials
+			const partialsPromises = [];
+			const partialsFilenames = [];
+			promises.push(
+				new Promise((resolve, reject) => {
+					fsPromise.readdir(`${__dirname}/views/partials/`)
+					.then( function(d){
+						d.forEach(function(filename){
+							if(filename.indexOf(".mustache" > 0)) {
+								partialsFilenames.push(filename.split(".mustache")[0]);
+								partialsPromises.push(
+									fsPromise.readFile(`${__dirname}/views/partials/${filename}`, {
+										encoding: 'utf8'
+									})
+								);
+							}
+						});
+
+						Promise.all(partialsPromises).then(function(array){
+							const results = {};
+							partialsFilenames.forEach((filename, i) => results[filename] = array[i])
+
+							resolve(results);
+						});
+					})
+				})
+			)
+
+
+
+
+
+
+// Get the data from the database
 			promises.push(
 				db.Camera.findAll({
 					attributes: ['brand', 'model', 'year'],
 					where: {
 						year: {
-							[db.Sequelize.Op.gt]: 2010
+							[Op.gt]: 2010
 						}
 					}
 				})
@@ -246,13 +283,26 @@ exports.config = {
 				})
 			);
 
-			Promise.all(promises).then(function([template, allCameras, data]){
-				data.allCameras = JSON.stringify(allCameras.map(d => `${d.brand} ${d.model} (${d.year})`))
-				
+			promises.push(
+				db.Scrape.findOne({
+					where: {
+						link: {
+							[Op.like]: `%${type}%`
+						}
+					}
+				})
+			)
 
-				// console.log(model.dataValues);
+			Promise.all(promises)
+				.then(function([template, partials, allCameras, model, scrape]){
+				const data = {
+					model: model.dataValues,
+					scrape: scrape.dataValues,
+					cameraData: JSON.stringify(model.dataValues),
+					allCameras: JSON.stringify(allCameras.map(d => `${d.brand} ${d.model} (${d.year})`))
+				}
 
-				var output = mustache.render(template, data);
+				var output = mustache.render(template, data, partials);
 				res.end(output);
 			});
 		},
