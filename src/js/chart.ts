@@ -1,12 +1,15 @@
 // jshint esversion: 6
 
 import * as d3 from 'd3';
-import 'd3-selection';
+import {selection, select} from "d3-selection";
 import 'd3-transition';
 import 'd3-selection-multi';
 
 import $ from 'jquery';
 import 'datatables.net';
+
+d3[<any>"select"] = select;
+d3[<any>"selection"] = selection;
 
 /*
  * David Ma - March 2018
@@ -1173,6 +1176,6 @@ function decorateTable(dataset:any, newOptions?:any) {
 
 
 
-export { Chart, decorateTable };
+export { Chart as default, Chart, decorateTable, d3 };
 
 
