@@ -321,14 +321,18 @@ exports.config = {
 	controller: {
 		"experiment": function(router) {
 			const promises = [loadMustacheTemplates('upload_experiment.mustache')];
+			Promise.all(promises).then(function([views]){		
+				const data = {}
 
-			console.log(router.path);
-			console.log(router.req.url);
+				var output = mustache.render(views.template, data, views);
+				router.res.end(output);
+			});
+		},
+		"stickers": function(router) {
+			const promises = [loadMustacheTemplates('stickers.mustache')];
 
 			Promise.all(promises).then(function([views]){		
-				const data = {
-					
-				}
+				const data = {}
 
 				var output = mustache.render(views.template, data, views);
 				router.res.end(output);
