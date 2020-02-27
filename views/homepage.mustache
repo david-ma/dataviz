@@ -5,7 +5,22 @@
 	<meta charset="utf-8">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>Upload page</title>
+	<title>Dataviz sandbox</title>
+
+<style>
+    #aboutMe.hidden {
+        display: none;
+    }
+    ul#nav {
+        list-style: none;
+    }
+    .vizPreviewImage {
+        max-width: 300px;
+    }
+    .vizPreviewBox {
+        border: solid 1px black;
+    }
+</style>
 
 </head>
 <body>
@@ -13,18 +28,21 @@
 
 	<div class="container page">
 		<div class="row">
-			<div class="col-xs-12">
+            <div class="col-xs-2">
+                <ul id='nav'>
+                    <li><a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a></li>
+                </ul>
+			</div>
+			<div class="col-xs-10">
 			
-			hello world
+            <h1>Dataviz Sandbox</h1>
+            <div id="aboutMe" class='hidden'></div>
 
-<form id="testform" action="/upload" method="post" enctype="multipart/form-data"> Select image to upload:
-	<input name="hello" value="world">
-	<input type="file" name="fileToUpload" id="fileToUpload">
-	<input type="submit" value="submit">
-</form>
-
+            <div id="vizPreviews">
 
             </div>
+
+        </div>
 		</div>
 	</div>
 
@@ -34,25 +52,40 @@
 	<script src="/js/vendor.min.js"></script>
     <script src="/js/scripts.min.js"></script>
 
-	<script>
 
-		$("form#testform").submit(function(e) {
-			e.preventDefault();
-			var formData = new FormData(this);
+<script src="/js/showdown.min.js"></script>
 
-			$.ajax({
-				url: '/upload',
-				type: 'POST',
-				data: formData,
-				success: function (data) {
-					alert(data)
-				},
-				cache: false,
-				contentType: false,
-				processData: false
-			});
-		});
+<script>
+const md = new showdown.Converter({
+    openLinksInNewWindow: true
+});
 
-    </script>
+$("#aboutMe").html(md.makeHtml(`
+Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in Melbourne, Australia. This is my sandbox for experimenting & practicing with d3js. You can see all the source code on [github]](https://github.com/david-ma/dataviz). It runs on my framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
+`))
+
+var previews = [{
+    img: "images/warPreview.jpg",
+    link: "war"
+}]
+
+d3.select("#vizPreviews").selectAll(".previews").data(previews).enter()
+    .append("div")
+    .classed("vizPreviewBox", true)
+    .each(d => {
+        console.log(d);
+        console.log(this);
+        // d3.select(this).append("h1").text('lol');
+    }).classed("preview", true)
+    .append("a").attr('href', d => d.link)
+    .append("img").attrs((d) => {
+        return {
+            class: "vizPreviewImage",
+            src: d.img
+        }
+    });
+
+
+</script>
 </body>
 </html>
