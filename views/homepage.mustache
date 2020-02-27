@@ -13,12 +13,14 @@
     }
     ul#nav {
         list-style: none;
+        padding: 0;
     }
     .vizPreviewImage {
         max-width: 300px;
     }
     .vizPreviewBox {
         border: solid 1px black;
+        padding: 10px;
     }
 </style>
 
@@ -62,20 +64,25 @@ const md = new showdown.Converter({
 
 $("#aboutMe").html(md.makeHtml(`
 Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in Melbourne, Australia. This is my sandbox for experimenting & practicing with d3js. You can see all the source code on [github]](https://github.com/david-ma/dataviz). It runs on my framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
+
+These data visualisations are mostly part of the [#MakeoverMonday](https://www.makeovermonday.co.uk/) series. And I am aiming to do one each week!
+
+I'm [@Frostickle](https://twitter.com/frostickle) on Twitter!
 `))
 
 var previews = [{
     img: "images/warPreview.jpg",
-    link: "war"
+    link: "war",
+    title: "What % of your life has America been at war?"
 }]
 
 d3.select("#vizPreviews").selectAll(".previews").data(previews).enter()
     .append("div")
     .classed("vizPreviewBox", true)
-    .each(d => {
-        console.log(d);
-        console.log(this);
-        // d3.select(this).append("h1").text('lol');
+    .each((d, i, j) => {
+        var box = d3.select(j[0]);
+        box.append("h2").text(d.title);
+        box.append("p").text("add a quick summary here");
     }).classed("preview", true)
     .append("a").attr('href', d => d.link)
     .append("img").attrs((d) => {
