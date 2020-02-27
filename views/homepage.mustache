@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Upload page</title>
+
+</head>
+<body>
+	{{> header}}
+
+	<div class="container page">
+		<div class="row">
+			<div class="col-xs-12">
+			
+			hello world
+
+<form id="testform" action="/upload" method="post" enctype="multipart/form-data"> Select image to upload:
+	<input name="hello" value="world">
+	<input type="file" name="fileToUpload" id="fileToUpload">
+	<input type="submit" value="submit">
+</form>
+
+
+            </div>
+		</div>
+	</div>
+
+	{{> footer}}
+	<link rel="stylesheet" href="/css/default.css">
+	<link rel="stylesheet" href="/css/thalia.css">
+	<script src="/js/vendor.min.js"></script>
+    <script src="/js/scripts.min.js"></script>
+
+	<script>
+
+		$("form#testform").submit(function(e) {
+			e.preventDefault();
+			var formData = new FormData(this);
+
+			$.ajax({
+				url: '/upload',
+				type: 'POST',
+				data: formData,
+				success: function (data) {
+					alert(data)
+				},
+				cache: false,
+				contentType: false,
+				processData: false
+			});
+		});
+
+    </script>
+</body>
+</html>

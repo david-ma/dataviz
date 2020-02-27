@@ -1,13 +1,13 @@
-var http = require("http");
-var fs = require('fs');
-var fsPromise = fs.promises;
-var mustache = require('mustache');
+const http = require("http");
+const fs = require('fs');
+const fsPromise = fs.promises;
+const mustache = require('mustache');
 const formidable = require('formidable');
 
 // These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.
 var xray, request, tabletojson;
-var loadWebsiteScrapingTools = false;
-if (loadWebsiteScrapingTools) {
+var scrapingToolsLoaded = false;
+if (scrapingToolsLoaded) {
 	xray = require('x-ray')();
 	request = require('request');
 	tabletojson = require('tabletojson');
@@ -79,6 +79,12 @@ const base = 'https://www.digicamdb.com/';
 exports.config = {
 	services: {
 		"scrapeAllCameras": function(res, req, db, type) {
+            if(!scrapingToolsLoaded) {
+                scrapingToolsLoaded = true;
+                xray = require('x-ray')();
+                request = require('request');
+                tabletojson = require('tabletojson');
+            }
 
 			db.Scrape.findAll({
 				where: {
@@ -138,7 +144,16 @@ exports.config = {
 			});
 
 		},
-		"scrapeAllBrands": function(res, req, db, type) {
+
+// Todo: fix this one.
+// The on-demand loading of tools isn't really working.
+        "scrapeAllBrands": function(res, req, db, type) {
+            if(!scrapingToolsLoaded) {
+                scrapingToolsLoaded = true;
+                xray = require('x-ray')();
+                request = require('request');
+                tabletojson = require('tabletojson');
+            }
 			const brands = ['canon', 'fujifilm', 'leica', 'nikon', 'olympus', 'panasonic', 'pentax', 'ricoh', 'samsung', 'sony', 'zeiss'];
 
 			asyncForEach(brands, 1, function(brand, iterator, brands, done){
@@ -317,8 +332,18 @@ exports.config = {
 			req.end();
 
 		}
-	},
+    },
+    mustacheIgnore: ['homepage', 'upload_experiment'],
 	controller: {
+		"": function(router) {
+			const promises = [loadMustacheTemplates('homepage.mustache')];
+			Promise.all(promises).then(function([views]){		
+				const data = {}
+
+                var output = mustache.render(views.template, data, views);
+				router.res.end(output);
+			});
+		},
 		"experiment": function(router) {
 			const promises = [loadMustacheTemplates('upload_experiment.mustache')];
 			Promise.all(promises).then(function([views]){		

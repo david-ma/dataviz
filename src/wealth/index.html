@@ -145,13 +145,6 @@ d3.csv("/wealth/WorldWealth.csv", function(d, i, columns){
         }
     });
 
-    treemapData.children[0].children[0].children = [
-        {
-            name: 'california',
-            value: 20000
-        }
-    ]
-
     drawTreemap(dataset);
 });
 
@@ -161,8 +154,8 @@ function drawTreemap(data) {
     const war = new Chart({
         element: "chart",
         data: data,
-        width: 2880,
-        height: 1800,
+        width: 1800,
+        height: 900,
         nav: false,
         title: "World Wealth 2019, Billions of $"
     }).scratchpad(function(c){
