@@ -21,7 +21,44 @@
                 <div class="col-xs-12 col-sm-9">
 
                     <h1 class="hidden-xs">America at War</h1>
+                    <div id="war_chart"></div>
+                    <section>
+                        <div class="row" id="AmericanWars">
+                            <div class="col-xs-12 col-md-4">
 
+                                <div id="explain"></div>
+                                <span>Birth:
+                                    <input id="birthyear" placeholder="1905"></span>
+                                <br>
+                                <span>Death:
+                                    <input id="deathyear" placeholder="N/A"></span>
+                                <input type="button" value="Update birth/death year" onclick="drawPieChart()">
+                                <div id="explain2"></div>
+
+                                <table style="border: solid 1px grey; margin: 5px 0;">
+                                    <thead>
+                                        <tr></tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <div class="download_csv_link">
+                                    <a target="_blank" href="/war/AmericanWars.csv">Download CSV</a>
+                                </div>
+
+
+                            </div>
+                            <div class="col-xs-12 col-md-offset-2 col-md-8">
+                                <div>
+                                    <input type="button" value="George Washington" onclick="celebrity(1732,1799)">
+                                    <input type="button" value="John F. Kennedy" onclick="celebrity(1917,1963)">
+                                    <input type="button" value="Alexander Hamilton" onclick="celebrity(1757,1804)">
+                                    <input type="button" value="Elvis Presley" onclick="celebrity(1935,1977)">
+                                    <input type="button" value="Abraham Lincoln" onclick="celebrity(1809,1865)">
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
                     <div id="vizPreviews"></div>
 
                 </div>
@@ -33,7 +70,16 @@
         <script src="/js/require.js"></script>
 
         <script>
-console.log("doing stuff..");
+
+            const currentYear = new Date().getFullYear();;
+            var drawPieChart;
+
+            function celebrity(birth, death) {
+                $("#birthyear").val(birth);
+                $("#deathyear").val(death);
+                drawPieChart();
+            }
+
             require.config({
                 baseUrl: '/js/vendor',
                 enforceDefine: true,
@@ -49,28 +95,299 @@ console.log("doing stuff..");
                 }
             });
 
-            require([
-                'chart', '/js/jquery.dataTables.min.js'
-            ], function (_chart) {
-                console.log(_chart);
-                const Chart = _chart.Chart;
 
-                const charts = [];
-                let data = [];
-                const seasons = {};
-                let AmericanWars = null;
 
-                console.log("Calling csv stuff");
-                d3.csv("/war/AmericanWars.csv", function (d, i, columns) {
-                    d.start = parseInt(d.start);
-                    d.end = parseInt(d.end) || "";
-                    d.length = (d.end || currentYear) - d.start;
 
-                    return d;
-                }).then(function (data) {
-                    console.log(data);
+    require(['chart',
+        '/js/jquery.dataTables.min.js'
+    ], function(_chart){
+        console.log(_chart);
+        const Chart = _chart.Chart;
+
+        const charts = [];
+        let data = [];
+        const seasons = {};
+        let AmericanWars = null;
+
+    console.log("Calling csv stuff");
+    d3.csv("/war/AmericanWars.csv", function(d, i, columns){
+        d.start = parseInt(d.start);
+        d.end = parseInt(d.end) || "";
+        d.length = (d.end || currentYear) - d.start;
+
+        return d;
+    }).then(function(data){
+        console.log(data);
+        AmericanWars = data;
+    //    AmericanWars.columns.push("length");
+        console.log("Start async stuff");
+        _chart.decorateTable(AmericanWars, {
+            element: "#AmericanWars table",
+            order:[1, 'asc'],
+            titles: ['War', 'Start', 'End']
+        });
+
+        drawPieChart(AmericanWars);
+//        log("Finish async stuff");
+    });
+
+
+    $("#birthyear").on('keyup', function (e) {
+        if (e.keyCode === 13) {
+            drawPieChart();
+        }
+    });
+
+
+    let warChart = null;
+
+    drawPieChart = function() {
+//        if(warChart) warChart.remove();
+        d3.select("#war_chart svg").remove();
+
+        const birth = parseInt($("#birthyear").val()) || 1905;
+
+        const death = parseInt($("#deathyear").val()) || currentYear;
+        const age = death - birth;
+
+        if ( birth > currentYear) {
+            alert("You haven't been born yet.");
+        } else if (death < birth) {
+            alert("You died before you were born???");
+        }
+
+        let peaceStart = birth; // assuming that you were born during peacetime.
+        let longestWar = 0;
+
+        var data = {};
+        var totals = {
+            peace: 0,
+            war: 0
+        };
+        var totalYears = 0;
+
+// Get a list of peacetime & wars for the person's life.
+        AmericanWars.forEach(function(war, i){
+            
+            if(!war.end) war.end = currentYear;
+
+            // If you were born during peacetime.. and your birth is after the war starts.
+            // then add a peacetime & war to the stack.
+            if(war.end > birth) {
+                // Personal experience of the war. Person may be born after the war starts, or die before it ends.
+                let thisWar = JSON.parse(JSON.stringify(war)); // Very stupid way to clone an object.
+
+                // Create a peacetime block
+                var peacetime = {
+                    name: `peace-${i}`,
+                    start: peaceStart,
+                    end: thisWar.start,
+                    length: thisWar.start - peaceStart
+                };
+
+                // if you were born during the war... change the lengths of the peacetime & the war
+                if (birth > war.start && birth < war.end) {
+                    peacetime.length = 0;
+                    thisWar.length = war.end - birth;
+                }
+
+                if (death < thisWar.end) {
+                    thisWar.end = death;
+                    thisWar.length = thisWar.end - thisWar.start;
+
+                    if (death < thisWar.start) {
+                        thisWar.length = 0;
+                        peacetime.end = death;
+                        peacetime.length = peacetime.end - peacetime.start;
+                    }
+                }
+
+
+
+                // update other helper variables
+                if(thisWar.length > longestWar) longestWar = thisWar.length;
+                peaceStart = thisWar.end;
+
+                totals.war += thisWar.length;
+                totalYears += thisWar.length;
+
+                // add the peacetime & war to the stack.
+                if (peacetime.length > 0) {
+                    data[2*i] = peacetime;
+                    totals.peace += peacetime.length;
+                    totalYears += peacetime.length;
+                }
+                if (thisWar.length > 0) {
+                    data[(2*i)+1] = thisWar;
+                }
+            }
+
+        });
+
+        console.log("stack", data);
+
+
+        console.log("Data is", data);
+
+        warChart = new Chart({
+            element: "war_chart",
+            data: data,
+            nav: false
+//            title: "Number of years USA was at war, during your lifetime"
+        }).scratchpad(function(c){
+            const   svg = c.plot.append("g").attr("transform","translate(370,250)"),
+                width = c.innerWidth,
+                height = c.innerHeight;
+
+
+            var radius = height / 2.5;
+
+// Compute the position of each group on the pie:
+            var pie = d3.pie()
+                .sort(null) // Do not sort group by size
+                .value(function(d) {return d.value.length; })
+            var data_ready = pie(d3.entries(data).reverse())
+console.log(data_ready);
+
+// The arc generator
+            var arc = d3.arc()
+                .innerRadius(radius * 0.7)         // This is the size of the donut hole
+                .outerRadius(radius * 0.8)
+
+// Another arc that won't be drawn. Just for labels positioning
+            var outerArc = d3.arc()
+                .innerRadius(radius * 0.9)
+                .outerRadius(radius * 0.9)
+
+// Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+            svg
+                .selectAll('allSlices')
+                .data(data_ready)
+                .enter()
+                .append('path')
+//                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
+                .attr('d', arc)
+                .attr('fill', 'red')
+                .attr('fill', 'black')
+                .attr("stroke", "white")
+                .style("stroke-width", "2px")
+                .style("opacity", (d) => data[d.data.key].name.indexOf("peace") == 0 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3)
+
+// Add the polylines between chart and labels:
+            svg
+                .selectAll('allPolylines')
+                .data(data_ready)
+                .enter()
+                .append('polyline')
+                .style("display", (d) => data[d.data.key].name.indexOf("peace") == 0 ? "none" : '')
+                .attr("stroke", "black")
+                .style("fill", "none")
+                .attr("stroke-width", 1)
+                .attr('points', function(d) {
+                    var posA = arc.centroid(d) // line insertion in the slice
+                    var posB = outerArc.centroid(d) // line break: we use the other arc generator that has been built only for that
+                    var posC = outerArc.centroid(d); // Label position = almost the same as posB
+                    var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2 // we need the angle to see if the X position will be at the extreme right or extreme left
+                    posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
+                    return [posA, posB, posC]
                 })
-            })
-        </script>
-    </body>
-</html>
+
+// Add the polylines between chart and labels:
+            svg
+                .selectAll('allLabels')
+                .data(data_ready)
+                .enter()
+                .append('text')
+                .style("display", (d) => data[d.data.key].name.indexOf("peace") == 0 ? "none" : '')
+                .text( (d) => data[d.data.key].name )
+                .attr('transform', function(d) {
+                    var pos = outerArc.centroid(d);
+                    var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                    pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
+                    return 'translate(' + pos + ')';
+                })
+                .style('text-anchor', function(d) {
+                    var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                    return (midangle < Math.PI ? 'start' : 'end')
+                })
+
+
+            var innerData = pie
+                .value((d) => d.value)
+                (d3.entries(totals).reverse());
+
+// The arc generator
+//            var arc = d3.arc()
+            arc.innerRadius(radius * 0)
+                .outerRadius(radius * 0.65);
+
+
+// Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+            svg
+                .selectAll('innerSlices')
+                .data(innerData)
+                .enter()
+                .append('path')
+                //                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
+                .attr('d', arc)
+                .attr('fill', 'maroon')
+                .attr("stroke", "white")
+                .style("stroke-width", "2px")
+                .style("opacity", (d) => d.index % 2 == 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3);
+
+
+            console.log("drawing legend...");
+
+            var legend = c.plot.append("g").attr("transform", "translate(220,0)");
+                legend.selectAll('.legendLabel')
+                    .data(innerData)
+                    .enter()
+                    .append("g")
+                    .classed("legendLabel", true)
+                    .append('rect')
+                    .attr('x', 50)
+                    .attr('y', (d,i) => 20+(30*i))
+                    .attr('height', 20)
+                    .attr('width', 20)
+                    .attr('fill', 'maroon')
+                    .style("opacity", (d) => d.index % 2 == 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3);
+
+                d3.selectAll('.legendLabel')
+                    .append("text")
+                    .attr('x', 75)
+                    .attr('y', (d,i) => 35+(30*i))
+                    .text((d) => `${d.value} years of ${d.index % 2 == 1 ? 'peace' : 'war'}: ${d3.format(".0%")(d.value / totalYears)}`);
+
+        });
+    }
+
+
+});
+
+
+
+</script>
+
+
+<script>
+
+    const md = new showdown.Converter({openLinksInNewWindow: true});
+
+    $("#explain").html(md.makeHtml(`
+# Number of years USA was at war, during your lifetime
+## Originally on [The Washington Post](https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/) by [@pbump](https://twitter.com/pbump)
+
+I redrew Philip Bump's diagram from his article "Nearly a quarter of Americans have never experienced the U.S. in a time of peace" as an exercise to practice d3.js.
+
+Simply enter your birth year here & it will recalculate the diagram.`));
+
+
+    $("#explain2").html(md.makeHtml(`Note that the "start" & "end" years reflect USA's involvement in the war, not the total length of each war.
+
+And yes, I know that you're supposed to improve the diagram for [#makeovermonday](https://www.makeovermonday.co.uk/), but I'm just doing this as a warmup exercise. Maybe next week I'll change the diagram more.
+
+Todo:
+ * Better labels, e.g. Years each war started
+ * Hoverover for labels?
+ `));
+</script></body></html></html></body></html>
