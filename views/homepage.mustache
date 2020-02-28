@@ -14,9 +14,22 @@
         {{> header}}
 
         <div id="dataviz_homepage" class="container page">
-            <div class="row">
+            <div class="row equal">
+
+                <div id="mobile_nav" class="visible-xs">
+                    <div id="title">
+                        <h1>David's Dataviz</h1>
+                    </div>
+                    <div id="search">
+                        <input>
+                        <i class="fas fa-search fa-2x"></i>
+                    </div>
+                    <div id="hamburger">
+                        <i class="fas fa-bars fa-2x"></i>
+                    </div>
+                </div>
                 <div class="col-sm-3 hidden-xs sidebar">
-                    <ul id='nav'>
+                    <ul>
                         <li>
                             <a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
                             <div id="aboutMe" class=''></div>
@@ -30,9 +43,11 @@
                         </ul>
                     </ul>
                 </div>
+
+
                 <div class="col-xs-12 col-sm-9">
 
-                    <h1>#MakeoverMonday</h1>
+                    <h1 class="hidden-xs">#MakeoverMonday</h1>
 
                     <div id="vizPreviews"></div>
 
