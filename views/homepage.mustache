@@ -22,6 +22,7 @@
         border: solid 1px black;
         padding: 10px;
     }
+
 </style>
 
 </head>
@@ -30,15 +31,23 @@
 
 	<div class="container page">
 		<div class="row">
-            <div class="col-xs-2">
+            <div class="col-xs-3">
                 <ul id='nav'>
-                    <li><a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a></li>
+                    <li><a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
+                        <div id="aboutMe" class=''></div>
+                    </li>
+                    <li><input placeholder="Search"></li>
+                    <ul>
+                        <li>Stuff</li>
+                        <li>Stuff</li>
+                        <li>Stuff</li>
+                        <li>Stuff</li>
+                    </ul>
                 </ul>
 			</div>
-			<div class="col-xs-10">
+			<div class="col-xs-9">
 			
             <h1>Dataviz Sandbox</h1>
-            <div id="aboutMe" class='hidden'></div>
 
             <div id="vizPreviews">
 
@@ -49,7 +58,7 @@
 	</div>
 
 	{{> footer}}
-	<link rel="stylesheet" href="/css/default.css">
+	<link rel="stylesheet" href="/css/vendor.min.css">
 	<link rel="stylesheet" href="/css/thalia.css">
 	<script src="/js/vendor.min.js"></script>
     <script src="/js/scripts.min.js"></script>
@@ -63,7 +72,7 @@ const md = new showdown.Converter({
 });
 
 $("#aboutMe").html(md.makeHtml(`
-Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in Melbourne, Australia. This is my sandbox for experimenting & practicing with d3js. You can see all the source code on [github]](https://github.com/david-ma/dataviz). It runs on my framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
+Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in Melbourne, Australia. This is my sandbox for experimenting & practicing with d3js. You can see all the source code on [github](https://github.com/david-ma/dataviz). It runs on my framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
 
 These data visualisations are mostly part of the [#MakeoverMonday](https://www.makeovermonday.co.uk/) series. And I am aiming to do one each week!
 
@@ -71,26 +80,37 @@ I'm [@Frostickle](https://twitter.com/frostickle) on Twitter!
 `))
 
 var previews = [{
-    img: "images/warPreview.jpg",
+    img: "images/war.jpg",
     link: "war",
-    title: "What % of your life has America been at war?"
+    title: "America at War",
+    summary: "What % of your life has America been at war?"
+}, {
+    link: "wealth",
+    title: "Wealth",
+    img: "images/wealth.png",
+    summary: ""
+}, {
+    link: "influenza",
+    title: "Influenza",
+    img: "images/influenza.jpg"
 }]
 
 d3.select("#vizPreviews").selectAll(".previews").data(previews).enter()
     .append("div")
     .classed("vizPreviewBox", true)
     .each((d, i, j) => {
-        var box = d3.select(j[0]);
+        var box = d3.select(j[i]);
         box.append("h2").text(d.title);
-        box.append("p").text("add a quick summary here");
-    }).classed("preview", true)
-    .append("a").attr('href', d => d.link)
-    .append("img").attrs((d) => {
-        return {
-            class: "vizPreviewImage",
-            src: d.img
-        }
-    });
+        box.append("p").text(d.summary);
+        box.classed("preview", true)
+        .append("a").attr('href', d => d.link)
+        .append("img").attrs((d) => {
+            return {
+                class: "vizPreviewImage",
+                src: d.img
+            }
+        });
+    })
 
 
 </script>
