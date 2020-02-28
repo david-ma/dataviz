@@ -333,7 +333,7 @@ exports.config = {
 
 		}
     },
-    mustacheIgnore: ['homepage', 'upload_experiment'],
+    mustacheIgnore: ['homepage', 'upload_experiment', 'camera'],
 	controller: {
 		"": function(router) {
 			const promises = [loadMustacheTemplates('homepage.mustache')];
