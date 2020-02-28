@@ -1,0 +1,36 @@
+<div id="mobile_nav" class="visible-xs">
+    <div id="title">
+        <h1>David's Dataviz</h1>
+    </div>
+    <div id="search">
+        <input>
+        <i class="fas fa-search fa-2x"></i>
+    </div>
+    <div id="hamburger">
+        <i class="fas fa-bars fa-2x"></i>
+    </div>
+</div>
+<div class="col-sm-3 hidden-xs sidebar">
+    <ul>
+        <li>
+            <a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
+            <div id="aboutMe" class=''></div>
+        </li>
+        <li><input placeholder="Search"></li>
+        <ul>
+            <li>Stuff</li>
+            <li>Stuff</li>
+            <li>Stuff</li>
+            <li>Stuff</li>
+        </ul>
+    </ul>
+</div>
+
+<script>
+console.log('testing lol');
+console.log($("input").val());
+
+
+</script>
+
+
