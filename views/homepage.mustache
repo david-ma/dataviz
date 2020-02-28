@@ -8,38 +8,6 @@
 	<title>#MakeoverMonday</title>
 
 <style>
-    #aboutMe.hidden {
-        display: none;
-    }
-    ul#nav {
-        list-style: none;
-        padding: 0;
-    }
-    .preview img {
-        position: absolute;
-        bottom: 0;
-        margin-bottom: 15px;
-        max-height: 65%;
-        left: 50%;
-        transform: translate(-50%, 0);
-        max-width: 100%;
-        max-width: calc(100% - 30px);
-        border: solid 1px grey;
-    }
-    .preview {
-        height: 400px;
-        border: solid 1px black;
-        padding: 15px;
-    }
-    .preview h2 {
-        margin-top: 0;
-    }
-    .preview p {
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-    }
 
 </style>
 
@@ -47,7 +15,7 @@
 <body>
 	{{> header}}
 
-	<div class="container page">
+	<div id="dataviz_homepage" class="container page">
 		<div class="row">
             <div class="col-sm-3 hidden-xs">
                 <ul id='nav'>
