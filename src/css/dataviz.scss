@@ -1,4 +1,3 @@
-
 #dataviz_homepage {
     #aboutMe.hidden {
         display: none;
@@ -31,5 +30,9 @@
             max-width: calc(100% - 30px);
             border: solid 1px grey;
         }
+    }
+    .sidebar {
+        background: lightgrey;
+        height: 100vh;
     }
 }

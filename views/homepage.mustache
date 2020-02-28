@@ -1,57 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="x-ua-compatible" content="ie=edge">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>#MakeoverMonday</title>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>#MakeoverMonday</title>
 
-<style>
+        <style></style>
 
-</style>
+    </head>
+    <body>
+        {{> header}}
 
-</head>
-<body>
-	{{> header}}
-
-	<div id="dataviz_homepage" class="container page">
-		<div class="row">
-            <div class="col-sm-3 hidden-xs">
-                <ul id='nav'>
-                    <li><a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
-                        <div id="aboutMe" class=''></div>
-                    </li>
-                    <li><input placeholder="Search"></li>
-                    <ul>
-                        <li>Stuff</li>
-                        <li>Stuff</li>
-                        <li>Stuff</li>
-                        <li>Stuff</li>
+        <div id="dataviz_homepage" class="container page">
+            <div class="row">
+                <div class="col-sm-3 hidden-xs sidebar">
+                    <ul id='nav'>
+                        <li>
+                            <a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
+                            <div id="aboutMe" class=''></div>
+                        </li>
+                        <li><input placeholder="Search"></li>
+                        <ul>
+                            <li>Stuff</li>
+                            <li>Stuff</li>
+                            <li>Stuff</li>
+                            <li>Stuff</li>
+                        </ul>
                     </ul>
-                </ul>
-			</div>
-			<div class="col-xs-12 col-sm-9">
-			
-                <h1>#MakeoverMonday</h1>
+                </div>
+                <div class="col-xs-12 col-sm-9">
 
-                <div id="vizPreviews">
+                    <h1>#MakeoverMonday</h1>
 
+                    <div id="vizPreviews"></div>
+
+                </div>
             </div>
-
         </div>
-		</div>
-	</div>
 
-	{{> footer}}
-    {{> assets}}
+        {{> footer}}
+        {{> assets}}
 
-<script>
-const md = new showdown.Converter({
-    openLinksInNewWindow: true
-});
+        <script>
+            const md = new showdown.Converter({openLinksInNewWindow: true});
 
-$("#aboutMe").html(md.makeHtml(`
+            $("#aboutMe").html(md.makeHtml(`
 Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in Melbourne, Australia. This is my sandbox for experimenting & practicing with d3js. You can see all the source code on [github](https://github.com/david-ma/dataviz). It runs on my framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
 
 These data visualisations are mostly part of the [#MakeoverMonday](https://www.makeovermonday.co.uk/) series. And I am aiming to do one each week!
@@ -59,46 +54,39 @@ These data visualisations are mostly part of the [#MakeoverMonday](https://www.m
 I'm [@Frostickle](https://twitter.com/frostickle) on Twitter!
 `))
 
-var previews = [{
-    img: "images/war.jpg",
-    link: "war",
-    title: "America at War",
-    summary: "What % of your life has America been at war?"
-}, {
-    link: "wealth",
-    title: "Wealth",
-    img: "images/wealth.png",
-    summary: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-}, {
-    link: "influenza",
-    title: "Influenza",
-    img: "images/influenza.jpg",
-    summary: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-}, {
-    img: "images/war.jpg",
-    link: "war",
-    title: "America at War",
-    summary: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
-}]
+            var previews = [
+                {
+                    img: "images/war.jpg",
+                    link: "war",
+                    title: "America at War",
+                    summary: "What % of your life has America been at war?"
+                }, {
+                    link: "wealth",
+                    title: "Wealth",
+                    img: "images/wealth.png",
+                    summary: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+                }, {
+                    link: "influenza",
+                    title: "Influenza",
+                    img: "images/influenza.jpg",
+                    summary: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                }, {
+                    img: "images/war.jpg",
+                    link: "war",
+                    title: "America at War",
+                    summary: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
+                }
+            ]
 
-d3.select("#vizPreviews").selectAll(".previews").data(previews).enter()
-    .append("div")
-    .classed("preview", true)
-    .classed("col-xl-3 col-lg-4 col-md-6 col-xs-12", true)
-    .each((d, i, j) => {
-        var box = d3.select(j[i]);
-        box.append("h2").text(d.title);
-        box.append("p").text(d.summary);
+            d3.select("#vizPreviews").selectAll(".previews").data(previews).enter().append("div").classed("preview", true).classed("col-xl-3 col-lg-4 col-md-6 col-xs-12", true).each((d, i, j) => {
+                var box = d3.select(j[i]);
+                box.append("h2").text(d.title);
+                box.append("p").text(d.summary);
 
-        box.append("a").attr('href', d => d.link)
-        .append("img").attrs((d) => {
-            return {
-                src: d.img
-            }
-        });
-    })
-
-
-</script>
-</body>
+                box.append("a").attr('href', d => d.link).append("img").attrs((d) => {
+                    return {src: d.img}
+                });
+            })
+        </script>
+    </body>
 </html>
