@@ -74,6 +74,7 @@
 }
 
 .sidebar {
+    min-height: calc(100vh - 100px - 50px);
     border-right: dashed 1px lightgrey;
     ul {
         list-style: none;

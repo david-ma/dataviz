@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>America at War</title>
+
+        {{> assets}}
+        <style></style>
+
+    </head>
+    <body>
+        {{> header}}
+
+        <div id="dataviz_homepage" class="container page">
+            <div class="row equal">
+                {{> nav}}
+
+                <div class="col-xs-12 col-sm-9">
+
+                    <h1 class="hidden-xs">America at War</h1>
+
+                    <div id="vizPreviews"></div>
+
+                </div>
+            </div>
+        </div>
+
+        {{> footer}}
+
+        <script src="/js/require.js"></script>
+
+        <script>
+console.log("doing stuff..");
+            require.config({
+                baseUrl: '/js/vendor',
+                enforceDefine: true,
+                paths: {
+                    'chart': "/js/chart",
+                    'datatables.net': "/js/datatables.min"
+                },
+                shim: {
+                    chart: {
+                        exports: "Chart",
+                        deps: ['d3', 'd3-selection-multi']
+                    }
+                }
+            });
+
+            require([
+                'chart', '/js/jquery.dataTables.min.js'
+            ], function (_chart) {
+                console.log(_chart);
+                const Chart = _chart.Chart;
+
+                const charts = [];
+                let data = [];
+                const seasons = {};
+                let AmericanWars = null;
+
+                console.log("Calling csv stuff");
+                d3.csv("/war/AmericanWars.csv", function (d, i, columns) {
+                    d.start = parseInt(d.start);
+                    d.end = parseInt(d.end) || "";
+                    d.length = (d.end || currentYear) - d.start;
+
+                    return d;
+                }).then(function (data) {
+                    console.log(data);
+                })
+            })
+        </script>
+    </body>
+</html>
