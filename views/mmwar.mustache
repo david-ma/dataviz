@@ -14,17 +14,14 @@
     <body>
         {{> header}}
 
-        <div id="dataviz_homepage" class="container-fluid">
+        <div id="dataviz_homepage" class="container-fluid page">
             <div class="row equal">
                 {{> nav}}
 
                 <div class="col-xs-12 col-sm-9">
-
-                    <h1 class="hidden-xs">America at War</h1>
-                    <div id="war_chart"></div>
                     <section>
                         <div class="row" id="AmericanWars">
-                            <div class="col-xs-12 col-md-4">
+                            <div class="col-xs-12 col-sm-6">
 
                                 <div id="explain"></div>
                                 <span>Birth:
@@ -47,7 +44,9 @@
 
 
                             </div>
-                            <div class="col-xs-12 col-md-offset-2 col-md-8">
+                            <div class="col-xs-12 col-md-6">
+                                    <div id="war_chart"></div>
+
                                 <div>
                                     <input type="button" value="George Washington" onclick="celebrity(1732,1799)">
                                     <input type="button" value="John F. Kennedy" onclick="celebrity(1917,1963)">
