@@ -22,7 +22,15 @@
 
                     <h1 class="hidden-xs">#MakeoverMonday</h1>
 
-                    <div id="vizPreviews"></div>
+                    <div id="vizPreviews">
+                    {{#blogposts}}
+                        <div class="preview col-xl-3 col-lg-4 col-md-6 col-xs-12">
+                            <h2>{{title}}</h2>
+                            <p>{{summary}}</p>
+                            <a href="/blog/{{shortname}}"><img src="{{image}}"></a>
+                        </div>
+                    {{/blogposts}}
+                    </div>
 
                 </div>
             </div>
@@ -31,6 +39,11 @@
         {{> footer}}
 
         <script>
+
+            {{#blogposts}}
+                console.log("{{shortname}}");
+            {{/blogposts}}
+
             const md = new showdown.Converter({openLinksInNewWindow: true});
 
             $("#aboutMe").html(md.makeHtml(`
@@ -39,41 +52,8 @@ Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in M
 These data visualisations are mostly part of the [#MakeoverMonday](https://www.makeovermonday.co.uk/) series. And I am aiming to do one each week!
 
 I'm [@Frostickle](https://twitter.com/frostickle) on Twitter!
-`))
+`));
 
-            var previews = [
-                {
-                    img: "images/war.jpg",
-                    link: "war",
-                    title: "America at War",
-                    summary: "What % of your life has America been at war?"
-                }, {
-                    link: "wealth",
-                    title: "Wealth",
-                    img: "images/wealth.png",
-                    summary: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-                }, {
-                    link: "influenza",
-                    title: "Influenza",
-                    img: "images/influenza.jpg",
-                    summary: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                }, {
-                    img: "images/war.jpg",
-                    link: "war",
-                    title: "America at War",
-                    summary: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
-                }
-            ]
-
-            d3.select("#vizPreviews").selectAll(".previews").data(previews).enter().append("div").classed("preview", true).classed("col-xl-3 col-lg-4 col-md-6 col-xs-12", true).each((d, i, j) => {
-                var box = d3.select(j[i]);
-                box.append("h2").text(d.title);
-                box.append("p").text(d.summary);
-
-                box.append("a").attr('href', d => d.link).append("img").attrs((d) => {
-                    return {src: d.img}
-                });
-            })
         </script>
     </body>
 </html>

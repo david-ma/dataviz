@@ -38,19 +38,39 @@ function sanitise(string) {
 
 
 // TODO: handle rejection & errors?
-async function loadMustacheTemplates(template) {
+async function loadTemplates(template, content = '') {
 	return new Promise((resolve, reject) => {
 		// Load the mustache partials
 		const promises = [];
-		const filenames = ['template'];
+		const filenames = ['template', 'content'];
 
-		// Load the mustache template
+		// Load the mustache template (outer layer)
 		promises.push(
 			fsPromise.readFile(`${__dirname}/views/${template}`, {
 				encoding: 'utf8'
 			})
+        );
+
+        // Load the mustache content (innermost layer)
+		promises.push(
+            new Promise((resolve, reject) => {
+                if (Array.isArray(content) && content[0]) content = content[0];
+                console.log(content);
+                fsPromise.readFile(`${__dirname}/views/content/${content}.mustache`, {
+                    encoding: 'utf8'
+                }).then(result => {
+                    resolve(result);
+                }).catch(e => {
+                    fsPromise.readFile(`${__dirname}/views/404.mustache`, {
+                        encoding: 'utf8'
+                    }).then(result => {
+                        resolve(result);
+                    });
+                });
+            })
 		);
 
+        // Load all the other partials we may need
 		fsPromise.readdir(`${__dirname}/views/partials/`)
 		.then( function(d){
 			d.forEach(function(filename){
@@ -207,7 +227,7 @@ exports.config = {
 			const brand = type.indexOf("_") > 0 ? type.split("_")[0] : "";
 			const model = type.indexOf("_") > 0 ? type.split("_")[1].replace(/-/g, " ") : "";
 
-			promises.push(loadMustacheTemplates('camera.mustache'));
+			promises.push(loadTemplates('camera.mustache'));
 
 // Get the data from the database
 			promises.push(
@@ -333,19 +353,35 @@ exports.config = {
 
 		}
     },
-    mustacheIgnore: ['homepage', 'upload_experiment', 'camera'],
+    mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
 	controller: {
 		"": function(router) {
-			const promises = [loadMustacheTemplates('homepage.mustache')];
+            const promises = [loadTemplates('homepage.mustache')];
 			Promise.all(promises).then(function([views]){		
 				const data = {}
+                router.db.Blogpost.findAll().then((results) => {
+                    data.blogposts = results.map(d => d.dataValues);
 
-                var output = mustache.render(views.template, data, views);
-				router.res.end(output);
+				    var output = mustache.render(views.template, data, views);
+    				router.res.end(output);
+                })
+			});
+        },
+        "blog": function(router) {
+            const promises = [
+                loadTemplates('blog.mustache', router.path)];
+			Promise.all(promises).then(function([views]){		
+				const data = {}
+                router.db.Blogpost.findAll().then((results) => {
+                    data.blogposts = results.map(d => d.dataValues);
+
+				    var output = mustache.render(views.template, data, views);
+    				router.res.end(output);
+                })
 			});
 		},
 		"experiment": function(router) {
-			const promises = [loadMustacheTemplates('upload_experiment.mustache')];
+			const promises = [loadTemplates('upload_experiment.mustache')];
 			Promise.all(promises).then(function([views]){		
 				const data = {}
 
@@ -354,7 +390,7 @@ exports.config = {
 			});
 		},
 		"stickers": function(router) {
-			const promises = [loadMustacheTemplates('stickers.mustache')];
+			const promises = [loadTemplates('stickers.mustache')];
 
 			Promise.all(promises).then(function([views]){		
 				const data = {}

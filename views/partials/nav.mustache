@@ -10,7 +10,7 @@
         <i class="fas fa-bars fa-2x"></i>
     </div>
 </div>
-<div class="col-sm-3 hidden-xs sidebar">
+<div class="col-md-2 col-sm-3 hidden-xs sidebar">
     <ul>
         <li>
             <a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
@@ -18,10 +18,9 @@
         </li>
         <li><input placeholder="Search"></li>
         <ul>
-            <li>Stuff</li>
-            <li>Stuff</li>
-            <li>Stuff</li>
-            <li>Stuff</li>
+            {{#blogposts}}
+                <li><a target="_blank" href="/blog/{{shortname}}">{{title}}</a></li>
+            {{/blogposts}}
         </ul>
     </ul>
 </div>

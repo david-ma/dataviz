@@ -1,7 +1,12 @@
-#dataviz_homepage {
+#dataviz_homepage, #dataviz_blog {
     z-index: 100;
     #aboutMe.hidden {
         display: none;
+    }
+    section.blogpost {
+        @media (max-width: 767px) {
+            margin-top: 55px;
+        }
     }
     .preview {
         @media (max-width: 767px) {

@@ -1,98 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
 
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>America at War</title>
+<section class="blogpost">
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>Number of years USA was at war, during your lifetime</h1>
+            <h2>Originally on <a target="_blank" href="https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/">The Washington Post</a> by <a target="_blank" href="https://twitter.com/pbump">@pbump</a></h2>
+        </div>
+    </div>
 
-        {{> assets}}
-        <style></style>
+    <div class="row" id="AmericanWars">
+        <div class="col-xs-12 col-md-6">
+                <div id="war_chart"></div>
 
-    </head>
-    <body>
-        {{> header}}
-
-        <div id="dataviz_homepage" class="container-fluid page">
-            <div class="row equal">
-                {{> nav}}
-
-                <div class="col-xs-12 col-sm-9">
-                    <section>
-                        <div class="row" id="AmericanWars">
-                            <div class="col-xs-12 col-sm-6">
-
-                                <div id="explain"></div>
-                                <span>Birth:
-                                    <input id="birthyear" placeholder="1905"></span>
-                                <br>
-                                <span>Death:
-                                    <input id="deathyear" placeholder="N/A"></span>
-                                <input type="button" value="Update birth/death year" onclick="drawPieChart()">
-                                <div id="explain2"></div>
-
-                                <table style="border: solid 1px grey; margin: 5px 0;">
-                                    <thead>
-                                        <tr></tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                                <div class="download_csv_link">
-                                    <a target="_blank" href="/war/AmericanWars.csv">Download CSV</a>
-                                </div>
-
-
-                            </div>
-                            <div class="col-xs-12 col-md-6">
-                                    <div id="war_chart"></div>
-
-                                <div>
-                                    <input type="button" value="George Washington" onclick="celebrity(1732,1799)">
-                                    <input type="button" value="John F. Kennedy" onclick="celebrity(1917,1963)">
-                                    <input type="button" value="Alexander Hamilton" onclick="celebrity(1757,1804)">
-                                    <input type="button" value="Elvis Presley" onclick="celebrity(1935,1977)">
-                                    <input type="button" value="Abraham Lincoln" onclick="celebrity(1809,1865)">
-                                </div>
-                            </div>
-
-                        </div>
-                    </section>
-                    <div id="vizPreviews"></div>
-
-                </div>
+            <div>
+                <input type="button" value="George Washington" onclick="celebrity(1732,1799)">
+                <input type="button" value="John F. Kennedy" onclick="celebrity(1917,1963)">
+                <input type="button" value="Alexander Hamilton" onclick="celebrity(1757,1804)">
+                <input type="button" value="Elvis Presley" onclick="celebrity(1935,1977)">
+                <input type="button" value="Abraham Lincoln" onclick="celebrity(1809,1865)">
             </div>
         </div>
+        <div class="col-xs-12 col-sm-6">
 
-        {{> footer}}
+            <div id="explain"></div>
+            <span>Birth:
+                <input id="birthyear" placeholder="1905"></span>
+            <br>
+            <span>Death:
+                <input id="deathyear" placeholder="N/A"></span>
+            <input type="button" value="Update birth/death year" onclick="drawPieChart()">
+            <div id="explain2"></div>
 
-        <script src="/js/require.js"></script>
+            <table style="border: solid 1px grey; margin: 5px 0;">
+                <thead>
+                    <tr></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="download_csv_link">
+                <a target="_blank" href="/war/AmericanWars.csv">Download CSV</a>
+            </div>
+        </div>
+    </div>
+</section>
 
-        <script>
+<script src="/js/require.js"></script>
 
-            const currentYear = new Date().getFullYear();;
-            var drawPieChart;
+<script>
 
-            function celebrity(birth, death) {
-                $("#birthyear").val(birth);
-                $("#deathyear").val(death);
-                drawPieChart();
+    const currentYear = new Date().getFullYear();;
+    var drawPieChart;
+
+    function celebrity(birth, death) {
+        $("#birthyear").val(birth);
+        $("#deathyear").val(death);
+        drawPieChart();
+    }
+
+    require.config({
+        baseUrl: '/js/vendor',
+        enforceDefine: true,
+        paths: {
+            'chart': "/js/chart",
+            'datatables.net': "/js/datatables.min"
+        },
+        shim: {
+            chart: {
+                exports: "Chart",
+                deps: ['d3', 'd3-selection-multi']
             }
-
-            require.config({
-                baseUrl: '/js/vendor',
-                enforceDefine: true,
-                paths: {
-                    'chart': "/js/chart",
-                    'datatables.net': "/js/datatables.min"
-                },
-                shim: {
-                    chart: {
-                        exports: "Chart",
-                        deps: ['d3', 'd3-selection-multi']
-                    }
-                }
-            });
+        }
+    });
 
 
 
@@ -359,23 +336,14 @@ console.log(data_ready);
 
         });
     }
-
-
 });
-
-
-
 </script>
-
 
 <script>
 
     const md = new showdown.Converter({openLinksInNewWindow: true});
 
     $("#explain").html(md.makeHtml(`
-# Number of years USA was at war, during your lifetime
-## Originally on [The Washington Post](https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/) by [@pbump](https://twitter.com/pbump)
-
 I redrew Philip Bump's diagram from his article "Nearly a quarter of Americans have never experienced the U.S. in a time of peace" as an exercise to practice d3.js.
 
 Simply enter your birth year here & it will recalculate the diagram.`));
@@ -390,5 +358,3 @@ Todo:
  * Hoverover for labels?
  `));
 </script>
-</body>
-</html>
