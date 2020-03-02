@@ -40,7 +40,6 @@ function sanitise(string) {
 // TODO: handle rejection & errors?
 async function loadTemplates(template, content = '') {
 	return new Promise((resolve, reject) => {
-		// Load the mustache partials
 		const promises = [];
 		const filenames = ['template', 'content'];
 
@@ -55,11 +54,20 @@ async function loadTemplates(template, content = '') {
 		promises.push(
             new Promise((resolve, reject) => {
                 if (Array.isArray(content) && content[0]) content = content[0];
-                console.log(content);
                 fsPromise.readFile(`${__dirname}/views/content/${content}.mustache`, {
                     encoding: 'utf8'
                 }).then(result => {
-                    resolve(result);
+                    var scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g,
+                        styleEx = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/g;
+
+                    var scripts = [...result.matchAll(scriptEx)].map(d => d[0]),
+                        styles = [...result.matchAll(styleEx)].map(d => d[0]);
+
+                    resolve({
+                        content: result.replace(scriptEx, "").replace(styleEx, ""),
+                        scripts: scripts.join("\n"),
+                        styles: styles.join("\n")
+                    });
                 }).catch(e => {
                     fsPromise.readFile(`${__dirname}/views/404.mustache`, {
                         encoding: 'utf8'
@@ -86,7 +94,13 @@ async function loadTemplates(template, content = '') {
 
 			Promise.all(promises).then(function(array){
 				const results = {};
-				filenames.forEach((filename, i) => results[filename] = array[i]);
+                filenames.forEach((filename, i) => results[filename] = array[i]);
+
+                if(typeof results.content == 'object') {
+                    results.scripts = results.content.scripts;
+                    results.styles = results.content.styles;
+                    results.content = results.content.content;
+                }
 
 				resolve(results);
 			});
