@@ -6,6 +6,7 @@
     section.blogpost {
         @media (max-width: 767px) {
             margin-top: 55px;
+            min-height: calc(100vh - 105px);
         }
     }
     .preview {
@@ -22,6 +23,10 @@
         padding: 15px;
         h2 {
             margin-top: 0;
+            margin-bottom: 0;
+        }
+        span.subtitle {
+            font-size: 12px;
         }
         p {
             overflow: hidden;

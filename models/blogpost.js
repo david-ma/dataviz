@@ -8,7 +8,12 @@ module.exports = (sequelize, DataTypes) => {
     title: DataTypes.STRING,
     summary: DataTypes.STRING,
     image: DataTypes.STRING,
-    published: DataTypes.DATE
+    category: DataTypes.STRING,
+    publish_date: DataTypes.DATE,
+    published: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
   }, {});
   Blogpost.associate = function(models) {
     // associations can be defined here

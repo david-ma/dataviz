@@ -14,33 +14,43 @@ if (false) {
         const blogposts = [{
             shortname: 'war',
             title: 'American wartime',
-            summary: '#MakeoverMonday 10-Feb-2020, Nearly a quarter of Americans have never experienced the U.S. in a time of peace according to the Washington Post.',
+            category: "#MakeoverMonday",
+            summary: 'Nearly a quarter of Americans have never experienced the U.S. in a time of peace according to the Washington Post.',
             image: 'images/war.jpg',
-            published: '2020-02-01'
+            publish_date: '2020-02-01',
+            published: true
         },{
             shortname: 'wealth',
             title: 'World Wealth',
-            summary: "#MakeoverMonday 17-Feb-2020, All of the world's wealth, according to the Credit Suisse report",
+            category: "#MakeoverMonday",
+            summary: "All of the world's wealth, according to the Credit Suisse report",
             image: 'images/wealth.png',
-            published: '2020-02-17'
+            publish_date: '2020-02-17',
+            published: true
         },{
             shortname: 'influenza',
             title: 'Influenza Surveillance Report',
-            summary: '#MakeoverMonday 18-June-2018, Influenza in the USA in 2018',
+            category: "#MakeoverMonday",
+            summary: 'Influenza in the USA in 2018',
             image: 'images/influenza.jpg',
-            published: '2018-06-18'
+            publish_date: '2018-06-18',
+            published: true
         },{
             shortname: 'homelessness',
             title: 'Australian homelessness',
-            summary: '#MakeoverMonday 24-February-2020, Housing outcomes for clients of Australian Specialist Homelessness Services',
+            category: "#MakeoverMonday",
+            summary: 'Housing outcomes for clients of Australian Specialist Homelessness Services',
             image: 'images/homelessness.png',
-            published: '2020-02-24'
+            publish_date: '2020-02-24',
+            published: false
         },{
             shortname: 'kids_sleep',
             title: "Kids' sleep",
-            summary: '#MakeoverMonday 2-March-2020, data from savvysleeper.org on how kids sleep',
+            category: "#MakeoverMonday",
+            summary: 'Data from savvysleeper.org on how kids sleep',
             image: 'images/kids_sleep.png',
-            published: '2020-03-02'
+            publish_date: '2020-03-02',
+            published: false
         }];
 
         blogposts.forEach(function(blogpost){
