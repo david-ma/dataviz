@@ -40,10 +40,6 @@
 
         <script>
 
-            {{#blogposts}}
-                console.log("{{shortname}}");
-            {{/blogposts}}
-
             const md = new showdown.Converter({openLinksInNewWindow: true});
 
             $("#aboutMe").html(md.makeHtml(`

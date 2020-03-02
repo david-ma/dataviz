@@ -382,12 +382,12 @@ exports.config = {
 			});
         },
         "blog": function(router) {
-            const promises = [
-                loadTemplates('blog.mustache', router.path)];
+            const promises = [loadTemplates('blog.mustache', router.path)];
 			Promise.all(promises).then(function([views]){		
 				const data = {}
                 router.db.Blogpost.findAll().then((results) => {
                     data.blogposts = results.map(d => d.dataValues);
+                    data.blogpost = data.blogposts.filter(d => d.shortname == router.path[0]);
 
 				    var output = mustache.render(views.template, data, views);
     				router.res.end(output);

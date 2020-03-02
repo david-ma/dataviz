@@ -14,12 +14,12 @@
     <ul>
         <li>
             <a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
-            <div id="aboutMe" class=''></div>
+            <div id="aboutMe" class='hidden'></div>
         </li>
         <li><input placeholder="Search"></li>
         <ul>
             {{#blogposts}}
-                <li><a target="_blank" href="/blog/{{shortname}}">{{title}}</a></li>
+                <li><a href="/blog/{{shortname}}">{{title}}</a></li>
             {{/blogposts}}
         </ul>
     </ul>

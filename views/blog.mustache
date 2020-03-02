@@ -5,7 +5,24 @@
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>America at War</title>
+
+        {{#blogpost}}
+        <title>{{title}}</title>
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:creator" content="@frostickle">
+        <meta name="twitter:title" content="{{title}}">
+        <meta name="twitter:description" content="{{summary}}">
+        <meta name="twitter:image" content="{{image}}">
+
+        <meta property="og:url"         content="https://dataviz.david-ma.net/blog/{{shortname}}" />
+        <meta property="og:type"        content="article" />
+        <meta property="og:title"       content="{{title}}" />
+        <meta property="og:description" content="{{summary}}" />
+        <meta property="og:image"       content="{{image}}" />
+
+        <meta name="author"             content="David Ma" />
+        <meta property="article:author" content="http://www.facebook.com/frostickle">
+        {{/blogpost}}
 
         {{> assets}}
         <style></style>
