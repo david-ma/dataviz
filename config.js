@@ -368,7 +368,7 @@ exports.config = {
 		}
     },
     mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
-	controller: {
+	controllers: {
 		"": function(router) {
             const promises = [loadTemplates('homepage.mustache')];
 			Promise.all(promises).then(function([views]){		
