@@ -289,8 +289,38 @@ exports.config = {
 					res.end("No model found");
 				}
 			});
-		},
-		"all-cameras": function(res, req, db, type) {
+        },
+        "brand-data": function(res, req, db, type) {
+            db.Camera.findAll({
+                where: {
+                    brand: type
+                }
+            }).then( d => {
+                res.end(JSON.stringify(d));
+            })
+
+        },
+        "brand": function(res, req, db, type) {
+            console.log("Hey");
+
+            const promises = [loadTemplates('brand.mustache')];
+            Promise.all(promises).then(function([views]){
+                const data = {};
+                db.Camera.findAll({
+                    where: {
+                        brand: type
+                    }
+                }).then(results => {
+                    data.cameras = JSON.stringify(results);
+                    data.testing = "HElloooo";
+                    var output = mustache.render(views.template, data, views);
+                    // console.log(output);
+                    res.end(output);
+                })
+            })
+
+        },
+        "all-cameras": function(res, req, db, type) {
 			// res.end("hello");
 			db.Camera.findAll({
 				attributes: ['brand', 'model', 'year'],
