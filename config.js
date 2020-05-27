@@ -301,7 +301,6 @@ exports.config = {
 
         },
         "brand": function(res, req, db, type) {
-            console.log("Hey");
 
             const promises = [loadTemplates('brand.mustache')];
             Promise.all(promises).then(function([views]){
@@ -312,7 +311,8 @@ exports.config = {
                     }
                 }).then(results => {
                     data.cameras = JSON.stringify(results);
-                    data.testing = "HElloooo";
+                    data.brand = type;
+
                     var output = mustache.render(views.template, data, views);
                     // console.log(output);
                     res.end(output);

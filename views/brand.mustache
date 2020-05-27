@@ -20,18 +20,11 @@
 			<div class="col-xs-12">
 				<input id="box">
 				
-				<h1>List of all cameras!</h1>
+				<h1 id="brandTitle">{{brand}}</h1>
 				{{! <img src="/{{scrape.img} }"> }}
 
-				<table>
-					<tr><td>Brand</td><td>{{model.brand}}</td></tr>
-					<tr><td>Megapixels</td><td>{{model.megapixels}}</td></tr>
-					<tr><td>Brand</td><td>{{model.brand}}</td></tr>
-					<tr><td>Brand</td><td>{{model.brand}}</td></tr>
-					<tr><td>Brand</td><td>{{model.brand}}</td></tr>
-					<tr><td>Brand</td><td>{{model.brand}}</td></tr>
-					<tr><td>Brand</td><td>{{model.brand}}</td></tr>
-					<tr><td>Brand</td><td>{{model.brand}}</td></tr>
+				<table id="cameras">
+
 				</table>
             </div>
 		</div>
@@ -51,9 +44,26 @@
 	<script>
         var cameras = {{{cameras}}};
 
+
         console.log(`Found ${cameras.length} cameras`);
 
         if(cameras.length == 0) alert("No cameras found for this brand");
+
+
+        var cameraTable = d3.select("table#cameras")
+        cameras.forEach(function(camera){
+            var tr = cameraTable.append("tr");
+
+            tr.append("td").text(camera.year);
+            tr.append("td").text(camera.brand);
+            tr.append("td").text(camera.model);
+
+
+
+        });
+
+
+
 
         $( function() {
 			$( "#box" ).autocomplete({
