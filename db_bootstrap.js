@@ -1,5 +1,7 @@
 
 const seq = require(`${__dirname}/models/index`);
+const Op = seq.Sequelize.Op;
+
 const Blogpost = seq.Blogpost = require(`${__dirname}/models`).Blogpost;
 
 const Scrape = seq.Scrape = require(`${__dirname}/models`).Scrape;
@@ -8,7 +10,48 @@ const Camera = seq.Camera = require(`${__dirname}/models`).Camera;
 const Family = seq.Family = require(`${__dirname}/models`).Family;
 
 // Uncomment to create the family table.
-// seq.Family.sync();
+// seq.sequelize.sync();
+
+
+// Family.get()
+if(false) {
+
+Camera.findAll({
+    where: {
+        model: {
+            [Op.like]: '%Coolpix%'
+        }
+    }
+}).then(function(cameras){
+
+    Family.findOne({
+        where: {
+            name: 'Coolpix'
+        }
+    }).then(family => {
+        cameras.forEach(camera => {
+
+            camera.setFamily(family);
+            // camera.addFamily(family);
+            // console.log(camera);
+            // camera.update({
+            //     family: family
+            // });
+        })
+    })
+});
+
+}
+
+if(false) {
+    Family.create({
+        brand: "Nikon",
+        name: "Coolpix",
+        description: "None"
+    });
+}
+
+
 
 // rebuild entire database & reload data..?
 if (false) {
