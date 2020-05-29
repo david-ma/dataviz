@@ -37,7 +37,10 @@
     <script src="/js/scripts.min.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  
+
+	<script src="/js/datatables.min.js"></script>
+    <link rel="stylesheet" href="/css/jquery.dataTables.min.css">
+
 
 
 
@@ -50,17 +53,24 @@
         if(cameras.length == 0) alert("No cameras found for this brand");
 
 
-        var cameraTable = d3.select("table#cameras")
+        var cameraTable = d3.select("table#cameras");
+        var header = cameraTable.append("thead").append("tr");
+        header.append("th").text("Year");
+        header.append("th").text("Brand");
+        header.append("th").text("Model");
+
+        var body = cameraTable.append("tbody");
+
         cameras.forEach(function(camera){
-            var tr = cameraTable.append("tr");
+            var tr = body.append("tr");
 
             tr.append("td").text(camera.year);
             tr.append("td").text(camera.brand);
             tr.append("td").text(camera.model);
 
-
-
         });
+
+        $("table#cameras").DataTable();
 
 
 
