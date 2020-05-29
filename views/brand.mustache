@@ -15,6 +15,7 @@
     width: 200px;
     height: 250px;
     margin: 10px;
+    overflow: scroll;
 }
 </style>
 
@@ -70,7 +71,7 @@
         if(cameras.length == 0) alert("No cameras found for this brand");
 
         var table = $("table#cameras").DataTable({
-            data: cameras,
+            data: cameras.filter(camera => camera.FamilyId == null),
             order: [1,'desc'],
             columnDefs: [
                 {targets: [ "_all" ], orderSequence: [ "desc", "asc" ]  }
@@ -138,6 +139,26 @@
 
 
         var familes = d3.select("#families");
+
+        var familyData = {{{familes}}};
+
+        familyData.forEach(data => {
+            var family = familes.append("div")
+                .classed("family", true)
+                .attrs({
+                    ondrop: "drop(event)",
+                    ondragover: "allowDrop(event)"
+                });
+
+            family.append("input").property("value", data.name);
+            var list = family.append("ul").attr("id", "lol");
+
+            cameras.filter(camera => camera.FamilyId == data.id)
+            .forEach(camera => {
+                list.append('ul').text(camera.model);
+            })
+        });
+
 
         function addFamily() {
             console.log("Adding family lol");

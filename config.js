@@ -303,20 +303,25 @@ exports.config = {
         "brand": function(res, req, db, type) {
 
             const promises = [loadTemplates('brand.mustache')];
-            Promise.all(promises).then(function([views]){
-                const data = {};
-                db.Camera.findAll({
-                    where: {
-                        brand: type
-                    }
-                }).then(results => {
-                    data.cameras = JSON.stringify(results);
-                    data.brand = type;
+            promises.push(db.Camera.findAll({
+                where: {
+                    brand: type
+                }
+            }));
+            promises.push(db.Family.findAll({
+                where: {
+                    brand: type
+                }
+            }));
 
-                    var output = mustache.render(views.template, data, views);
-                    // console.log(output);
-                    res.end(output);
-                })
+            Promise.all(promises).then(function([views, cameras, familes]){
+                const data = {};
+                data.cameras = JSON.stringify(cameras);
+                data.brand = type;
+                data.familes = JSON.stringify(familes);
+
+                var output = mustache.render(views.template, data, views);
+                res.end(output);
             })
 
         },
