@@ -52,7 +52,7 @@
 
         if(cameras.length == 0) alert("No cameras found for this brand");
 
-
+/*
         var cameraTable = d3.select("table#cameras");
         var header = cameraTable.append("thead").append("tr");
         header.append("th").text("Year");
@@ -69,8 +69,45 @@
             tr.append("td").text(camera.model);
 
         });
-
-        $("table#cameras").DataTable();
+*/
+        $("table#cameras").DataTable({
+            data: cameras,
+            order: [0,'desc'],
+            columnDefs: [
+                {targets: [ "_all" ], orderSequence: [ "desc", "desc", "asc" ]  }
+            ],
+            columns: [
+                { 
+                    data: 'year',
+                    title: 'Year',
+                    order: 'desc'
+                },
+                { 
+                    title: 'Model',
+                    data: function( row, type, val, meta) {
+//                        let res = row['sensor_resolution'].split(" x ")
+                        return `<a href='/camera/${row['brand']}_${row['model'].replace(" ", "-")}' target='_blank'>${row['model']}</a>`;
+                    }
+                },
+                { 
+                    data: 'sensor_resolution',
+                    title: 'Sensor Pixels',
+                    order: 'desc'
+                },
+                { 
+                    title: 'Calculated',
+                    data: function( row, type, val, meta) {
+                        let res = row['sensor_resolution'].split(" x ")
+                        return Math.round(res[0] * res[1] / 10000) / 100;
+                    },
+                    order: 'desc'
+                },
+                { 
+                    data: 'total_megapixels',
+                    title: 'Advertised Megapixels'
+                }
+            ]
+        });
 
 
 
