@@ -47,29 +47,10 @@
 	<script>
         var cameras = {{{cameras}}};
 
-
         console.log(`Found ${cameras.length} cameras`);
 
         if(cameras.length == 0) alert("No cameras found for this brand");
 
-/*
-        var cameraTable = d3.select("table#cameras");
-        var header = cameraTable.append("thead").append("tr");
-        header.append("th").text("Year");
-        header.append("th").text("Brand");
-        header.append("th").text("Model");
-
-        var body = cameraTable.append("tbody");
-
-        cameras.forEach(function(camera){
-            var tr = body.append("tr");
-
-            tr.append("td").text(camera.year);
-            tr.append("td").text(camera.brand);
-            tr.append("td").text(camera.model);
-
-        });
-*/
         $("table#cameras").DataTable({
             data: cameras,
             order: [0,'desc'],
@@ -85,8 +66,7 @@
                 { 
                     title: 'Model',
                     data: function( row, type, val, meta) {
-//                        let res = row['sensor_resolution'].split(" x ")
-                        return `<a href='/camera/${row['brand']}_${row['model'].replace(" ", "-")}' target='_blank'>${row['model']}</a>`;
+                        return `<a href='/camera/${row['indentifier']}' target='_blank'>${row['model']}</a>`;
                     }
                 },
                 { 

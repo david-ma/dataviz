@@ -1,6 +1,12 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Camera = sequelize.define('Camera', {
+    indentifier: {
+        type: DataTypes.VIRTUAL,
+        get: function () {
+            return `${this.get('brand')}_${this.get('model').replace(" ", "-")}`
+        }
+    },
     brand: DataTypes.STRING,
     model: DataTypes.STRING,
     year: DataTypes.STRING,
