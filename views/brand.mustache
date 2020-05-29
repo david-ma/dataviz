@@ -7,6 +7,17 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<title>Camera</title>
 
+
+<style>
+#families .family {
+    float: left;
+    background: lightgrey;
+    width: 200px;
+    height: 250px;
+    margin: 10px;
+}
+</style>
+
 </head>
 <body>
 	<header>
@@ -16,12 +27,19 @@
 	</header>
 
 	<div class="container page">
+        <h1 id="brandTitle">{{brand}}</h1>
+
+        <div class="row">
+			<div class="col-xs-12">
+                <button type="button" onclick="addFamily()">Add Family</button>
+                <button type="button" onclick="save()">Save</button>
+
+                <div id="families"></div>
+            </div>
+        </div>
+
 		<div class="row">
 			<div class="col-xs-12">
-				<input id="box">
-				
-				<h1 id="brandTitle">{{brand}}</h1>
-				{{! <img src="/{{scrape.img} }"> }}
 
 				<table id="cameras">
 
@@ -51,13 +69,22 @@
 
         if(cameras.length == 0) alert("No cameras found for this brand");
 
-        $("table#cameras").DataTable({
+        var table = $("table#cameras").DataTable({
             data: cameras,
-            order: [0,'desc'],
+            order: [1,'desc'],
             columnDefs: [
-                {targets: [ "_all" ], orderSequence: [ "desc", "desc", "asc" ]  }
+                {targets: [ "_all" ], orderSequence: [ "desc", "asc" ]  }
             ],
+            rowId: 'identifier',
             columns: [
+                { 
+                    data: function( row, type, val, meta ) {
+
+                        return `<div draggable='true' ondragstart='drag(event)' data-rowid='${row['identifier']}'>Drag Me</div>`;
+                    },
+                    title: 'Drag',
+                    order: 'desc'
+                },
                 { 
                     data: 'year',
                     title: 'Year',
@@ -65,8 +92,8 @@
                 },
                 { 
                     title: 'Model',
-                    data: function( row, type, val, meta) {
-                        return `<a href='/camera/${row['indentifier']}' target='_blank'>${row['model']}</a>`;
+                    data: function( row, type, val, meta ) {
+                        return `<a href='/camera/${row['identifier']}' target='_blank'>${row['model']}</a>`;
                     }
                 },
                 { 
@@ -76,7 +103,7 @@
                 },
                 { 
                     title: 'Calculated',
-                    data: function( row, type, val, meta) {
+                    data: function( row, type, val, meta ) {
                         let res = row['sensor_resolution'].split(" x ")
                         return Math.round(res[0] * res[1] / 10000) / 100;
                     },
@@ -92,20 +119,40 @@
 
 
 
-        $( function() {
-			$( "#box" ).autocomplete({
-				source: "{{{allCameras}}}"
-			});
-            // $.ajax("/all-cameras", {
-            //     success: function(data){
-			// 		var allCameras = eval(data);
-			// 		console.log(`Number of cameras: ${allCameras.length}`);
-            //         $( "#box" ).autocomplete({
-            //             source: eval(allCameras)
-            //         });
-            //     }
-            // })
-        })
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.dataset.rowid);
+        }
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            ev.target.appendChild(document.getElementById(data));
+
+            table.row( $(`#${data}`) ).remove();
+
+        }
+
+
+        var familes = d3.select("#families");
+
+        function addFamily() {
+            console.log("Adding family lol");
+            var family = familes.append("div")
+                .classed("family", true)
+                .attrs({
+                    ondrop: "drop(event)",
+                    ondragover: "allowDrop(event)"
+                });
+
+            family.append("input");
+            family.append("ul");
+        }
+
+
     </script>
 </body>
 </html>

@@ -1,8 +1,14 @@
 
 const seq = require(`${__dirname}/models/index`);
-const Camera = seq.Camera = require(`${__dirname}/models`).Camera;
-const Scrape = seq.Scrape = require(`${__dirname}/models`).Scrape;
 const Blogpost = seq.Blogpost = require(`${__dirname}/models`).Blogpost;
+
+const Scrape = seq.Scrape = require(`${__dirname}/models`).Scrape;
+
+const Camera = seq.Camera = require(`${__dirname}/models`).Camera;
+const Family = seq.Family = require(`${__dirname}/models`).Family;
+
+// Uncomment to create the family table.
+// seq.Family.sync();
 
 // rebuild entire database & reload data..?
 if (false) {
