@@ -1,0 +1,244 @@
+<section class="blogpost">
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>Seqrun timings</h1>
+        </div>
+    </div> 
+
+    <div class="row" id="contentBox">
+        <div class="col-xs-12 col-md-12" id='tables'>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Seqrun</th>
+                        <th>Experiment</th>
+                        <th>Nº&nbsp;Samples</th>
+                        <th>Nº&nbsp;Logged&nbsp;Events</th>
+                        <th>Total Seqrun Time</th>
+                        <th>Average Sample Time</th>
+                        <th class='dataviz'>Event DataViz</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<script src="/js/require.js"></script>
+
+<style>
+.sidebar {
+    display: none;
+}
+.project {
+    padding: 5px;    
+}
+.project:hover {
+    background: lightgrey;
+}
+table th, table td {
+    padding: 2px;
+    border: 1px lightgrey solid;
+    text-align: center;
+}
+table td.time {
+    text-align: right;
+}
+th.dataviz, td.dataviz {
+    display: none;
+}
+</style>
+
+<script>
+
+    var promises = [
+        d3.tsv("/prodInfoLoader.tsv", function(d, i, columns){
+            var result = {};
+            var data = d.string.split(` [main] INFO  org.petermac.pathos.loader.PathosImportReceiver - createOrUpdate `);
+            if(data[1]) {
+                var matches = data[1].match(/(\d+) (.*):(.*) (.*) objects./);
+
+                result.timestamp = Date.parse(data[0].split(",")[0]);
+                result.string = d.string;
+
+                if(matches && matches.length == 5) {
+                    result.count = parseInt(matches[1]);
+                    result.seqrun = matches[2];
+                    result.sample = matches[3];
+                    result.type = matches[4];
+
+                    return result;
+                } else {
+                    matches = d.string.match(/(?:.*)PathosImportReceiver - createOrUpdate (\d+) (.*);(.*) (Seqrun) objects\./);
+                    if(matches) {
+                        result.count = parseInt(matches[1]);
+                        result.seqrun = matches[2];
+                        result.experiment = matches[3];
+                        result.type = matches[4];
+                        return result;
+                    }
+                }
+            }
+        }),
+        d3.tsv("/prodInfoVcfLoader.tsv", function(d, i, columns){
+            var result = {}
+            var matches = d.string.match(/(.*),\d\d\d \[main\] INFO  org\.petermac\.pathos\.(.*) -.+(\d+) variants from \/pathology\/NGS\/Samples\/(?:.+?)\/(.*?)\/(.*?)\/.*/);
+            if(matches && matches.length == 6) {
+                result.timestamp = Date.parse(matches[1]);
+                result.string = d.string;
+                result.type = matches[2];
+                result.count = parseInt(matches[3]);
+                result.seqrun = matches[4];
+                result.sample = matches[5];
+                return result;
+            } else {
+                matches = d.string.match(/(.*),\d\d\d \[main\] INFO  org\.petermac\.pathos\.loader\.(VcfLoader) - Processing (\d+) files from (.*) into /);
+                if(matches) {
+                    result.timestamp = Date.parse(matches[1]);
+                    result.type = matches[2];
+                    result.count = parseInt(matches[3]);
+                    result.seqrun = matches[4];
+                    return result;
+                }
+            }
+        }),
+    ]
+
+var data = {};
+
+    Promise.all(promises).then(function([d, j]){
+        console.log(d);
+        console.log(j);
+
+/*
+        var types = {};
+        var seqruns = {};
+        var samples = {};
+        d.forEach(event => {
+            types[event.type] ? types[event.type]++ : types[event.type] = 1;
+            seqruns[event.seqrun] ? seqruns[event.seqrun]++ : seqruns[event.seqrun] = 1;
+            samples[event.sample] ? samples[event.sample]++ : samples[event.sample] = 1;
+        });
+        console.log(types);
+        console.log(seqruns);
+        console.log(samples);
+*/
+                
+        d.forEach(event => {
+            if(data[event.seqrun]) {
+                data[event.seqrun].events.push(event);
+                if(event.sample) {
+                    if(data[event.seqrun].samples[event.sample]) {
+                        data[event.seqrun].samples[event.sample].push(event);
+                    } else {
+                        data[event.seqrun].samples[event.sample] = [event];
+                    }
+                }
+            } else {
+                data[event.seqrun] = {
+                    events: [event],
+                    samples: {}
+                }
+                if(event.sample) {
+                    data[event.seqrun].samples[event.sample] = [event];
+                }
+            }
+            if(event.experiment) {
+                data[event.seqrun].experiment = event.experiment;
+            }
+        })
+
+        j.forEach(event => {
+            {{! console.log(event); }}
+            if(data[event.seqrun]) {
+                data[event.seqrun].events.push(event);
+                if(event.sample) {
+                    if(data[event.seqrun].samples[event.sample]) {
+                        data[event.seqrun].samples[event.sample].push(event);
+                    } else {
+                        console.log("seqsample missing?", event.sample);
+                    }
+                }
+            } else {
+                console.log("seqrun missing?");
+            }
+        })
+
+        Object.keys(data).forEach(seqrun => {
+            var seqrunTime = timeTaken(data[seqrun].events);
+            data[seqrun].totalTime = seqrunTime;
+//            console.log(`Seqrun ${seqrun} had ${data[seqrun].events.length} events: ${seqrunTime}`);
+
+            data[seqrun].sampleTimes = [];
+            var timeTally = 0;
+
+            Object.keys(data[seqrun].samples).forEach(sample => {
+                var sampleTime = timeTaken(data[seqrun].samples[sample]);
+//                console.log(`Sample ${sample} took: ${sampleTime}`, data[seqrun].samples[sample]);
+                data[seqrun].sampleTimes.push(sampleTime);
+
+                timeTally += sampleTime;
+            });
+            data[seqrun].averageTime = timeTally / data[seqrun].sampleTimes.length;
+        });
+
+        var table = d3.select("tbody");
+        Object.keys(data).forEach(seqrun => {
+            var tr = table.append('tr');
+            tr.append("td").text(seqrun);
+            tr.append("td").text(data[seqrun].experiment);
+            tr.append("td").text(Object.keys(data[seqrun].samples).length);
+            tr.append("td").text(data[seqrun].events.length);
+            tr.append("td").text(humanReadbleTime(data[seqrun].totalTime)).classed("time", true);
+            tr.append("td").text(humanReadbleTime(data[seqrun].averageTime)).classed("time", true);
+
+            drawViz(tr.append("td").classed("dataviz", true), data[seqrun].events);
+        });
+    });
+
+function drawViz(dom, events) {
+    var svg = dom.append("svg");
+}
+
+function timeTaken(eventArray) {
+    var oldest = Number.MAX_SAFE_INTEGER;
+    var newest = Number.MIN_SAFE_INTEGER;
+    eventArray.forEach(event => {
+        if(event.timestamp > newest) newest = event.timestamp;
+        if(event.timestamp < oldest) oldest = event.timestamp;
+    });
+// seconds;
+    return (newest - oldest)/1000;
+/*
+    var time = (newest - oldest)/1000;
+    var seconds = time % 60;
+    var minutes = Math.floor((time % 3600)/60);
+    var hours = Math.floor(time / 3600);
+    return `${hours}h ${minutes}m ${seconds}s`;
+*/
+}
+
+function humanReadbleTime(seconds) {
+    var days = Math.floor( seconds / 86400 ),
+        hours = Math.floor( seconds % 86400 / 3600),
+        minutes = Math.floor( seconds % 3600 / 60),
+        seconds = Math.floor(seconds % 60);
+    if( days ) {
+        return `${days}d ${hours}h ${minutes}m ${seconds}s`
+    } else if (hours) {
+        return `${hours}h ${minutes}m ${seconds}s`
+    } else if (minutes) {
+        return `${minutes}m ${seconds}s`
+    } else {
+        return `${seconds}s`
+    }
+}
+
+
+</script>
+
+
+
+
