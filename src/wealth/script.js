@@ -3,16 +3,22 @@ console.log("script.js");
 // This is a script which loads chart.js (compiled from chart.ts)
 
 require.config({
+	// baseUrl: '/js/vendor',
 	baseUrl: '/',
 	// enforceDefine: true,
 	paths: {
         'datatables.net': "/js/datatables.min",
 
-        d3: "/js/vendor/d3",
+
+// The vendor stuff does not need to be listed here if we set the
+// baseUrl to /js/vendor
+// But that breaks importing chart.ts???
+// How do we do this??? :(
+        "d3": "/js/vendor/d3",
         "d3-selection": "/js/vendor/d3-selection",
         "d3-transition": "/js/vendor/d3-transition",
         "d3-selection-multi": "/js/vendor/d3-selection-multi",
-        jquery: "/js/vendor/jquery",
+        "jquery": "/js/vendor/jquery",
         "d3-dispatch": "/js/vendor/d3-dispatch",
         "d3-timer": "/js/vendor/d3-timer",
         "d3-interpolate": "/js/vendor/d3-interpolate",
@@ -21,7 +27,7 @@ require.config({
 
         chart: "/js/chart",
         wealth: '/wealth/WorldWealth',
-        'harder': '/wealth/harder'
+        harder: '/wealth/harder'
     },
     shim: {
         // chart: ['d3-selection-multi'],

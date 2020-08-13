@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "baseUrl": "/src/",
+        "paths": {
+            "chart": [
+                "/src/js/chart.ts"
+            ]
+        },
+        "module": "commonjs",
+        // "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true
+    },
+    "include": [
+        "src/js"
+    ]
+}
