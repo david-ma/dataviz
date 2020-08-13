@@ -1,11 +1,8 @@
-// import * as _chart from '../chart';
+// import * as _chart from 'chart';
+
 import * as d3 from 'd3';
-import 'd3-selection-multi';
+import Chart from '../js/chart';
 
-import $ from 'jquery';
-import 'datatables.net';
-
-// import * as _chart from '../js/chart';
 console.log("Running WorldWealth.ts");
 
 // console.log(_chart);
@@ -15,8 +12,6 @@ const charts = [];
 let data = [];
 const seasons = {};
 let dataset = null;
-
-let Chart = require('/js/chart');
 
 console.log("Calling csv stuff");
 d3.csv("/wealth/WorldWealth.csv", function(d:any, i, columns){
