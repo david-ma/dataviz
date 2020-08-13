@@ -1,0 +1,230 @@
+<section class="blogpost">
+
+{{! 
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>Number of years USA was at war, during your lifetime</h1>
+            <h2>Originally on <a target="_blank" href="https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/">The Washington Post</a> by <a target="_blank" href="https://twitter.com/pbump">@pbump</a></h2>
+        </div>
+    </div> 
+}}
+
+    <div class="row" id="contentBox">
+        <div>
+            <ul id="tabs">
+            </ul>
+        </div>
+        <div class="col-xs-12 col-md-12" id='AwesomeStuff'>
+            hello
+
+
+
+        </div>
+    </div>
+</section>
+
+<script src="/js/require.js"></script>
+
+<style>
+.sidebar {
+    display: none;
+}
+.project {
+    padding: 5px;    
+}
+.project:hover {
+    background: lightgrey;
+}
+</style>
+
+<script>
+    const md = new showdown.Converter({openLinksInNewWindow: true});
+
+
+var margin = ({top: 20, right: 20, bottom: 30, left: 40})
+var height = 600,
+    width = 900;
+var x, y, bins
+
+/*
+
+        yAxis = g => g
+            .attr("transform", `translate(${margin.left},0)`)
+            .call(d3.axisLeft(y).ticks(height / 40))
+            .call(g => g.select(".domain").remove())
+            .call(g => g.select(".tick:last-of-type text").clone()
+                .attr("x", 4)
+                .attr("text-anchor", "start")
+                .attr("font-weight", "bold")
+                .text(data.y))
+
+        xAxis = g => g
+            .attr("transform", `translate(0,${height - margin.bottom})`)
+            .call(d3.axisBottom(x).ticks(width / 80 ).tickSizeOuter(0))
+            .call(g => g.append("text")
+                .attr("x", width - margin.right)
+                .attr("y", -4)
+                .attr("fill", "currentColor")
+                .attr("font-weight", "bold")
+                .attr("text-anchor", "end")
+                .text(data.x))
+*/
+
+    $.getJSON('/facebook_friend_timestamps.json', function(data) {
+        console.log(data);
+        data = data.map(d => d * 1000);
+
+        var firstDate = data[0],
+            lastDate = data[data.length -1];
+
+
+        y = d3.scaleLinear()
+            .domain([0, d3.max(bins, d => d.length)]).nice()
+            .range([height - margin.bottom, margin.top])
+
+        x = d3.scaleLinear()
+            .domain(d3.extent(data)).nice()
+            .range([margin.left, width - margin.right])
+
+        bins = d3.histogram()
+            .domain(x.domain())
+            .thresholds(x.ticks(40))(data);
+
+        console.log(bins);
+
+
+
+
+/*
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height]);
+    
+    svg.append("g")
+        .attr("fill", "steelblue")
+        .selectAll("rect")
+        .data(bins)
+        .join("rect")
+        .attr("x", d => x(d.x0) + 1)
+        .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
+        .attr("y", d => y(d.length))
+        .attr("height", d => y(0) - y(d.length));
+
+    svg.append("g")
+        .call(xAxis);
+    
+    svg.append("g")
+        .call(yAxis);
+    
+    return svg.node();
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        data.forEach((timestamp) => {
+            var date = new Date(timestamp * 1000)
+            {{! console.log(date.toLocaleDateString("en-GB", {day: 'numeric', month: 'long', year: 'numeric'})); }}
+
+/*
+var x = d3.time.scale().domain([firstDate, lastDate]).range([0, width]);
+
+var data = d3.layout.histogram()
+        .bins(x.ticks(bins))  
+        (values);
+
+var formatDate = d3.time.format("%d/%m/%y");
+var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickFormat(formatDate);
+
+*/
+
+
+
+{{! new Date(string).toLocaleDateString("en-GB", {day: 'numeric', month: 'long', year: 'numeric'})             }}
+
+        })
+        //do stuff with your data here
+    });
+    
+    console.log("hello");
+
+
+/**
+    {{! d3.csv("/melbourne_export.csv", function(d, i, columns){
+        if(d.hidden_at == "") {
+            console.log(d);
+            return d;
+        } else {
+            return null;
+        }
+    }).then(function(d){
+        console.log(d);
+        d3.select("#AwesomeStuff")
+        .selectAll("div")
+        .data(d)
+        .enter()
+        .append("div")
+        .classed("project", true)
+        .attr("id", (d) => "project-"+d.id)
+        .each(function(d){
+            var tab = d3.select("#tabs").append("li");
+            tab.append("input").attr("id", "tab-"+d.id).attrs({
+                type: 'radio',
+                name: 'tabs'
+            });
+            tab.append("label").attr("for", "tab-"+d.id).text(d.title);
+
+            var box = d3.select(this);
+            box.append("h1")
+                .append("a")
+                .attr("href", d.url)
+                .text(d.title);
+            box.append("h2").text(d.name);
+
+            box.append("div").attr("id", "description-"+d.id);
+            $("#description-"+d.id).html(md.makeHtml(d.about_project));
+
+            box.append('h3').text('How it will be spent:');
+
+            box.append("div").attr("id", "use-"+d.id);
+            $("#use-"+d.id).html(md.makeHtml(d.use_for_money));
+
+            console.log(d);
+        })
+    }); }}
+
+
+*/
+
+</script>
+
+
+
+

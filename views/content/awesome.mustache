@@ -1,0 +1,91 @@
+<section class="blogpost">
+
+{{! 
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>Number of years USA was at war, during your lifetime</h1>
+            <h2>Originally on <a target="_blank" href="https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/">The Washington Post</a> by <a target="_blank" href="https://twitter.com/pbump">@pbump</a></h2>
+        </div>
+    </div> 
+}}
+
+    <div class="row" id="contentBox">
+        <div>
+            <ul id="tabs">
+            </ul>
+        </div>
+        <div class="col-xs-12 col-md-12" id='AwesomeStuff'>
+            
+
+
+
+        </div>
+    </div>
+</section>
+
+<script src="/js/require.js"></script>
+
+<style>
+.sidebar {
+    display: none;
+}
+.project {
+    padding: 5px;    
+}
+.project:hover {
+    background: lightgrey;
+}
+</style>
+
+<script>
+    const md = new showdown.Converter({openLinksInNewWindow: true});
+
+    d3.csv("/melbourne_export.csv", function(d, i, columns){
+        if(d.hidden_at == "") {
+            console.log(d);
+            return d;
+        } else {
+            return null;
+        }
+    }).then(function(d){
+        console.log(d);
+        d3.select("#AwesomeStuff")
+        .selectAll("div")
+        .data(d)
+        .enter()
+        .append("div")
+        .classed("project", true)
+        .attr("id", (d) => "project-"+d.id)
+        .each(function(d){
+            var tab = d3.select("#tabs").append("li");
+            tab.append("input").attr("id", "tab-"+d.id).attrs({
+                type: 'radio',
+                name: 'tabs'
+            });
+            tab.append("label").attr("for", "tab-"+d.id).text(d.title);
+{{! <input type="radio" id="male" name="gender" value="male"> }}
+{{! <label for="male">Male</label><br> }}
+
+            var box = d3.select(this);
+            box.append("h1")
+                .append("a")
+                .attr("href", d.url)
+                .text(d.title);
+            box.append("h2").text(d.name);
+
+            box.append("div").attr("id", "description-"+d.id);
+            $("#description-"+d.id).html(md.makeHtml(d.about_project));
+
+            box.append('h3').text('How it will be spent:');
+
+            box.append("div").attr("id", "use-"+d.id);
+            $("#use-"+d.id).html(md.makeHtml(d.use_for_money));
+
+            console.log(d);
+        })
+    });
+</script>
+
+
+
+
