@@ -2,6 +2,7 @@
     <div class="row">
         <div class="col-xs-12">
             <h1>Seqrun timings</h1>
+            <button onclick="$('.extra').toggleClass('hide')">Show extra info</button>
         </div>
     </div> 
 
@@ -47,6 +48,9 @@ table td.time {
     text-align: right;
 }
 th.dataviz, td.dataviz {
+    display: none;
+}
+div.extra.hide {
     display: none;
 }
 </style>
@@ -112,7 +116,7 @@ var data = {};
         console.log(d);
         console.log(j);
 
-/*
+
         var types = {};
         var seqruns = {};
         var samples = {};
@@ -124,8 +128,8 @@ var data = {};
         console.log(types);
         console.log(seqruns);
         console.log(samples);
-*/
-                
+
+
         d.forEach(event => {
             if(data[event.seqrun]) {
                 data[event.seqrun].events.push(event);
@@ -173,6 +177,8 @@ var data = {};
 
             data[seqrun].sampleTimes = [];
             var timeTally = 0;
+            var svTally = 0;
+            var cnvTally = 0;
 
             Object.keys(data[seqrun].samples).forEach(sample => {
                 var sampleTime = timeTaken(data[seqrun].samples[sample]);
@@ -180,6 +186,8 @@ var data = {};
                 data[seqrun].sampleTimes.push(sampleTime);
 
                 timeTally += sampleTime;
+
+                {{! console.log(data[seqrun].samples[sample].filter(d => d.type == 'SeqCnv')); }}
             });
             data[seqrun].averageTime = timeTally / data[seqrun].sampleTimes.length;
         });
@@ -187,10 +195,24 @@ var data = {};
         var table = d3.select("tbody");
         Object.keys(data).forEach(seqrun => {
             var tr = table.append('tr');
-            tr.append("td").text(seqrun);
+            tr.append("td").append("a").attrs({
+                href: `http://bioinf-pathos.unix.petermac.org.au/PathOS/seqrun/show/${seqrun}`,
+                target: "_blank"
+            }).text(seqrun);
             tr.append("td").text(data[seqrun].experiment);
-            tr.append("td").text(Object.keys(data[seqrun].samples).length);
-            tr.append("td").text(data[seqrun].events.length);
+            tr.append("td").text(Object.keys(data[seqrun].samples).length)
+                .append("div").classed("extra hide", true).append('ul').selectAll('li').data(Object.keys(data[seqrun].samples))
+                .enter()
+                .append('li')
+                .text(d => `${d}`);
+            tr.append("td").text(data[seqrun].events.length)
+                .append("div").classed("extra hide", true).append('ul').selectAll('li').data(Object.keys(data[seqrun].samples))
+                .enter()
+                .append('li')
+                .text(d => `${d} - ${ data[seqrun].samples[d].map(event => event.type)
+                    .filter( (value, index, self) => self.indexOf(value) === index ) 
+                }`);
+
             tr.append("td").text(humanReadbleTime(data[seqrun].totalTime)).classed("time", true);
             tr.append("td").text(humanReadbleTime(data[seqrun].averageTime)).classed("time", true);
 
