@@ -6,8 +6,9 @@
                 "/src/js/chart.ts"
             ]
         },
+        "target": "es6",
         "module": "commonjs",
-        // "noImplicitAny": true,
+        "esModuleInterop": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": true
