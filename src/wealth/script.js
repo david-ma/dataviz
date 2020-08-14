@@ -44,18 +44,6 @@ require(['chart', 'wealth'], function(exports){
     d3 = exports.d3;
     Chart = exports.Chart;
     decorateTable = exports.decorateTable;
-
-
-
-    // Test that various parts of d3.js were included properly:
-    d3.select("body").styles({
-        background: 'green'
-    });
-
-    d3.select("div").attrs({abc : 1})
-
 });
 
-
 console.log("trying to do stuff");
-
