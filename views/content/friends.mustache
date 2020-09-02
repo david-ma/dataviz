@@ -67,7 +67,10 @@ var test = null;
     $.ajax( {
         dataType: 'json',
         contentType: "application/json",
-        url: '/friends.json', 
+        url: '/friends.json',
+        error: function(e) {
+            console.log("Error", e);
+        },
         success: function(data) {
             test = data.test;
             data = data.friends.map(d => {return {timestamp: d.timestamp * 1000, name: decodeFBEmoji(d.name)}});
@@ -179,9 +182,7 @@ var test = null;
 
 
 // From https://dev.to/raicuparta/ditching-worthless-friends-with-facebook-data-and-javascript-3f2i
-function decodeFBEmoji (fbString) {
-    console.log('fbString', fbString);
-
+function decodeFBEmoji (fbString, verbose) {
   // Convert String to Array of hex codes
   const codeArray = (
     fbString  // starts as '\u00f0\u009f\u0098\u00a2'
@@ -191,12 +192,17 @@ function decodeFBEmoji (fbString) {
     )
   );  // result is [0xf0, 0x9f, 0x98, 0xa2]
 
-  console.log('codeArray', codeArray);
 
   // Convert plain JavaScript array to Uint8Array
   const byteArray = Uint8Array.from(codeArray);
 
-  console.log('byteArray', byteArray);
+
+  if(verbose) {
+    console.log('fbString', fbString);
+    console.log('hex', codeArray.map(char => `\\u00${char.toString(16)}`).join(''));
+    console.log('codeArray', codeArray);  
+    console.log('byteArray', byteArray);
+  }
 
   // Decode byte array as a UTF-8 string
   return new TextDecoder('utf-8').decode(byteArray);  // '😢'
