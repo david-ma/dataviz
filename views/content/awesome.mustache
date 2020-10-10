@@ -71,15 +71,23 @@
                 .append("a")
                 .attr("href", d.url)
                 .text(d.title);
+            box.append("p").text(d.url);
+
             box.append("h2").text(d.name);
 
+            box.append("h3").text("Here's my idea:");
             box.append("div").attr("id", "description-"+d.id);
             $("#description-"+d.id).html(md.makeHtml(d.about_project));
 
-            box.append('h3').text('How it will be spent:');
+            box.append('h3').text('How I will use the money:');
 
             box.append("div").attr("id", "use-"+d.id);
             $("#use-"+d.id).html(md.makeHtml(d.use_for_money));
+
+            box.append('h3').text('A little about me:');
+            box.append("div").attr("id", "me-"+d.id);
+            $("#me-"+d.id).html(md.makeHtml(d.about_me));
+
 
             console.log(d);
         })
