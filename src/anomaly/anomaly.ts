@@ -1,4 +1,4 @@
-import $ from 'jquery';
+// import $ from 'jquery';
 import 'datatables.net';
 declare var jsonPath: any;
 

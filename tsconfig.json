@@ -1,17 +1,24 @@
 {
     "compilerOptions": {
         "baseUrl": "/src/",
-        "paths": {
-            "chart": [
-                "/src/js/chart.ts"
-            ]
-        },
+        // Perhaps specify which files to process? Whitelist?
+        // "paths": {
+        //     "chart": [
+        //         "/src/js/chart.ts"
+        //     ]
+        // },
         "target": "es6",
         "module": "commonjs",
         "esModuleInterop": true,
         "removeComments": true,
         "preserveConstEnums": true,
-        "sourceMap": true
+        "sourceMap": true,
+
+// This might be overwritten by gulpfile
+        "noImplicitAny": false,
+        "noImplicitThis": false,
+        "noImplicitReturns": false,
+        "noUnusedLocals":false
     },
     "include": [
         "src/js"
