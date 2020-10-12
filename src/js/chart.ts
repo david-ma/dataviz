@@ -5,7 +5,10 @@ import {selection, select} from "d3-selection";
 import 'd3-transition';
 import 'd3-selection-multi';
 
-import $ from 'jquery';
+// import $ from 'jquery';
+// declare module "jquery" {
+//     export = $;
+// }
 import 'datatables.net';
 
 d3[<any>"select"] = select;
