@@ -183,7 +183,7 @@
 
 
     const data = {};
-    d3.tsv("/data/all_oberyn_commits.tsv", function(row, i){
+    d3.tsv("/all_oberyn_commits.tsv", function(row, i){
         const regex = /(PATHOS-\d+)/;
         let key = `untagged-${i}`;
 
@@ -204,7 +204,7 @@
     }).then(function(d){
         console.log("Here are all your commits..?", d);
 
-        d3.tsv("/data/oberyn_jira_issues.txt", function(row){
+        d3.tsv("/oberyn_jira_issues.txt", function(row){
             data[row.key] = data[row.key] || {};
             Object.keys(row).forEach(function(column){
                 data[row.key][column] = row[column];
@@ -330,7 +330,7 @@
 
 //        "2018-03-21T06:46:20.000Z"
 
-        d3.tsv("/data/duplicate_issues_with_commits.txt", function(d){
+        d3.tsv("/duplicate_issues_with_commits.txt", function(d){
             authors[d.author] = authors[d.author] || [];
 //            d.x = d3.timeMonth(d3.timeParse(d.date));
 

@@ -1,18 +1,42 @@
 // jshint esversion: 6
 
-import * as d3 from 'd3';
-import {selection, select} from "d3-selection";
-import 'd3-transition';
-import 'd3-selection-multi';
+// import * as d3 from 'd3';
+// import {selection, select} from "d3-selection";
+// import 'd3-transition';
+// import 'd3-selection-multi';
 
-// import $ from 'jquery';
-// declare module "jquery" {
-//     export = $;
-// }
-import 'datatables.net';
+// // import $ from 'jquery';
+// // declare module "jquery" {
+// //     export = $;
+// // }
+// import 'datatables.net';
 
-d3[<any>"select"] = select;
-d3[<any>"selection"] = selection;
+// d3[<any>"select"] = select;
+// d3[<any>"selection"] = selection;
+
+
+interface chartOptions {
+    element: string;
+    data: any[];
+    title: string;
+    xLabel: string;
+    yLabel: string;
+    width: number;
+    height: number;
+    margin: { top: number; right: number; bottom: number; left: number; };
+    colours: string[];
+}
+
+type commit = {
+    author  : string;
+    date    : string;
+    hash    : string;
+    iso     : string;
+    key     : string;
+    message : string;
+    value   : string;
+    x       : Date;
+}
 
 /*
  * David Ma - March 2018
@@ -38,7 +62,7 @@ class Chart {
     yBand: d3.ScaleBand<string>;
 
     // Sets variables
-    constructor(opts) {
+    constructor(opts: chartOptions) {
 
         // Set variables...
         this.opts = opts;
@@ -128,7 +152,7 @@ class Chart {
         $(`#${this.element}`).dblclick(() => this.toggleFullscreen());
     }
 
-    toggleFullscreen(chart?) {
+    toggleFullscreen(chart? : Chart) {
         chart = chart || this;
 
         if(chart.fullscreen) {
@@ -137,7 +161,7 @@ class Chart {
             grow();
         }
 
-        function keydownHandler(e) {
+        function keydownHandler(e : JQuery.Event ) {
             if(e && e.keyCode && e.keyCode == 27) {
                 shrink();
             }
@@ -167,7 +191,9 @@ class Chart {
         console.log("Drawing cumulative chart", this.data);
         const svg       : any    = this.plot,
               data      : string = this.data[0],
-              authors   : string = this.data[1],
+              authors   : {
+                  [author: string] : commit[]
+              } = this.data[1],
               width     : number = this.innerWidth,
               height    : number = this.innerHeight;
 
@@ -185,93 +211,22 @@ class Chart {
         x.domain(d3.extent(data, (d:any) => d.x ));
         y.domain([0, d3.max(data, (d:any) => d.value )]);
 
-        //
-        // Object.keys(samples).forEach(function(sample){
-        //     sampleData[sample] = [];
-        //     sampleData[sample] = Object.keys(samples[sample]).map(function(something){
-        //
-        //         return {
-        //             rawDate: something,
-        //             date: d3.timeMonth(parseTime(something)),
-        //             value: samples[sample][something]
-        //         };
-        //     }).sort((a,b) => a.date - b.date);
-        //
-        // });
-
-        // console.log("this is...", this);
-        // var months = {};
-        // var weeks = {};
-        //
-        // data.forEach(function(point){
-        //     months[point.month] = months[point.month] || {
-        //         rawDate: point.rawDate,
-        //         value: 0
-        //     };
-        //     months[point.month].value += point.value;
-        //
-        //     weeks[point.week] = weeks[point.week] || {
-        //         rawDate: point.rawDate,
-        //         value: 0
-        //     };
-        //     weeks[point.week].value += point.value;
-        // });
-
-        // months = Object.keys(months).map(function(month){
-        //     return {
-        //         month: parseTime(months[month].rawDate),
-        //         value: months[month].value
-        //     };
-        // });
-        //
-        // weeks = Object.keys(weeks).map(function(week){
-        //     return {
-        //         week: parseTime(weeks[week].rawDate),
-        //         value: weeks[week].value
-        //     };
-        // });
-
 console.log(data);
-        // Add the valueline path.
-        // this.plot.append("path")
-        //     .data([data])
-        //     .attr("class", "line")
-        //     .attr("d", valueline);
-
-        //
-        // y.domain([0, d3.max(weeks, function(d) { return d.value; })]);
-        // this.plot.append("path")
-        //     .data([weeks])
-        //     .attr("class", "line")
-        //     .style("stroke", "red")
-        //     .attr("d", valueline.x(function(d) { return x(d.week); }));
-
-        // y.domain([0, d3.max(months, function(d) { return d.value; })]);
-        // this.plot.append("path")
-        //     .data([months])
-        //     .attr("class", "line")
-        //     .style("stroke", "black")
-        //     .attr("d", valueline.x(function(d) { return x(d.month); }));
-
-
-        // var that = this;
-
-        // console.log("Here is our sample data", sampleData);
         var that = this;
 
         Object.keys(authors).forEach(function(author, i){
 
-            var data = {};
+            var data :any = {};
 
             authors[author].forEach(function(commit){
-                data[commit.x] = data[commit.x] || {
+                data[commit.x.toString()] = data[commit.x.toString()] || {
                     date: commit.x,
                     value: 0
                 };
-                data[commit.x].value++;
+                data[commit.x.toString()].value++;
                 // data[commit.x].value += commit.value;
             });
-            console.log(data);
+            console.log("Data is...", data);
 
             data = Object.keys(data).map(function(date){
                 return {
@@ -302,16 +257,16 @@ console.log(data);
     lineChart() {
         console.log("Drawing line chart", this.data);
 
-        var all = {};
+        var all :any = {};
 
-        var samples = {};
+        var samples :any = {};
 
-        this.data.forEach(function(sample){
+        this.data.forEach(function(sample :any){
             // console.log(`First pass of: ${sample}`)
             var sampleName = sample.name;
             samples[sampleName] = {};
 
-            sample.values.forEach(function(d){
+            sample.values.forEach(function(d:any){
                 all[d] = all[d] || 0;
                 all[d]++;
 
@@ -336,7 +291,7 @@ console.log(data);
         });
 
         console.log(samples);
-        var sampleData = {};
+        var sampleData :any = {};
 
         Object.keys(samples).forEach(function(sample){
 
@@ -432,9 +387,9 @@ console.log(data);
 
         Object.keys(sampleData).forEach(function(sample, i){
             console.log("doing sample...", sample);
-            var data = {};
+            var data :any = {};
 
-            sampleData[sample].forEach(function(point){
+            sampleData[sample].forEach(function(point :any){
                 data[point.date] = data[point.date] || {
                     rawDate: point.rawDate,
                     value: 0
@@ -478,7 +433,7 @@ console.log(data);
         console.log("Drawing bar graph", this.data);
 
         var values:Array<any> = [];
-        this.data.forEach(function(bar){
+        this.data.forEach(function(bar :any){
             values = values.concat(bar.values);
         });
 
@@ -505,7 +460,7 @@ console.log(data);
 
         this.yBand = d3.scaleBand()
             .paddingInner(0.2)
-            .domain(this.data.map(d => d.name))
+            .domain(this.data.map((d :any) => d.name))
             .rangeRound([this.innerHeight - 20, 20]);
 
     }
@@ -584,7 +539,7 @@ console.log(data);
             .style("font-size", "24px")
             .text("Legend");
 
-        this.data[0].labels.forEach(function(label, i){
+        this.data[0].labels.forEach(function(label :any, i :number){
             legend.append("rect")
                 .attr('x', 20)
                 .attr('y', 38 + (30*i))
@@ -618,7 +573,7 @@ console.log(data);
             .data(this.data)
             .enter()
             .append("g").classed("bar", true)
-            .each(function(d){
+            .each(function(this :any, d :any){
                 let bar = d3.select(this);
 
                 // bar.on('mouseover', function(d){
@@ -630,7 +585,7 @@ console.log(data);
                 //         legend.selectAll(`.legend-label`).text("");
                 //     });
 
-                d.values.forEach(function(data, i){
+                d.values.forEach(function(data :any, i :number){
                     let text = `${d.values[i]} m\u00B2`;
                     bar.append("rect")
                         .attr('data-toggle', 'tooltip')
@@ -677,12 +632,12 @@ console.log(data);
             .data(this.data)
             .enter()
             .append("circle")
-            .attr('id',  (d) => `circle-${camelize(d.name)}`)
+            .attr('id',  (d :any) => `circle-${camelize(d.name)}`)
             .attr('stroke',  "black")
             .attr('fill',  "rgba(0,0,0,0.05)")
             .attr('cx',  x)
-            .attr('cy',  (d) => y + radius - ratio * Math.sqrt(d.values[0]))
-            .attr('r',  (d) => ratio * Math.sqrt(d.values[0]));
+            .attr('cy',  (d :any) => y + radius - ratio * Math.sqrt(d.values[0]))
+            .attr('r',  (d :any) => ratio * Math.sqrt(d.values[0]));
 
         let table = svg.append("g")
             .attr("transform", `translate(${this.innerHeight * 0.05} ${this.innerHeight * 0.05})`);
@@ -699,8 +654,8 @@ console.log(data);
             .data(this.data)
             .enter()
             .append("g")
-            .attr("transform", (d, i) => `translate(0, ${i * blockHeight})`)
-            .each(function(d, i){
+            .attr("transform", (d :any, i :number) => `translate(0, ${i * blockHeight})`)
+            .each(function(this :any, d :any, i :number){
                 // console.log(d);
                 const row = d3.select(this);
 
@@ -756,13 +711,13 @@ console.log(data);
             .data(this.data)
             .enter()
             .append("rect")
-            .attr('id', (d) => `square-${camelize(d.name)}`)
+            .attr('id', (d :any) => `square-${camelize(d.name)}`)
             .attr('stroke', "black")
             .attr('fill', "rgba(0,0,0,0.05)")
             .attr('x', x)
-            .attr('y', (d) => y - ( ratio * Math.sqrt(d.values[0])))
-            .attr('height', (d) => ratio * Math.sqrt(d.values[0]))
-            .attr('width', (d) => ratio * Math.sqrt(d.values[0]));
+            .attr('y', (d :any) => y - ( ratio * Math.sqrt(d.values[0])))
+            .attr('height', (d :any) => ratio * Math.sqrt(d.values[0]))
+            .attr('width', (d :any) => ratio * Math.sqrt(d.values[0]));
 
         let table = svg.append("g")
             .attr("transform", `translate(${this.innerHeight * 0.05} ${this.innerHeight * 0.05})`);
@@ -779,8 +734,8 @@ console.log(data);
             .data(this.data)
             .enter()
             .append("g")
-            .attr("transform", (d, i) => `translate(0, ${i * blockHeight})`)
-            .each(function(d, i){
+            .attr("transform", (d :any, i :number) => `translate(0, ${i * blockHeight})`)
+            .each(function(this :any, d :any, i :number){
                 // console.log(d);
                 const row = d3.select(this);
 
@@ -849,7 +804,7 @@ console.log(data);
             // data = this.data,
             svg = this.plot;
 
-        let fader = function(color) { return d3.interpolateRgb(color, "#fff")(0.2); },
+        let fader = function(color :any) { return d3.interpolateRgb(color, "#fff")(0.2); },
             color = d3.scaleOrdinal(d3.schemeCategory10.map(fader)),
             format = d3.format(",d");
 
@@ -857,7 +812,7 @@ console.log(data);
 
         let data = {
             "name": "cluster",
-            "children": this.data.map(function (d) {
+            "children": this.data.map(function (d :any) {
                 return {
                     name: d.name,
                     size: parseInt(d.values[0]),
@@ -885,44 +840,44 @@ console.log(data);
         var cell = svg.selectAll("g")
             .data(root.leaves())
             .enter().append("g")
-            .attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; });
+            .attr("transform", function(d :any) { return "translate(" + d.x0 + "," + d.y0 + ")"; });
 
         cell.append("rect")
-            .attr("id", (d) => `rect-${d.data.id}` )
-            .attr("width", (d) => d.x1 - d.x0)
-            .attr("height", (d) => d.y1 - d.y0)
-            .attr("fill", function(d) { return color(d.parent.data.id); });
+            .attr("id", (d :any) => `rect-${d.data.id}` )
+            .attr("width", (d :any) => d.x1 - d.x0)
+            .attr("height", (d :any) => d.y1 - d.y0)
+            .attr("fill", function(d :any) { return color(d.parent.data.id); });
 
         cell.append("image")
-            .attr("id", (d) => `image-${d.data.id}` )
+            .attr("id", (d :any) => `image-${d.data.id}` )
             .attr('x', 3)
             .attr('y', 3)
             // .attr("width", (d) => Math.max(d.x1 - d.x0, d.y1 - d.y0))
             // .attr("height", (d) => Math.max(d.x1 - d.x0, d.y1 - d.y0))
-            .attr("width", (d) => d.x1 - d.x0 - 6)
-            .attr("height", (d) => d.y1 - d.y0 - 6)
+            .attr("width", (d :any) => d.x1 - d.x0 - 6)
+            .attr("height", (d :any) => d.y1 - d.y0 - 6)
             .attr("preserveAspectRatio", "xMidYMid slice")
             // .attr("meetOrSlice", "meet")
-            .attr("xlink:href", (d) => `/data/mm/2018-05-28/photos/${d.data.blob.photo}`);
+            .attr("xlink:href", (d :any) => `/data/mm/2018-05-28/photos/${d.data.blob.photo}`);
             // .attr("fill", function(d) { return color(d.parent.data.id); });
 
 
         cell.append("clipPath")
-            .attr("id", function(d) { return "clip-" + d.data.id; })
+            .attr("id", function(d :any) { return "clip-" + d.data.id; })
             .append("use")
-            .attr("xlink:href", function(d) { return "#" + d.data.id; });
+            .attr("xlink:href", function(d :any) { return "#" + d.data.id; });
 
         cell.append("text")
-            .attr("clip-path", function(d) { return "url(#clip-" + d.data.id + ")"; })
+            .attr("clip-path", function(d :any) { return "url(#clip-" + d.data.id + ")"; })
             .selectAll("tspan")
-            .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
+            .data(function(d :any) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
             .enter().append("tspan")
             .attr("x", 4)
-            .attr("y", function(d, i) { return 13 + i * 10; })
-            .text(function(d) { return d; });
+            .attr("y", function(d :any, i :number) { return 13 + i * 10; })
+            .text(function(d :any) { return d; });
 
         cell.append("title")
-            .text(function(d) { return d.data.id + "\n" + format(d.value); });
+            .text(function(d :any) { return d.data.id + "\n" + format(d.value); });
 
         d3.selectAll("input")
             .data([sumBySize, sumByCount], function(d:any) { return d.name })
@@ -935,26 +890,26 @@ console.log(data);
                 .dispatch("change");
         }, 2000);
 
-        function changed(sum) {
+        function changed(sum :any) {
             timeout.stop();
 
             treemap(root.sum(sum));
 
             cell.transition()
                 .duration(750)
-                .attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
+                .attr("transform", function(d :any) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
                 .select("rect")
-                .attr("width", function(d) { return d.x1 - d.x0; })
-                .attr("height", function(d) { return d.y1 - d.y0; });
+                .attr("width", function(d :any) { return d.x1 - d.x0; })
+                .attr("height", function(d :any) { return d.y1 - d.y0; });
         }
 
     }
 
-    scratchpad(callback){
+    scratchpad(callback :Function){
         callback(this);
     }
 
-    venn(options) {
+    venn(options  :any) {
         const svg = this.plot,
               data = this.data,
               width = this.innerWidth,
@@ -1051,7 +1006,7 @@ console.log(data);
             .style('text-anchor', 'middle')
             .style('font-size', '24px');
 
-        const results = {
+        const results :any = {
             left: [],
             both: [],
             right: []
@@ -1108,11 +1063,11 @@ console.log(data);
 // I'm dumping utility functions here...
 // These are probably available from underscore or jquery or whatever
 
-function sumByCount(d) {
+function sumByCount(d :any) {
     return d.children ? 0 : 1;
 }
 
-function sumBySize(d) {
+function sumBySize(d :any) {
     return d.size;
 }
 
@@ -1125,20 +1080,20 @@ function average( array:Array<any> ) {
     }
 }
 
-function camelize(str) {
-    return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
+function camelize(str :any) {
+    return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match :any, index :number) {
         if (+match === 0) return ""; // or if (/\s+/.test(match)) for white spaces
         return index == 0 ? match.toLowerCase() : match.toUpperCase();
     });
 }
 
-function injectStyles(rule) {
+function injectStyles(rule :any) {
     var div = $("<div />", {
         html: '&shy;<style>' + rule + '</style>'
     }).appendTo("body");
 }
 
-function log(message){
+function log(message :string){
     "use strict";
     message = message ? ` - ${message}` : "";
     const   formatTime = d3.timeFormat("%H:%M:%S"),
@@ -1158,17 +1113,17 @@ function decorateTable(dataset:any, newOptions?:any) {
         data: dataset,
         pageLength: 25,
         order: [[0, 'desc']],
-        columns: dataset.columns.map(function(d){ return {
+        columns: dataset.columns.map(function(d :any){ return {
             title: d,
             data: d
         };})
     };
     if (newOptions) {
         Object.keys(newOptions).forEach(function(key) {
-            options[key] = newOptions[key];
+            (<any>options)[key] = newOptions[key];
         });
         if(newOptions.titles) {
-            newOptions.titles.forEach((d,i) => options.columns[i].title = d );
+            newOptions.titles.forEach((d :any, i :number) => options.columns[i].title = d );
         }
         if(newOptions.render) {
             options.columns.forEach((d) => d.render = newOptions.render );
@@ -1179,6 +1134,6 @@ function decorateTable(dataset:any, newOptions?:any) {
 
 
 
-export { Chart as default, Chart, decorateTable, d3 };
+// export { Chart as default, Chart, decorateTable, d3 };
 
 

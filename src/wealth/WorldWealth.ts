@@ -11,7 +11,7 @@ var d3 = chartExports.d3,
     decorateTable = chartExports.decorateTable;
 */
 
-import {d3, Chart, decorateTable} from '../js/chart';
+// import {d3, Chart, decorateTable} from '../js/chart';
 
 const charts = [];
 let data = [];

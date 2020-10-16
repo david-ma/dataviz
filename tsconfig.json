@@ -15,10 +15,10 @@
         "sourceMap": true,
 
 // This might be overwritten by gulpfile
-        "noImplicitAny": false,
-        "noImplicitThis": false,
-        "noImplicitReturns": false,
-        "noUnusedLocals":false
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": false
     },
     "include": [
         "src/js"
