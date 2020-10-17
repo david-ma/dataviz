@@ -1,3 +1,7 @@
+import {Chart, decorateTable, d3} from 'chart';
+import $ from 'jquery';
+import 'datatables.net';
+
 
 var margin = ({top: 20, right: 20, bottom: 30, left: 40})
 var height = 600,
