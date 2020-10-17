@@ -6,7 +6,7 @@ import 'datatables.net';
 
 interface chartOptions {
     element ?: string;
-    data    ?: any[];
+    data    ?: any[] | {};
     title   ?: string;
     xLabel  ?: string;
     yLabel  ?: string;
