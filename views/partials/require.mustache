@@ -6,19 +6,30 @@
         enforceDefine: true,
         paths: {
             'chart': "/js/chart",
-            'datatables.net': "/js/datatables.min"
+            'datatables.net': "/js/datatables.min",
+            'd3': "/js/vendor.min",
+            'jquery': "/js/vendor.min"
         },
         shim: {
             chart: {
                 exports: "Chart",
-                deps: ['d3', 'd3-selection-multi', 'd3-scale']
-            }
+                deps: ["d3", "jquery", "datatables.net"]
+            },
+            d3: {
+                exports: "d3"
+            },
+            "jquery": {
+                exports: "$"
+            },
+            "datatables.net": ["jquery"]
         }
     });
 
     require(['chart',
+            "d3",
+            "jquery",
             {{{typescript}}},
-            '/js/jquery.dataTables.min.js'
+            'datatables.net'
         ], function(_chart){});
 
 
