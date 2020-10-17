@@ -7,6 +7,7 @@ import 'datatables.net';
 const currentYear = new Date().getFullYear();
 var drawPieChart;
 
+globalThis.celebrity = celebrity;
 function celebrity(birth, death) {
     $("#birthyear").val(birth);
     $("#deathyear").val(death);

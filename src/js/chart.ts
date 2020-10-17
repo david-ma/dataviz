@@ -1124,6 +1124,6 @@ function decorateTable(dataset:any, newOptions?:any) {
 
 
 
-export { Chart as default, Chart, decorateTable, d3 };
+export { Chart as default, Chart, decorateTable };
 
 
