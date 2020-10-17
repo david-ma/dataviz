@@ -11,14 +11,17 @@
         shim: {
             chart: {
                 exports: "Chart",
-                deps: ['d3', 'd3-selection-multi', 'd3-scale']
+                deps: ['d3']
+            },
+            "datatables.net": {
+                deps: ["jquery"]
             }
         }
     });
 
     require(['chart',
             {{{typescript}}},
-            '/js/jquery.dataTables.min.js'
+            'datatables.net'
         ], function(_chart){});
 
 
