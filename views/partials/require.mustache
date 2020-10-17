@@ -1,0 +1,25 @@
+<script src="/js/require.js"></script>
+<script>
+
+    require.config({
+        baseUrl: '/js/vendor',
+        enforceDefine: true,
+        paths: {
+            'chart': "/js/chart",
+            'datatables.net': "/js/datatables.min"
+        },
+        shim: {
+            chart: {
+                exports: "Chart",
+                deps: ['d3', 'd3-selection-multi', 'd3-scale']
+            }
+        }
+    });
+
+    require(['chart',
+            {{{typescript}}},
+            '/js/jquery.dataTables.min.js'
+        ], function(_chart){});
+
+
+</script>

@@ -1,14 +1,5 @@
 <section class="blogpost">
 
-{{! 
-    <div class="row">
-        <div class="col-xs-12">
-            <h1>Number of years USA was at war, during your lifetime</h1>
-            <h2>Originally on <a target="_blank" href="https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/">The Washington Post</a> by <a target="_blank" href="https://twitter.com/pbump">@pbump</a></h2>
-        </div>
-    </div> 
-}}
-
     <div class="row" id="contentBox">
         <div>
             <ul id="tabs">
@@ -48,32 +39,5 @@ td.dates {
 
 </style>
 
-<script src="/js/require.js"></script>
-<script>
-
-    require.config({
-        baseUrl: '/js/vendor',
-        enforceDefine: true,
-        paths: {
-            'chart': "/js/chart",
-            'datatables.net': "/js/datatables.min"
-        },
-        shim: {
-            chart: {
-                exports: "Chart",
-                deps: ['d3', 'd3-selection-multi', 'd3-scale']
-            }
-        }
-    });
-
-    require(['chart',
-        '/js/friends.js',
-        '/js/jquery.dataTables.min.js'
-    ], function(_chart){
-    });
-
-</script>
-
-
-
+{{> require}}
 

@@ -434,6 +434,11 @@ exports.config = {
                     data.blogposts = results.map(d => d.dataValues);
                     data.blogpost = data.blogposts.filter(d => d.shortname == router.path[0]);
 
+                    try {
+                        var shortname = router.path[0];
+                        data.typescript = `'/js/${shortname}.js'`
+                    } catch(e){}
+
 				    var output = mustache.render(views.template, data, views);
     				router.res.end(output);
                 })
