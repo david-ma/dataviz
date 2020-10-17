@@ -43,7 +43,6 @@
 </section>
 
 <script src="/js/require.js"></script>
-<script src="/js/chart.js"></script>
 
 <script>
 
@@ -71,6 +70,15 @@
         }
     });
 
+
+
+
+    require(['chart',
+        '/js/jquery.dataTables.min.js'
+    ], function(_chart){
+        console.log(_chart);
+        const Chart = _chart.Chart;
+
         const charts = [];
         let data = [];
         const seasons = {};
@@ -88,7 +96,7 @@
         AmericanWars = data;
     //    AmericanWars.columns.push("length");
         console.log("Start async stuff");
-        decorateTable(AmericanWars, {
+        _chart.decorateTable(AmericanWars, {
             element: "#AmericanWars table",
             order:[1, 'asc'],
             titles: ['War', 'Start', 'End']
@@ -327,6 +335,7 @@ console.log(data_ready);
 
         });
     }
+});
 </script>
 
 <script>

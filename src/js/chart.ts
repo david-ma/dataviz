@@ -1,30 +1,20 @@
 // jshint esversion: 6
 
-// import * as d3 from 'd3';
-// import {selection, select} from "d3-selection";
-// import 'd3-transition';
-// import 'd3-selection-multi';
-
-// // import $ from 'jquery';
-// // declare module "jquery" {
-// //     export = $;
-// // }
-// import 'datatables.net';
-
-// d3[<any>"select"] = select;
-// d3[<any>"selection"] = selection;
-
+import * as d3 from 'd3';
+import $ from 'jquery';
+import 'datatables.net';
 
 interface chartOptions {
-    element: string;
-    data: any[];
-    title: string;
-    xLabel: string;
-    yLabel: string;
-    width: number;
-    height: number;
-    margin: { top: number; right: number; bottom: number; left: number; };
-    colours: string[];
+    element ?: string;
+    data    ?: any[];
+    title   ?: string;
+    xLabel  ?: string;
+    yLabel  ?: string;
+    width   ?: number;
+    height  ?: number;
+    margin  ?: { top: number; right: number; bottom: number; left: number; };
+    colours ?: string[];
+    nav     ?: boolean;
 }
 
 type commit = {
@@ -1134,6 +1124,6 @@ function decorateTable(dataset:any, newOptions?:any) {
 
 
 
-// export { Chart as default, Chart, decorateTable, d3 };
+export { Chart as default, Chart, decorateTable, d3 };
 
 

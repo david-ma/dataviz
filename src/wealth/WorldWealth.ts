@@ -1,8 +1,9 @@
 
 console.log("Running WorldWealth.ts");
 
+import {Chart, decorateTable} from '../js/chart';
+import * as d3 from 'd3';
 
-// import * as d3 from 'd3';
 // import Chart from '../js/chart';
 /*
 import * as chartExports from '../js/chart';

@@ -38,9 +38,9 @@ require.config({
     }
 });
 
-let d3, Chart, decorateTable;
+// let d3, Chart, decorateTable;
 
-require(['chart', 'wealth'], function(exports){
+require(['d3', 'chart', 'wealth'], function(exports){
     d3 = exports.d3;
     Chart = exports.Chart;
     decorateTable = exports.decorateTable;
