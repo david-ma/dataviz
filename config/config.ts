@@ -45,7 +45,7 @@ async function loadTemplates(template, content = '') {
 
 		// Load the mustache template (outer layer)
 		promises.push(
-			fsPromise.readFile(`${__dirname}/views/${template}`, {
+			fsPromise.readFile(`${__dirname}/../views/${template}`, {
 				encoding: 'utf8'
 			})
         );
@@ -54,7 +54,7 @@ async function loadTemplates(template, content = '') {
 		promises.push(
             new Promise((resolve, reject) => {
                 if (Array.isArray(content) && content[0]) content = content[0];
-                fsPromise.readFile(`${__dirname}/views/content/${content}.mustache`, {
+                fsPromise.readFile(`${__dirname}/../views/content/${content}.mustache`, {
                     encoding: 'utf8'
                 }).then(result => {
                     var scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g,
@@ -69,7 +69,7 @@ async function loadTemplates(template, content = '') {
                         styles: styles.join("\n")
                     });
                 }).catch(e => {
-                    fsPromise.readFile(`${__dirname}/views/404.mustache`, {
+                    fsPromise.readFile(`${__dirname}/../views/404.mustache`, {
                         encoding: 'utf8'
                     }).then(result => {
                         resolve(result);
@@ -79,13 +79,13 @@ async function loadTemplates(template, content = '') {
 		);
 
         // Load all the other partials we may need
-		fsPromise.readdir(`${__dirname}/views/partials/`)
+		fsPromise.readdir(`${__dirname}/../views/partials/`)
 		.then( function(d){
 			d.forEach(function(filename){
-				if(filename.indexOf(".mustache" > 0)) {
+				if(filename.indexOf(".mustache") > 0) {
 					filenames.push(filename.split(".mustache")[0]);
 					promises.push(
-						fsPromise.readFile(`${__dirname}/views/partials/${filename}`, {
+						fsPromise.readFile(`${__dirname}/../views/partials/${filename}`, {
 							encoding: 'utf8'
 						})
 					);
@@ -93,7 +93,7 @@ async function loadTemplates(template, content = '') {
 			});
 
 			Promise.all(promises).then(function(array){
-				const results = {};
+				const results :any = {};
                 filenames.forEach((filename, i) => results[filename] = array[i]);
 
                 if(typeof results.content == 'object') {
@@ -199,12 +199,12 @@ exports.config = {
 					i++;
 					console.log(`Scrapeing Page ${i} of ${brand}`)
 					request.get(`${base}cameras/${brand}/${i}/`, function(err, response, html){
-							if(err) {
-							return PromiseRejectionEvent(err);
-						}
-						if (response.statusCode >= 400) {
-							return PromiseRejectionEvent(new Error('400 error'));
-						}
+                        if (err) {
+                            return err;
+                        }
+                        if (response.statusCode >= 400) {
+                            return new Error('400 error');
+                        }
 
 						xray(html, '.newest_div', [{
 							img: 'img@src',
@@ -315,12 +315,12 @@ exports.config = {
             }));
 
             Promise.all(promises).then(function([views, cameras, familes]){
-                const data = {};
+                const data :any = {};
                 data.cameras = JSON.stringify(cameras);
                 data.brand = type;
                 data.familes = JSON.stringify(familes);
 
-                var output = mustache.render(views.template, data, views);
+                var output = mustache.render((<any>views).template, data, views);
                 res.end(output);
             })
 
@@ -407,7 +407,7 @@ exports.config = {
 		"": function(router) {
             const promises = [loadTemplates('homepage.mustache')];
 			Promise.all(promises).then(function([views]){		
-				const data = {}
+				const data :any = {}
                 router.db.Blogpost.findAll({
                     where: {
                         published: true
@@ -416,7 +416,7 @@ exports.config = {
                 }).then((results) => {
                     data.blogposts = results.map(d => d.dataValues);
 
-				    var output = mustache.render(views.template, data, views);
+				    var output = mustache.render((<any>views).template, data, views);
     				router.res.end(output);
                 })
 			});
@@ -424,7 +424,7 @@ exports.config = {
         "blog": function(router) {
             const promises = [loadTemplates('blog.mustache', router.path)];
 			Promise.all(promises).then(function([views]){		
-				const data = {}
+				const data :any = {}
                 router.db.Blogpost.findAll({
                     where: {
                         published: true
@@ -439,7 +439,7 @@ exports.config = {
                         data.typescript = `'/js/${shortname}.js'`
                     } catch(e){}
 
-				    var output = mustache.render(views.template, data, views);
+				    var output = mustache.render((<any>views).template, data, views);
     				router.res.end(output);
                 })
 			});
@@ -449,7 +449,7 @@ exports.config = {
 			Promise.all(promises).then(function([views]){		
 				const data = {}
 
-				var output = mustache.render(views.template, data, views);
+				var output = mustache.render((<any>views).template, data, views);
 				router.res.end(output);
 			});
 		},
@@ -459,7 +459,7 @@ exports.config = {
 			Promise.all(promises).then(function([views]){		
 				const data = {}
 
-				var output = mustache.render(views.template, data, views);
+				var output = mustache.render((<any>views).template, data, views);
 				router.res.end(output);
 			});
 		}

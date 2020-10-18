@@ -1,13 +1,13 @@
 
-const seq = require(`${__dirname}/models/index`);
+const seq = require(`${__dirname}/../models/index`);
 const Op = seq.Sequelize.Op;
 
-const Blogpost = seq.Blogpost = require(`${__dirname}/models`).Blogpost;
+const Blogpost = seq.Blogpost = require(`${__dirname}/../models`).Blogpost;
 
-const Scrape = seq.Scrape = require(`${__dirname}/models`).Scrape;
+const Scrape = seq.Scrape = require(`${__dirname}/../models`).Scrape;
 
-const Camera = seq.Camera = require(`${__dirname}/models`).Camera;
-const Family = seq.Family = require(`${__dirname}/models`).Family;
+const Camera = seq.Camera = require(`${__dirname}/../models`).Camera;
+const Family = seq.Family = require(`${__dirname}/../models`).Family;
 
 // Uncomment to create the family table.
 // seq.sequelize.sync();

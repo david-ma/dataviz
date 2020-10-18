@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "module": "AMD",
+
+        "allowSyntheticDefaultImports":  true,
+        "esModuleInterop": true,
+
+        "noImplicitAny": false,
+        "noImplicitThis": false,
+        "noImplicitReturns": false,
+        "noUnusedLocals": false
+    }
+}
