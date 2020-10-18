@@ -57,7 +57,7 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
         };
 
         regions[country.region].wealth += result.wealth;
-        treemapData.wealth += result.wealth;
+        // treemapData.wealth += result.wealth;
 
         return result;
     } else {
@@ -68,7 +68,9 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
     dataset = data;
     globalThis.data = data;
 
-    treemapData.children = Object.keys(regions).map(d => regions[d]);
+    treemapData.children = Object.keys(regions)
+        .map(d => regions[d])
+        .sort((a,b) => b.wealth - a.wealth);
 
 // Table options:
     var tableOptions = {
@@ -103,25 +105,25 @@ function drawTreemap(data) {
         nav: false,
         title: "World Wealth 2019, Billions of $"
     }).scratchpad(function(c){
-
+globalThis.c = c;
         const   svg = c.plot,
                 width = c.innerWidth,
                 height = c.innerHeight;
 
 console.log("treemapData", treemapData);
         // Here the size of each leave is given in the 'value' field in input data
-        var root = d3.hierarchy(treemapData)
-            .sum( (d:any) => d.wealth );
+var root = d3.hierarchy(treemapData)
+    .sum( (d:any) => d.wealth );
 
 console.log("root", root);
 
-        d3.treemap()
+const tree = d3.treemap()
             .size([width, height])
-            .paddingTop(28)
-            .paddingRight(7)
-            .paddingInner(3)      // Padding between each rectangle
-            //.paddingOuter(6)
-            //.padding(20)
+            // .paddingTop(28)
+            // .paddingRight(7)
+            // .paddingInner(3)      // Padding between each rectangle
+            // .paddingOuter(6)
+            .padding(2)
             (root)
 
   // prepare a color scale
@@ -136,10 +138,12 @@ console.log("root", root);
     .domain([10, Math.max(...treemapData.children.map(d => d.wealth))])
     .range([.5,1])
 
-  // use this information to add rectangles:
+globalThis.tree = tree;
+
+    // use this information to add rectangles:
   svg
     .selectAll("rect.region")
-    .data(root.leaves())
+    .data(tree.leaves())
     .enter()
     .append("rect")
         .classed("region", true)
@@ -182,16 +186,16 @@ console.log("root", root);
       .attr("fill", "black")
 
   // Add title for the 3 groups
-  svg
-    .selectAll("titles")
-    .data(root.descendants().filter(function(d){return d.depth==1}))
-    .enter()
-    .append("text")
-      .attr("x", function(d){ return d.x0})
-      .attr("y", function(d){ return d.y0+21})
-      .text(function(d){ return d.data.name })
-      .attr("font-size", "19px")
-      .attr("fill",  function(d){ return color(d.data.name)} )
+//   svg
+//     .selectAll("titles")
+//     .data(root.descendants().filter(function(d){return d.depth==1}))
+//     .enter()
+//     .append("text")
+//       .attr("x", function(d){ return d.x0})
+//       .attr("y", function(d){ return d.y0+21})
+//       .text(function(d){ return d.data.name })
+//       .attr("font-size", "19px")
+//       .attr("fill",  function(d){ return color(d.data.name)} )
 
         });
 
