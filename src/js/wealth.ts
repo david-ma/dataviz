@@ -38,7 +38,20 @@ d3.csv("/wealth/WorldWealth.csv", function(d:any, i, columns){
 
 // Table options:
     var tableOptions = {
-        element: "#dataset table"
+        element: "#dataset table",
+        paging: true,
+        pageLength: 10,
+        order: [2, 'desc'],
+        columns: [{
+            data: "country",
+            title: "Country"
+        },{
+            data: "region",
+            title: "Region"
+        },{
+            data: "wealth_b",
+            title: "Wealth (Billions)"
+        }]
     }
     decorateTable(dataset, tableOptions);
 

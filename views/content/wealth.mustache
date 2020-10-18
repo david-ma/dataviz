@@ -2,10 +2,27 @@
     <div class="row">
         <div class="col-xs-12">
             <h1>World Wealth</h1>
+            <div id="explain"></div>
         </div>
     </div>
 
     <div class="row" id="wealth">
+
+    </div>
+<style>
+#dataset {
+    border: solid 1px grey; padding: 5px;
+}
+#dataset table {
+    border: solid 1px grey; margin: 5px 0;
+}
+#dataset td {
+    border: solid 1px lightgrey;
+}
+</style>
+    <div id="dataset">
+        <div class="download_csv_link"><a target="_blank" href="/wealth/WorldWealth.csv">Download CSV</a></div>
+        <table></table>
     </div>
 </section>
 
@@ -16,17 +33,8 @@
     const md = new showdown.Converter({openLinksInNewWindow: true});
 
     $("#explain").html(md.makeHtml(`
-I redrew Philip Bump's diagram from his article "Nearly a quarter of Americans have never experienced the U.S. in a time of peace" as an exercise to practice d3.js.
+Let's draw the world's wealth as a tree map.
 
-Simply enter your birth year here & it will recalculate the diagram.`));
+`));
 
-
-    $("#explain2").html(md.makeHtml(`Note that the "start" & "end" years reflect USA's involvement in the war, not the total length of each war.
-
-And yes, I know that you're supposed to improve the diagram for [#makeovermonday](https://www.makeovermonday.co.uk/), but I'm just doing this as a warmup exercise. Maybe next week I'll change the diagram more.
-
-Todo:
- * Better labels, e.g. Years each war started
- * Hoverover for labels?
- `));
 </script>
