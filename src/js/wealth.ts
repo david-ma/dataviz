@@ -1,18 +1,12 @@
 
-console.log("Running WorldWealth.ts");
 
-import {Chart, decorateTable} from '../js/chart';
+import { Chart, decorateTable } from 'chart';
 import * as d3 from 'd3';
+// import $ from 'jquery';
+import 'datatables.net';
 
-// import Chart from '../js/chart';
-/*
-import * as chartExports from '../js/chart';
-var d3 = chartExports.d3,
-    Chart = chartExports.Chart,
-    decorateTable = chartExports.decorateTable;
-*/
-
-// import {d3, Chart, decorateTable} from '../js/chart';
+console.log("Running wealth.ts");
+console.log("hello testing");
 
 const charts = [];
 let data = [];
@@ -25,6 +19,7 @@ let treemapData = {
     total: 0,
     name: "Wealth"
 }
+
 
 console.log("Calling csv stuff");
 d3.csv("/wealth/WorldWealth.csv", function(d:any, i, columns){
@@ -155,9 +150,6 @@ console.log(treemapData);
         });
 
     }
-
-
-
 
 
 
