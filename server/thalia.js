@@ -50,7 +50,12 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                 let config, cred;
                 try {
                     const start = Date.now();
-                    config = require('../config').config;
+                    if (fs.existsSync(`${__dirname}/../config.js`)) {
+                        config = require(`${__dirname}/../config`).config;
+                    }
+                    else {
+                        config = require(`${__dirname}/../config/config`).config;
+                    }
                     console.log(`Loading time: ${Date.now() - start} ms - config.js`);
                 }
                 catch (err) {
@@ -80,7 +85,12 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                 var config, cred;
                 try {
                     const start = Date.now();
-                    config = require('../websites/' + site + '/config').config;
+                    if (fs.existsSync(`${__dirname}/../websites/${site}/config.js`)) {
+                        config = require(`${__dirname}/../websites/${site}/config`).config;
+                    }
+                    else {
+                        config = require(`${__dirname}/../websites/${site}/config/config`).config;
+                    }
                     console.log(`${Date.now() - start} ms - config.js for ${site}`);
                 }
                 catch (err) {
@@ -153,6 +163,16 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                 try {
                     const start = Date.now();
                     handle.websites[site].seq = require(`${baseUrl}db_bootstrap.js`).seq;
+                    console.log(`${Date.now() - start} ms - Database bootstrap.js ${site}`);
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            }
+            else if (fs.existsSync(`${baseUrl}config/db_bootstrap.js`)) {
+                try {
+                    const start = Date.now();
+                    handle.websites[site].seq = require(`${baseUrl}config/db_bootstrap.js`).seq;
                     console.log(`${Date.now() - start} ms - Database bootstrap.js ${site}`);
                 }
                 catch (e) {
@@ -579,7 +599,7 @@ define("server", ["require", "exports"], function (require, exports) {
     const httpProxy = require('http-proxy');
     let blacklist = [];
     try {
-        require("./../blacklist").blacklist || [];
+        blacklist = require("../blacklist").blacklist;
         console.log("This is the blacklist:", blacklist);
     }
     catch (e) { }
@@ -816,7 +836,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 define(function (require) {
-    require(['server', 'router', 'requestHandlers'], function (server, router, requestHandlers) {
+    require(['server', 'router', 'requestHandlers', 'fs'], function (server, router, requestHandlers, fs) {
         let port = '1337'; // change the port here?
         const pattern = /^\d{0,5}$/;
         let workspace = 'default';
@@ -832,6 +852,10 @@ define(function (require) {
         }
         else if (typeof process.argv[3] !== null && process.argv[3] !== undefined && !pattern.exec(process.argv[3])) {
             workspace = process.argv[3];
+        }
+        if (!fs.existsSync(`websites/${workspace}`)) {
+            console.error(`Error. ${workspace} is an invalid workspace`);
+            process.exit(1);
         }
         requestHandlers.handle.index.localhost = workspace;
         requestHandlers.handle.loadAllWebsites();
