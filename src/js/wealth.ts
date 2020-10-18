@@ -13,28 +13,62 @@ let data = [];
 const seasons = {};
 let dataset = null;
 
-let regions = [];
-let treemapData = {
+const regions : {
+    [name:string]: Region
+} = {};
+
+const treemapData = {
     children: [],
-    total: 0,
-    name: "Wealth"
+    wealth: 0,
+    name: "World"
 }
 
+type rawCountry = {
+    country: string;
+    region: string;
+    wealth_b: string;
+}
+type Country = {
+    name: string;
+    region: string;
+    wealth: number;
+}
+type Region = {
+    name: string;
+    wealth: number;
+    children: Country[];
+}
 
 console.log("Calling csv stuff");
-d3.csv("/wealth/WorldWealth.csv", function(d:any, i, columns){
-    if(!d.wealth_b) d.wealth_b = 0;
-    if(d.region) {
-        return d;
+d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
+    if(!country.wealth_b) country.wealth_b = "0";
+
+    if(country.region) {
+        const result :Country = {
+            name: country.country,
+            region: country.region,
+            wealth: parseInt(country.wealth_b)
+        }
+
+        regions[country.region] = regions[country.region] || {
+            name: country.region,
+            wealth: 0,
+            children:[]
+        };
+
+        regions[country.region].wealth += result.wealth;
+        treemapData.wealth += result.wealth;
+
+        return result;
     } else {
         return null;
     }
 
 }).then(function(data){
-    console.log(data);
     dataset = data;
+    globalThis.data = data;
 
-    console.log("Start async stuff");
+    treemapData.children = Object.keys(regions).map(d => regions[d]);
 
 // Table options:
     var tableOptions = {
@@ -43,33 +77,29 @@ d3.csv("/wealth/WorldWealth.csv", function(d:any, i, columns){
         pageLength: 10,
         order: [2, 'desc'],
         columns: [{
-            data: "country",
+            data: "name",
             title: "Country"
         },{
             data: "region",
             title: "Region"
         },{
-            data: "wealth_b",
+            data: "wealth",
             title: "Wealth (Billions)"
         }]
     }
     decorateTable(dataset, tableOptions);
 
-
-
     drawTreemap(dataset);
-
-
 });
 
 
 function drawTreemap(data) {
 
-    const war = new Chart({
+    const wealth = new Chart({
         element: "chart",
-        data: data,
-        width: 1800,
-        height: 900,
+        data: treemapData,
+        // width: 1800,
+        // height: 900,
         nav: false,
         title: "World Wealth 2019, Billions of $"
     }).scratchpad(function(c){
@@ -77,10 +107,13 @@ function drawTreemap(data) {
         const   svg = c.plot,
                 width = c.innerWidth,
                 height = c.innerHeight;
-console.log(treemapData);
+
+console.log("treemapData", treemapData);
         // Here the size of each leave is given in the 'value' field in input data
         var root = d3.hierarchy(treemapData)
-            .sum( (d:any) => d.value );
+            .sum( (d:any) => d.wealth );
+
+console.log("root", root);
 
         d3.treemap()
             .size([width, height])
@@ -93,14 +126,14 @@ console.log(treemapData);
 
   // prepare a color scale
   var color = d3.scaleOrdinal()
-    .domain(regions)
+    .domain(Object.keys(regions))
     .range(c.colours)
     // .range(['#d53e4f','#fc8d59','#fee08b','#ffffbf','#e6f598','#99d594','#3288bd'])
 
-    console.log(Math.max(...treemapData.children.map(d => d.total)));
+    console.log(Math.max(...treemapData.children.map(d => d.wealth)));
   // And a opacity scale
   var opacity = d3.scaleLinear()
-    .domain([10, Math.max(...treemapData.children.map(d => d.total))])
+    .domain([10, Math.max(...treemapData.children.map(d => d.wealth))])
     .range([.5,1])
 
   // use this information to add rectangles:
@@ -116,7 +149,7 @@ console.log(treemapData);
         .attr('height', function (d) { return d.y1 - d.y0; })
         .style("stroke", "black")
         .style("fill", function(d){ 
-            console.log(d);
+            // console.log(d);
             // return 'red'
             return d.parent ? color(d.parent.data.name) : "rgba(0,0,0,0)";
         })
@@ -132,7 +165,7 @@ console.log(treemapData);
     .append("text")
       .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
       .attr("y", function(d){ return d.y0+20})    // +20 to adjust position (lower)
-      .text(function(d){ return d.data.name.replace('mister_','') })
+      .text(function(d){ return d.data.name })
       .attr("font-size", "19px")
       .attr("fill", "white")
 
@@ -144,7 +177,7 @@ console.log(treemapData);
     .append("text")
       .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
       .attr("y", function(d){ return d.y0+35})    // +20 to adjust position (lower)
-      .text(function(d){ return d.data.value })
+      .text(function(d){ return d.data.wealth })
       .attr("font-size", "11px")
       .attr("fill", "black")
 
