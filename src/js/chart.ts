@@ -127,6 +127,9 @@ class Chart {
         this.svg.append('text')
             .attr('transform', `translate(${this.width / 2},${this.margin.top / 2})`)
             .attr("class", "chart-title")
+            .attr("font-size", "24px")
+            .attr("font-weight", "700")
+            .attr("text-anchor", "middle")
             .attr('x', 0)
             .attr('y', 0)
             .text(this.title);

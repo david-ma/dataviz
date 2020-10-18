@@ -100,8 +100,8 @@ function drawTreemap(data) {
     const wealth = new Chart({
         element: "chart",
         data: treemapData,
-        // width: 1800,
-        // height: 900,
+        width: 1200,
+        height: 600,
         nav: false,
         title: "World Wealth 2019, Billions of $"
     }).scratchpad(function(c){
@@ -119,18 +119,14 @@ console.log("root", root);
 
 const tree = d3.treemap()
             .size([width, height])
-            // .paddingTop(28)
-            // .paddingRight(7)
-            // .paddingInner(3)      // Padding between each rectangle
-            // .paddingOuter(6)
             .padding(2)
             (root)
 
+console.log(Object.keys(regions));
   // prepare a color scale
   var color = d3.scaleOrdinal()
     .domain(Object.keys(regions))
-    .range(c.colours)
-    // .range(['#d53e4f','#fc8d59','#fee08b','#ffffbf','#e6f598','#99d594','#3288bd'])
+    .range(['#7fc97f','#beaed4','#fdc086','#ffff99','#386cb0','#f0027f','#bf5b17'])
 
     console.log(Math.max(...treemapData.children.map(d => d.wealth)));
   // And a opacity scale
@@ -153,9 +149,10 @@ globalThis.tree = tree;
         .attr('height', function (d) { return d.y1 - d.y0; })
         .style("stroke", "black")
         .style("fill", function(d){ 
-            // console.log(d);
+            console.log(d.data.name)
+            return color(d.data.name);
             // return 'red'
-            return d.parent ? color(d.parent.data.name) : "rgba(0,0,0,0)";
+            // return d.parent ? color(d.parent.data.name) : "rgba(0,0,0,0)";
         })
         .style("opacity", function(d:any){
             return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1;
@@ -171,7 +168,8 @@ globalThis.tree = tree;
       .attr("y", function(d){ return d.y0+20})    // +20 to adjust position (lower)
       .text(function(d){ return d.data.name })
       .attr("font-size", "19px")
-      .attr("fill", "white")
+      .attr("font-weight", "700")
+      .attr("fill", "black")
 
   // and to add the text labels
   svg
@@ -181,25 +179,13 @@ globalThis.tree = tree;
     .append("text")
       .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
       .attr("y", function(d){ return d.y0+35})    // +20 to adjust position (lower)
-      .text(function(d){ return d.data.wealth })
+      .text(function(d){ return `$${d.data.wealth} billion` })
       .attr("font-size", "11px")
       .attr("fill", "black")
 
-  // Add title for the 3 groups
-//   svg
-//     .selectAll("titles")
-//     .data(root.descendants().filter(function(d){return d.depth==1}))
-//     .enter()
-//     .append("text")
-//       .attr("x", function(d){ return d.x0})
-//       .attr("y", function(d){ return d.y0+21})
-//       .text(function(d){ return d.data.name })
-//       .attr("font-size", "19px")
-//       .attr("fill",  function(d){ return color(d.data.name)} )
+    });
 
-        });
-
-    }
+}
 
 
 
