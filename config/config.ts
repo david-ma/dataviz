@@ -404,7 +404,7 @@ exports.config = {
     },
     mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
 	controllers: {
-		"": function(router) {
+		"": function homepage(router) {
             const promises = [loadTemplates('homepage.mustache')];
 			Promise.all(promises).then(function([views]){		
 				const data :any = {}
@@ -421,7 +421,7 @@ exports.config = {
                 })
 			});
         },
-        "blog": function(router) {
+        "blog": function blogpost(router) {
             const promises = [loadTemplates('blog.mustache', router.path)];
 			Promise.all(promises).then(function([views]){		
 				const data :any = {}

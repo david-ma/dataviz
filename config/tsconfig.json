@@ -10,5 +10,6 @@
         "noImplicitThis": false,
         "noImplicitReturns": false,
         "noUnusedLocals": false
-    }
+    },
+    "files": ["config.ts", "db_bootstrap.ts"]
 }

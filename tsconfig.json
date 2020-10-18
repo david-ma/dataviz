@@ -13,5 +13,7 @@
         "noImplicitThis": false,
         "noImplicitReturns": false,
         "noUnusedLocals": false
-    }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["config"]
 }

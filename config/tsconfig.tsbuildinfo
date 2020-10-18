@@ -162,7 +162,7 @@
         "affectsGlobalScope": true
       },
       "./config.ts": {
-        "version": "0c300e4151bb78a311272d7ed3978b652484a2f5f6ca4ef9f62dc6c5f703ca29",
+        "version": "67aa2a67e5ac101469198c529fe6af037a76e926c746a624ec84f5c0d92e0157",
         "signature": "4f5df4666372d85f52369e73879d4744e9dcc0c0fc9a3a1dd5a22f11cf0e0238",
         "affectsGlobalScope": true
       },
