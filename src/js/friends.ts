@@ -4,19 +4,19 @@ import $ from 'jquery';
 import 'datatables.net';
 
 
-var margin = ({top: 20, right: 20, bottom: 30, left: 40})
+var margin = ({top: 40, right: 40, bottom: 40, left: 40})
 var height = 600,
     width = 900;
-var x, y;
-var bins = [];
-var buckets = [];
-
-var dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
 
 type friend = {
     "name": string;
     "timestamp": number;
 }
+
+var bins = [];
+var buckets : friend[][] = [];
+
+var dateOpts = { year: 'numeric', month: 'long', day: 'numeric' };
 
 var test = null;
 
@@ -37,20 +37,13 @@ var test = null;
             var data :friend[] = rawData.friends.map(d => {return {timestamp: d.timestamp * 1000, name: decodeFBEmoji(d.name)}});
             console.log("data", data);
 
-            var firstDate = data[0].timestamp,
-                lastDate = data[data.length -1].timestamp;
-
-            y = d3.scaleLinear()
-                .domain([0, d3.max(bins, d => d.length)]).nice()
-                .range([height - margin.bottom, margin.top])
-
-            x = d3.scaleLinear()
-                .domain(d3.extent(data, d => d.timestamp)).nice()
+            var x : d3.ScaleLinear<Number, Number> = d3.scaleLinear()
+                .domain(d3.extent(data, d => d.timestamp))
                 .range([margin.left, width - margin.right])
 
             bins = d3.histogram()
-                .domain(x.domain())
-                .thresholds(x.ticks(40))(data.map(d => d.timestamp));
+                .domain(x.domain() as [number, number])
+                .thresholds(x.ticks(150))(data.map(d => d.timestamp));
 
             console.log("bins", bins);
 
@@ -62,6 +55,10 @@ var test = null;
                     }
                 })
             })
+
+            var y = d3.scaleLinear()
+                .domain([0, Math.max(...buckets.filter(d => d).map(d => d.length))])
+                .range([height - margin.bottom, margin.top]);
 
             console.log("buckets", buckets);
 
@@ -90,7 +87,90 @@ var test = null;
                         
                         tr.append("td").append("textarea");
                     }
-                })
+                });
+
+            var friendsChart = new Chart({
+                margin: margin,
+                height: height,
+                width: width,
+                element: "friends_chart",
+                title: "Friends over time",
+                data: data,
+                nav: false
+            }).scratchpad(function(chart :Chart){
+                console.log("hello, in scratchpad");
+                console.log(chart.innerWidth);
+
+                var rect = chart.svg.append("rect")
+                    .attrs({
+                        x: chart.margin.left,
+                        y: chart.margin.top,
+                        width: chart.innerWidth,
+                        height: chart.innerHeight,
+                        fill: "white"
+                    });
+
+                var box = chart.svg.append("g")
+                    .attrs({
+                        id: "columns",
+                        transform: `translate(${chart.margin.left}, ${chart.margin.top})`
+                    });
+
+                    globalThis.buckets = buckets;
+                    var numberOfBuckets = buckets.length;
+
+                    var max = Math.max(...buckets.map(d => d.length).filter(d => d));
+                    console.log("Max", max);
+
+                    d3.select("#columns")
+                        .selectAll("rect")
+                        .data(buckets)
+                        .enter()
+                        .append("rect")
+                        .attrs(function(bucket,i){
+                            // console.log(d);
+                            // console.log(i);
+                            if(bucket) {
+                                return {
+                                    height: bucket.length * (chart.innerHeight / max),
+                                    width: chart.innerWidth / buckets.length,
+                                    x: i * chart.innerWidth / buckets.length,
+                                    y: chart.innerHeight - (bucket.length * (chart.innerHeight / max)),
+                                    fill: 'grey',
+                                    stroke: 'black'
+                                }
+                            } else {
+                                return {}
+                            }
+                        });
+
+                    var x_axis = d3.axisBottom(x as any)
+                        .tickFormat(function(d :number){
+                            // var date = new Date(d);
+                            // date.getUTCMonth()
+                            // return `${date.getUTCMonth()} ${date.getFullYear()}`
+                            return new Date(d).toLocaleDateString();
+                        })
+                        .tickSizeOuter(10);
+
+                    chart.svg.append("g")
+                        .attr("transform", `translate(${0},${chart.margin.top + chart.innerHeight})`)
+                        .call(x_axis);
+                 
+     
+                        var y_axis = d3.axisLeft(y)
+                            // .ticks(50)
+                            // .tickFormat(function(d :number){
+                            //     // return new Date(d).toLocaleDateString();
+                            //     return `${d}`
+                            // })
+                        .tickSizeOuter(10);
+
+                    chart.svg.append("g")
+                        .attr("transform", `translate(${chart.margin.left},${0})`)
+                        .call(y_axis);
+
+            });
         }
     });
 

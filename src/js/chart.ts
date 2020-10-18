@@ -1,6 +1,10 @@
 // jshint esversion: 6
 
 import * as d3 from 'd3';
+import {selection, select} from "d3-selection";
+d3[<any>"select"] = select;
+d3[<any>"selection"] = selection;
+
 import $ from 'jquery';
 import 'datatables.net';
 
