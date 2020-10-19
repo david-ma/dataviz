@@ -37,6 +37,7 @@ type Region = {
     name: string;
     wealth: number;
     children: Country[];
+    countries: Country[];
 }
 
 console.log("Calling csv stuff");
@@ -53,10 +54,12 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
         regions[country.region] = regions[country.region] || {
             name: country.region,
             wealth: 0,
-            children:[]
+            children:[],
+            countries: []
         };
 
         regions[country.region].wealth += result.wealth;
+        regions[country.region].countries.push(result);
         // treemapData.wealth += result.wealth;
 
         return result;
@@ -149,14 +152,72 @@ globalThis.tree = tree;
         .attr('height', function (d) { return d.y1 - d.y0; })
         .style("stroke", "black")
         .style("fill", function(d){ 
-            console.log(d.data.name)
             return color(d.data.name);
-            // return 'red'
-            // return d.parent ? color(d.parent.data.name) : "rgba(0,0,0,0)";
         })
         .style("opacity", function(d:any){
             return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1;
         })
+        .on('click', function(d, i){
+            var rWidth = d.x1 - d.x0,
+                rHeight = d.y1 - d.y0;
+
+            console.log(d);
+
+            var regionRoot = d3.hierarchy({
+                name: d.data.name,
+                children: d.data.countries,
+                wealth: 0
+            })
+            .sum( (d:any) => d.wealth );
+
+            var regionTree = d3.treemap()
+                .size([rWidth, rHeight])
+                .padding(2)
+                (regionRoot);
+            
+            var regionGroup = svg.append("g").attrs({
+                transform: `translate(${d.x0},${d.y0})`
+            })
+
+            regionGroup.selectAll("rect.country")
+                .data(regionTree.leaves())
+                .enter()
+                .append("rect")
+                .classed("country", true)
+                .attr('x', function (d) { return d.x0; })
+                .attr('y', function (d) { return d.y0; })
+                .attr('width', function (d) { return d.x1 - d.x0; })
+                .attr('height', function (d) { return d.y1 - d.y0; })
+                .style("stroke", "black")
+                .style("fill", color(d.data.name))
+                .style("opacity", function(d:any){
+                    return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1;
+                })
+
+            regionTree = d3.treemap()
+                .size([width, height])
+                .padding(2)
+                (regionRoot);
+
+            var speed = 1000;
+
+            regionGroup
+                .transition()
+                .duration(speed)
+                .attrs({
+                    transform: `translate(0,0)`
+                })
+            regionGroup.selectAll("rect.country")
+                .data(regionTree.leaves())
+                .transition()
+                .duration(speed)
+                .attr('x', function (d) { return d.x0; })
+                .attr('y', function (d) { return d.y0; })
+                .attr('width', function (d) { return d.x1 - d.x0; })
+                .attr('height', function (d) { return d.y1 - d.y0; })
+
+            console.log(regionTree);
+        });
 
   // and to add the text labels
   svg
