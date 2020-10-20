@@ -88,6 +88,13 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
         paging: true,
         search: true,
         searching: true,
+        language: {
+            searchPlaceholder: "Search",
+            sLengthMenu: "Show _MENU_"
+        },
+        oLanguage: {
+            sSearch: ""
+        },
         pageLength: 10,
         order: [2, 'desc'],
         columns: [{

@@ -13,7 +13,22 @@
     padding: 3px;
 }
 #wealth tr {
+    line-height: 1em;
     filter: brightness(1.15);
+}
+#wealth table {
+    width: 100% !important;
+}
+#wealth .paginate_button {
+    padding: 3px 6px;
+    flex: auto;
+}
+#wealth .dataTables_paginate {
+    display: flex;
+    width: 100%;
+}
+#wealth .dataTables_paginate .ellipsis {
+    padding: 0;
 }
 
 </style>
@@ -28,8 +43,8 @@
         </div>
 
         <div class="col-sm-4" id="dataset">
-            <div class="download_csv_link"><a target="_blank" href="/wealth/WorldWealth.csv">Download CSV</a></div>
             <table></table>
+            <div class="download_csv_link"><a target="_blank" href="/wealth/WorldWealth.csv">Download CSV</a></div>
         </div>
     </div>
 </section>
