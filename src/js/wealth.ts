@@ -86,6 +86,8 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
     var tableOptions = {
         element: "#dataset table",
         paging: true,
+        search: true,
+        searching: true,
         pageLength: 10,
         order: [2, 'desc'],
         columns: [{
@@ -96,13 +98,17 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
             title: "Region"
         },{
             data: "wealth",
-            title: "Wealth (Billions USD)"
+            title: "Wealth (Billions USD)",
+            render: function(d){
+                return d3.format("$,")(d)
+            }
         }],
         rowCallback: function(row, data){
             d3.select(row).style("background", color(data.region) as string);
         }
     }
     var datatable :DataTables.Api = decorateTable(dataset, tableOptions);
+    globalThis.datatable = datatable;
 
     drawTreemap(dataset, datatable);
 });
@@ -166,6 +172,7 @@ globalThis.tree = tree;
                 rHeight = d.y1 - d.y0;
 
             console.log(d);
+            datatable.search(d.data.name).draw();
 
             var regionRoot = d3.hierarchy({
                 name: d.data.name,
