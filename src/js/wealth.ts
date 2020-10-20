@@ -39,6 +39,7 @@ type Region = {
     children: Country[];
     countries: Country[];
 }
+var color: d3.ScaleOrdinal<string, unknown>;
 
 console.log("Calling csv stuff");
 d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
@@ -75,6 +76,12 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
         .map(d => regions[d])
         .sort((a,b) => b.wealth - a.wealth);
 
+    console.log(Object.keys(regions));
+    // prepare a color scale
+    color = d3.scaleOrdinal()
+        .domain(Object.keys(regions))
+        .range(['#7fc97f','#beaed4','#fdc086','#ffff99','#386cb0','#f0027f','#bf5b17'])
+      
 // Table options:
     var tableOptions = {
         element: "#dataset table",
@@ -90,15 +97,18 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
         },{
             data: "wealth",
             title: "Wealth (Billions USD)"
-        }]
+        }],
+        rowCallback: function(row, data){
+            d3.select(row).style("background", color(data.region) as string);
+        }
     }
-    decorateTable(dataset, tableOptions);
+    var datatable :DataTables.Api = decorateTable(dataset, tableOptions);
 
-    drawTreemap(dataset);
+    drawTreemap(dataset, datatable);
 });
 
 
-function drawTreemap(data) {
+function drawTreemap(data, datatable : DataTables.Api) {
 
     const wealth = new Chart({
         element: "chart",
@@ -124,12 +134,6 @@ const tree = d3.treemap()
             .size([width, height])
             .padding(2)
             (root)
-
-console.log(Object.keys(regions));
-  // prepare a color scale
-  var color = d3.scaleOrdinal()
-    .domain(Object.keys(regions))
-    .range(['#7fc97f','#beaed4','#fdc086','#ffff99','#386cb0','#f0027f','#bf5b17'])
 
     console.log(Math.max(...treemapData.children.map(d => d.wealth)));
   // And a opacity scale

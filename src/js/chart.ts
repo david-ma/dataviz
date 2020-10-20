@@ -1099,7 +1099,7 @@ function log(message :string){
 }
 
 
-function decorateTable(dataset:any, newOptions?:any) {
+function decorateTable(dataset:any, newOptions?:any) : DataTables.Api {
     const element = newOptions ? newOptions.element : "#dataset table";
 
     var options: DataTables.Settings = {
@@ -1126,7 +1126,7 @@ function decorateTable(dataset:any, newOptions?:any) {
             options.columns.forEach((d) => d.render = newOptions.render );
         }
     }
-    $(element).DataTable(options);
+    return $(element).DataTable(options);
 }
 
 
