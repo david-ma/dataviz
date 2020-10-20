@@ -111,7 +111,12 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
             }
         }],
         rowCallback: function(row, data){
-            d3.select(row).style("background", color(data.region) as string);
+            d3.select(row).style("background", color(data.region) as string)
+                .on("mouseenter", function(d){
+                    d3.select(`#${classifyName(data.name)}`).classed("highlight", true);
+                }).on("mouseout", function(d){
+                    d3.select(`#${classifyName(data.name)}`).classed("highlight", false);
+                });
         }
     }
     var datatable :DataTables.Api = decorateTable(dataset, tableOptions);
@@ -174,12 +179,11 @@ globalThis.tree = tree;
         .style("opacity", function(d:any){
             return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1;
         })
-        .on('click', function(d, i){
+        .each(function(d){
+            console.log(d);
+
             var rWidth = d.x1 - d.x0,
                 rHeight = d.y1 - d.y0;
-
-            console.log(d);
-            datatable.search(d.data.name).draw();
 
             var regionRoot = d3.hierarchy({
                 name: d.data.name,
@@ -202,6 +206,7 @@ globalThis.tree = tree;
                 .enter()
                 .append("rect")
                 .classed("country", true)
+                .attr("id", d => classifyName(d.data.name))
                 .attr('x', function (d) { return d.x0; })
                 .attr('y', function (d) { return d.y0; })
                 .attr('width', function (d) { return d.x1 - d.x0; })
@@ -210,8 +215,9 @@ globalThis.tree = tree;
                 .style("fill", color(d.data.name))
                 .style("opacity", function(d:any){
                     return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1;
-                })
+                });
 
+/*
             regionTree = d3.treemap()
                 .size([width, height])
                 .padding(2)
@@ -233,8 +239,13 @@ globalThis.tree = tree;
                 .attr('y', function (d) { return d.y0; })
                 .attr('width', function (d) { return d.x1 - d.x0; })
                 .attr('height', function (d) { return d.y1 - d.y0; })
+*/
+        })
+        .on('click', function(d, i){
+            console.log(d);
+            datatable.search(d.data.name).draw();
 
-            console.log(regionTree);
+            // console.log(regionTree);
         });
 
   // and to add the text labels
@@ -266,7 +277,9 @@ globalThis.tree = tree;
 
 }
 
-
+function classifyName ( name :string) :string  {
+    return name.replace(" ", "-");
+}
 
 
 
