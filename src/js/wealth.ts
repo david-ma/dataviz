@@ -89,7 +89,7 @@ d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
             title: "Region"
         },{
             data: "wealth",
-            title: "Wealth (Billions)"
+            title: "Wealth (Billions USD)"
         }]
     }
     decorateTable(dataset, tableOptions);
@@ -103,10 +103,10 @@ function drawTreemap(data) {
     const wealth = new Chart({
         element: "chart",
         data: treemapData,
-        width: 1200,
-        height: 600,
+        width: 1000,
+        height: 700,
         nav: false,
-        title: "World Wealth 2019, Billions of $"
+        title: "World Wealth 2019, Billions of $USD"
     }).scratchpad(function(c){
 globalThis.c = c;
         const   svg = c.plot,
@@ -240,7 +240,7 @@ globalThis.tree = tree;
     .append("text")
       .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
       .attr("y", function(d){ return d.y0+35})    // +20 to adjust position (lower)
-      .text(function(d){ return `$${d.data.wealth} billion` })
+      .text(function(d){ return `${d3.format("$,")(d.data.wealth)} billion` })
       .attr("font-size", "11px")
       .attr("fill", "black")
 

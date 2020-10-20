@@ -1,15 +1,4 @@
-<section class="blogpost">
-    <div class="row">
-        <div class="col-xs-12">
-            <h1>World Wealth</h1>
-            <div id="explain"></div>
-        </div>
-    </div>
 
-    <div class="row" id="wealth">
-        <div id="chart"></div>
-
-    </div>
 <style>
 #dataset {
     border: solid 1px grey; padding: 5px;
@@ -20,10 +9,24 @@
 #dataset td {
     border: solid 1px lightgrey;
 }
+#wealth th {
+    padding: 3px;
+}
 </style>
-    <div id="dataset">
-        <div class="download_csv_link"><a target="_blank" href="/wealth/WorldWealth.csv">Download CSV</a></div>
-        <table></table>
+
+<section class="blogpost">
+
+    <div class="row" id="wealth">
+
+        <div class="col-sm-8" id="chart">
+            <h1>World Wealth</h1>
+            <div id="explain"></div>
+        </div>
+
+        <div class="col-sm-4" id="dataset">
+            <div class="download_csv_link"><a target="_blank" href="/wealth/WorldWealth.csv">Download CSV</a></div>
+            <table></table>
+        </div>
     </div>
 </section>
 
