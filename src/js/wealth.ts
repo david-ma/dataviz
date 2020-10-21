@@ -29,6 +29,7 @@ type rawCountry = {
     wealth_b: string;
 }
 type Country = {
+    rank: number;
     name: string;
     region: string;
     wealth: number;
@@ -41,12 +42,15 @@ type Region = {
 }
 var color: d3.ScaleOrdinal<string, unknown>;
 
+let rank :number = 1;
+
 console.log("Calling csv stuff");
 d3.csv("/blogposts/WorldWealth.csv", function( country :rawCountry, i, columns){
     if(!country.wealth_b) country.wealth_b = "0";
 
     if(country.region) {
         const result :Country = {
+            rank: rank++,
             name: country.country,
             region: country.region,
             wealth: parseInt(country.wealth_b)
@@ -96,8 +100,11 @@ d3.csv("/blogposts/WorldWealth.csv", function( country :rawCountry, i, columns){
             sSearch: ""
         },
         pageLength: 10,
-        order: [2, 'desc'],
+        order: [3, 'desc'],
         columns: [{
+            data: "rank",
+            title: "Rank"
+        },{
             data: "name",
             title: "Country"
         },{
