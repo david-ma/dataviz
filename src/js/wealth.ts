@@ -42,7 +42,7 @@ type Region = {
 var color: d3.ScaleOrdinal<string, unknown>;
 
 console.log("Calling csv stuff");
-d3.csv("/wealth/WorldWealth.csv", function( country :rawCountry, i, columns){
+d3.csv("/blogposts/WorldWealth.csv", function( country :rawCountry, i, columns){
     if(!country.wealth_b) country.wealth_b = "0";
 
     if(country.region) {

@@ -1,14 +1,22 @@
+<style>
+#desktopSearch .blogSearch {
+    width: 100%;
+}
+</style>
+
 <div id="mobile_nav" class="visible-xs">
     <div id="title">
         <h1>David's Dataviz</h1>
     </div>
+    {{! 
     <div id="search">
-        <input>
+        <input class="blogSearch" placeholder="Search">
         <i class="fas fa-search fa-2x"></i>
     </div>
     <div id="hamburger">
         <i class="fas fa-bars fa-2x"></i>
     </div>
+     }}
 </div>
 <div class="col-md-2 col-sm-3 hidden-xs sidebar">
     <ul>
@@ -16,7 +24,7 @@
             <a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
             <div id="aboutMe" class='hidden'></div>
         </li>
-        <li><input placeholder="Search"></li>
+        {{! <li id="desktopSearch"><input class="blogSearch" placeholder="Search"></li> }}
         <ul>
             {{#blogposts}}
                 <li><a href="/blog/{{shortname}}">{{title}}</a></li>
@@ -24,6 +32,3 @@
         </ul>
     </ul>
 </div>
-
-
-

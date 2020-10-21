@@ -29,7 +29,7 @@ type war = {
 
 
 console.log("Calling csv stuff");
-d3.csv("/war/AmericanWars.csv", <any>function (d :war) {
+d3.csv("/blogposts/AmericanWars.csv", <any>function (d :war) {
 
     d.start = parseInt(d.start as string);
     d.end = parseInt(d.end as string) || "";
