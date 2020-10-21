@@ -204,10 +204,12 @@ globalThis.tree = tree;
                 .size([rWidth, rHeight])
                 .padding(2)
                 (regionRoot);
+
+            var regionGroupTranslate = `translate(${d.x0},${d.y0})`;
             
             var regionGroup = svg.append("g").attrs({
                 id: `${classifyName(d.data.name)}`,
-                transform: `translate(${d.x0},${d.y0})`
+                transform: regionGroupTranslate
             })
 
             regionGroup.selectAll("rect.country")
@@ -230,15 +232,18 @@ globalThis.tree = tree;
                 }).on("mouseout", function(d){
                     d3.select(`#row-${classifyName(d.data.name)}`).classed("highlight", false);
                 }).on("click", function(d){
+                    console.log("Zoom in!");
+
                     $(".plot").append($(`#${classifyName(d.data.region)}`).detach());
                     datatable.search(d.data.region).draw();
 
-                    regionTree = d3.treemap()
+                    var zoomedRegionTree = d3.treemap()
                     .size([width, height])
                     .padding(2)
                     (regionRoot);
     
                     var speed = 1000;
+                    var done = false;
         
                     regionGroup
                         .transition()
@@ -247,7 +252,7 @@ globalThis.tree = tree;
                             transform: `translate(0,0)`
                         })
                     regionGroup.selectAll("rect.country")
-                        .data(regionTree.leaves())
+                        .data(zoomedRegionTree.leaves())
                         .transition()
                         .duration(speed)
                         .attr('x', function (d) { return d.x0; })
@@ -255,34 +260,73 @@ globalThis.tree = tree;
                         .attr('width', function (d) { return d.x1 - d.x0; })
                         .attr('height', function (d) { return d.y1 - d.y0; })
                         .on("end", function(d){
+                            if(!done) {
+                                done = true;
+                                console.log("Finished zooming in");
 
-                            // and to add the text labels
-                            regionGroup
-                                .selectAll("text")
-                                .data(regionTree.leaves())
-                                .enter()
-                                .append("text")
-                                .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
-                                .attr("y", function(d){ return d.y0+20})    // +20 to adjust position (lower)
-                                .text(function(d){ return d.data.name })
-                                .attr("font-size", "19px")
-                                .attr("font-weight", "700")
-                                .attr("fill", "black");
+                                // and to add the text labels
+                                regionGroup
+                                    .selectAll("text")
+                                    .data(zoomedRegionTree.leaves())
+                                    .enter()
+                                    .append("text")
+                                    .classed("tempText", true)
+                                    .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
+                                    .attr("y", function(d){ return d.y0+20})    // +20 to adjust position (lower)
+                                    .text(function(d){ return d.data.name })
+                                    .attr("font-size", "19px")
+                                    .attr("font-weight", "700")
+                                    .attr("fill", "black");
 
-                            // and to add the text labels
-                            regionGroup
-                                .selectAll("vals")
-                                .data(regionTree.leaves())
-                                .enter()
-                                .append("text")
-                                .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
-                                .attr("y", function(d){ return d.y0+35})    // +20 to adjust position (lower)
-                                .text(function(d){ return `${d3.format("$,")(d.data.wealth)} billion` })
-                                .attr("font-size", "11px")
-                                .attr("fill", "black");
+                                // and to add the text labels
+                                regionGroup
+                                    .selectAll(".countryVals")
+                                    .data(zoomedRegionTree.leaves())
+                                    .enter()
+                                    .append("text")
+                                    .classed("tempText", true)
+                                    .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
+                                    .attr("y", function(d){ return d.y0+35})    // +20 to adjust position (lower)
+                                    .text(function(d){ return `${d3.format("$,")(d.data.wealth)} billion` })
+                                    .attr("font-size", "11px")
+                                    .attr("fill", "black");
 
+                                    svg.append("rect").attrs({
+                                        id: "blocker",
+                                        x: 0,
+                                        y: 0,
+                                        width: width,
+                                        height: height,
+                                        fill: "rgba(0,0,0,0)"
+                                    }).on("click", function(){
+                                        console.log("Reverse time!!!");
+                                        d3.selectAll(".tempText").remove();
 
+                                        var regionTree = d3.treemap()
+                                        .size([rWidth, rHeight])
+                                        .padding(2)
+                                        (regionRoot);
+
+                                        regionGroup
+                                            .transition()
+                                            .duration(speed)
+                                            .attrs({
+                                                transform: regionGroupTranslate
+                                            });
+                                        regionGroup.selectAll("rect.country")
+                                            .data(regionTree.leaves())
+                                            .transition()
+                                            .duration(speed)
+                                            .attr('x', function (d) { return d.x0; })
+                                            .attr('y', function (d) { return d.y0; })
+                                            .attr('width', function (d) { return d.x1 - d.x0; })
+                                            .attr('height', function (d) { return d.y1 - d.y0; });
+
+                                        d3.select("#blocker").remove();
+                                    });
+                            }
                         });
+
 
                 });
 
