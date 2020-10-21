@@ -11,7 +11,7 @@ Canada,North America,8573
 Spain,Europe,7772
 Korea,Asia-Pacific,7302
 Australia,Asia-Pacific,7202
-Taiwan (Chinese Taipei),Asia-Pacific,4062
+Taiwan,Asia-Pacific,4062
 Switzerland,Europe,3877
 Netherlands,Europe,3719
 Brazil,Latin America,3535
@@ -96,8 +96,6 @@ Tanzania,Africa,82
 Estonia,Europe,81
 Libya,Africa,81
 Bolivia,Latin America,78
-Bosnia and Herzegovina,,
-Europe,,
 Uruguay,Latin America,76
 Yemen,Asia-Pacific,72
 Albania,Europe,70
@@ -153,8 +151,6 @@ Guinea,Africa,14
 Somalia,Africa,14
 Burkina Faso,Africa,13
 Equatorial Guinea,Africa,13
-Northern Mariana Islands,,
-Asia-Pacific,,
 Benin,Africa,12
 Malawi,Africa,12
 Mongolia,Asia-Pacific,12
@@ -194,16 +190,12 @@ Tonga,Asia-Pacific,3
 Antigua and Barbuda,Latin America,2
 Belize,Latin America,2
 Cayman Islands,Latin America,2
-Central African Republic,,
-Africa,,
 Comoros,Africa,2
 Djibouti,Africa,2
 Dominica,Latin America,2
 Gambia,Africa,2
 Guinea-Bissau,Africa,2
 Lesotho,Africa,2
-St. Vincent and the Grenadines,,
-Latin America,,
 Suriname,Latin America,2
 Vanuatu,Asia-Pacific,2
 American Samoa,Asia-Pacific,1
