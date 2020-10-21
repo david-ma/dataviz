@@ -118,7 +118,8 @@ d3.csv("/blogposts/WorldWealth.csv", function( country :rawCountry, i, columns){
             }
         }],
         rowCallback: function(row, data){
-            d3.select(row).style("background", color(data.region) as string)
+            d3.select(row).attr("id", `row-${classifyName(data.name)}`)
+                .style("background", color(data.region) as string)
                 .on("mouseenter", function(d){
                     d3.select(`#${classifyName(data.name)}`).classed("highlight", true);
                 }).on("mouseout", function(d){
@@ -222,6 +223,11 @@ globalThis.tree = tree;
                 .style("fill", color(d.data.name))
                 .style("opacity", function(d:any){
                     return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1;
+                })
+                .on("mouseover", function(d){
+                    d3.select(`#row-${classifyName(d.data.name)}`).classed("highlight", true);
+                }).on("mouseout", function(d){
+                    d3.select(`#row-${classifyName(d.data.name)}`).classed("highlight", false);
                 });
 
 /*
@@ -285,7 +291,7 @@ globalThis.tree = tree;
 }
 
 function classifyName ( name :string) :string  {
-    return name.replace(" ", "-");
+    return name.replace(/[ \(\)]/gi, "-");
 }
 
 
