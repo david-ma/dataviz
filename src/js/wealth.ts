@@ -206,6 +206,7 @@ globalThis.tree = tree;
                 (regionRoot);
             
             var regionGroup = svg.append("g").attrs({
+                id: `${classifyName(d.data.name)}`,
                 transform: `translate(${d.x0},${d.y0})`
             })
 
@@ -228,32 +229,67 @@ globalThis.tree = tree;
                     d3.select(`#row-${classifyName(d.data.name)}`).classed("highlight", true);
                 }).on("mouseout", function(d){
                     d3.select(`#row-${classifyName(d.data.name)}`).classed("highlight", false);
+                }).on("click", function(d){
+                    $(".plot").append($(`#${classifyName(d.data.region)}`).detach());
+
+                    regionTree = d3.treemap()
+                    .size([width, height])
+                    .padding(2)
+                    (regionRoot);
+    
+                    var speed = 1000;
+        
+                    regionGroup
+                        .transition()
+                        .duration(speed)
+                        .attrs({
+                            transform: `translate(0,0)`
+                        })
+                    regionGroup.selectAll("rect.country")
+                        .data(regionTree.leaves())
+                        .transition()
+                        .duration(speed)
+                        .attr('x', function (d) { return d.x0; })
+                        .attr('y', function (d) { return d.y0; })
+                        .attr('width', function (d) { return d.x1 - d.x0; })
+                        .attr('height', function (d) { return d.y1 - d.y0; })
+
+
+                    // and to add the text labels
+                    regionGroup
+                    .selectAll("text")
+                    .data(regionTree.leaves())
+                    .enter()
+                    .append("text")
+                    .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
+                    .attr("y", function(d){ return d.y0+20})    // +20 to adjust position (lower)
+                    .text(function(d){ return d.data.name })
+                    .attr("font-size", "19px")
+                    .attr("font-weight", "700")
+                    .attr("fill", "black")
+
+                    // and to add the text labels
+                    regionGroup
+                        .selectAll("vals")
+                        .data(regionTree.leaves())
+                        .enter()
+                        .append("text")
+                        .attr("x", function(d){ return d.x0+5})    // +10 to adjust position (more right)
+                        .attr("y", function(d){ return d.y0+35})    // +20 to adjust position (lower)
+                        .text(function(d){ return `${d3.format("$,")(d.data.wealth)} billion` })
+                        .attr("font-size", "11px")
+                        .attr("fill", "black")
+
+
+
+
+
+
                 });
 
-/*
-            regionTree = d3.treemap()
-                .size([width, height])
-                .padding(2)
-                (regionRoot);
 
-            var speed = 1000;
 
-            regionGroup
-                .transition()
-                .duration(speed)
-                .attrs({
-                    transform: `translate(0,0)`
-                })
-            regionGroup.selectAll("rect.country")
-                .data(regionTree.leaves())
-                .transition()
-                .duration(speed)
-                .attr('x', function (d) { return d.x0; })
-                .attr('y', function (d) { return d.y0; })
-                .attr('width', function (d) { return d.x1 - d.x0; })
-                .attr('height', function (d) { return d.y1 - d.y0; })
-*/
-        })
+            })
         .on('click', function(d, i){
             console.log(d);
             datatable.search(d.data.name).draw();
@@ -285,13 +321,12 @@ globalThis.tree = tree;
       .text(function(d){ return `${d3.format("$,")(d.data.wealth)} billion` })
       .attr("font-size", "11px")
       .attr("fill", "black")
-
     });
 
 }
 
 function classifyName ( name :string) :string  {
-    return name.replace(/[ \(\)]/gi, "-");
+    return name.replace(/[ \(\)\.\']/gi, "-");
 }
 
 
