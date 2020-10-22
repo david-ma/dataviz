@@ -276,7 +276,14 @@ globalThis.tree = tree;
                                     .text(function(d){ return d.data.name })
                                     .attr("font-size", "19px")
                                     .attr("font-weight", "700")
-                                    .attr("fill", "black");
+                                    .attr("fill", "black")
+                                    .each(function(d){
+                                        const width = d.x1 - d.x0,
+                                            node = d3.select(this).node();
+                                        if ( node != null && width < node.getBBox().width) {
+                                            d3.select(this).remove();
+                                        }
+                                    });
 
                                 // and to add the text labels
                                 regionGroup
@@ -289,7 +296,14 @@ globalThis.tree = tree;
                                     .attr("y", function(d){ return d.y0+35})    // +20 to adjust position (lower)
                                     .text(function(d){ return `${d3.format("$,")(d.data.wealth)} billion` })
                                     .attr("font-size", "11px")
-                                    .attr("fill", "black");
+                                    .attr("fill", "black")
+                                    .each(function(d){
+                                        const width = d.x1 - d.x0,
+                                            node = d3.select(this).node();
+                                        if ( node != null && width < node.getBBox().width) {
+                                            d3.select(this).remove();
+                                        }
+                                    });
 
                                     svg.append("rect").attrs({
                                         id: "blocker",
@@ -301,6 +315,8 @@ globalThis.tree = tree;
                                     }).on("click", function(){
                                         console.log("Reverse time!!!");
                                         d3.selectAll(".tempText").remove();
+                                        datatable.search('').draw();
+
 
                                         var regionTree = d3.treemap()
                                         .size([rWidth, rHeight])
