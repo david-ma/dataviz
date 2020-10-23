@@ -6,15 +6,27 @@ const OAUTH_ORIGIN = 'https://api.smugmug.com',
 
     API_ORIGIN = 'https://api.smugmug.com',
 
-    key = "KEY-GOES-HERE",
-    secret = "SECRET-GOES-HERE"
+    consumer_key = "KEY-GOES-HERE",
+    consumer_secret = "SECRET-GOES-HERE",
+    oauth_token = "paste-token-here",
+    oauth_token_secret = "paste-token-secret-here"
 
 
-var params = {
+
+var params :any = {
     access: "Full",
     permissions: "Modify",
-    oauth_callback: "https://dataviz.david-ma.net/smugmug-test.html"
+    oauth_callback: encodeURIComponent("https://dataviz.david-ma.net/smugmug-test.html"),
+    oauth_consumer_key: consumer_key,
+    oauth_nonce: Math.random().toString().replace("0.",""),
+    oauth_signature_method: "HMAC-SHA1",
+    oauth_timestamp: Date.now(),
+    oauth_token: oauth_token
 }
+var normalized = encodeURIComponent($.param(params));
+var method = "GET";
+
+params.oauth_signature = b64_hmac_sha1(`${consumer_secret}&${oauth_token}`, `${method}&${encodeURIComponent(REQUEST_TOKEN_URL)}&${normalized}`);
 
 // console.log($.param(params));
 
@@ -27,18 +39,23 @@ d3.select("#authorise").attrs({
 
 
 
+
+
+
+
+
 var token = "";
 var method = "GET";
 var requestParams :any = {
     oauth_callback: encodeURIComponent("https://dataviz.david-ma.net/smugmug-test.html"),
-    oauth_consumer_key: key,
+    oauth_consumer_key: consumer_key,
     oauth_nonce: Math.random().toString().replace("0.",""),
     oauth_signature_method: "HMAC-SHA1",
     oauth_timestamp: Date.now()
 }
 var normalized = encodeURIComponent($.param(requestParams));
 
-requestParams.oauth_signature = b64_hmac_sha1(`${secret}&${token}`, `${method}&${encodeURIComponent(REQUEST_TOKEN_URL)}&${normalized}`);
+requestParams.oauth_signature = b64_hmac_sha1(`${consumer_secret}&${token}`, `${method}&${encodeURIComponent(REQUEST_TOKEN_URL)}&${normalized}`);
 
 console.log("requestParams", requestParams);
 
@@ -64,11 +81,34 @@ $("#requestToken").on("click", function(d){
 
 })
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 globalThis.smugmug = smugmug;
 function smugmug () {
     $.ajax({
         method: "GET",
-        url: `https://api.smugmug.com/api/v2/user/frostickle?APIKey=${key}`,
+        url: `https://api.smugmug.com/api/v2/user/frostickle?APIKey=${consumer_key}`,
         headers: {
             Accept: "application/json; charset=utf-8"
         },
@@ -82,7 +122,7 @@ function smugmug () {
     })
 }
 
-    
+
 
 
 // https://github.com/pH200/hmacsha1-js
