@@ -242,7 +242,7 @@ function viewFolders () {
 
 
 $(document).ready(function (e) {
-    $('#imageUploadForm').on('submit',(function(e) {
+    $('#imageUploadForm').on('submit',(function(this :HTMLFormElement, e) {
 
         console.log("hey, clicking ");
 
