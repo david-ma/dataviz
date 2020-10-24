@@ -4,15 +4,16 @@ var fs = require('fs');
 var https = require("https");
 var mime = require('mime');
 var crypto = require('crypto');
+var _ = require('lodash');
 exports.config = {
     services: {
         "test": function (res, req, db, type) {
             res.end("Hello World");
         },
         "uploadPhoto": function (res, req, db, type) {
-            const uploadFolder = `${__dirname}/../tmp/`;
+            const uploadFolder = `${__dirname}/../data/tmp/`;
             const form = formidable();
-            console.log("uploading files to ", uploadFolder);
+            // console.log("uploading files to ", uploadFolder);
             form.parse(req, (err, fields, files) => {
                 Object.keys(files).forEach((inputfield) => {
                     var file = files[inputfield];
@@ -22,16 +23,37 @@ exports.config = {
                         var data = fs.readFileSync(newLocation);
                         console.log(`data.length is:`, data.length);
                         console.log("Buffer length..?", Buffer.byteLength(data));
-                        console.log("Filetype", filetype);
+                        // console.log("Filetype", filetype);
                         // console.log("data is", data);
-                        var host = 'photos.david-ma.net';
-                        var path = '/api/v2/album/jHhcL7!images';
+                        var host = 'api.smugmug.com';
+                        // var host = 'api.smugmug.com'
+                        // var path = '/api/v2/node/QdvhkM'
+                        // var path = '/api/v2/album/jHhcL7'
+                        var path = '/api/v2/album/jHhcL7!uploadfromuri';
+                        // var path = '/api/v2/album/jHhcL7!images'
                         var target_url = `https://${host}${path}`;
                         // var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
                         var method = "POST";
-                        var params = signRequest(method, target_url);
-                        console.log("Authorization", bundleAuthorization(target_url, params));
                         var MD5 = crypto.createHash('md5').update(data).digest("hex");
+                        var package = {
+                            "ByteCount": Buffer.byteLength(data),
+                            "Caption": "",
+                            "Hidden": false,
+                            "Keywords": null,
+                            "MD5Sum": MD5,
+                            "Title": "",
+                            "Cookie": "cookieGoesHereLol",
+                            "FileName": "",
+                            "AllowInsecure": false,
+                            "Uri": `https://dataviz.david-ma.net/tmp/${file.name}`
+                        };
+                        const packageData = JSON.stringify(package);
+                        var extraParams = {
+                        // ByteCount: Buffer.byteLength(data),
+                        // MD5Sum: MD5
+                        };
+                        var params = signRequest(method, target_url, extraParams);
+                        console.log("Authorization", bundleAuthorization(target_url, params));
                         console.log("MD5", MD5);
                         var options = {
                             // host: 'photos.david-ma.net',
@@ -44,17 +66,19 @@ exports.config = {
                             method: method,
                             headers: {
                                 Authorization: bundleAuthorization(target_url, params),
-                                'X-Smug-FileName': "blah",
-                                'X-Smug-Title': "blahblah",
+                                // 'Content-Type': filetype,
+                                // 'X-Smug-AlbumUri': path,
+                                // 'X-Smug-ResponseType': 'JSON',
+                                // 'X-Smug-Version': 'v2',
+                                // 'X-Smug-FileName': "blah",
+                                // 'X-Smug-Title': "blahblah",
                                 // 'X-Smug-AlbumUri': '/api/v2/album/jHhcL7',
                                 // 'X-Smug-AlbumUri': '/api/v2/node/QdvhkM',
-                                'X-Smug-AlbumUri': path,
-                                'X-Smug-ResponseType': 'JSON',
-                                'X-Smug-Version': 'v2',
-                                'Content-Type': filetype,
-                                'Content-MD5': MD5,
-                                Connection: "keep-alive",
-                                'Content-Length': Buffer.byteLength(data),
+                                // 'Content-MD5': MD5,
+                                // host: '122.150.70.136:1337',
+                                // Connection: "keep-alive",
+                                'Content-Type': 'application/json',
+                                'Content-Length': packageData.length,
                                 Accept: "application/json; charset=utf-8"
                             }
                         };
@@ -70,7 +94,7 @@ exports.config = {
                             console.log('problem with request: ' + e.message);
                             console.log(e);
                         });
-                        req.write(data);
+                        req.write(packageData);
                         req.end();
                         res.end("success");
                     });
@@ -170,16 +194,26 @@ function bundleAuthorization(url, params) {
 function expandParams(params) {
     return Object.keys(params).map(key => `${key}=${params[key]}`).join("&");
 }
-function signRequest(method, target_url) {
+function signRequest(method, target_url, extraParams) {
     var normalParams = {
         oauth_consumer_key: tokens.consumer_key,
         oauth_nonce: Math.random().toString().replace("0.", ""),
         oauth_signature_method: "HMAC-SHA1",
         oauth_timestamp: Date.now(),
         oauth_token: tokens.oauth_token,
+        oauth_token_secret: tokens.oauth_token_secret,
         oauth_version: "1.0"
     };
-    var normalized = oauthEscape(expandParams(normalParams));
+    var normalized = oauthEscape(expandParams(sortParams(_.merge(normalParams, extraParams))));
     normalParams.oauth_signature = b64_hmac_sha1(`${tokens.consumer_secret}&${tokens.oauth_token_secret}`, `${method}&${oauthEscape(target_url)}&${normalized}`);
     return normalParams;
+}
+function sortParams(object) {
+    var keys = Object.keys(object).sort();
+    var result = {};
+    keys.forEach(function (key) {
+        result[key] = object[key];
+    });
+    console.log(result);
+    return result;
 }

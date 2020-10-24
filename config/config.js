@@ -12,7 +12,7 @@ var fs = require('fs');
 const fsPromise = fs.promises;
 const mustache = require('mustache');
 var formidable = require('formidable');
-const _ = require('lodash');
+var _ = require('lodash');
 // These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.
 var xray, request, tabletojson;
 var scrapingToolsLoaded = false;
