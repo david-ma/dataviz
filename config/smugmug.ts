@@ -39,41 +39,50 @@ exports.config = {
                         console.log("Filetype", filetype);
                         // console.log("data is", data);
 
-                        var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
+
+                        var host = 'photos.david-ma.net'
+                        var path = '/api/v2/album/jHhcL7!images'
+                        var target_url = `https://${host}${path}`
+
+                        // var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
                         var method = "POST";
                         var params = signRequest(method, target_url);
 
-                        // console.log("Authorization", bundleAuthorization(target_url, params));
+                        console.log("Authorization", bundleAuthorization(target_url, params));
 
                         var MD5 = (<any>crypto).createHash('md5').update(data).digest("hex");
                         console.log("MD5", MD5);
 
                         var options = {
                             // host: 'photos.david-ma.net',
-                            host: 'upload.smugmug.com',
+                            // host: 'upload.smugmug.com',
+                            host: host,
                             port: 443,
                             // path: '/api/v2/album/jHhcL7',
-                            path: '/api/v2/node/QdvhkM',
+                            // path: '/api/v2/node/QdvhkM',
+                            path: path,
                             method: method,
 
                             headers: {
+                                Authorization: bundleAuthorization(target_url, params),
                                 
                                 'X-Smug-FileName': "blah",
                                 'X-Smug-Title': "blahblah",
                                 // 'X-Smug-AlbumUri': '/api/v2/album/jHhcL7',
-                                'X-Smug-AlbumUri': '/api/v2/node/QdvhkM',
+                                // 'X-Smug-AlbumUri': '/api/v2/node/QdvhkM',
+                                'X-Smug-AlbumUri': path,
                                 'X-Smug-ResponseType': 'JSON',
                                 'X-Smug-Version': 'v2',
                                 'Content-Type': filetype,
                                 'Content-MD5': MD5,
+                                Connection: "keep-alive",
                                 'Content-Length': Buffer.byteLength(data),
-                                Authorization: bundleAuthorization(target_url, params),
                                 Accept: "application/json; charset=utf-8"                
                             }
                         };
 
 
-                        var req = https.request(options, function(res :IncomingMessage) {
+                        var req = https.request(options, function(res) {
                             console.log('STATUS: ' + res.statusCode);
                             console.log('HEADERS: ' + JSON.stringify(res.headers));
 

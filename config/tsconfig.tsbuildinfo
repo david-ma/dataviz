@@ -167,7 +167,7 @@
         "affectsGlobalScope": true
       },
       "./smugmug.ts": {
-        "version": "5d106bd2049c49558312efdcddffca1de6cbc77fb80d52d19fba072b81cb58bd",
+        "version": "721d4844013cbed8809386ea851f7102636bbea580988a72895fb4a1e448c8c5",
         "signature": "d8e26b7ab4fdad1ceca78dd44f0ffe2071f427a5bb9a57b5b7d9ea93887a20c5",
         "affectsGlobalScope": true
       },
@@ -1379,19 +1379,7 @@
       "../../../node_modules/@types/sizzle/index.d.ts",
       "./config.ts",
       "./db_bootstrap.ts",
-      [
-        "./smugmug.ts",
-        [
-          {
-            "file": "./smugmug.ts",
-            "start": 3111,
-            "length": 15,
-            "messageText": "Cannot find name 'IncomingMessage'.",
-            "category": 1,
-            "code": 2304
-          }
-        ]
-      ]
+      "./smugmug.ts"
     ]
   },
   "version": "4.0.3"
