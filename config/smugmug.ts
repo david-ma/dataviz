@@ -7,6 +7,9 @@ const tokens :{
 
 var formidable = require('formidable');
 var fs = require('fs');
+var https = require("https");
+var mime = require('mime');
+var crypto :Crypto = require('crypto');
 
 exports.config = {
     services : {
@@ -27,8 +30,78 @@ exports.config = {
 					var newLocation = uploadFolder + file.name;
 
 					fs.rename(file.path, newLocation, function(err){
+
+                        const filetype = mime.getType(newLocation);
+                        var data = fs.readFileSync(newLocation);
+
+                        console.log(`data.length is:`,data.length);
+                        console.log("Buffer length..?", Buffer.byteLength(data));
+                        console.log("Filetype", filetype);
+                        // console.log("data is", data);
+
+                        var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
+                        var method = "POST";
+                        var params = signRequest(method, target_url);
+
+                        // console.log("Authorization", bundleAuthorization(target_url, params));
+
+                        var MD5 = (<any>crypto).createHash('md5').update(data).digest("hex");
+                        console.log("MD5", MD5);
+
+                        var options = {
+                            // host: 'photos.david-ma.net',
+                            host: 'upload.smugmug.com',
+                            port: 443,
+                            // path: '/api/v2/album/jHhcL7',
+                            path: '/api/v2/node/QdvhkM',
+                            method: method,
+
+                            headers: {
+                                
+                                'X-Smug-FileName': "blah",
+                                'X-Smug-Title': "blahblah",
+                                // 'X-Smug-AlbumUri': '/api/v2/album/jHhcL7',
+                                'X-Smug-AlbumUri': '/api/v2/node/QdvhkM',
+                                'X-Smug-ResponseType': 'JSON',
+                                'X-Smug-Version': 'v2',
+                                'Content-Type': filetype,
+                                'Content-MD5': MD5,
+                                'Content-Length': Buffer.byteLength(data),
+                                Authorization: bundleAuthorization(target_url, params),
+                                Accept: "application/json; charset=utf-8"                
+                            }
+                        };
+
+
+                        var req = https.request(options, function(res :IncomingMessage) {
+                            console.log('STATUS: ' + res.statusCode);
+                            console.log('HEADERS: ' + JSON.stringify(res.headers));
+
+                            res.setEncoding('utf8');
+                            res.on('data', function (chunk) {
+                                console.log('BODY: ' + chunk);
+                            });
+                        });
+
+                        req.on('error', function(e) {
+                            console.log('problem with request: ' + e.message);
+                            console.log(e);
+                        });
+            
+
+                        req.write(data)
+                        req.end()
+
+
+
+
+
+
+
+
+
 						res.end("success");
-					});
+                    });
 				})
 			});
 		},
@@ -74,6 +147,10 @@ function bundleAuthorization(url :string, params :object){
     return authorization
 }
 
+function expandParams(params) {
+    return Object.keys(params).map(key => `${key}=${params[key]}`).join("&")
+}
+
 function signRequest(method :string, target_url :string) {
 
     var normalParams :any = {
@@ -84,7 +161,7 @@ function signRequest(method :string, target_url :string) {
         oauth_token: tokens.oauth_token,
         oauth_version: "1.0"
     }
-    var normalized = oauthEscape($.param(normalParams));
+    var normalized = oauthEscape(expandParams(normalParams));
     
     normalParams.oauth_signature = b64_hmac_sha1(`${tokens.consumer_secret}&${tokens.oauth_token_secret}`,
     `${method}&${oauthEscape(target_url)}&${normalized}`

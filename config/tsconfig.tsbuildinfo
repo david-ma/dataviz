@@ -167,13 +167,13 @@
         "affectsGlobalScope": true
       },
       "./smugmug.ts": {
-        "version": "ea7b18e203b1174cad3ad0094e9b7113bd74d7612422c9cb306bd741e3e4f1e9",
-        "signature": "5a350b653e2995c9889eade9d91a750f6551d8448c677c5319c52ad1720877c7",
+        "version": "5d106bd2049c49558312efdcddffca1de6cbc77fb80d52d19fba072b81cb58bd",
+        "signature": "d8e26b7ab4fdad1ceca78dd44f0ffe2071f427a5bb9a57b5b7d9ea93887a20c5",
         "affectsGlobalScope": true
       },
       "./config.ts": {
-        "version": "5f2f1d05b26b860327434e12e7a3acc02add2594b329c761ca979035c52f26fb",
-        "signature": "183ff436b9529cec7b65f3a2a91ae1d317e736eddfabd0af3508c43643b90421",
+        "version": "452437b0e677dcb529b96c90fee882f650dc0956963e3e509e66c2eef05b89f4",
+        "signature": "5a6ca755c9d7359bc76fa57275a776336e7e731c3aaa31e23534fec379b106fc",
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/node/globals.d.ts": {
@@ -1379,7 +1379,19 @@
       "../../../node_modules/@types/sizzle/index.d.ts",
       "./config.ts",
       "./db_bootstrap.ts",
-      "./smugmug.ts"
+      [
+        "./smugmug.ts",
+        [
+          {
+            "file": "./smugmug.ts",
+            "start": 3111,
+            "length": 15,
+            "messageText": "Cannot find name 'IncomingMessage'.",
+            "category": 1,
+            "code": 2304
+          }
+        ]
+      ]
     ]
   },
   "version": "4.0.3"

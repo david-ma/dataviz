@@ -261,6 +261,9 @@ $(document).ready(function (e) {
             // url: `${target_url}?${$.param(params)}`,
             url: `${target_url}`,
             headers: {
+                'X-Smug-AlbumUri': '/api/v2/album/jHhcL7',
+                'X-Smug-ResponseType': 'JSON',
+                'X-Smug-Version': 'v2',
                 "Access-Control-Allow-Origin": "*",
                 Authorization: bundleAuthorization(target_url, params),
                 Accept: "application/json; charset=utf-8"
