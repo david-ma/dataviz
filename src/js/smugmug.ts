@@ -174,23 +174,46 @@ function simpleRequest () {
 
 
 
+
+
+
 globalThis.createFolder = createFolder;
 function createFolder () {
+
+    var target_url = "https://api.smugmug.com/api/v2/node/rXXjjD!children";
+    var method = "POST";
+    var params = signRequest(method, target_url);
+
+    var folderDetails = {
+        "Type": "Album",
+        "Name": "My Smug Album",
+        "UrlName": "My-Smug-Album",
+        "Privacy": "Public"
+    }
+
     $.ajax({
-        method: "POST",
-        url: `https://api.smugmug.com/api/v2/folder/frostickle/Thalia/Cats!albums?APIKey=${consumer_key}`,
+        method: method,
+        url: `${target_url}?${$.param(params)}`,
         headers: {
+            "Content-Type": "application/json",
             Accept: "application/json; charset=utf-8"
         },
-        data: {"NiceName": "Big-Cats", "Title": "Big Cats", "Privacy": "Public"},
+        data: JSON.stringify(folderDetails),
         success: function (d) {
             console.log("Success", d);
+            console.log("Response", d.Response);
+            console.log("Keys: "+Object.keys(d.Response).join(", "));
         },
         error: function(error) {
             console.error(error);
         }
     })
 }
+
+
+
+
+
 
 
 var tester = {
