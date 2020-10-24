@@ -167,13 +167,13 @@
         "affectsGlobalScope": true
       },
       "./smugmug.ts": {
-        "version": "9f08ac52d3b679c3c3ff157cc6e28d83740f0f91b5ad013e18f6659f50704473",
-        "signature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "version": "ea7b18e203b1174cad3ad0094e9b7113bd74d7612422c9cb306bd741e3e4f1e9",
+        "signature": "5a350b653e2995c9889eade9d91a750f6551d8448c677c5319c52ad1720877c7",
         "affectsGlobalScope": true
       },
       "./config.ts": {
-        "version": "fdaa112e1a554feb65709d862bd41a90e5cc916f4264469c33f2879053f4e80f",
-        "signature": "5e1fd47d0cae42b9339ff773623fafba3ac07af65c1109e41e99f4f543e74993",
+        "version": "5f2f1d05b26b860327434e12e7a3acc02add2594b329c761ca979035c52f26fb",
+        "signature": "183ff436b9529cec7b65f3a2a91ae1d317e736eddfabd0af3508c43643b90421",
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/node/globals.d.ts": {

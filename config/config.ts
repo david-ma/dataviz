@@ -1,8 +1,8 @@
 const http = require("http");
-const fs = require('fs');
+var fs = require('fs');
 const fsPromise = fs.promises;
 const mustache = require('mustache');
-const formidable = require('formidable');
+var formidable = require('formidable');
 const _ = require('lodash');
 
 // These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.

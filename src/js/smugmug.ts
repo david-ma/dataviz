@@ -250,7 +250,8 @@ $(document).ready(function (e) {
         var formData = new FormData(this);
 
 
-        var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
+        var target_url = "/uploadPhoto";
+        // var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
         var method = "POST";
         var params = signRequest(method, target_url);
     

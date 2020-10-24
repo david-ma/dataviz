@@ -1,9 +1,25 @@
 const tokens = require('./config.json')["smugmug"];
+var formidable = require('formidable');
+var fs = require('fs');
 exports.config = {
     services: {
         "test": function (res, req, db, type) {
             res.end("Hello World");
-        }
+        },
+        "uploadPhoto": function (res, req, db, type) {
+            const uploadFolder = `${__dirname}/../tmp/`;
+            const form = formidable();
+            console.log("uploading files to ", uploadFolder);
+            form.parse(req, (err, fields, files) => {
+                Object.keys(files).forEach((inputfield) => {
+                    var file = files[inputfield];
+                    var newLocation = uploadFolder + file.name;
+                    fs.rename(file.path, newLocation, function (err) {
+                        res.end("success");
+                    });
+                });
+            });
+        },
     }
 };
 // Useful resources:
