@@ -213,6 +213,151 @@ function createFolder () {
 
 
 
+globalThis.viewFolders = viewFolders;
+function viewFolders () {
+
+    var target_url = "https://api.smugmug.com/api/v2/node/rXXjjD!children";
+    var method = "GET";
+    var params = signRequest(method, target_url);
+
+    $.ajax({
+        method: method,
+        url: `${target_url}?${$.param(params)}`,
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json; charset=utf-8"
+        },
+        // data: JSON.stringify(folderDetails),
+        success: function (d) {
+            console.log("Success", d);
+            console.log("Response", d.Response);
+            console.log("Keys: "+Object.keys(d.Response).join(", "));
+        },
+        error: function(error) {
+            console.error(error);
+        }
+    })
+}
+
+
+
+$(document).ready(function (e) {
+    $('#imageUploadForm').on('submit',(function(e) {
+
+        console.log("hey, clicking ");
+
+        e.preventDefault();
+        var formData = new FormData(this);
+
+
+        var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
+        var method = "POST";
+        var params = signRequest(method, target_url);
+    
+
+        $.ajax({
+            type: method,
+            // url: `${target_url}?${$.param(params)}`,
+            url: `${target_url}`,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                Authorization: bundleAuthorization(target_url, params),
+                Accept: "application/json; charset=utf-8"
+            },
+            data:formData,
+            cache:false,
+            contentType: false,
+            processData: false,
+            success:function(data){
+                console.log("success");
+                console.log(data);
+            },
+            error: function(data){
+                console.log("error");
+                console.log(data);
+            }
+        });
+    }));
+
+    $("#ImageBrowse").on("change", function() {
+        $("#imageUploadForm").submit();
+    });
+});
+
+
+globalThis.uploadPhoto = uploadPhoto;
+function uploadPhoto () {
+
+    var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
+    var method = "POST";
+    var params = signRequest(method, target_url);
+
+    var folderDetails = {
+        "Type": "Album",
+        "Name": "My Smug Album",
+        "UrlName": "My-Smug-Album",
+        "Privacy": "Public"
+    }
+
+    $.ajax({
+        method: method,
+        url: `${target_url}?${$.param(params)}`,
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json; charset=utf-8"
+        },
+        data: JSON.stringify(folderDetails),
+        success: function (d) {
+            console.log("Success", d);
+            console.log("Response", d.Response);
+            console.log("Keys: "+Object.keys(d.Response).join(", "));
+        },
+        error: function(error) {
+            console.error(error);
+        }
+    })
+}
+
+
+
+// Put authorisation in a realm in the header, instead of a query string in the URL.
+globalThis.authFolders = authFolders;
+function authFolders () {
+
+    var target_url = "https://api.smugmug.com/api/v2/node/rXXjjD!children";
+    var method = "GET";
+    var params = signRequest(method, target_url);
+
+    $.ajax({
+        method: method,
+        // url: `${target_url}?${$.param(params)}`,
+        url: `${target_url}`,
+        headers: {
+            Authorization: bundleAuthorization(target_url, params),
+            "Content-Type": "application/json",
+            Accept: "application/json; charset=utf-8"
+        },
+        // data: JSON.stringify(folderDetails),
+        success: function (d) {
+            console.log("Success", d);
+            console.log("Response", d.Response);
+            console.log("Keys: "+Object.keys(d.Response).join(", "));
+        },
+        error: function(error) {
+            console.error(error);
+        }
+    })
+}
+
+
+
+
+
+
+
+
+
+
 
 
 // Useful resources:
@@ -243,6 +388,11 @@ function oauthEscape(string :string) {
     replace(/\)/g, "%29");
 };
 
+function bundleAuthorization(url :string, params :object){
+    var keys = Object.keys(params);
+    var authorization = `OAuth realm="${url}",${keys.map(key => `${key}="${params[key]}"`).join(",")}`;
+    return authorization
+}
 
 function signRequest(method :string, target_url :string) {
 
