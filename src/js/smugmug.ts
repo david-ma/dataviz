@@ -239,7 +239,13 @@ var exampleKey = "kd94hf93k423kf44&pfkkdhi9sl3r4s00"
 
 type key = string;
 
+
+// Useful resources:
+// https://oauth.net/core/1.0a/
+// https://medium.com/@imashishmathur/0auth-a142656859c6
+// https://developer.chrome.com/extensions/examples/extensions/oauth_contacts/chrome_ex_oauthsimple.js
 // https://github.com/pH200/hmacsha1-js
+
 function b64_hmac_sha1(k :key, d, _p ?, _z ?) {
     // heavily optimized and compressed version of http://pajhome.org.uk/crypt/md5/sha1.js
     // _p = b64pad, _z = character size; not used here but I left them available just in case
