@@ -17,7 +17,6 @@ const OAUTH_ORIGIN = 'https://api.smugmug.com',
 
 
 
-declare function OAuthSimple(consumer_key: string, shared_secret: string): any;
 
 
 var params :any = {
@@ -73,21 +72,7 @@ d3.select("#requestToken").attrs({
 });
 
 
-// Doesn't work because of CORS or something..?
-// $("#requestToken").on("click", function(d){
-//     console.log("requesting token!");
-//     $.ajax({
-//         method: method,
-//         contentType: "x-www-form-urlencoded",
-//         headers: requestParams,
-//         data: requestParams,
-//         url: REQUEST_TOKEN_URL+"?"+$.param(requestParams),
-//         complete: function(d){
-//             console.log(d);
-//         }
-//     })
 
-// })
 
 
 
@@ -133,19 +118,9 @@ d3.select("#access").attrs({
 
 
 
-
-// <reference path="../oauthsimple.js" />
-
-
-// var OAuthSimple = require("../oauthsimple");
-// import {OAuthSimple} from '../oauthsimple';
-// console.log(OAuthSimple);
-
-
-
 var target_url = "https://photos.david-ma.net/api/v2!siteuser";
 target_url = "https://api.smugmug.com/api/v2!authuser";
-// target_url = "https://api.smugmug.com/api/v2/node/md3GVt!children";
+target_url = "https://api.smugmug.com/api/v2/node/SCSW8!children";
 
 
 var normalParams :any = {
@@ -159,41 +134,10 @@ var normalParams :any = {
 var normalized = oauthEscape($.param(normalParams));
 var method = "GET";
 
-console.log("Normalised... ",normalized);
-
 var oauth_signature = b64_hmac_sha1(`${consumer_secret}&${access_token_secret}`,
-// `${normalized}`
-// `${encodeURIComponent(target_url)}&${normalized}`
-// `${method}&${encodeURIComponent(target_url)}&${normalized}`
-// `${method}&${encodeURIComponent("https://photos.david-ma.net")}&${encodeURIComponent("/api/v2!siteuser")}&${normalized}`
 `${method}&${oauthEscape(target_url)}&${normalized}`
-// `&${oauthEscape(target_url)}&${normalized}`
-// `&&${normalized}`
 );
-console.log("Shit", `${method}&${oauthEscape(target_url)}&${normalized}`);
 
-// normalParams.oauth_signature = encodeURIComponent(normalParams.oauth_signature);
-
-console.log(normalParams.oauth_signature);
-
-console.log(`${$.param(normalParams)}`)
-
-console.log(`What we send: ${target_url}?${$.param(normalParams)}`);
-
-
-var oauthObject = OAuthSimple(consumer_key, consumer_secret)
-    .setTokensAndSecrets({
-        oauth_token: access_token,
-        oauth_secret: access_token_secret
-    })
-    .sign({
-        path: target_url,
-        parameters: $.param(normalParams)
-    });
-console.log("Simple stuff: ", oauthObject);
-
-console.log(encodeURIComponent(oauth_signature));
-console.log(oauthObject.signature);
 
 globalThis.smugmug = smugmug;
 function smugmug () {
@@ -202,14 +146,9 @@ function smugmug () {
     $.ajax({
         method: method,
         url: `${target_url}?${decodeURIComponent($.param(normalParams))}&oauth_signature=${encodeURIComponent(oauth_signature)}`,
-        // url: `https://api.smugmug.com/api/v2/user/frostickle!nodes?APIKey=${consumer_key}`,
         headers: {
-            // "Content-Type": "application/json",
-            // Authorization: `Oauth realm="${'https://api.smugmug.com/'}"`,
-            // "withCredentials": true,
             Accept: "application/json; charset=utf-8"
         },
-        // data: "data",
         success: function (d) {
             console.log("Success", d);
             console.log("Response", d.Response);
@@ -246,7 +185,8 @@ function simpleRequest () {
 }
 
 
-// frostickle primary node: SCSW8
+
+
 
 globalThis.createFolder = createFolder;
 function createFolder () {
