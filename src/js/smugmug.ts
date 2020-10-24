@@ -9,13 +9,15 @@ const OAUTH_ORIGIN = 'https://api.smugmug.com',
     consumer_key = "KEY-GOES-HERE",
     consumer_secret = "SECRET-GOES-HERE",
     oauth_token = "paste-token-here",
-    oauth_token_secret = "paste-token-secret-here"
-
+    oauth_token_secret = "paste-token-secret-here",
+    oauth_verifier = "paste",
+    access_token = 'paste',
+    access_token_secret = "paste"
 
 
 var params :any = {
-    access: "Full",
-    permissions: "Modify",
+    Access: "Full",
+    Permissions: "Modify",
     oauth_callback: encodeURIComponent("https://dataviz.david-ma.net/smugmug-test.html"),
     oauth_consumer_key: consumer_key,
     oauth_nonce: Math.random().toString().replace("0.",""),
@@ -47,6 +49,7 @@ d3.select("#authorise").attrs({
 var token = "";
 var method = "GET";
 var requestParams :any = {
+    extra: "stuff",
     oauth_callback: encodeURIComponent("https://dataviz.david-ma.net/smugmug-test.html"),
     oauth_consumer_key: consumer_key,
     oauth_nonce: Math.random().toString().replace("0.",""),
@@ -66,22 +69,20 @@ d3.select("#requestToken").attrs({
 
 
 // Doesn't work because of CORS or something..?
-$("#requestToken").on("click", function(d){
-    console.log("requesting token!");
-    $.ajax({
-        method: method,
-        contentType: "x-www-form-urlencoded",
-        headers: requestParams,
-        data: requestParams,
-        url: REQUEST_TOKEN_URL+"?"+$.param(requestParams),
-        complete: function(d){
-            console.log(d);
-        }
-    })
+// $("#requestToken").on("click", function(d){
+//     console.log("requesting token!");
+//     $.ajax({
+//         method: method,
+//         contentType: "x-www-form-urlencoded",
+//         headers: requestParams,
+//         data: requestParams,
+//         url: REQUEST_TOKEN_URL+"?"+$.param(requestParams),
+//         complete: function(d){
+//             console.log(d);
+//         }
+//     })
 
-})
-
-
+// })
 
 
 
@@ -89,6 +90,31 @@ $("#requestToken").on("click", function(d){
 
 
 
+var accessParams :any = {
+    // access: "Full",
+    APIKey: consumer_key,
+    // permissions: "Modify",
+    // oauth_callback: encodeURIComponent("https://photos.david-ma.net/api/v2!siteuser"),
+    oauth_consumer_key: consumer_key,
+    oauth_nonce: Math.random().toString().replace("0.",""),
+    oauth_signature_method: "HMAC-SHA1",
+    oauth_timestamp: Date.now(),
+    oauth_token: oauth_token,
+    oauth_verifier: oauth_verifier,
+    oauth_version: "1.0a"
+}
+var normalizedAccess = encodeURIComponent($.param(accessParams));
+var method = "GET";
+
+accessParams.oauth_signature = b64_hmac_sha1(`${consumer_secret}&${oauth_token_secret}`,
+`${method}&${encodeURIComponent(ACCESS_TOKEN_URL)}&${normalizedAccess}`
+);
+
+
+
+d3.select("#access").attrs({
+    href: ACCESS_TOKEN_URL+"?"+$.param(accessParams)
+});
 
 
 
@@ -103,16 +129,70 @@ $("#requestToken").on("click", function(d){
 
 
 
+
+var target_url = "https://photos.david-ma.net/api/v2!siteuser";
+target_url = "https://api.smugmug.com/api/v2!authuser";
+
+
+var normalParams :any = {
+    // access: "Full",
+    APIKey: consumer_key,
+    // permissions: "Modify",
+    oauth_callback: encodeURIComponent(target_url),
+    oauth_consumer_key: consumer_key,
+    oauth_nonce: Math.random().toString().replace("0.",""),
+    oauth_signature_method: "HMAC-SHA1",
+    oauth_timestamp: Date.now(),
+    oauth_token: access_token
+}
+var normalized = encodeURIComponent($.param(normalParams));
+var method = "GET";
+
+normalParams.oauth_signature = b64_hmac_sha1(`${consumer_secret}&${access_token_secret}`,
+// `${normalized}`
+`${method}&${encodeURIComponent(target_url)}&${normalized}`
+);
+
+normalParams.oauth_signature = encodeURIComponent(normalParams.oauth_signature);
+
+console.log(normalParams.oauth_signature);
 
 globalThis.smugmug = smugmug;
 function smugmug () {
+    console.log(normalParams);
+    console.log($.param(normalParams));
     $.ajax({
-        method: "GET",
-        url: `https://api.smugmug.com/api/v2/user/frostickle?APIKey=${consumer_key}`,
+        method: method,
+        url: `${target_url}?${$.param(normalParams)}`,
+        // url: `https://api.smugmug.com/api/v2/user/frostickle!nodes?APIKey=${consumer_key}`,
         headers: {
+            // Authorization: "OAuth",
             Accept: "application/json; charset=utf-8"
         },
         // data: "data",
+        success: function (d) {
+            console.log("Success", d);
+            console.log("Response", d.Response);
+            console.log("Keys: "+Object.keys(d.Response).join(", "));
+        },
+        error: function(error) {
+            console.error(error);
+        }
+    })
+}
+
+
+// frostickle primary node: SCSW8
+
+globalThis.createFolder = createFolder;
+function createFolder () {
+    $.ajax({
+        method: "POST",
+        url: `https://api.smugmug.com/api/v2/folder/frostickle/Thalia/Cats!albums?APIKey=${consumer_key}`,
+        headers: {
+            Accept: "application/json; charset=utf-8"
+        },
+        data: {"NiceName": "Big-Cats", "Title": "Big Cats", "Privacy": "Public"},
         success: function (d) {
             console.log("Success", d);
         },
@@ -121,6 +201,10 @@ function smugmug () {
         }
     })
 }
+
+
+
+
 
 
 
