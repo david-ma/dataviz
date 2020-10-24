@@ -12,6 +12,7 @@ const fs = require('fs');
 const fsPromise = fs.promises;
 const mustache = require('mustache');
 const formidable = require('formidable');
+const _ = require('lodash');
 // These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.
 var xray, request, tabletojson;
 var scrapingToolsLoaded = false;
@@ -98,7 +99,7 @@ function loadTemplates(template, content = '') {
     });
 }
 const base = 'https://www.digicamdb.com/';
-exports.config = {
+var config = {
     services: {
         "scrapeAllCameras": function (res, req, db, type) {
             if (!scrapingToolsLoaded) {
@@ -408,3 +409,4 @@ exports.config = {
         }
     }
 };
+exports.config = _.merge(config, require('./smugmug').config);

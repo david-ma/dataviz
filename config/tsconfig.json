@@ -11,5 +11,9 @@
         "noImplicitReturns": false,
         "noUnusedLocals": false
     },
-    "files": ["config.ts", "db_bootstrap.ts"]
+    "files": [
+        "db_bootstrap.ts",
+        "smugmug.ts",
+        "config.ts"
+    ]
 }

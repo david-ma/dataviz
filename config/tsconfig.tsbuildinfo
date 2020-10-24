@@ -161,14 +161,19 @@
         "signature": "89bf2b7a601b73ea4311eda9c41f86a58994fec1bee3b87c4a14d68d9adcdcbd",
         "affectsGlobalScope": true
       },
-      "./config.ts": {
-        "version": "67aa2a67e5ac101469198c529fe6af037a76e926c746a624ec84f5c0d92e0157",
-        "signature": "4f5df4666372d85f52369e73879d4744e9dcc0c0fc9a3a1dd5a22f11cf0e0238",
-        "affectsGlobalScope": true
-      },
       "./db_bootstrap.ts": {
         "version": "d878ed1fd55604682f846c37f357f8994a992167c84d21f7cbcad15d5884ffd4",
         "signature": "21ba781ea7f06d3a51b3061b837dd61beda7d9c7b7d5213fcfbd92d56d9adb0d",
+        "affectsGlobalScope": true
+      },
+      "./smugmug.ts": {
+        "version": "9f08ac52d3b679c3c3ff157cc6e28d83740f0f91b5ad013e18f6659f50704473",
+        "signature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "affectsGlobalScope": true
+      },
+      "./config.ts": {
+        "version": "fdaa112e1a554feb65709d862bd41a90e5cc916f4264469c33f2879053f4e80f",
+        "signature": "5e1fd47d0cae42b9339ff773623fafba3ac07af65c1109e41e99f4f543e74993",
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/node/globals.d.ts": {
@@ -1373,7 +1378,8 @@
       "../../../node_modules/@types/responselike/index.d.ts",
       "../../../node_modules/@types/sizzle/index.d.ts",
       "./config.ts",
-      "./db_bootstrap.ts"
+      "./db_bootstrap.ts",
+      "./smugmug.ts"
     ]
   },
   "version": "4.0.3"
