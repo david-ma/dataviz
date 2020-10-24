@@ -150,10 +150,10 @@ target_url = "https://api.smugmug.com/api/v2!authuser";
 
 var normalParams :any = {
     oauth_consumer_key: consumer_key,
-    oauth_token: access_token,
+    oauth_nonce: Math.random().toString().replace("0.",""),
     oauth_signature_method: "HMAC-SHA1",
     oauth_timestamp: Date.now(),
-    oauth_nonce: Math.random().toString().replace("0.",""),
+    oauth_token: access_token,
     oauth_version: "1.0"
 }
 var normalized = oauthEscape($.param(normalParams));
@@ -192,6 +192,8 @@ var oauthObject = OAuthSimple(consumer_key, consumer_secret)
     });
 console.log("Simple stuff: ", oauthObject);
 
+console.log(encodeURIComponent(oauth_signature));
+console.log(oauthObject.signature);
 
 globalThis.smugmug = smugmug;
 function smugmug () {
@@ -199,7 +201,7 @@ function smugmug () {
     console.log($.param(normalParams));
     $.ajax({
         method: method,
-        url: `${target_url}?${decodeURIComponent($.param(normalParams))}&oauth_signature=${oauthObject.signature}`,
+        url: `${target_url}?${decodeURIComponent($.param(normalParams))}&oauth_signature=${encodeURIComponent(oauth_signature)}`,
         // url: `https://api.smugmug.com/api/v2/user/frostickle!nodes?APIKey=${consumer_key}`,
         headers: {
             // "Content-Type": "application/json",
@@ -283,17 +285,17 @@ var hash = b64_hmac_sha1(`${consumer_secret}&${access_token_secret}`,
 `${method}&${target_url}&${normalizedTester}`
 );
 
-console.log("hash", hash);
+// console.log("hash", hash);
 
-console.log("ucwO5E/iuypfu1Zzr0Ku15rxssE=");
+// console.log("ucwO5E/iuypfu1Zzr0Ku15rxssE=");
 
 var exampleBaseString = "GET&http%3A%2F%2Fphotos.example.net%2Fphotos&file%3Dvacation.jpg%26oauth_consumer_key%3Ddpf43f3p2l4k3l03%26oauth_nonce%3Dkllo9940pd9333jh%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1191242096%26oauth_token%3Dnnch734d00sl2jdk%26oauth_version%3D1.0%26size%3Doriginal"
 
 var sig = "tR3+Ty81lMeYAr/Fid0kMTYa/WM="
 var exampleKey = "kd94hf93k423kf44&pfkkdhi9sl3r4s00"
 
-console.log(sig);
-console.log(b64_hmac_sha1(exampleKey,exampleBaseString));
+// console.log(sig);
+// console.log(b64_hmac_sha1(exampleKey,exampleBaseString));
 
 type key = string;
 
