@@ -180,13 +180,26 @@ console.log(`${$.param(normalParams)}`)
 
 console.log(`What we send: ${target_url}?${$.param(normalParams)}`);
 
+
+var oauthObject = OAuthSimple(consumer_key, consumer_secret)
+    .setTokensAndSecrets({
+        oauth_token: access_token,
+        oauth_secret: access_token_secret
+    })
+    .sign({
+        path: target_url,
+        parameters: $.param(normalParams)
+    });
+console.log("Simple stuff: ", oauthObject);
+
+
 globalThis.smugmug = smugmug;
 function smugmug () {
     console.log(normalParams);
     console.log($.param(normalParams));
     $.ajax({
         method: method,
-        url: `${target_url}?${decodeURIComponent($.param(normalParams))}&oauth_signature=${oauth_signature}`,
+        url: `${target_url}?${decodeURIComponent($.param(normalParams))}&oauth_signature=${oauthObject.signature}`,
         // url: `https://api.smugmug.com/api/v2/user/frostickle!nodes?APIKey=${consumer_key}`,
         headers: {
             // "Content-Type": "application/json",
