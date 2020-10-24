@@ -122,30 +122,16 @@ var target_url = "https://photos.david-ma.net/api/v2!siteuser";
 target_url = "https://api.smugmug.com/api/v2!authuser";
 target_url = "https://api.smugmug.com/api/v2/node/SCSW8!children";
 
-
-var normalParams :any = {
-    oauth_consumer_key: consumer_key,
-    oauth_nonce: Math.random().toString().replace("0.",""),
-    oauth_signature_method: "HMAC-SHA1",
-    oauth_timestamp: Date.now(),
-    oauth_token: access_token,
-    oauth_version: "1.0"
-}
-var normalized = oauthEscape($.param(normalParams));
 var method = "GET";
 
-var oauth_signature = b64_hmac_sha1(`${consumer_secret}&${access_token_secret}`,
-`${method}&${oauthEscape(target_url)}&${normalized}`
-);
-
+var params = signRequest(method, target_url);
 
 globalThis.smugmug = smugmug;
 function smugmug () {
-    console.log(normalParams);
-    console.log($.param(normalParams));
+
     $.ajax({
         method: method,
-        url: `${target_url}?${decodeURIComponent($.param(normalParams))}&oauth_signature=${encodeURIComponent(oauth_signature)}`,
+        url: `${target_url}?${$.param(params)}`,
         headers: {
             Accept: "application/json; charset=utf-8"
         },
@@ -267,3 +253,22 @@ function oauthEscape(string) {
     replace(/\(/g, "%28").
     replace(/\)/g, "%29");
 };
+
+
+function signRequest(method, target_url) {
+
+    var normalParams :any = {
+        oauth_consumer_key: consumer_key,
+        oauth_nonce: Math.random().toString().replace("0.",""),
+        oauth_signature_method: "HMAC-SHA1",
+        oauth_timestamp: Date.now(),
+        oauth_token: access_token,
+        oauth_version: "1.0"
+    }
+    var normalized = oauthEscape($.param(normalParams));
+    
+    normalParams.oauth_signature = b64_hmac_sha1(`${consumer_secret}&${access_token_secret}`,
+    `${method}&${oauthEscape(target_url)}&${normalized}`
+    );
+    return normalParams    
+}
