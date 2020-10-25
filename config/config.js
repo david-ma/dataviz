@@ -1,12 +1,6 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.config = void 0;
 var http = require("http");
 var fs = require('fs');
 const fsPromise = fs.promises;
@@ -22,78 +16,74 @@ if (scrapingToolsLoaded) {
     tabletojson = require('tabletojson');
 }
 // Asynchronous for each, doing a limited number of things at a time.
-function asyncForEach(array, limit, callback) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let i = 0;
-        for (; i < limit; i++) {
-            doNextThing(i);
+async function asyncForEach(array, limit, callback) {
+    let i = 0;
+    for (; i < limit; i++) {
+        doNextThing(i);
+    }
+    function doNextThing(index) {
+        if (array[index]) {
+            callback(array[index], index, array, function done() {
+                doNextThing(i++);
+            });
         }
-        function doNextThing(index) {
-            if (array[index]) {
-                callback(array[index], index, array, function done() {
-                    doNextThing(i++);
-                });
-            }
-        }
-        return 1;
-    });
+    }
+    return 1;
 }
 function sanitise(string) {
     return string.replace(/\W+/g, " ").trim().replace(/\W/g, "_").toLowerCase();
 }
 // TODO: handle rejection & errors?
-function loadTemplates(template, content = '') {
-    return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            const promises = [];
-            const filenames = ['template', 'content'];
-            // Load the mustache template (outer layer)
-            promises.push(fsPromise.readFile(`${__dirname}/../views/${template}`, {
+async function loadTemplates(template, content = '') {
+    return new Promise((resolve, reject) => {
+        const promises = [];
+        const filenames = ['template', 'content'];
+        // Load the mustache template (outer layer)
+        promises.push(fsPromise.readFile(`${__dirname}/../views/${template}`, {
+            encoding: 'utf8'
+        }));
+        // Load the mustache content (innermost layer)
+        promises.push(new Promise((resolve, reject) => {
+            if (Array.isArray(content) && content[0])
+                content = content[0];
+            fsPromise.readFile(`${__dirname}/../views/content/${content}.mustache`, {
                 encoding: 'utf8'
-            }));
-            // Load the mustache content (innermost layer)
-            promises.push(new Promise((resolve, reject) => {
-                if (Array.isArray(content) && content[0])
-                    content = content[0];
-                fsPromise.readFile(`${__dirname}/../views/content/${content}.mustache`, {
+            }).then(result => {
+                var scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g, styleEx = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/g;
+                var scripts = [...result.matchAll(scriptEx)].map(d => d[0]), styles = [...result.matchAll(styleEx)].map(d => d[0]);
+                resolve({
+                    content: result.replace(scriptEx, "").replace(styleEx, ""),
+                    scripts: scripts.join("\n"),
+                    styles: styles.join("\n")
+                });
+            }).catch(e => {
+                fsPromise.readFile(`${__dirname}/../views/404.mustache`, {
                     encoding: 'utf8'
                 }).then(result => {
-                    var scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g, styleEx = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/g;
-                    var scripts = [...result.matchAll(scriptEx)].map(d => d[0]), styles = [...result.matchAll(styleEx)].map(d => d[0]);
-                    resolve({
-                        content: result.replace(scriptEx, "").replace(styleEx, ""),
-                        scripts: scripts.join("\n"),
-                        styles: styles.join("\n")
-                    });
-                }).catch(e => {
-                    fsPromise.readFile(`${__dirname}/../views/404.mustache`, {
+                    resolve(result);
+                });
+            });
+        }));
+        // Load all the other partials we may need
+        fsPromise.readdir(`${__dirname}/../views/partials/`)
+            .then(function (d) {
+            d.forEach(function (filename) {
+                if (filename.indexOf(".mustache") > 0) {
+                    filenames.push(filename.split(".mustache")[0]);
+                    promises.push(fsPromise.readFile(`${__dirname}/../views/partials/${filename}`, {
                         encoding: 'utf8'
-                    }).then(result => {
-                        resolve(result);
-                    });
-                });
-            }));
-            // Load all the other partials we may need
-            fsPromise.readdir(`${__dirname}/../views/partials/`)
-                .then(function (d) {
-                d.forEach(function (filename) {
-                    if (filename.indexOf(".mustache") > 0) {
-                        filenames.push(filename.split(".mustache")[0]);
-                        promises.push(fsPromise.readFile(`${__dirname}/../views/partials/${filename}`, {
-                            encoding: 'utf8'
-                        }));
-                    }
-                });
-                Promise.all(promises).then(function (array) {
-                    const results = {};
-                    filenames.forEach((filename, i) => results[filename] = array[i]);
-                    if (typeof results.content == 'object') {
-                        results.scripts = results.content.scripts;
-                        results.styles = results.content.styles;
-                        results.content = results.content.content;
-                    }
-                    resolve(results);
-                });
+                    }));
+                }
+            });
+            Promise.all(promises).then(function (array) {
+                const results = {};
+                filenames.forEach((filename, i) => results[filename] = array[i]);
+                if (typeof results.content == 'object') {
+                    results.scripts = results.content.scripts;
+                    results.styles = results.content.styles;
+                    results.content = results.content.content;
+                }
+                resolve(results);
             });
         });
     });
@@ -409,4 +399,6 @@ var config = {
         }
     }
 };
-exports.config = _.merge(config, require('./smugmug').config);
+exports.config = config;
+const smugmug_1 = require("./smugmug");
+exports.config = config = _.merge(config, smugmug_1.smugmug);

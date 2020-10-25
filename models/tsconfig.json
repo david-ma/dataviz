@@ -12,8 +12,5 @@
         "noUnusedLocals": false
     },
     "files": [
-        "db_bootstrap.ts",
-        "smugmug.ts",
-        "config.ts"
     ]
 }

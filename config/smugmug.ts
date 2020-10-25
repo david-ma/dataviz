@@ -1,3 +1,5 @@
+import { IncomingMessage } from "http";
+
 const tokens :{
     "consumer_key"      : string;
     "consumer_secret"   : string;
@@ -12,7 +14,8 @@ var mime = require('mime');
 var crypto :Crypto = require('crypto');
 var _ = require('lodash');
 
-exports.config = {
+export { smugmug }
+var smugmug = {
     services : {
         "test": function(res, req, db, type) {
             
@@ -55,7 +58,7 @@ exports.config = {
 
                         var MD5 = (<any>crypto).createHash('md5').update(data).digest("hex");
 
-                        var package = {
+                        var payload = JSON.stringify({
                             "ByteCount": Buffer.byteLength(data),
                             "Caption": "",
                             "Hidden": false,
@@ -66,9 +69,7 @@ exports.config = {
                             "FileName": "",
                             "AllowInsecure": false,
                             "Uri": `https://dataviz.david-ma.net/tmp/${file.name}`
-                        }
-
-                        const packageData = JSON.stringify(package);
+                        });
 
                         var extraParams = {
                             // ByteCount: Buffer.byteLength(data),
@@ -106,13 +107,13 @@ exports.config = {
                                 // host: '122.150.70.136:1337',
                                 // Connection: "keep-alive",
                                 'Content-Type': 'application/json',
-                                'Content-Length': packageData.length,
+                                'Content-Length': payload.length,
                                 Accept: "application/json; charset=utf-8"                
                             }
                         };
 
 
-                        var req = https.request(options, function(res) {
+                        var req = https.request(options, function(res :IncomingMessage) {
                             console.log('STATUS: ' + res.statusCode);
                             console.log('HEADERS: ' + JSON.stringify(res.headers));
 
@@ -128,7 +129,7 @@ exports.config = {
                         });
             
 
-                        req.write(packageData)
+                        req.write(payload)
                         req.end()
 
 

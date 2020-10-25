@@ -467,5 +467,8 @@ var config = {
 	}
 };
 
+import { smugmug } from './smugmug';
 
-exports.config = _.merge(config, require('./smugmug').config);
+config = _.merge(config, smugmug);
+
+export { config }

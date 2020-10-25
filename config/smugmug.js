@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.smugmug = void 0;
 const tokens = require('./config.json')["smugmug"];
 var formidable = require('formidable');
 var fs = require('fs');
@@ -5,7 +8,7 @@ var https = require("https");
 var mime = require('mime');
 var crypto = require('crypto');
 var _ = require('lodash');
-exports.config = {
+var smugmug = {
     services: {
         "test": function (res, req, db, type) {
             res.end("Hello World");
@@ -35,7 +38,7 @@ exports.config = {
                         // var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
                         var method = "POST";
                         var MD5 = crypto.createHash('md5').update(data).digest("hex");
-                        var package = {
+                        var payload = JSON.stringify({
                             "ByteCount": Buffer.byteLength(data),
                             "Caption": "",
                             "Hidden": false,
@@ -46,8 +49,7 @@ exports.config = {
                             "FileName": "",
                             "AllowInsecure": false,
                             "Uri": `https://dataviz.david-ma.net/tmp/${file.name}`
-                        };
-                        const packageData = JSON.stringify(package);
+                        });
                         var extraParams = {
                         // ByteCount: Buffer.byteLength(data),
                         // MD5Sum: MD5
@@ -78,7 +80,7 @@ exports.config = {
                                 // host: '122.150.70.136:1337',
                                 // Connection: "keep-alive",
                                 'Content-Type': 'application/json',
-                                'Content-Length': packageData.length,
+                                'Content-Length': payload.length,
                                 Accept: "application/json; charset=utf-8"
                             }
                         };
@@ -94,7 +96,7 @@ exports.config = {
                             console.log('problem with request: ' + e.message);
                             console.log(e);
                         });
-                        req.write(packageData);
+                        req.write(payload);
                         req.end();
                         res.end("success");
                     });
@@ -103,6 +105,7 @@ exports.config = {
         },
     }
 };
+exports.smugmug = smugmug;
 // Useful resources:
 // https://oauth.net/core/1.0a/
 // https://medium.com/@imashishmathur/0auth-a142656859c6
