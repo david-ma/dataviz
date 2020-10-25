@@ -205,16 +205,6 @@
         "signature": "21ba781ea7f06d3a51b3061b837dd61beda7d9c7b7d5213fcfbd92d56d9adb0d",
         "affectsGlobalScope": true
       },
-      "./smugmug.ts": {
-        "version": "07cb81330d8de9ef511827a8f72ceb2ffc106b2f238f4f1a91b4d9e03b96c3a5",
-        "signature": "bdd21ef3dd2520aee28f52af2fd5a9b618ed08a34767160de6832d09fd843a73",
-        "affectsGlobalScope": false
-      },
-      "./config.ts": {
-        "version": "1ce3156d0bbbcac78bdf873a66bf4b6224c6c735fd481fb64991bc2156ec6857",
-        "signature": "1690ec225f062e054b9611ddcd4f85b98b12e9180689301a97bf58411e16b71e",
-        "affectsGlobalScope": false
-      },
       "../../../node_modules/@types/node/globals.d.ts": {
         "version": "56050f582fd08c001b713b168ade15cc8c1649801e13c94b4370f8f203e03087",
         "signature": "56050f582fd08c001b713b168ade15cc8c1649801e13c94b4370f8f203e03087",
@@ -228,6 +218,11 @@
       "../../../node_modules/@types/node/buffer.d.ts": {
         "version": "bc6a78961535181265845bf9b9e8a147ffd0ca275097ceb670a9b92afa825152",
         "signature": "bc6a78961535181265845bf9b9e8a147ffd0ca275097ceb670a9b92afa825152",
+        "affectsGlobalScope": false
+      },
+      "../../../node_modules/@types/events/index.d.ts": {
+        "version": "400db42c3a46984118bff14260d60cec580057dc1ab4c2d7310beb643e4f5935",
+        "signature": "400db42c3a46984118bff14260d60cec580057dc1ab4c2d7310beb643e4f5935",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/child_process.d.ts": {
@@ -448,6 +443,21 @@
       "../../../node_modules/@types/node/index.d.ts": {
         "version": "5825520e2099309182c6e2a2b3061b060d42a098c58f67d1754880a7e2cce99a",
         "signature": "5825520e2099309182c6e2a2b3061b060d42a098c58f67d1754880a7e2cce99a",
+        "affectsGlobalScope": false
+      },
+      "../../../node_modules/@types/formidable/index.d.ts": {
+        "version": "c87fdfbe484cb43964ca2ae19db5ac30e4f945826d1ade33c0d3d653006ddd22",
+        "signature": "c87fdfbe484cb43964ca2ae19db5ac30e4f945826d1ade33c0d3d653006ddd22",
+        "affectsGlobalScope": false
+      },
+      "./smugmug.ts": {
+        "version": "0f19c3e992a36bdd69e61b1dcb03062e266b8e8b78c73b57c635e5fba7a54d18",
+        "signature": "ed25468294aefa6f1ac3a9fa3b0282e281f033c18171cd02def43cbbe12c8833",
+        "affectsGlobalScope": false
+      },
+      "./config.ts": {
+        "version": "1ce3156d0bbbcac78bdf873a66bf4b6224c6c735fd481fb64991bc2156ec6857",
+        "signature": "1690ec225f062e054b9611ddcd4f85b98b12e9180689301a97bf58411e16b71e",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/keyv/index.d.ts": {
@@ -830,6 +840,12 @@
       "../../../node_modules/@types/datatables.net/index.d.ts": [
         "../../../node_modules/@types/jquery/index.d.ts"
       ],
+      "../../../node_modules/@types/formidable/index.d.ts": [
+        "../../../node_modules/@types/node/events.d.ts",
+        "../../../node_modules/@types/node/http.d.ts",
+        "../../../node_modules/@types/node/index.d.ts",
+        "../../../node_modules/@types/node/stream.d.ts"
+      ],
       "../../../node_modules/@types/jquery/index.d.ts": [
         "../../../node_modules/@types/jquery/jquery.d.ts",
         "../../../node_modules/@types/jquery/jquerystatic.d.ts",
@@ -1017,6 +1033,7 @@
         "./smugmug.ts"
       ],
       "./smugmug.ts": [
+        "../../../node_modules/@types/formidable/index.d.ts",
         "../../../node_modules/@types/node/http.d.ts"
       ]
     },
@@ -1108,6 +1125,12 @@
       ],
       "../../../node_modules/@types/datatables.net/index.d.ts": [
         "../../../node_modules/@types/jquery/index.d.ts"
+      ],
+      "../../../node_modules/@types/formidable/index.d.ts": [
+        "../../../node_modules/@types/node/events.d.ts",
+        "../../../node_modules/@types/node/http.d.ts",
+        "../../../node_modules/@types/node/index.d.ts",
+        "../../../node_modules/@types/node/stream.d.ts"
       ],
       "../../../node_modules/@types/jquery/index.d.ts": [
         "../../../node_modules/@types/jquery/jquery.d.ts",
@@ -1291,6 +1314,9 @@
         "../../../node_modules/@types/node/http.d.ts",
         "../../../node_modules/@types/node/index.d.ts",
         "../../../node_modules/@types/node/stream.d.ts"
+      ],
+      "./smugmug.ts": [
+        "../../../node_modules/@types/node/http.d.ts"
       ]
     },
     "semanticDiagnosticsPerFile": [
@@ -1379,6 +1405,8 @@
       "../../../node_modules/@types/d3/node_modules/@types/d3-scale/index.d.ts",
       "../../../node_modules/@types/d3/node_modules/@types/d3-selection/index.d.ts",
       "../../../node_modules/@types/datatables.net/index.d.ts",
+      "../../../node_modules/@types/events/index.d.ts",
+      "../../../node_modules/@types/formidable/index.d.ts",
       "../../../node_modules/@types/geojson/index.d.ts",
       "../../../node_modules/@types/http-cache-semantics/index.d.ts",
       "../../../node_modules/@types/jquery/index.d.ts",

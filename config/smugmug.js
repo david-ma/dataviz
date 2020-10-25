@@ -15,13 +15,24 @@ var smugmug = {
         },
         "uploadPhoto": function (res, req, db, type) {
             const uploadFolder = `${__dirname}/../data/tmp/`;
-            const form = formidable();
+            const form = formidable({
+                maxFileSize: 25 * 1024 * 1024 // 25 megabytes. Note we're also putting this size limit in nginx.conf
+            });
             // console.log("uploading files to ", uploadFolder);
             form.parse(req, (err, fields, files) => {
+                if (err) {
+                    res.writeHead(413, err.message);
+                    res.end(err.message);
+                }
                 Object.keys(files).forEach((inputfield) => {
                     var file = files[inputfield];
                     var newLocation = uploadFolder + file.name;
                     fs.rename(file.path, newLocation, function (err) {
+                        if (err) {
+                            console.error(err);
+                            res.end(err);
+                            return;
+                        }
                         const filetype = mime.getType(newLocation);
                         var data = fs.readFileSync(newLocation);
                         console.log(`data.length is:`, data.length);

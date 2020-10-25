@@ -1,4 +1,5 @@
-import { IncomingMessage } from "http";
+import { IncomingMessage, ServerResponse } from "http";
+import { IncomingForm } from "formidable";
 
 const tokens :{
     "consumer_key"      : string;
@@ -17,23 +18,36 @@ var _ = require('lodash');
 export { smugmug }
 var smugmug = {
     services : {
-        "test": function(res, req, db, type) {
+        "test": function(res :ServerResponse, req :IncomingMessage, db, type) {
             
 
             res.end("Hello World");
         },
-        "uploadPhoto": function(res, req, db, type){
+        "uploadPhoto": function(res :ServerResponse, req :IncomingMessage, db, type){
 			const uploadFolder = `${__dirname}/../data/tmp/`;
-            const form = formidable();
+
+            const form :IncomingForm = formidable({
+                maxFileSize: 25 * 1024 * 1024  // 25 megabytes. Note we're also putting this size limit in nginx.conf
+            });
             // console.log("uploading files to ", uploadFolder);
 
-            form.parse(req, (err, fields, files) => {
+            form.parse(req, (err :Error, fields, files) => {
+                if(err) {
+                    res.writeHead(413, err.message);
+                    res.end(err.message);
+                }
 
 				Object.keys(files).forEach((inputfield) => {
 					var file = files[inputfield];
 					var newLocation = uploadFolder + file.name;
 
 					fs.rename(file.path, newLocation, function(err){
+
+                        if(err) {
+                            console.error(err);
+                            res.end(err);
+                            return;
+                        }
 
                         const filetype = mime.getType(newLocation);
                         var data = fs.readFileSync(newLocation);
