@@ -586,8 +586,8 @@
         "affectsGlobalScope": false
       },
       "../models/models.d.ts": {
-        "version": "8622088d28bf1748319a84b1d3c79af40434234d997420ae767685ed3d42b6a0",
-        "signature": "8622088d28bf1748319a84b1d3c79af40434234d997420ae767685ed3d42b6a0",
+        "version": "06c8bde2340fd589c09d48977d36b5ce0f777a2d8ed9455d9240235d3bc27b22",
+        "signature": "06c8bde2340fd589c09d48977d36b5ce0f777a2d8ed9455d9240235d3bc27b22",
         "affectsGlobalScope": false
       },
       "../models/scrape.ts": {
@@ -616,7 +616,7 @@
         "affectsGlobalScope": false
       },
       "./db_bootstrap.ts": {
-        "version": "8df9343005975ad2fb5aed05339790a9eb03a3ce11b1cc20467a2f7a7a5a0ff7",
+        "version": "b5a319a4fa2911570f7627f5e8610e595a160a18306f181ab368dd3d3be10ad6",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },
@@ -1965,64 +1965,7 @@
       "../../../node_modules/sequelize/types/lib/utils/validator-extras.d.ts",
       "../../../node_modules/sequelize/types/type-helpers/set-required.d.ts",
       "./config.ts",
-      [
-        "./db_bootstrap.ts",
-        [
-          {
-            "file": "./db_bootstrap.ts",
-            "start": 666,
-            "length": 9,
-            "code": 2339,
-            "category": 1,
-            "messageText": "Property 'setFamily' does not exist on type 'CameraModel'."
-          },
-          {
-            "file": "./db_bootstrap.ts",
-            "start": 961,
-            "length": 19,
-            "code": 2345,
-            "category": 1,
-            "messageText": {
-              "messageText": "Argument of type '{ brand: string; name: string; description: string; }' is not assignable to parameter of type 'FamilyAttributes'.",
-              "category": 1,
-              "code": 2345,
-              "next": [
-                {
-                  "messageText": "Object literal may only specify known properties, but 'description' does not exist in type 'FamilyAttributes'. Did you mean to write 'descriptoin'?",
-                  "category": 1,
-                  "code": 2561
-                }
-              ]
-            }
-          },
-          {
-            "file": "./db_bootstrap.ts",
-            "start": 3156,
-            "length": 8,
-            "code": 2345,
-            "category": 1,
-            "messageText": {
-              "messageText": "Argument of type '{ shortname: string; title: string; category: string; summary: string; image: string; publish_date: string; published: boolean; }' is not assignable to parameter of type 'BlogpostAttributes'.",
-              "category": 1,
-              "code": 2345,
-              "next": [
-                {
-                  "messageText": "Types of property 'publish_date' are incompatible.",
-                  "category": 1,
-                  "code": 2326,
-                  "next": [
-                    {
-                      "messageText": "Type 'string' is not assignable to type 'Date'.",
-                      "category": 1,
-                      "code": 2322
-                    }
-                  ]
-                }
-              ]
-            }
-          }
-        ]
-      ],
+      "./db_bootstrap.ts",
       "./smugmug.ts",
       "../models/blogpost.ts",
       "../models/camera.ts",

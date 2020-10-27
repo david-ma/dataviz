@@ -23,10 +23,10 @@ export type ScrapeStatic = typeof Model & {
 
 
 export interface FamilyAttributes extends mysqlAttributes {
-    identifier: string;
+    identifier?: string;
     brand: string;
     name: string;
-    descriptoin: string;
+    description: string;
 }
 export interface FamilyModel extends Model<FamilyAttributes>, FamilyAttributes { }
 export class Family extends Model<FamilyModel, FamilyAttributes> { }
@@ -37,7 +37,7 @@ export type FamilyStatic = typeof Model & {
 
 
 export interface CameraAttributes extends mysqlAttributes {
-    identifier: string;
+    identifier?: string;
     brand: string;
     model: string;
     year: string;
@@ -99,7 +99,7 @@ export interface BlogpostAttributes extends mysqlAttributes {
     summary: string;
     image: string;
     category: string;
-    publish_date: Date;
+    publish_date: Date | string;
     published: boolean;
 }
 export interface BlogpostModel extends Model<BlogpostAttributes>, BlogpostAttributes { }

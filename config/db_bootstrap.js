@@ -23,7 +23,9 @@ if (false) {
             }
         }).then(family => {
             cameras.forEach(camera => {
-                camera.setFamily(family);
+                camera.update({
+                    family: family
+                });
             });
         });
     });

@@ -33,12 +33,12 @@ Camera.findAll({
     }).then(family => {
         cameras.forEach(camera => {
 
-            camera.setFamily(family);
+            // camera.setFamily(family);
             // camera.addFamily(family);
             // console.log(camera);
-            // camera.update({
-            //     family: family
-            // });
+            camera.update({
+                family: family
+            });
         })
     })
 });
