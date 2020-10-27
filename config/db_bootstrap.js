@@ -1,49 +1,42 @@
-const seq = require(`${__dirname}/../models/index`);
-const Op = seq.Sequelize.Op;
-const Blogpost = seq.Blogpost = require(`${__dirname}/../models`).Blogpost;
-const Scrape = seq.Scrape = require(`${__dirname}/../models`).Scrape;
-const Camera = seq.Camera = require(`${__dirname}/../models`).Camera;
-const Family = seq.Family = require(`${__dirname}/../models`).Family;
-// Uncomment to create the family table.
-// seq.sequelize.sync();
-// Family.get()
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const sequelize_1 = require("sequelize");
+const models_1 = require("../models");
+const seq = {
+    sequelize: models_1.dbConfig,
+    Blogpost: models_1.Blogpost,
+    Scrape: models_1.Scrape,
+    Camera: models_1.Camera,
+    Family: models_1.Family
+};
 if (false) {
-    Camera.findAll({
+    models_1.Camera.findAll({
         where: {
             model: {
-                [Op.like]: '%Coolpix%'
+                [sequelize_1.Op.like]: '%Coolpix%'
             }
         }
     }).then(function (cameras) {
-        Family.findOne({
+        models_1.Family.findOne({
             where: {
                 name: 'Coolpix'
             }
         }).then(family => {
             cameras.forEach(camera => {
                 camera.setFamily(family);
-                // camera.addFamily(family);
-                // console.log(camera);
-                // camera.update({
-                //     family: family
-                // });
             });
         });
     });
 }
 if (false) {
-    Family.create({
+    models_1.Family.create({
         brand: "Nikon",
         name: "Coolpix",
         description: "None"
     });
 }
-// rebuild entire database & reload data..?
 if (false) {
-    seq.sequelize.sync({
-    // force: true
-    }).then(function (d) {
-        // Add blog posts
+    seq.sequelize.sync({}).then(function (d) {
         const blogposts = [{
                 shortname: 'war',
                 title: 'American wartime',
@@ -87,13 +80,13 @@ if (false) {
             }];
         blogposts.forEach(function (blogpost) {
             console.log(`Adding ${blogpost.shortname}`);
-            Blogpost.findOne({
+            models_1.Blogpost.findOne({
                 where: {
                     shortname: blogpost.shortname
                 }
             }).then((entry) => {
                 if (!entry) {
-                    Blogpost.create(blogpost);
+                    models_1.Blogpost.create(blogpost);
                 }
                 else {
                     entry.update(blogpost);

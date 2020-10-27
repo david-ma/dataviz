@@ -7,7 +7,6 @@ const fsPromise = fs.promises;
 const mustache = require('mustache');
 var formidable = require('formidable');
 var _ = require('lodash');
-// These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.
 var xray, request, tabletojson;
 var scrapingToolsLoaded = false;
 if (scrapingToolsLoaded) {
@@ -15,7 +14,6 @@ if (scrapingToolsLoaded) {
     request = require('request');
     tabletojson = require('tabletojson');
 }
-// Asynchronous for each, doing a limited number of things at a time.
 async function asyncForEach(array, limit, callback) {
     let i = 0;
     for (; i < limit; i++) {
@@ -33,16 +31,13 @@ async function asyncForEach(array, limit, callback) {
 function sanitise(string) {
     return string.replace(/\W+/g, " ").trim().replace(/\W/g, "_").toLowerCase();
 }
-// TODO: handle rejection & errors?
 async function loadTemplates(template, content = '') {
     return new Promise((resolve, reject) => {
         const promises = [];
         const filenames = ['template', 'content'];
-        // Load the mustache template (outer layer)
         promises.push(fsPromise.readFile(`${__dirname}/../views/${template}`, {
             encoding: 'utf8'
         }));
-        // Load the mustache content (innermost layer)
         promises.push(new Promise((resolve, reject) => {
             if (Array.isArray(content) && content[0])
                 content = content[0];
@@ -64,7 +59,6 @@ async function loadTemplates(template, content = '') {
                 });
             });
         }));
-        // Load all the other partials we may need
         fsPromise.readdir(`${__dirname}/../views/partials/`)
             .then(function (d) {
             d.forEach(function (filename) {
@@ -99,13 +93,10 @@ var config = {
                 tabletojson = require('tabletojson');
             }
             db.Scrape.findAll({
-                where: {
-                // brand: brand.toLowerCase()
-                }
+                where: {}
             }).then(function (d) {
                 var results = d.map(d => d.dataValues);
                 if (results.length > 0) {
-                    // async.mapLimit(results, 20, function(d, loopback){
                     asyncForEach(results, 20, function (d, i, array, done) {
                         var target = d.link;
                         var brand = d.title.split(/(?<=^\S+)\s/)[0].trim();
@@ -150,8 +141,6 @@ var config = {
                 }
             });
         },
-        // Todo: fix this one.
-        // The on-demand loading of tools isn't really working.
         "scrapeAllBrands": function (res, req, db, type) {
             if (!scrapingToolsLoaded) {
                 scrapingToolsLoaded = true;
@@ -163,7 +152,6 @@ var config = {
             asyncForEach(brands, 1, function (brand, iterator, brands, done) {
                 let lastPageReached = false;
                 let i = 0;
-                // TODO: the lastPageReached thing doesn't work... because it loops through all 20 requests before the first one finishes.
                 while (!lastPageReached && i < 20) {
                     i++;
                     console.log(`Scrapeing Page ${i} of ${brand}`);
@@ -206,7 +194,6 @@ var config = {
             const brand = type.indexOf("_") > 0 ? type.split("_")[0] : "";
             const model = type.indexOf("_") > 0 ? type.split("_")[1].replace(/-/g, " ") : "";
             promises.push(loadTemplates('camera.mustache'));
-            // Get the data from the database
             promises.push(db.Camera.findAll({
                 attributes: ['brand', 'model', 'year'],
                 where: {
@@ -275,7 +262,6 @@ var config = {
             });
         },
         "all-cameras": function (res, req, db, type) {
-            // res.end("hello");
             db.Camera.findAll({
                 attributes: ['brand', 'model', 'year'],
                 where: {
@@ -287,9 +273,6 @@ var config = {
         },
         "fetchCamera": function (res, req, db, type) {
             console.log("Request for a camera..");
-            // console.log(db);
-            // console.log(db.Camera);
-            // console.log(type);
             db.Camera.findOne({
                 where: {
                     name: type
@@ -301,8 +284,6 @@ var config = {
                 console.log("Error??", e);
                 res.end("bad");
             });
-            // return 200;
-            // res.end("Requesting camera...");
         },
         "upload": function (res, req, db, type) {
             const uploadFolder = "websites/dataviz/data/campjs/";
@@ -335,9 +316,6 @@ var config = {
             req.on('error', function (e) {
                 console.log('problem with request: ' + e.message);
             });
-            // write data to request body
-            //			req.write('data\n');
-            //			req.write('data\n');
             req.end();
         }
     },

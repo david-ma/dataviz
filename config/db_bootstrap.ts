@@ -1,16 +1,18 @@
+import { Model, Op, Sequelize } from "sequelize";
+import { dbConfig, Blogpost, Scrape, Camera, Family } from '../models'
 
-const seq = require(`${__dirname}/../models/index`);
-const Op = seq.Sequelize.Op;
+interface seqObject {
+    [key: string] : Model | any | Sequelize;
+    sequelize :Sequelize;
+}
 
-const Blogpost = seq.Blogpost = require(`${__dirname}/../models`).Blogpost;
-
-const Scrape = seq.Scrape = require(`${__dirname}/../models`).Scrape;
-
-const Camera = seq.Camera = require(`${__dirname}/../models`).Camera;
-const Family = seq.Family = require(`${__dirname}/../models`).Family;
-
-// Uncomment to create the family table.
-// seq.sequelize.sync();
+const seq :seqObject = {
+    sequelize: dbConfig,
+    Blogpost: Blogpost,
+    Scrape: Scrape,
+    Camera: Camera,
+    Family: Family
+}
 
 
 // Family.get()

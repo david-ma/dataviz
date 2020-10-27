@@ -16,9 +16,8 @@ var smugmug = {
         "uploadPhoto": function (res, req, db, type) {
             const uploadFolder = `${__dirname}/../data/tmp/`;
             const form = formidable({
-                maxFileSize: 25 * 1024 * 1024 // 25 megabytes. Note we're also putting this size limit in nginx.conf
+                maxFileSize: 25 * 1024 * 1024
             });
-            // console.log("uploading files to ", uploadFolder);
             form.parse(req, (err, fields, files) => {
                 if (err) {
                     res.writeHead(413, err.message);
@@ -37,16 +36,9 @@ var smugmug = {
                         var data = fs.readFileSync(newLocation);
                         console.log(`data.length is:`, data.length);
                         console.log("Buffer length..?", Buffer.byteLength(data));
-                        // console.log("Filetype", filetype);
-                        // console.log("data is", data);
                         var host = 'api.smugmug.com';
-                        // var host = 'api.smugmug.com'
-                        // var path = '/api/v2/node/QdvhkM'
-                        // var path = '/api/v2/album/jHhcL7'
                         var path = '/api/v2/album/jHhcL7!uploadfromuri';
-                        // var path = '/api/v2/album/jHhcL7!images'
                         var target_url = `https://${host}${path}`;
-                        // var target_url = "https://upload.smugmug.com/api/v2/node/QdvhkM";
                         var method = "POST";
                         var MD5 = crypto.createHash('md5').update(data).digest("hex");
                         var payload = JSON.stringify({
@@ -61,35 +53,17 @@ var smugmug = {
                             "AllowInsecure": false,
                             "Uri": `https://dataviz.david-ma.net/tmp/${file.name}`
                         });
-                        var extraParams = {
-                        // ByteCount: Buffer.byteLength(data),
-                        // MD5Sum: MD5
-                        };
+                        var extraParams = {};
                         var params = signRequest(method, target_url, extraParams);
                         console.log("Authorization", bundleAuthorization(target_url, params));
                         console.log("MD5", MD5);
                         var options = {
-                            // host: 'photos.david-ma.net',
-                            // host: 'upload.smugmug.com',
                             host: host,
                             port: 443,
-                            // path: '/api/v2/album/jHhcL7',
-                            // path: '/api/v2/node/QdvhkM',
                             path: path,
                             method: method,
                             headers: {
                                 Authorization: bundleAuthorization(target_url, params),
-                                // 'Content-Type': filetype,
-                                // 'X-Smug-AlbumUri': path,
-                                // 'X-Smug-ResponseType': 'JSON',
-                                // 'X-Smug-Version': 'v2',
-                                // 'X-Smug-FileName': "blah",
-                                // 'X-Smug-Title': "blahblah",
-                                // 'X-Smug-AlbumUri': '/api/v2/album/jHhcL7',
-                                // 'X-Smug-AlbumUri': '/api/v2/node/QdvhkM',
-                                // 'Content-MD5': MD5,
-                                // host: '122.150.70.136:1337',
-                                // Connection: "keep-alive",
                                 'Content-Type': 'application/json',
                                 'Content-Length': payload.length,
                                 Accept: "application/json; charset=utf-8"
@@ -117,14 +91,7 @@ var smugmug = {
     }
 };
 exports.smugmug = smugmug;
-// Useful resources:
-// https://oauth.net/core/1.0a/
-// https://medium.com/@imashishmathur/0auth-a142656859c6
-// https://developer.chrome.com/extensions/examples/extensions/oauth_contacts/chrome_ex_oauthsimple.js
-// https://github.com/pH200/hmacsha1-js
 function b64_hmac_sha1(k, d, _p, _z) {
-    // heavily optimized and compressed version of http://pajhome.org.uk/crypt/md5/sha1.js
-    // _p = b64pad, _z = character size; not used here but I left them available just in case
     if (!_p) {
         _p = '=';
     }

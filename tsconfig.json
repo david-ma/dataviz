@@ -8,6 +8,7 @@
 
         "allowSyntheticDefaultImports":  true,
         "esModuleInterop": true,
+        "removeComments": true,
 
         "noImplicitAny": false,
         "noImplicitThis": false,
@@ -15,5 +16,5 @@
         "noUnusedLocals": false
     },
     "include": ["src/**/*"],
-    "exclude": ["config"]
+    "exclude": ["config", "models"]
 }
