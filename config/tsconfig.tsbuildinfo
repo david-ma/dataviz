@@ -914,6 +914,11 @@
         "version": "f9a2dd6a6084665f093ed0e9664b8e673be2a45e342a59dd4e0e4e552e68a9ad",
         "signature": "f9a2dd6a6084665f093ed0e9664b8e673be2a45e342a59dd4e0e4e552e68a9ad",
         "affectsGlobalScope": false
+      },
+      "../../../node_modules/@types/showdown/index.d.ts": {
+        "version": "2f5663a907b70a487ca1541607b72fb58a627d78d1a3b94ec6df15fa9a4266b3",
+        "signature": "2f5663a907b70a487ca1541607b72fb58a627d78d1a3b94ec6df15fa9a4266b3",
+        "affectsGlobalScope": false
       }
     },
     "options": {
@@ -1937,6 +1942,7 @@
       "../../../node_modules/@types/node/zlib.d.ts",
       "../../../node_modules/@types/q/index.d.ts",
       "../../../node_modules/@types/responselike/index.d.ts",
+      "../../../node_modules/@types/showdown/index.d.ts",
       "../../../node_modules/@types/sizzle/index.d.ts",
       "../../../node_modules/@types/validator/index.d.ts",
       "../../../node_modules/sequelize/types/index.d.ts",
