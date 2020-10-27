@@ -1,0 +1,42 @@
+.sidebar {
+    display: none;
+}
+.project {
+    padding: 5px;    
+    &:hover {
+        background: lightgrey;
+    }
+    border: solid 1px grey;
+}
+
+
+ul#tabs {
+    li {
+        float: left;
+        margin: 2px;
+        border: solid 1px black;
+        list-style: none;
+        border-radius: 3px;
+        &:hover {
+            background: grey;
+        }
+        cursor: pointer;
+        input {
+            display: none;
+        }
+        label {
+            cursor: pointer;
+            padding: 2px;
+        }
+        input:checked + label {
+            background: lightgrey;
+        }
+    }
+}
+
+textarea.comments {
+    width: 100%;
+    min-height: 500px;
+    height: 100%;
+}
+
