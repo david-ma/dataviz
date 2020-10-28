@@ -321,8 +321,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/process.d.ts": {
-        "version": "bdaf7d2be100799b17067d5288b8f6c6dfc97073c6ea6cdb3b91b1092a73171c",
-        "signature": "bdaf7d2be100799b17067d5288b8f6c6dfc97073c6ea6cdb3b91b1092a73171c",
+        "version": "e64979f6084c279bf8cd58dbc9203567f68f1ed19a8ad91351f078f03323ddf6",
+        "signature": "e64979f6084c279bf8cd58dbc9203567f68f1ed19a8ad91351f078f03323ddf6",
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/node/punycode.d.ts": {
@@ -341,8 +341,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/repl.d.ts": {
-        "version": "dd3706b25d06fe23c73d16079e8c66ac775831ef419da00716bf2aee530a04a4",
-        "signature": "dd3706b25d06fe23c73d16079e8c66ac775831ef419da00716bf2aee530a04a4",
+        "version": "acbed967a379b3e9f73237ba9473f8b337eeea14b7dc64d445430b5d695751da",
+        "signature": "acbed967a379b3e9f73237ba9473f8b337eeea14b7dc64d445430b5d695751da",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/stream.d.ts": {
@@ -450,8 +450,13 @@
         "signature": "ed25468294aefa6f1ac3a9fa3b0282e281f033c18171cd02def43cbbe12c8833",
         "affectsGlobalScope": false
       },
+      "./socket.ts": {
+        "version": "70d84ea1bc1782b9b077ecf1f187d6f1a7797ebe67e1fe334dc38150192f5694",
+        "signature": "836feeffaa405690851dd6f6d6ca5d2f478ed23ea3ec398513fea143776b1b4c",
+        "affectsGlobalScope": false
+      },
       "./config.ts": {
-        "version": "1ce3156d0bbbcac78bdf873a66bf4b6224c6c735fd481fb64991bc2156ec6857",
+        "version": "5ad4f12554117d8fb3531c1a643c4246bec339c00008d57855352c32a1e375e1",
         "signature": "1690ec225f062e054b9611ddcd4f85b98b12e9180689301a97bf58411e16b71e",
         "affectsGlobalScope": false
       },
@@ -861,8 +866,8 @@
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/jquery/jquery.d.ts": {
-        "version": "c7e41611fca9dda55b40fdaabc0a2cb3b254517a8040515dcd7cb2bef67a065f",
-        "signature": "c7e41611fca9dda55b40fdaabc0a2cb3b254517a8040515dcd7cb2bef67a065f",
+        "version": "eab1e3426e549678fa8243ff87e0214838de91eb638c28f7dce3f1b8d8b8f140",
+        "signature": "eab1e3426e549678fa8243ff87e0214838de91eb638c28f7dce3f1b8d8b8f140",
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/jquery/misc.d.ts": {
@@ -889,6 +894,11 @@
         "version": "310c4f4f0ea7174f45ff9451409dd6dbb7ffad13a368c8480ad79190c26038d7",
         "signature": "310c4f4f0ea7174f45ff9451409dd6dbb7ffad13a368c8480ad79190c26038d7",
         "affectsGlobalScope": true
+      },
+      "../../../node_modules/@types/engine.io/index.d.ts": {
+        "version": "2bc5a885dc91b4006192c477dfae4f2856e5809c6ffbf62cc242ac010f15ab51",
+        "signature": "2bc5a885dc91b4006192c477dfae4f2856e5809c6ffbf62cc242ac010f15ab51",
+        "affectsGlobalScope": false
       },
       "../../../node_modules/@types/http-proxy/index.d.ts": {
         "version": "15e05617b8bcc6dd4cb71a716ffa0d7d0a868ac62d7b14d44cb131e1285a5ae4",
@@ -918,6 +928,11 @@
       "../../../node_modules/@types/showdown/index.d.ts": {
         "version": "2f5663a907b70a487ca1541607b72fb58a627d78d1a3b94ec6df15fa9a4266b3",
         "signature": "2f5663a907b70a487ca1541607b72fb58a627d78d1a3b94ec6df15fa9a4266b3",
+        "affectsGlobalScope": false
+      },
+      "../../../node_modules/@types/socket.io/index.d.ts": {
+        "version": "7d666a6623022683b640930047127f754d79393a29c0f51f3447325f8435809f",
+        "signature": "7d666a6623022683b640930047127f754d79393a29c0f51f3447325f8435809f",
         "affectsGlobalScope": false
       }
     },
@@ -1025,6 +1040,12 @@
       ],
       "../../../node_modules/@types/datatables.net/index.d.ts": [
         "../../../node_modules/@types/jquery/index.d.ts"
+      ],
+      "../../../node_modules/@types/engine.io/index.d.ts": [
+        "../../../node_modules/@types/node/events.d.ts",
+        "../../../node_modules/@types/node/http.d.ts",
+        "../../../node_modules/@types/node/index.d.ts",
+        "../../../node_modules/@types/node/net.d.ts"
       ],
       "../../../node_modules/@types/formidable/index.d.ts": [
         "../../../node_modules/@types/node/events.d.ts",
@@ -1229,6 +1250,13 @@
         "../../../node_modules/@types/node/index.d.ts",
         "../../../node_modules/@types/node/stream.d.ts"
       ],
+      "../../../node_modules/@types/socket.io/index.d.ts": [
+        "../../../node_modules/@types/engine.io/index.d.ts",
+        "../../../node_modules/@types/node/events.d.ts",
+        "../../../node_modules/@types/node/http.d.ts",
+        "../../../node_modules/@types/node/https.d.ts",
+        "../../../node_modules/@types/node/index.d.ts"
+      ],
       "../../../node_modules/sequelize/types/index.d.ts": [
         "../../../node_modules/sequelize/types/lib/associations/index.d.ts",
         "../../../node_modules/sequelize/types/lib/data-types.d.ts",
@@ -1333,7 +1361,8 @@
         "../../../node_modules/@types/validator/index.d.ts"
       ],
       "./config.ts": [
-        "./smugmug.ts"
+        "./smugmug.ts",
+        "./socket.ts"
       ],
       "./db_bootstrap.ts": [
         "../../../node_modules/sequelize/types/index.d.ts",
@@ -1459,6 +1488,12 @@
       "../../../node_modules/@types/datatables.net/index.d.ts": [
         "../../../node_modules/@types/jquery/index.d.ts"
       ],
+      "../../../node_modules/@types/engine.io/index.d.ts": [
+        "../../../node_modules/@types/node/events.d.ts",
+        "../../../node_modules/@types/node/http.d.ts",
+        "../../../node_modules/@types/node/index.d.ts",
+        "../../../node_modules/@types/node/net.d.ts"
+      ],
       "../../../node_modules/@types/formidable/index.d.ts": [
         "../../../node_modules/@types/node/events.d.ts",
         "../../../node_modules/@types/node/http.d.ts",
@@ -1661,6 +1696,13 @@
         "../../../node_modules/@types/node/http.d.ts",
         "../../../node_modules/@types/node/index.d.ts",
         "../../../node_modules/@types/node/stream.d.ts"
+      ],
+      "../../../node_modules/@types/socket.io/index.d.ts": [
+        "../../../node_modules/@types/engine.io/index.d.ts",
+        "../../../node_modules/@types/node/events.d.ts",
+        "../../../node_modules/@types/node/http.d.ts",
+        "../../../node_modules/@types/node/https.d.ts",
+        "../../../node_modules/@types/node/index.d.ts"
       ],
       "../../../node_modules/sequelize/types/index.d.ts": [
         "../../../node_modules/sequelize/types/lib/associations/index.d.ts",
@@ -1879,6 +1921,7 @@
       "../../../node_modules/@types/d3/node_modules/@types/d3-scale/index.d.ts",
       "../../../node_modules/@types/d3/node_modules/@types/d3-selection/index.d.ts",
       "../../../node_modules/@types/datatables.net/index.d.ts",
+      "../../../node_modules/@types/engine.io/index.d.ts",
       "../../../node_modules/@types/events/index.d.ts",
       "../../../node_modules/@types/formidable/index.d.ts",
       "../../../node_modules/@types/geojson/index.d.ts",
@@ -1944,6 +1987,7 @@
       "../../../node_modules/@types/responselike/index.d.ts",
       "../../../node_modules/@types/showdown/index.d.ts",
       "../../../node_modules/@types/sizzle/index.d.ts",
+      "../../../node_modules/@types/socket.io/index.d.ts",
       "../../../node_modules/@types/validator/index.d.ts",
       "../../../node_modules/sequelize/types/index.d.ts",
       "../../../node_modules/sequelize/types/lib/associations/base.d.ts",
@@ -1973,6 +2017,7 @@
       "./config.ts",
       "./db_bootstrap.ts",
       "./smugmug.ts",
+      "./socket.ts",
       "../models/blogpost.ts",
       "../models/camera.ts",
       "../models/family.ts",

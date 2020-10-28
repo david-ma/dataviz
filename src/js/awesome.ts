@@ -35,10 +35,9 @@ d3.csv("/melbourne_export_october.csv", function (d, i, columns) {
                 .append("a")
                 .attr("href", d.url)
                 .text(d.title);
-            var span = header.append("span").text(d.name +' - ');
-            // span.append()
-            span.append("a").text(d.url);
-            // header.append("h2")
+
+            header.append("span").text(d.name +' - ')
+                .append("a").text(d.url);
 
             left.append("h3").text("Here's my idea:");
             left.append("div").attr("id", "description-" + d.id);
@@ -53,8 +52,11 @@ d3.csv("/melbourne_export_october.csv", function (d, i, columns) {
             left.append("div").attr("id", "me-" + d.id);
             $("#me-" + d.id).html(md.makeHtml(d.about_me));
 
-            right.append("textarea").classed("comments", true);
-
+            right.append("textarea")
+                .classed("comments", true)
+                .attrs({
+                    id: `comments-${d.id}`
+                });
 
             console.log(d);
         })

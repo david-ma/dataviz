@@ -468,7 +468,8 @@ var config = {
 };
 
 import { smugmug } from './smugmug';
+import { socket } from './socket';
 
-config = _.merge(config, smugmug);
+config = _.merge(config, smugmug, socket);
 
 export { config }

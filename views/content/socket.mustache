@@ -1,0 +1,30 @@
+<section class="blogpost">
+
+    <div class="row" id="contentBox">
+        <div>
+            <textarea id="text" rows="40" style="width: 100%;"></textarea>
+        </div>
+    </div>
+</section>
+
+<link rel="stylesheet" href="/css/awesome.min.css">
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io("/dataviz");
+
+    console.log("Starting socket", socket);
+
+    socket.on('text', (packet) => {
+        $("#text").val(packet.data);
+    });
+
+    $("#text").on("keydown", function(d){
+        var text = $("#text").val();
+        socket.emit("overwriteText", {
+            data: text
+        });
+    });
+
+
+</script>
