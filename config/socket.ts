@@ -1,7 +1,7 @@
 
 let text = "Write here"
 
-import { Thalia } from '../../../server';
+import { Thalia } from '../../../server/thalia';
 
 const socket :Thalia.sockets = {
     sockets: {

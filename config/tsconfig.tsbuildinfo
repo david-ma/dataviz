@@ -450,14 +450,14 @@
         "signature": "ed25468294aefa6f1ac3a9fa3b0282e281f033c18171cd02def43cbbe12c8833",
         "affectsGlobalScope": false
       },
-      "../../../server/index.ts": {
-        "version": "c4698877bd9d4a30188d3d9e86a507266910bd87eb35807587211a8d5cb74545",
-        "signature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "affectsGlobalScope": true
+      "../../../server/thalia.d.ts": {
+        "version": "489d3e37e3f2bacc0e4d4c55f73908b264f1b343c506c80436a98aab70b27b89",
+        "signature": "489d3e37e3f2bacc0e4d4c55f73908b264f1b343c506c80436a98aab70b27b89",
+        "affectsGlobalScope": false
       },
       "./socket.ts": {
-        "version": "f26d051b19541fd9d38e45f9119d93f0449fb71ba598f5104d974cf0a4d34a0c",
-        "signature": "b5b5634ecb3dcf3c861639ecee82c27a5185e28318dad86a99bbe9175928f638",
+        "version": "956a8aa586621d6afb3ded2a05496f830e9c5eb36274eec73875d3df47b11364",
+        "signature": "6a20ff1d68bc13491db86921d364a2db452295c85e78a8d0b9727722533a1d2d",
         "affectsGlobalScope": false
       },
       "./config.ts": {
@@ -1377,6 +1377,9 @@
         "../../../node_modules/@types/formidable/index.d.ts",
         "../../../node_modules/@types/node/http.d.ts"
       ],
+      "./socket.ts": [
+        "../../../server/thalia.d.ts"
+      ],
       "../models/blogpost.ts": [
         "../../../node_modules/sequelize/types/index.d.ts",
         "../models/models.d.ts"
@@ -1815,6 +1818,9 @@
       "./smugmug.ts": [
         "../../../node_modules/@types/node/http.d.ts"
       ],
+      "./socket.ts": [
+        "../../../server/thalia.d.ts"
+      ],
       "../models/blogpost.ts": [
         "../../../node_modules/sequelize/types/index.d.ts",
         "../models/models.d.ts"
@@ -2019,23 +2025,11 @@
       "../../../node_modules/sequelize/types/lib/utils.d.ts",
       "../../../node_modules/sequelize/types/lib/utils/validator-extras.d.ts",
       "../../../node_modules/sequelize/types/type-helpers/set-required.d.ts",
-      "../../../server/index.ts",
+      "../../../server/thalia.d.ts",
       "./config.ts",
       "./db_bootstrap.ts",
       "./smugmug.ts",
-      [
-        "./socket.ts",
-        [
-          {
-            "file": "./socket.ts",
-            "start": 49,
-            "length": 17,
-            "messageText": "File '/Users/David/Dropbox/amazonsydney/server/index.ts' is not a module.",
-            "category": 1,
-            "code": 2306
-          }
-        ]
-      ],
+      "./socket.ts",
       "../models/blogpost.ts",
       "../models/camera.ts",
       "../models/family.ts",
