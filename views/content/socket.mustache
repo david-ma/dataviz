@@ -19,7 +19,7 @@
         $("#text").val(packet.data);
     });
 
-    $("#text").on("keydown", function(d){
+    $("#text").on("keyup", function(d){
         var text = $("#text").val();
         socket.emit("overwriteText", {
             data: text

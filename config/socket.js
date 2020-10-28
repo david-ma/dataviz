@@ -7,17 +7,14 @@ const socket = {
         on: [
             {
                 'name': "overwriteText",
-                callback: function (packet, db, socket) {
+                callback: function (socket, packet, seq) {
                     text = packet.data;
                     socket.broadcast.emit("text", { data: text });
                 }
             }
         ],
         emit: [
-            {
-                'name': "text",
-                'data': { data: text }
-            }
+            (socket, db) => { socket.emit("text", { data: text }); }
         ]
     }
 };

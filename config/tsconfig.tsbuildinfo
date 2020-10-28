@@ -450,9 +450,14 @@
         "signature": "ed25468294aefa6f1ac3a9fa3b0282e281f033c18171cd02def43cbbe12c8833",
         "affectsGlobalScope": false
       },
+      "../../../server/index.ts": {
+        "version": "c4698877bd9d4a30188d3d9e86a507266910bd87eb35807587211a8d5cb74545",
+        "signature": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "affectsGlobalScope": true
+      },
       "./socket.ts": {
-        "version": "70d84ea1bc1782b9b077ecf1f187d6f1a7797ebe67e1fe334dc38150192f5694",
-        "signature": "836feeffaa405690851dd6f6d6ca5d2f478ed23ea3ec398513fea143776b1b4c",
+        "version": "f26d051b19541fd9d38e45f9119d93f0449fb71ba598f5104d974cf0a4d34a0c",
+        "signature": "b5b5634ecb3dcf3c861639ecee82c27a5185e28318dad86a99bbe9175928f638",
         "affectsGlobalScope": false
       },
       "./config.ts": {
@@ -2014,10 +2019,23 @@
       "../../../node_modules/sequelize/types/lib/utils.d.ts",
       "../../../node_modules/sequelize/types/lib/utils/validator-extras.d.ts",
       "../../../node_modules/sequelize/types/type-helpers/set-required.d.ts",
+      "../../../server/index.ts",
       "./config.ts",
       "./db_bootstrap.ts",
       "./smugmug.ts",
-      "./socket.ts",
+      [
+        "./socket.ts",
+        [
+          {
+            "file": "./socket.ts",
+            "start": 49,
+            "length": 17,
+            "messageText": "File '/Users/David/Dropbox/amazonsydney/server/index.ts' is not a module.",
+            "category": 1,
+            "code": 2306
+          }
+        ]
+      ],
       "../models/blogpost.ts",
       "../models/camera.ts",
       "../models/family.ts",
