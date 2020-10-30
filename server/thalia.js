@@ -9,34 +9,38 @@
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
-define("requestHandlers", ["require", "exports"], function (require, exports) {
+define("requestHandlers", ["require", "exports", "fs", "mustache"], function (require, exports, fs, mustache) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.handle = void 0;
+    exports.Website = exports.handle = void 0;
     // requestHandlers.ts
     const db = require("./database").db;
-    const fs = require('fs');
     const fsPromise = fs.promises;
-    const mustache = require('mustache');
-    const Website = function (site, config) {
-        if (typeof config === "object") {
-            this.data = false;
-            this.dist = false;
-            this.cache = typeof config.cache === "boolean" ? config.cache : true;
-            this.folder = typeof config.folder === "string" ? config.folder : "websites/" + site + "/public";
-            this.domains = typeof config.domains === "object" ? config.domains : [];
-            this.pages = typeof config.pages === "object" ? config.pages : {};
-            this.redirects = typeof config.redirects === "object" ? config.redirects : {};
-            this.services = typeof config.services === "object" ? config.services : {};
-            this.controllers = typeof config.controllers === "object" ? config.controllers : {};
-            this.proxies = typeof config.proxies === "object" ? config.proxies : {};
-            this.security = typeof config.security === "object" ? config.security : { loginNeeded: function () { return false; } };
-            this.viewableFolders = config.viewableFolders || false;
+    class Website {
+        constructor(site, config) {
+            if (typeof config === "object") {
+                this.name = site;
+                this.data = ""; // Used to be false. Todo: Check if this is ok
+                this.dist = ""; // Used to be false. Todo: Check if this is ok
+                this.cache = typeof config.cache === "boolean" ? config.cache : true;
+                this.folder = typeof config.folder === "string" ? config.folder : "websites/" + site + "/public";
+                this.domains = typeof config.domains === "object" ? config.domains : [];
+                this.pages = typeof config.pages === "object" ? config.pages : {};
+                this.redirects = typeof config.redirects === "object" ? config.redirects : {};
+                this.services = typeof config.services === "object" ? config.services : {};
+                this.controllers = typeof config.controllers === "object" ? config.controllers : {};
+                this.proxies = typeof config.proxies === "object" ? config.proxies : {};
+                this.sockets = typeof config.sockets === "object" ? config.sockets : { on: [], emit: [] };
+                this.security = typeof config.security === "object" ? config.security : { loginNeeded: function () { return false; } };
+                this.viewableFolders = config.viewableFolders || false;
+            }
+            else {
+                console.log("Config isn't an object");
+            }
         }
-        else {
-            console.log("Config isn't an object");
-        }
-    };
+        ;
+    }
+    exports.Website = Website;
     const handle = {
         websites: {},
         index: { localhost: 'default' },
@@ -61,6 +65,7 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                 catch (err) {
                     if (err.code !== 'MODULE_NOT_FOUND') {
                         console.log("Warning, your config script is broken!");
+                        console.error(err);
                         console.log();
                     }
                     else {
@@ -69,7 +74,7 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                     }
                 }
                 try {
-                    cred = JSON.parse(fs.readFileSync('cred.json'));
+                    cred = JSON.parse(fs.readFileSync('cred.json').toString());
                 }
                 catch (err) { }
                 config.standAlone = true;
@@ -96,6 +101,7 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                 catch (err) {
                     if (err.code !== 'MODULE_NOT_FOUND') {
                         console.log("Warning, your config script for " + site + " is broken!");
+                        console.error(err);
                         console.log();
                     }
                     else {
@@ -104,9 +110,14 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                     }
                 }
                 try {
-                    cred = JSON.parse(fs.readFileSync('websites/' + site + '/cred.json'));
+                    if (fs.existsSync(`${__dirname}/../websites/${site}/cred.json`)) {
+                        cred = JSON.parse(fs.readFileSync(`${__dirname}/../websites/${site}/cred.json`).toString());
+                        console.log("Cred: ", cred);
+                    }
                 }
-                catch (err) { }
+                catch (err) {
+                    console.log(err);
+                }
                 config.cache = false;
                 handle.addWebsite(site, config, cred);
             }
@@ -116,16 +127,22 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                         console.log("Adding site: " + site);
                         var config, cred;
                         try {
-                            config = require('../websites/' + site + '/config').config;
+                            if (fs.existsSync(`${__dirname}/../websites/${site}/config.js`)) {
+                                config = require(`${__dirname}/../websites/${site}/config`).config;
+                            }
+                            else {
+                                config = require(`${__dirname}/../websites/${site}/config/config`).config;
+                            }
                         }
                         catch (err) {
                             if (err.code !== 'MODULE_NOT_FOUND') {
                                 console.log("Warning, your config script for " + site + " is broken!");
+                                console.error(err);
                                 console.log();
                             }
                         }
                         try {
-                            cred = JSON.parse(fs.readFileSync('websites/' + site + '/cred.json'));
+                            cred = JSON.parse(fs.readFileSync(`websites/${site}/cred.json`).toString());
                         }
                         catch (err) { }
                         handle.addWebsite(site, config, cred);
@@ -212,12 +229,13 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                     }).catch((e) => console.log(e));
                 });
             }
+            // Unused feature? Commenting it out DKGM 2020-10-29
             // If the site has any startup actions, do them
-            if (config.startup) {
-                config.startup.forEach(function (action) {
-                    action(handle.websites[site]);
-                });
-            }
+            // if(config.startup){
+            //     config.startup.forEach(function(action:any){
+            //         action(handle.websites[site]);
+            //     });
+            // }
         },
         getWebsite: function (domain) {
             var site = handle.index.localhost;
@@ -318,20 +336,19 @@ define("requestHandlers", ["require", "exports"], function (require, exports) {
                     }
                 }))).then((array) => {
                     finish(array.reduce((a, b) => Object.assign(a, b)));
+                }, (reason) => {
+                    console.log("Error in readAllViews", reason);
+                    reject(reason);
                 });
             }).catch((e) => console.log(e));
         });
     }
 });
-define("router", ["require", "exports"], function (require, exports) {
+define("router", ["require", "exports", "fs", "mime", "zlib"], function (require, exports, fs, mime, zlib) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.router = void 0;
-    // router.ts
-    const fs = require("fs");
-    const mime = require('mime');
-    const zlib = require('zlib');
-    function router(website, pathname, response, request) {
+    const router = function (website, pathname, response, request) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         const route = new Promise(function (resolve, reject) {
             try {
@@ -586,17 +603,47 @@ ${links.join("\n")}
                 });
             });
         }
-    }
+    };
     exports.router = router;
 });
-define("server", ["require", "exports"], function (require, exports) {
+define("socket", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.socketInit = void 0;
+    function socketInit(io, handle) {
+        console.log("Initialising Socket.io");
+        Object.keys(handle.websites).forEach((siteName) => {
+            io.of(`/${siteName}`).use((socket, next) => {
+                const host = socket.handshake.headers.host;
+                const website = handle.getWebsite(host);
+                if (website.name == siteName) {
+                    next();
+                }
+                else {
+                    next(new Error("Wrong namespace for this site"));
+                }
+            }).on('connection', function (socket) {
+                const host = socket.handshake.headers.host;
+                const website = handle.getWebsite(host);
+                // Simple logging
+                console.log("Socket connection " + socket.id + " from " + socket.handshake.headers.referer);
+                website.sockets.on.forEach(function (d) {
+                    socket.on(d.name, function (data) {
+                        d.callback(socket, data, website.db || website.seq);
+                    });
+                });
+                website.sockets.emit.forEach((emitter) => {
+                    emitter(socket, website.db || website.seq);
+                });
+            });
+        });
+    }
+    exports.socketInit = socketInit;
+});
+define("server", ["require", "exports", "http", "url", "http-proxy", "socket.io", "socket"], function (require, exports, http, url, httpProxy, socketIO, socket_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.start = void 0;
-    // server.ts
-    const http = require("http");
-    const url = require("url");
-    const httpProxy = require('http-proxy');
     let blacklist = [];
     try {
         blacklist = require("../blacklist").blacklist;
@@ -685,7 +732,9 @@ define("server", ["require", "exports"], function (require, exports) {
                     response.end("Logged out.");
                 }
                 else if (url_object.query.password && passwords.indexOf(url_object.query.password) >= 0) {
-                    let password = encodeBase64(url_object.query.password);
+                    // console.log(url_object.query.password);
+                    let password = encodeBase64(url_object.query.password[0]);
+                    // let password = encodeBase64(url_object.query.password);
                     response.setHeader('Set-Cookie', [`password=${password};path=/;expires=false`]);
                     webProxy(proxyConfig);
                 }
@@ -700,6 +749,8 @@ define("server", ["require", "exports"], function (require, exports) {
         }
         console.log("Server has started on port: " + port);
         server = http.createServer(onRequest).listen(port);
+        var io = new socketIO.listen(server, {});
+        socket_1.socketInit(io, handle);
         return server.on('upgrade', function (request, socket, head) {
             "use strict";
             const host = request.headers.host;
@@ -772,11 +823,10 @@ div {
 </html>`;
 });
 // database.ts
-define("database", ["require", "exports"], function (require, exports) {
+define("database", ["require", "exports", "mysql"], function (require, exports, mysql) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.db = void 0;
-    var mysql = require("mysql");
     var Database = function (cred) {
         this.cred = cred;
         this.connected = false;
