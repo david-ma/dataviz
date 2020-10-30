@@ -27,6 +27,7 @@ ul#tabs {
         label {
             cursor: pointer;
             padding: 2px;
+            font-size: 20px;
         }
         input:checked + label {
             background: lightgrey;
@@ -40,3 +41,6 @@ textarea.comments {
     height: 100%;
 }
 
+input.signatures {
+    width: 100%;
+}
