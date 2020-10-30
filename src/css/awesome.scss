@@ -4,9 +4,9 @@
 .project {
     padding: 5px;    
     &:hover {
-        background: lightgrey;
+        background:  #d3d3d324;
     }
-    border: solid 1px grey;
+    border: solid 1px lightgrey;
 }
 
 
@@ -37,10 +37,37 @@ ul#tabs {
 
 textarea.comments {
     width: 100%;
-    min-height: 500px;
+    min-height: 400px;
     height: 100%;
+}
+textarea.debrief {
+    width: 100%;
+    min-height: 100px;
 }
 
 input.signatures {
     width: 100%;
+}
+
+ul.categoryList {
+    list-style: none;
+    padding-left: 10px;
+    label {
+        margin-left: 3px;
+        font-size: 1.25em;
+    }
+    label, input {
+        cursor: pointer;
+    }
+    p.categoryDesription {
+        font-size: 0.8em;
+        margin-bottom: 3px;
+    }
+    li {
+        float: left;
+        border: solid 1px grey;
+        padding: 5px;
+        margin: 2px 5px;
+        border-radius: 5px;
+    }
 }

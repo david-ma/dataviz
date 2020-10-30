@@ -1,28 +1,49 @@
 
 const md = new showdown.Converter({ openLinksInNewWindow: true });
-
 const socket = io("/dataviz");
+
+/**
+ * Todo:
+ * sort by votes
+ * hide/show project when tab is selected?
+ * filter by categories
+ * add better categories
+ * photos?
+ * security???
+ */
 
 let initialData = {};
 socket.on("allData", (packet) => {
     initialData = packet;
     console.log("Receiving initial Data!", initialData);
-    Object.keys(initialData).forEach( (key) => {
-        $(`#${key}`).val(initialData[key]);
-        var type = key.split("-")[0];
-        if(type == "signatures") countVotes(key);
-    })
+    window.setTimeout(() => {
+        Object.keys(initialData).forEach( (key) => {
+            var type = key.split("-")[0];
+            if( type == 'category') {
+                $(`#${key}`).prop('checked', initialData[key]);
+            } else {
+                $(`#${key}`).val(initialData[key]);
+            }
+            if(type == "signatures") countVotes(key);
+        })
+    }, 100)
 });
 
 socket.on("overwriteText", (packet) => {
     const element = $(`#${packet.name}`);
-    var properties = {
-        "selectionStart": element.prop("selectionStart"),
-        "selectionEnd" : element.prop("selectionEnd")
-    }
+    const type = packet.name.split("-")[0];
 
-    $(`#${packet.name}`).val(packet.data);
-    if(properties.selectionStart) $(`#${packet.name}`).prop(properties);
+    if( type == 'category') {
+        element.prop('checked', packet.data);
+    } else {
+        const properties = {
+            "selectionStart": element.prop("selectionStart"),
+            "selectionEnd" : element.prop("selectionEnd")
+        }
+        element.val(packet.data);
+        if(properties.selectionStart) element.prop(properties);
+    }
+    if(type == "signatures") countVotes(packet.name);
 });
 
 
@@ -126,7 +147,65 @@ d3.csv("/melbourne_export_october.csv", function (d, i, columns) {
                     }
                 }).on("input", countVotes);
 
-            // console.log(d);
+                right.append("h3").text("Applicable Categories:");
+                const categories = {
+                    "Social Justice": "Description goes here",
+                    "Art": "Some sorta art piece??",
+                    "Healthcare": "Has a healthcare aspect to it",
+                    "Big Impact": "Our $1000 will make a real to the cause / it wouldn't happen without our help",
+                    "Viable": "Sounds like these peeps will get the job done"
+                }
+                right.append("ul").attrs({
+                    class: "categoryList row"
+                }).selectAll("li").data(Object.keys(categories))
+                    .enter()
+                    .append("li")
+                    .attr("id", category => `categoryLi-${d.id}-${cssSelectorSafe(category)}`)
+                    .each(category => {
+                        const li = d3.select(`#categoryLi-${d.id}-${cssSelectorSafe(category)}`);
+                        const elementId = `category-${d.id}-${cssSelectorSafe(category)}`
+
+                        li.append("input").attrs({
+                            id: elementId,
+                            type: "checkbox"
+                        })
+                        .on("input", function(){
+                            const value = $(`#${elementId}`).is(':checked');
+                            socket.emit("overwriteText", {
+                                name: elementId,
+                                data: value
+                            });
+                        });
+                        li.append("label").text(category).attrs({
+                            for: elementId
+                        });
+                        li.append("p")
+                        .classed("categoryDesription", true)
+                        .text(categories[category]);
+                    });
+
+                right.append("h3").text("Follow up items:");
+                right.append("textarea")
+                .classed("debrief", true)
+                .attrs({
+                    id: `debrief-${d.id}`,
+                    name: `debrief-${d.id}`,
+                    placeholder: `What other things could be done for this project, besides money? What advice can we give them?`
+                }).on("keyup", function(d){
+                    var text = $(this).val();
+                    socket.emit("overwriteText", {
+                        name: `debrief-${d.id}`,
+                        data: text
+                    });
+                }).text(() => {
+                    var data = initialData[`debrief-${d.id}`]
+                    if (data) {
+                        return initialData[`debrief-${d.id}`];
+                    } else {
+                        return "";
+                    }
+                });
+
         });
 });
 
@@ -144,4 +223,8 @@ function countVotes(id) {
     let ideaID = id.split('-')[1];
     d3.select(`#voteCounts-${ideaID}`).text(` (${votes})`);
     d3.select(`#tabVotes-${ideaID}`).text(` (${votes})`);
+}
+
+function cssSelectorSafe(string) {
+    return string.toLowerCase().replace(/[ .!$#{}'"`\/\\\[\]]/, "-");
 }
