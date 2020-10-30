@@ -1,6 +1,22 @@
 
 const md = new showdown.Converter({ openLinksInNewWindow: true });
 
+const socket = io("/dataviz");
+
+let initialData = {};
+socket.on("allData", (packet) => {
+    initialData = packet;
+    console.log("Receiving initial Data!", initialData);
+    Object.keys(initialData).forEach( (key) => {
+        d3.select(`#${key}`).text(initialData[key])
+    })
+});
+
+socket.on("overwriteText", (packet) => {
+    d3.select(`#${packet.name}`).text(packet.data);
+});
+
+
 d3.csv("/melbourne_export_october.csv", function (d, i, columns) {
     if (d.hidden_at == "") {
         console.log(d);
@@ -52,12 +68,29 @@ d3.csv("/melbourne_export_october.csv", function (d, i, columns) {
             left.append("div").attr("id", "me-" + d.id);
             $("#me-" + d.id).html(md.makeHtml(d.about_me));
 
+            right.append("h3").text("Awesome Trustee Comments:");
             right.append("textarea")
                 .classed("comments", true)
                 .attrs({
-                    id: `comments-${d.id}`
+                    id: `comments-${d.id}`,
+                    name: `comments-${d.id}`,
+                    placeholder: `Write collaborative comments here`
+                }).on("keyup", function(d){
+                    var text = $(this).val();
+                    socket.emit("overwriteText", {
+                        name: `comments-${d.id}`,
+                        data: text
+                    });
+                }).text(() => {
+                    var data = initialData[`comments-${d.id}`]
+                    if (data) {
+                        return initialData[`comments-${d.id}`];
+                    } else {
+                        return "";
+                    }
                 });
 
             console.log(d);
-        })
+        });
 });
+

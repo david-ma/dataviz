@@ -211,12 +211,12 @@
         "affectsGlobalScope": false
       },
       "../../../server/thalia.d.ts": {
-        "version": "63453adae2365f1c8f83a468a76c202dfcc26516b6d06d346d3cc2f9778652e6",
-        "signature": "63453adae2365f1c8f83a468a76c202dfcc26516b6d06d346d3cc2f9778652e6",
+        "version": "5a8db15c957b3432c227729d0ec03d28013bc922ea28ba0eeae71fbfe2677918",
+        "signature": "5a8db15c957b3432c227729d0ec03d28013bc922ea28ba0eeae71fbfe2677918",
         "affectsGlobalScope": false
       },
       "./awesome.ts": {
-        "version": "550a6a64fd646e5ce7ea61a09927c39766c2007b0631d22e2542333cd4b963d3",
+        "version": "d1471fb4ffd1c2067babe12b647862978203efc7ee0b49a9851baab24a9ad0fc",
         "signature": "185884e109bc53b9988bcf45de6ce2845648cee72fa1f381db2cdb980276a992",
         "affectsGlobalScope": false
       },
@@ -465,8 +465,13 @@
         "signature": "c87fdfbe484cb43964ca2ae19db5ac30e4f945826d1ade33c0d3d653006ddd22",
         "affectsGlobalScope": false
       },
+      "../../../node_modules/@types/mime/index.d.ts": {
+        "version": "be27a64e821a3e5af838650e4aa25805c60f057d0c37a9762c378d19d364b3e6",
+        "signature": "be27a64e821a3e5af838650e4aa25805c60f057d0c37a9762c378d19d364b3e6",
+        "affectsGlobalScope": false
+      },
       "./smugmug.ts": {
-        "version": "73d12d25408315d7367d6118f4f83cfee72f511faa3f3a447ffcd23619eb8de9",
+        "version": "25eddda6b46f363f35fa1f0084ef6ab536c9f9bd9adf64383b3b5dc2068a98c4",
         "signature": "6d3c99c6ac427d00e7c98ade51371cd699d0ec24fb7bcd976d38bd08e61128b0",
         "affectsGlobalScope": false
       },
@@ -920,11 +925,6 @@
         "signature": "15e05617b8bcc6dd4cb71a716ffa0d7d0a868ac62d7b14d44cb131e1285a5ae4",
         "affectsGlobalScope": false
       },
-      "../../../node_modules/@types/mime/index.d.ts": {
-        "version": "be27a64e821a3e5af838650e4aa25805c60f057d0c37a9762c378d19d364b3e6",
-        "signature": "be27a64e821a3e5af838650e4aa25805c60f057d0c37a9762c378d19d364b3e6",
-        "affectsGlobalScope": false
-      },
       "../../../node_modules/@types/mysql/index.d.ts": {
         "version": "e2ba19c1f9f0f2e48f3d4ff98202f43e1802f530e065f0402086f2ae1c7e5a0a",
         "signature": "e2ba19c1f9f0f2e48f3d4ff98202f43e1802f530e065f0402086f2ae1c7e5a0a",
@@ -944,6 +944,11 @@
         "version": "7d666a6623022683b640930047127f754d79393a29c0f51f3447325f8435809f",
         "signature": "7d666a6623022683b640930047127f754d79393a29c0f51f3447325f8435809f",
         "affectsGlobalScope": false
+      },
+      "../../../node_modules/@types/socket.io-client/index.d.ts": {
+        "version": "61b47b5916240af10c044424efe51a551ec47d9e799b18225e0e3a7c19903b03",
+        "signature": "61b47b5916240af10c044424efe51a551ec47d9e799b18225e0e3a7c19903b03",
+        "affectsGlobalScope": true
       }
     },
     "options": {
@@ -1393,7 +1398,11 @@
       ],
       "./smugmug.ts": [
         "../../../node_modules/@types/formidable/index.d.ts",
+        "../../../node_modules/@types/mime/index.d.ts",
+        "../../../node_modules/@types/node/crypto.d.ts",
+        "../../../node_modules/@types/node/fs.d.ts",
         "../../../node_modules/@types/node/http.d.ts",
+        "../../../node_modules/@types/node/https.d.ts",
         "../../../server/thalia.d.ts"
       ],
       "../models/blogpost.ts": [
@@ -2024,6 +2033,7 @@
       "../../../node_modules/@types/responselike/index.d.ts",
       "../../../node_modules/@types/showdown/index.d.ts",
       "../../../node_modules/@types/sizzle/index.d.ts",
+      "../../../node_modules/@types/socket.io-client/index.d.ts",
       "../../../node_modules/@types/socket.io/index.d.ts",
       "../../../node_modules/@types/validator/index.d.ts",
       "../../../node_modules/sequelize/types/index.d.ts",

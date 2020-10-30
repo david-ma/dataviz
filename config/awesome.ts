@@ -1,6 +1,9 @@
 
-let text = "Write here"
 
+let datastore = {};
+// Transient data store, will need to use a real database in future.
+
+import _ from 'lodash';
 import { Thalia } from '../../../server/thalia';
 
 const config :Thalia.WebsiteConfig = {
@@ -9,13 +12,15 @@ const config :Thalia.WebsiteConfig = {
             {
                 'name': "overwriteText",
                 callback: function (socket, packet, seq) {
-                    text = packet.data;
-                    socket.broadcast.emit("text", { data: text });
+                    socket.broadcast.emit("overwriteText", packet);
+                    _.merge(datastore, {
+                        [packet.name] : packet.data
+                    });
                 }
             }
         ],
         emit: [
-            (socket, db ) => { socket.emit("text", { data: text }); }
+            (socket, db ) => { socket.emit("allData", datastore); }
         ]
     }
 }

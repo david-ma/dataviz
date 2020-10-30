@@ -925,6 +925,11 @@
         "version": "7d666a6623022683b640930047127f754d79393a29c0f51f3447325f8435809f",
         "signature": "7d666a6623022683b640930047127f754d79393a29c0f51f3447325f8435809f",
         "affectsGlobalScope": false
+      },
+      "../../../node_modules/@types/socket.io-client/index.d.ts": {
+        "version": "61b47b5916240af10c044424efe51a551ec47d9e799b18225e0e3a7c19903b03",
+        "signature": "61b47b5916240af10c044424efe51a551ec47d9e799b18225e0e3a7c19903b03",
+        "affectsGlobalScope": true
       }
     },
     "options": {
@@ -1963,6 +1968,7 @@
       "../../../node_modules/@types/responselike/index.d.ts",
       "../../../node_modules/@types/showdown/index.d.ts",
       "../../../node_modules/@types/sizzle/index.d.ts",
+      "../../../node_modules/@types/socket.io-client/index.d.ts",
       "../../../node_modules/@types/socket.io/index.d.ts",
       "../../../node_modules/@types/validator/index.d.ts",
       "../../../node_modules/sequelize/types/index.d.ts",
