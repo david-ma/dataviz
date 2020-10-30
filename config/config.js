@@ -379,5 +379,5 @@ var config = {
 };
 exports.config = config;
 const smugmug_1 = require("./smugmug");
-const socket_1 = require("./socket");
-exports.config = config = _.merge(config, smugmug_1.smugmug, socket_1.socket);
+const awesome_1 = require("./awesome");
+exports.config = config = _.merge(config, smugmug_1.config, awesome_1.config);

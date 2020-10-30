@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.smugmug = void 0;
+exports.config = void 0;
 const tokens = require('./config.json')["smugmug"];
 var formidable = require('formidable');
 var fs = require('fs');
@@ -8,7 +8,7 @@ var https = require("https");
 var mime = require('mime');
 var crypto = require('crypto');
 var _ = require('lodash');
-var smugmug = {
+var config = {
     services: {
         "test": function (res, req, db, type) {
             res.end("Hello World");
@@ -90,7 +90,7 @@ var smugmug = {
         },
     }
 };
-exports.smugmug = smugmug;
+exports.config = config;
 function b64_hmac_sha1(k, d, _p, _z) {
     if (!_p) {
         _p = '=';

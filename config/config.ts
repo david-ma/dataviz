@@ -111,7 +111,7 @@ async function loadTemplates(template, content = '') {
 
 const base = 'https://www.digicamdb.com/';
 
-var config = {
+var config :Thalia.WebsiteConfig = {
 	services: {
 		"scrapeAllCameras": function(res, req, db, type) {
             if(!scrapingToolsLoaded) {
@@ -467,9 +467,10 @@ var config = {
 	}
 };
 
-import { smugmug } from './smugmug';
-import { socket } from './socket';
+import { Thalia } from '../../../server/thalia';
+import { config as smugmugConfig } from './smugmug';
+import { config as awesomeConfig } from './awesome';
 
-config = _.merge(config, smugmug, socket);
+config = _.merge(config, smugmugConfig, awesomeConfig);
 
 export { config }

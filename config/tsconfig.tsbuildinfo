@@ -200,6 +200,26 @@
         "version": "f58c6d0669d1ee04b2fcb0e87fb949b6828602f3f29c7bf6c76a214f16fd50d5",
         "affectsGlobalScope": false
       },
+      "../../../node_modules/@types/mustache/index.d.ts": {
+        "version": "976fdab81483f691ad4a132b56e5a699f7ee2316139e9021a4f13df0a7675a15",
+        "signature": "976fdab81483f691ad4a132b56e5a699f7ee2316139e9021a4f13df0a7675a15",
+        "affectsGlobalScope": false
+      },
+      "../../../server/requesthandlers.ts": {
+        "version": "fceedf859fec212c99671b18cde9ddef5a863a6a0cb588b96c6d0d36c8ab5d2f",
+        "signature": "94fb86ecbba9c588cbb871205dc4c5e436b3071856345bbce4cc56db786a0d88",
+        "affectsGlobalScope": false
+      },
+      "../../../server/thalia.d.ts": {
+        "version": "63453adae2365f1c8f83a468a76c202dfcc26516b6d06d346d3cc2f9778652e6",
+        "signature": "63453adae2365f1c8f83a468a76c202dfcc26516b6d06d346d3cc2f9778652e6",
+        "affectsGlobalScope": false
+      },
+      "./awesome.ts": {
+        "version": "550a6a64fd646e5ce7ea61a09927c39766c2007b0631d22e2542333cd4b963d3",
+        "signature": "185884e109bc53b9988bcf45de6ce2845648cee72fa1f381db2cdb980276a992",
+        "affectsGlobalScope": false
+      },
       "../../../node_modules/@types/node/globals.d.ts": {
         "version": "56050f582fd08c001b713b168ade15cc8c1649801e13c94b4370f8f203e03087",
         "signature": "56050f582fd08c001b713b168ade15cc8c1649801e13c94b4370f8f203e03087",
@@ -446,23 +466,13 @@
         "affectsGlobalScope": false
       },
       "./smugmug.ts": {
-        "version": "0f19c3e992a36bdd69e61b1dcb03062e266b8e8b78c73b57c635e5fba7a54d18",
-        "signature": "ed25468294aefa6f1ac3a9fa3b0282e281f033c18171cd02def43cbbe12c8833",
-        "affectsGlobalScope": false
-      },
-      "../../../server/thalia.d.ts": {
-        "version": "489d3e37e3f2bacc0e4d4c55f73908b264f1b343c506c80436a98aab70b27b89",
-        "signature": "489d3e37e3f2bacc0e4d4c55f73908b264f1b343c506c80436a98aab70b27b89",
-        "affectsGlobalScope": false
-      },
-      "./socket.ts": {
-        "version": "956a8aa586621d6afb3ded2a05496f830e9c5eb36274eec73875d3df47b11364",
-        "signature": "6a20ff1d68bc13491db86921d364a2db452295c85e78a8d0b9727722533a1d2d",
+        "version": "73d12d25408315d7367d6118f4f83cfee72f511faa3f3a447ffcd23619eb8de9",
+        "signature": "6d3c99c6ac427d00e7c98ade51371cd699d0ec24fb7bcd976d38bd08e61128b0",
         "affectsGlobalScope": false
       },
       "./config.ts": {
-        "version": "5ad4f12554117d8fb3531c1a643c4246bec339c00008d57855352c32a1e375e1",
-        "signature": "1690ec225f062e054b9611ddcd4f85b98b12e9180689301a97bf58411e16b71e",
+        "version": "86bfc99d7fed0c18d92a93ba3001a3e87bfdcd6d525fe7203335d1e32916d427",
+        "signature": "18f2d2f20e4c5bdd277098c5daf985078acbb1fa7e974c9859452ce20d12b5d4",
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/data-types.d.ts": {
@@ -915,11 +925,6 @@
         "signature": "be27a64e821a3e5af838650e4aa25805c60f057d0c37a9762c378d19d364b3e6",
         "affectsGlobalScope": false
       },
-      "../../../node_modules/@types/mustache/index.d.ts": {
-        "version": "976fdab81483f691ad4a132b56e5a699f7ee2316139e9021a4f13df0a7675a15",
-        "signature": "976fdab81483f691ad4a132b56e5a699f7ee2316139e9021a4f13df0a7675a15",
-        "affectsGlobalScope": false
-      },
       "../../../node_modules/@types/mysql/index.d.ts": {
         "version": "e2ba19c1f9f0f2e48f3d4ff98202f43e1802f530e065f0402086f2ae1c7e5a0a",
         "signature": "e2ba19c1f9f0f2e48f3d4ff98202f43e1802f530e065f0402086f2ae1c7e5a0a",
@@ -1365,9 +1370,22 @@
       "../../../node_modules/sequelize/types/lib/utils/validator-extras.d.ts": [
         "../../../node_modules/@types/validator/index.d.ts"
       ],
+      "../../../server/requesthandlers.ts": [
+        "../../../node_modules/@types/mustache/index.d.ts",
+        "../../../node_modules/@types/node/fs.d.ts",
+        "../../../server/thalia.d.ts"
+      ],
+      "../../../server/thalia.d.ts": [
+        "../../../node_modules/@types/node/http.d.ts",
+        "../../../server/requesthandlers.ts"
+      ],
+      "./awesome.ts": [
+        "../../../server/thalia.d.ts"
+      ],
       "./config.ts": [
-        "./smugmug.ts",
-        "./socket.ts"
+        "../../../server/thalia.d.ts",
+        "./awesome.ts",
+        "./smugmug.ts"
       ],
       "./db_bootstrap.ts": [
         "../../../node_modules/sequelize/types/index.d.ts",
@@ -1375,9 +1393,7 @@
       ],
       "./smugmug.ts": [
         "../../../node_modules/@types/formidable/index.d.ts",
-        "../../../node_modules/@types/node/http.d.ts"
-      ],
-      "./socket.ts": [
+        "../../../node_modules/@types/node/http.d.ts",
         "../../../server/thalia.d.ts"
       ],
       "../models/blogpost.ts": [
@@ -1815,10 +1831,20 @@
       "../../../node_modules/sequelize/types/lib/utils/validator-extras.d.ts": [
         "../../../node_modules/@types/validator/index.d.ts"
       ],
-      "./smugmug.ts": [
-        "../../../node_modules/@types/node/http.d.ts"
+      "../../../server/requesthandlers.ts": [
+        "../../../server/thalia.d.ts"
       ],
-      "./socket.ts": [
+      "../../../server/thalia.d.ts": [
+        "../../../node_modules/@types/node/http.d.ts",
+        "../../../server/requesthandlers.ts"
+      ],
+      "./awesome.ts": [
+        "../../../server/thalia.d.ts"
+      ],
+      "./config.ts": [
+        "../../../server/thalia.d.ts"
+      ],
+      "./smugmug.ts": [
         "../../../server/thalia.d.ts"
       ],
       "../models/blogpost.ts": [
@@ -2025,11 +2051,12 @@
       "../../../node_modules/sequelize/types/lib/utils.d.ts",
       "../../../node_modules/sequelize/types/lib/utils/validator-extras.d.ts",
       "../../../node_modules/sequelize/types/type-helpers/set-required.d.ts",
+      "../../../server/requesthandlers.ts",
       "../../../server/thalia.d.ts",
+      "./awesome.ts",
       "./config.ts",
       "./db_bootstrap.ts",
       "./smugmug.ts",
-      "./socket.ts",
       "../models/blogpost.ts",
       "../models/camera.ts",
       "../models/family.ts",

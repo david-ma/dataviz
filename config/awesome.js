@@ -1,9 +1,8 @@
-
-let text = "Write here"
-
-import { Thalia } from '../../../server/thalia';
-
-const socket :Thalia.sockets = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.config = void 0;
+let text = "Write here";
+const config = {
     sockets: {
         on: [
             {
@@ -15,9 +14,8 @@ const socket :Thalia.sockets = {
             }
         ],
         emit: [
-            (socket, db ) => { socket.emit("text", { data: text }); }
+            (socket, db) => { socket.emit("text", { data: text }); }
         ]
     }
-}
-
-export { socket }
+};
+exports.config = config;

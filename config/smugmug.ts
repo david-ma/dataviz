@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { IncomingForm } from "formidable";
+import { Thalia } from "../../../server/thalia";
 
 const tokens :{
     "consumer_key"      : string;
@@ -15,8 +16,8 @@ var mime = require('mime');
 var crypto :Crypto = require('crypto');
 var _ = require('lodash');
 
-export { smugmug }
-var smugmug = {
+export { config }
+var config :Thalia.WebsiteConfig = {
     services : {
         "test": function(res :ServerResponse, req :IncomingMessage, db, type) {
             
