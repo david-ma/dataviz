@@ -1,0 +1,127 @@
+/* line 1, websites/dataviz/src/css/dataviz.scss */
+#dataviz_homepage, #dataviz_blog {
+  z-index: 100;
+}
+
+/* line 3, websites/dataviz/src/css/dataviz.scss */
+#dataviz_homepage #aboutMe.hidden, #dataviz_blog #aboutMe.hidden {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  /* line 6, websites/dataviz/src/css/dataviz.scss */
+  #dataviz_homepage section.blogpost, #dataviz_blog section.blogpost {
+    margin-top: 55px;
+    min-height: calc(100vh - 105px);
+  }
+}
+
+/* line 12, websites/dataviz/src/css/dataviz.scss */
+#dataviz_homepage .preview, #dataviz_blog .preview {
+  height: 400px;
+  border: dashed 1px lightgrey;
+  padding: 15px;
+}
+
+@media (max-width: 767px) {
+  /* line 12, websites/dataviz/src/css/dataviz.scss */
+  #dataviz_homepage .preview, #dataviz_blog .preview {
+    margin-top: 55px;
+    margin-bottom: -30px;
+  }
+  /* line 16, websites/dataviz/src/css/dataviz.scss */
+  #dataviz_homepage .preview:last-child, #dataviz_blog .preview:last-child {
+    margin-bottom: 10px;
+  }
+}
+
+/* line 24, websites/dataviz/src/css/dataviz.scss */
+#dataviz_homepage .preview h2, #dataviz_blog .preview h2 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* line 28, websites/dataviz/src/css/dataviz.scss */
+#dataviz_homepage .preview span.subtitle, #dataviz_blog .preview span.subtitle {
+  font-size: 12px;
+}
+
+/* line 31, websites/dataviz/src/css/dataviz.scss */
+#dataviz_homepage .preview p, #dataviz_blog .preview p {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* line 37, websites/dataviz/src/css/dataviz.scss */
+#dataviz_homepage .preview img, #dataviz_blog .preview img {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 15px;
+  max-height: 65%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  max-width: 100%;
+  max-width: calc(100% - 30px);
+  border: solid 1px grey;
+}
+
+/* line 51, websites/dataviz/src/css/dataviz.scss */
+#mobile_nav {
+  position: fixed;
+  z-index: 1000;
+  background: url("/images/unsplash.jpg");
+  background-size: cover;
+  background-position: 50% 60%;
+  color: white;
+  height: 50px;
+  width: 100%;
+}
+
+/* line 60, websites/dataviz/src/css/dataviz.scss */
+#mobile_nav div {
+  display: flex;
+}
+
+/* line 63, websites/dataviz/src/css/dataviz.scss */
+#mobile_nav h1 {
+  margin: 5px;
+}
+
+/* line 67, websites/dataviz/src/css/dataviz.scss */
+#mobile_nav #title {
+  height: 50px;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+}
+
+/* line 71, websites/dataviz/src/css/dataviz.scss */
+#mobile_nav #search {
+  position: fixed;
+  top: 10px;
+  right: 50px;
+}
+
+/* line 75, websites/dataviz/src/css/dataviz.scss */
+#mobile_nav #search input {
+  margin-right: 5px;
+}
+
+/* line 79, websites/dataviz/src/css/dataviz.scss */
+#mobile_nav #hamburger {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+
+/* line 86, websites/dataviz/src/css/dataviz.scss */
+.sidebar {
+  min-height: calc(100vh - 100px - 50px);
+  border-right: dashed 1px lightgrey;
+}
+
+/* line 89, websites/dataviz/src/css/dataviz.scss */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}

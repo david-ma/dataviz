@@ -375,6 +375,20 @@ var config = {
                 router.res.end(output);
             });
         }
+    },
+    publish: {
+        dist: [
+            "css/vendor.min.css",
+            "css/BootstrapXL.css",
+            "css/thalia.css",
+            "css/dataviz.css",
+            "js/showdown.min.js",
+            "js/vendor.min.js",
+            "js/scripts.min.js",
+            "js/datatables.min.js",
+            "css/awesome.min.css",
+            "favicon.ico"
+        ]
     }
 };
 exports.config = config;
