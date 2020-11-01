@@ -378,15 +378,12 @@ var config = {
     },
     publish: {
         dist: [
-            "css/vendor.min.css",
-            "css/BootstrapXL.css",
-            "css/thalia.css",
-            "css/dataviz.css",
-            "js/showdown.min.js",
             "js/vendor.min.js",
             "js/scripts.min.js",
+            "js/showdown.min.js",
             "js/datatables.min.js",
-            "css/awesome.min.css",
+            "css/**/*",
+            "fonts/**/*",
             "favicon.ico"
         ]
     }

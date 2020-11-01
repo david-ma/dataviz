@@ -1,0 +1,97 @@
+/* line 1, websites/dataviz/src/css/awesome.scss */
+.sidebar {
+  display: none;
+}
+
+/* line 4, websites/dataviz/src/css/awesome.scss */
+.project {
+  padding: 5px;
+  border: solid 1px lightgrey;
+}
+
+/* line 6, websites/dataviz/src/css/awesome.scss */
+.project:hover {
+  background: #d3d3d324;
+}
+
+/* line 14, websites/dataviz/src/css/awesome.scss */
+ul#tabs li {
+  float: left;
+  margin: 2px;
+  border: solid 1px black;
+  list-style: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* line 20, websites/dataviz/src/css/awesome.scss */
+ul#tabs li:hover {
+  background: grey;
+}
+
+/* line 24, websites/dataviz/src/css/awesome.scss */
+ul#tabs li input {
+  display: none;
+}
+
+/* line 27, websites/dataviz/src/css/awesome.scss */
+ul#tabs li label {
+  cursor: pointer;
+  padding: 2px;
+  font-size: 20px;
+}
+
+/* line 32, websites/dataviz/src/css/awesome.scss */
+ul#tabs li input:checked + label {
+  background: lightgrey;
+}
+
+/* line 38, websites/dataviz/src/css/awesome.scss */
+textarea.comments {
+  width: 100%;
+  min-height: 400px;
+  height: 100%;
+}
+
+/* line 43, websites/dataviz/src/css/awesome.scss */
+textarea.debrief {
+  width: 100%;
+  min-height: 100px;
+}
+
+/* line 48, websites/dataviz/src/css/awesome.scss */
+input.signatures {
+  width: 100%;
+}
+
+/* line 52, websites/dataviz/src/css/awesome.scss */
+ul.categoryList {
+  list-style: none;
+  padding-left: 10px;
+}
+
+/* line 55, websites/dataviz/src/css/awesome.scss */
+ul.categoryList label {
+  margin-left: 3px;
+  font-size: 1.25em;
+}
+
+/* line 59, websites/dataviz/src/css/awesome.scss */
+ul.categoryList label, ul.categoryList input {
+  cursor: pointer;
+}
+
+/* line 62, websites/dataviz/src/css/awesome.scss */
+ul.categoryList p.categoryDesription {
+  font-size: 0.8em;
+  margin-bottom: 3px;
+}
+
+/* line 66, websites/dataviz/src/css/awesome.scss */
+ul.categoryList li {
+  float: left;
+  border: solid 1px grey;
+  padding: 5px;
+  margin: 2px 5px;
+  border-radius: 5px;
+}
