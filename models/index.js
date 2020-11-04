@@ -34,7 +34,13 @@ let seqOptions = {
     "username": process.env.DB_USER || "root",
     "password": process.env.DB_PASSWORD || "",
     "port": 3306,
-    "dialect": "mysql",
+    "dialect": 'mariadb',
+    timezone: 'Australia/Melbourne',
+    dialectOptions: {
+        timezone: 'Australia/Melbourne',
+        decimalNumbers: true
+    },
+    logging: false,
     "define": {
         "underscored": true
     }
