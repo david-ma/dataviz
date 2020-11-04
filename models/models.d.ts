@@ -1,4 +1,6 @@
-import { BuildOptions, Model } from "sequelize";
+/* eslint-disable camelcase */
+
+import { BuildOptions, Model } from 'sequelize'
 
 interface mysqlAttributes {
     id?: number;
@@ -19,9 +21,6 @@ export type ScrapeStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): ScrapeModel;
 };
 
-
-
-
 export interface FamilyAttributes extends mysqlAttributes {
     identifier?: string;
     brand: string;
@@ -33,8 +32,6 @@ export class Family extends Model<FamilyModel, FamilyAttributes> { }
 export type FamilyStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): FamilyModel;
 };
-
-
 
 export interface CameraAttributes extends mysqlAttributes {
     identifier?: string;
@@ -88,11 +85,6 @@ export type CameraStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): CameraModel;
 };
 
-
-
-
-
-
 export interface BlogpostAttributes extends mysqlAttributes {
     shortname: string;
     title: string;
@@ -107,4 +99,3 @@ export class Blogpost extends Model<BlogpostModel, BlogpostAttributes> { }
 export type BlogpostStatic = typeof Model & {
     new(values?: object, options?: BuildOptions): BlogpostModel;
 };
-

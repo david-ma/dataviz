@@ -531,7 +531,7 @@
         "affectsGlobalScope": false
       },
       "./awesome.ts": {
-        "version": "d1471fb4ffd1c2067babe12b647862978203efc7ee0b49a9851baab24a9ad0fc",
+        "version": "562607666b347d1d6db64c8c0b7609f1db8ea0a37bd41362ca7572bbfe56dc00",
         "signature": "185884e109bc53b9988bcf45de6ce2845648cee72fa1f381db2cdb980276a992",
         "affectsGlobalScope": false
       },
@@ -546,13 +546,13 @@
         "affectsGlobalScope": false
       },
       "./smugmug.ts": {
-        "version": "25eddda6b46f363f35fa1f0084ef6ab536c9f9bd9adf64383b3b5dc2068a98c4",
-        "signature": "6d3c99c6ac427d00e7c98ade51371cd699d0ec24fb7bcd976d38bd08e61128b0",
+        "version": "4972ec0fe576877360c16d08d5428eb289b1efa8282b7dba3ba2f257a1a43b5f",
+        "signature": "185884e109bc53b9988bcf45de6ce2845648cee72fa1f381db2cdb980276a992",
         "affectsGlobalScope": false
       },
       "./config.ts": {
-        "version": "86bfc99d7fed0c18d92a93ba3001a3e87bfdcd6d525fe7203335d1e32916d427",
-        "signature": "18f2d2f20e4c5bdd277098c5daf985078acbb1fa7e974c9859452ce20d12b5d4",
+        "version": "45047af8fd8011288c180ed80d179d1488443fed3fc161e3416c4ca88f64c7f2",
+        "signature": "aab0d9864bdeac0cb386147afcbebe1d66b411861fc1f9524b2b8d430af7eddf",
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/data-types.d.ts": {
@@ -686,37 +686,37 @@
         "affectsGlobalScope": false
       },
       "../models/models.d.ts": {
-        "version": "06c8bde2340fd589c09d48977d36b5ce0f777a2d8ed9455d9240235d3bc27b22",
-        "signature": "06c8bde2340fd589c09d48977d36b5ce0f777a2d8ed9455d9240235d3bc27b22",
+        "version": "59fe6768ccef90cc9ea278bb27f5f762b23173fad45c1ca89ac0f61e9dc93fb5",
+        "signature": "59fe6768ccef90cc9ea278bb27f5f762b23173fad45c1ca89ac0f61e9dc93fb5",
         "affectsGlobalScope": false
       },
       "../models/scrape.ts": {
-        "version": "2993fdfdc1ecd450c01309dd63b4fa6fc881b9fc58b6d3bab10f679065b07792",
+        "version": "ec61108bdad8b6a66401e64cc55c28ecdc145d97ad700656d9dde8b671b1e196",
         "signature": "d766be73c419b30174eebac3584c0c077851a8bc25bf203768f3594194e2afa4",
         "affectsGlobalScope": false
       },
       "../models/family.ts": {
-        "version": "bc725e4545504019b72220006c8ef37c0ea33037002176551c22907437514fb7",
+        "version": "d6629c924711a9e24a77910bf36da23f79665dda001324b2c30bc74fd8d9a07f",
         "signature": "2386c92ce2421ff0b2bd6ce60c0037e385bd44bb4feced1aad646e0d9a0e5a8e",
         "affectsGlobalScope": false
       },
       "../models/camera.ts": {
-        "version": "b7fd9793a9ee5b8e3ca2d7241c30a71573e36d8b00767eea9f1d5575d7c7d687",
+        "version": "f760ba42026eb7a79ef258bf23c366235b60e86b89f0d73d3fe36e3b1dfa00d4",
         "signature": "58a6f4fcafb9fad6c529c9eb2b8400ed14f23912da1a46e2d9f340b21a988564",
         "affectsGlobalScope": false
       },
       "../models/blogpost.ts": {
-        "version": "e29cee76f7233b0cba702955b7d9b99b6dbc095424f7ab50852ec3dbc0ddcb14",
+        "version": "2205b633e6bdd561848547108e58d60e96ab1c598b657eafb0702e360a138d08",
         "signature": "e73967fc08755d5a9a344b5d422ef0c6bc8e09ae9ebc4f57a146e22eb3b5cc04",
         "affectsGlobalScope": false
       },
       "../models/index.ts": {
-        "version": "e03378faaa046fe30ebb050900413683112f9b7e3f8856ff77efe80da80c6cf2",
+        "version": "fa29073dac909d20d9dd32e1cee34fa8a38a17e2e18ad5d4a28337ac5a46d068",
         "signature": "12fd232036bdbf75ed155673a0f0a6ac0685e8c06872daa3012f4d8e787dc317",
         "affectsGlobalScope": false
       },
       "./db_bootstrap.ts": {
-        "version": "b5a319a4fa2911570f7627f5e8610e595a160a18306f181ab368dd3d3be10ad6",
+        "version": "9deff4c5431cd87cacc68a3528529502e67ce538f767edff924a0ecc5ce2aa4d",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },
@@ -1653,6 +1653,11 @@
         "../../../server/thalia.d.ts"
       ],
       "./config.ts": [
+        "../../../node_modules/@types/lodash/index.d.ts",
+        "../../../node_modules/@types/mustache/index.d.ts",
+        "../../../node_modules/@types/node/fs.d.ts",
+        "../../../node_modules/@types/node/http.d.ts",
+        "../../../node_modules/@types/node/path.d.ts",
         "../../../server/thalia.d.ts",
         "./awesome.ts",
         "./smugmug.ts"
@@ -1663,11 +1668,13 @@
       ],
       "./smugmug.ts": [
         "../../../node_modules/@types/formidable/index.d.ts",
+        "../../../node_modules/@types/lodash/index.d.ts",
         "../../../node_modules/@types/mime/index.d.ts",
         "../../../node_modules/@types/node/crypto.d.ts",
         "../../../node_modules/@types/node/fs.d.ts",
         "../../../node_modules/@types/node/http.d.ts",
         "../../../node_modules/@types/node/https.d.ts",
+        "../../../node_modules/@types/node/path.d.ts",
         "../../../server/thalia.d.ts"
       ],
       "../models/blogpost.ts": [
@@ -1684,6 +1691,7 @@
       ],
       "../models/index.ts": [
         "../../../node_modules/@types/lodash/index.d.ts",
+        "../../../node_modules/@types/node/path.d.ts",
         "../../../node_modules/sequelize/types/index.d.ts",
         "../models/blogpost.ts",
         "../models/camera.ts",

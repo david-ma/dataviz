@@ -3,11 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CameraFactory = void 0;
 const sequelize_1 = require("sequelize");
 function CameraFactory(sequelize) {
-    return sequelize.define("Camera", {
+    return sequelize.define('Camera', {
         identifier: {
             type: sequelize_1.DataTypes.VIRTUAL,
             get: function () {
-                return `${this.get('brand')}_${this.get('model').replace(" ", "-")}`;
+                return `${this.get('brand')}_${this.get('model').replace(' ', '-')}`;
             }
         },
         brand: sequelize_1.DataTypes.STRING,

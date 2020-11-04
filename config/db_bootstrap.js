@@ -32,9 +32,9 @@ if (false) {
 }
 if (false) {
     models_1.Family.create({
-        brand: "Nikon",
-        name: "Coolpix",
-        description: "None"
+        brand: 'Nikon',
+        name: 'Coolpix',
+        description: 'None'
     });
 }
 if (false) {
@@ -42,7 +42,7 @@ if (false) {
         const blogposts = [{
                 shortname: 'war',
                 title: 'American wartime',
-                category: "#MakeoverMonday",
+                category: '#MakeoverMonday',
                 summary: 'Nearly a quarter of Americans have never experienced the U.S. in a time of peace according to the Washington Post.',
                 image: 'images/war.jpg',
                 publish_date: '2020-02-01',
@@ -50,7 +50,7 @@ if (false) {
             }, {
                 shortname: 'wealth',
                 title: 'World Wealth',
-                category: "#MakeoverMonday",
+                category: '#MakeoverMonday',
                 summary: "All of the world's wealth, according to the Credit Suisse report",
                 image: 'images/wealth.png',
                 publish_date: '2020-02-17',
@@ -58,7 +58,7 @@ if (false) {
             }, {
                 shortname: 'influenza',
                 title: 'Influenza Surveillance Report',
-                category: "#MakeoverMonday",
+                category: '#MakeoverMonday',
                 summary: 'Influenza in the USA in 2018',
                 image: 'images/influenza.jpg',
                 publish_date: '2018-06-18',
@@ -66,7 +66,7 @@ if (false) {
             }, {
                 shortname: 'homelessness',
                 title: 'Australian homelessness',
-                category: "#MakeoverMonday",
+                category: '#MakeoverMonday',
                 summary: 'Housing outcomes for clients of Australian Specialist Homelessness Services',
                 image: 'images/homelessness.png',
                 publish_date: '2020-02-24',
@@ -74,7 +74,7 @@ if (false) {
             }, {
                 shortname: 'kids_sleep',
                 title: "Kids' sleep",
-                category: "#MakeoverMonday",
+                category: '#MakeoverMonday',
                 summary: 'Data from savvysleeper.org on how kids sleep',
                 image: 'images/kids_sleep.png',
                 publish_date: '2020-03-02',

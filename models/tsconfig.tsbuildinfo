@@ -342,22 +342,22 @@
         "affectsGlobalScope": false
       },
       "./models.d.ts": {
-        "version": "06c8bde2340fd589c09d48977d36b5ce0f777a2d8ed9455d9240235d3bc27b22",
-        "signature": "06c8bde2340fd589c09d48977d36b5ce0f777a2d8ed9455d9240235d3bc27b22",
+        "version": "59fe6768ccef90cc9ea278bb27f5f762b23173fad45c1ca89ac0f61e9dc93fb5",
+        "signature": "59fe6768ccef90cc9ea278bb27f5f762b23173fad45c1ca89ac0f61e9dc93fb5",
         "affectsGlobalScope": false
       },
       "./blogpost.ts": {
-        "version": "e29cee76f7233b0cba702955b7d9b99b6dbc095424f7ab50852ec3dbc0ddcb14",
+        "version": "2205b633e6bdd561848547108e58d60e96ab1c598b657eafb0702e360a138d08",
         "signature": "e73967fc08755d5a9a344b5d422ef0c6bc8e09ae9ebc4f57a146e22eb3b5cc04",
         "affectsGlobalScope": false
       },
       "./camera.ts": {
-        "version": "b7fd9793a9ee5b8e3ca2d7241c30a71573e36d8b00767eea9f1d5575d7c7d687",
+        "version": "f760ba42026eb7a79ef258bf23c366235b60e86b89f0d73d3fe36e3b1dfa00d4",
         "signature": "58a6f4fcafb9fad6c529c9eb2b8400ed14f23912da1a46e2d9f340b21a988564",
         "affectsGlobalScope": false
       },
       "./family.ts": {
-        "version": "bc725e4545504019b72220006c8ef37c0ea33037002176551c22907437514fb7",
+        "version": "d6629c924711a9e24a77910bf36da23f79665dda001324b2c30bc74fd8d9a07f",
         "signature": "2386c92ce2421ff0b2bd6ce60c0037e385bd44bb4feced1aad646e0d9a0e5a8e",
         "affectsGlobalScope": false
       },
@@ -427,12 +427,12 @@
         "affectsGlobalScope": true
       },
       "./scrape.ts": {
-        "version": "2993fdfdc1ecd450c01309dd63b4fa6fc881b9fc58b6d3bab10f679065b07792",
+        "version": "ec61108bdad8b6a66401e64cc55c28ecdc145d97ad700656d9dde8b671b1e196",
         "signature": "d766be73c419b30174eebac3584c0c077851a8bc25bf203768f3594194e2afa4",
         "affectsGlobalScope": false
       },
       "./index.ts": {
-        "version": "e03378faaa046fe30ebb050900413683112f9b7e3f8856ff77efe80da80c6cf2",
+        "version": "fa29073dac909d20d9dd32e1cee34fa8a38a17e2e18ad5d4a28337ac5a46d068",
         "signature": "12fd232036bdbf75ed155673a0f0a6ac0685e8c06872daa3012f4d8e787dc317",
         "affectsGlobalScope": false
       },
@@ -1632,6 +1632,7 @@
       ],
       "./index.ts": [
         "../../../node_modules/@types/lodash/index.d.ts",
+        "../../../node_modules/@types/node/path.d.ts",
         "../../../node_modules/sequelize/types/index.d.ts",
         "./blogpost.ts",
         "./camera.ts",
