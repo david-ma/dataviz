@@ -1,20 +1,23 @@
 {
-    "compilerOptions": {
-        "baseUrl": "src",
-        "outDir": "dist",
-
-        "target": "ES2015",
-        "module": "AMD",
-
-        "allowSyntheticDefaultImports":  true,
-        "esModuleInterop": true,
-        "removeComments": true,
-
-        "noImplicitAny": false,
-        "noImplicitThis": false,
-        "noImplicitReturns": false,
-        "noUnusedLocals": false
-    },
-    "include": ["src/**/*"],
-    "exclude": ["config", "models"]
+  "compilerOptions": {
+    "rootDir": "src",
+    "baseUrl": "src",
+    "outDir": "dist",
+    "target": "ES2015",
+    "module": "AMD",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "removeComments": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "config",
+    "models"
+  ]
 }
