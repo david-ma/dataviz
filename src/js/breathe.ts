@@ -34,7 +34,8 @@ type DataPoint = {
 
 const speed :number = 400
 const size :number = 100
-const n :number = 14
+const n :number = 13
+const colors = ['#9e0142','#d53e4f','#f46d43','#fdae61','#fee08b','#ffffbf','#e6f598','#abdda4','#66c2a5','#3288bd','#5e4fa2']
 
 $.when($.ready).then(function () {
   const chart = new Chart({ // eslint-disable-line
@@ -95,7 +96,7 @@ $.when($.ready).then(function () {
     chart.svg.selectAll('.line')
       .data(dataPoints)
       .enter()
-      .append('polyline')
+      .insert('polyline', 'polyline')
       .classed('.line', true)
       .each((d, i, k) => {
 
@@ -105,7 +106,7 @@ $.when($.ready).then(function () {
           .attr('points', d.start.vertices.map(d => d.join(',')).join(' '))
           .attr('transform', d.start.transform)
           .attrs({
-            fill: 'rgba(0,0,0,0)',
+            fill: colors[i],
             stroke: 'black'
           }).transition()
           .duration(speed)
