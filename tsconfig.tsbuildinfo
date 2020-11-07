@@ -377,7 +377,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/breathe.ts": {
-        "version": "becde936b6463b474d4b7768d0bf5a6d44cfe1199de23b1d1ddf64b6ca58be86",
+        "version": "f1e68aa493a5e29f37529a61fbbe6ab471e93523bf9f8c727b1cdf9d22506b30",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },

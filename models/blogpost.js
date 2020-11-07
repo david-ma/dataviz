@@ -12,7 +12,7 @@ function BlogpostFactory(sequelize) {
         summary: sequelize_1.DataTypes.STRING,
         image: sequelize_1.DataTypes.STRING,
         category: sequelize_1.DataTypes.STRING,
-        publish_date: sequelize_1.DataTypes.DATE,
+        publish_date: sequelize_1.DataTypes.DATEONLY,
         published: {
             type: sequelize_1.DataTypes.BOOLEAN,
             defaultValue: false

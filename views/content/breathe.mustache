@@ -9,6 +9,7 @@
     <div class="col-xs-12 col-md-6">
       <h2>Timing Data:</h2>
       <table id='timing'></table>
+      <div id="colorExplain"></div>
     </div>
   </div>
 
@@ -48,5 +49,9 @@ svg to gif example:<br>
 
 svg animations help:<br>
 [https://css-tricks.com/guide-svg-animations-smil/](https://css-tricks.com/guide-svg-animations-smil/)
+`))
+
+$("#colorExplain").html(md.makeHtml(`
+Colors thanks to [Color Brewer](https://colorbrewer2.org/#type=diverging&scheme=Spectral&n=11), which is named such because it was made by Cynthia Brewer, not because you brew colors with it.
 `))
 </script>

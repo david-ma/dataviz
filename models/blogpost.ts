@@ -11,7 +11,7 @@ export function BlogpostFactory (sequelize: Sequelize): BlogpostStatic {
     summary: DataTypes.STRING,
     image: DataTypes.STRING,
     category: DataTypes.STRING,
-    publish_date: DataTypes.DATE,
+    publish_date: DataTypes.DATEONLY,
     published: {
       type: DataTypes.BOOLEAN,
       defaultValue: false

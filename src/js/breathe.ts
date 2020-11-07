@@ -138,8 +138,8 @@ decorateTable(timingData, {
 })
 
 function getName (i :number) :string {
-  const names = ['Void', 'Dot', 'Line', 'Triangle', 'Square', 'Pentagon', 'Hexagon', 'Heptagon', 'Octagon', 'Nonagon', 'Decagon']
-  if (i <= 10) {
+  const names = ['Void', 'Dot', 'Line', 'Triangle', 'Square', 'Pentagon', 'Hexagon', 'Heptagon', 'Octagon', 'Nonagon', 'Decagon', 'Hendecagon', 'Dodecagon', 'Tridecagon', 'Tetradecagon', 'Pentadecagon', 'Hexadecagon', 'Heptadecagon', 'Octadecagon', 'Enneadecagon', 'Icosagon', 'Henicosagon', 'Doicosagon', 'Triaicosagon']
+  if (i < names.length) {
     return names[i]
   } else {
     return `${i}-gon`

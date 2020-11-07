@@ -49,7 +49,7 @@ if (false) { // eslint-disable-line
 }
 
 // rebuild entire database & reload data..?
-if (false) { // eslint-disable-line
+if (true) { // eslint-disable-line
   seq.sequelize.sync({
     // force: true
   }).then(function (d) { // eslint-disable-line
@@ -77,7 +77,7 @@ if (false) { // eslint-disable-line
       summary: 'Influenza in the USA in 2018',
       image: 'images/influenza.jpg',
       publish_date: '2018-06-18',
-      published: true
+      published: false
     }, {
       shortname: 'homelessness',
       title: 'Australian homelessness',
@@ -94,6 +94,14 @@ if (false) { // eslint-disable-line
       image: 'images/kids_sleep.png',
       publish_date: '2020-03-02',
       published: false
+    }, {
+      shortname: 'breathe',
+      title: "Breathing Polygons",
+      category: '',
+      summary: 'D3.js & maths practice by drawing breathing polygons',
+      image: 'images/breathe.png',
+      publish_date: '2020-11-07',
+      published: true
     }]
 
     blogposts.forEach(function (blogpost) {

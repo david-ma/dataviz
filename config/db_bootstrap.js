@@ -37,7 +37,7 @@ if (false) {
         description: 'None'
     });
 }
-if (false) {
+if (true) {
     seq.sequelize.sync({}).then(function (d) {
         const blogposts = [{
                 shortname: 'war',
@@ -62,7 +62,7 @@ if (false) {
                 summary: 'Influenza in the USA in 2018',
                 image: 'images/influenza.jpg',
                 publish_date: '2018-06-18',
-                published: true
+                published: false
             }, {
                 shortname: 'homelessness',
                 title: 'Australian homelessness',
@@ -79,6 +79,14 @@ if (false) {
                 image: 'images/kids_sleep.png',
                 publish_date: '2020-03-02',
                 published: false
+            }, {
+                shortname: 'breathe',
+                title: "Breathing Polygons",
+                category: '',
+                summary: 'D3.js & maths practice by drawing breathing polygons',
+                image: 'images/breathe.png',
+                publish_date: '2020-11-07',
+                published: true
             }];
         blogposts.forEach(function (blogpost) {
             console.log(`Adding ${blogpost.shortname}`);

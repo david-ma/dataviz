@@ -357,7 +357,7 @@ let config = {
                     where: {
                         published: true
                     },
-                    order: [['published', 'DESC']]
+                    order: [['publish_date', 'DESC']]
                 }).then((results) => {
                     data.blogposts = results.map(d => d.dataValues);
                     const output = mustache_1.default.render(views.template, data, views);
