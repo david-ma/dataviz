@@ -39,11 +39,11 @@ $.when($.ready).then(function () {
     chart.svg.select('.chart-title')
       .attr('transform', `translate(${chart.width / 2},${chart.height - 15})`)
 
-    const n = 9
+    const n = 14
 
     const allVertices :Array<Array<Vertex>> = []
 
-    for (let i = 1; i < n; i++) {
+    for (let i = 2; i < n; i++) {
       const vertices : Array<Vertex> = poly(i)
       allVertices.push(vertices)
     }
@@ -55,27 +55,23 @@ $.when($.ready).then(function () {
       .append('polyline')
       .classed('.line', true)
       .each((d, i, k) => {
-        console.log(d)
-        console.log(i)
-        console.log(k)
 
         const distance = finalDistance(d)
         const ratio = size / distance
         d = scaleSize(d, ratio)
-        console.log(ratio)
 
-        const translateTarget = [150, 450]
+        const translateTarget = [250, 500]
         const translate = [translateTarget[0] - d[0][0], translateTarget[1] - d[0][1]]
-        const last :Vertex = d[d.length - 1]
-        const rotate = `${Math.atan2(last[0] - translateTarget[0], last[1] - translateTarget[1]) * 180 / Math.PI}`
+
+        var startVertices = i > 0 ? getStartVertices(allVertices[i-1]) : [[0,0],[0,0]]
 
         d3.select(k[i]).attrs({
           points: d.map(d => d.join(',')).join(' '),
           fill: 'rgba(0,0,0,0)',
           stroke: 'black'
-        }).attrs({
-          transform: `
-          translate(${translate.join(',')})`
+        })
+        .attrs({
+          transform: `translate(${translate.join(',')})`
         })
       })
 
@@ -196,29 +192,29 @@ const Tau = 2 * Math.PI
 function poly (n) :Array<Vertex> {
   const result :Array<Vertex> = []
 
-  const start_x = Math.cos(Tau * 0.5) // -1
-  const start_y = Math.sin(Tau * 0.5) // 0 y
-  const end_x = Math.cos(Tau * 1) // 1 x
-  const end_y = Math.sin(Tau * 1) // 0 y
-
-  const endX = Math.cos(Tau * 2 / 3) // * -50 x = -1
-  const endY = Math.sin(Tau * (n - 1) / n) // * -50 y =
-
   for (let i = 0; i < n; i++) {
     const x = 0
     const y = 0
     const r = 50
 
-    const thing = (1 / 4) + (i / n) - (i-1 / (2 *n))
+    /*
+      We always want the first coordinates to be [-1, 0]
+      and the last to always be [1,0]:
 
-    console.log('thing', thing)
+      const start_x = Math.cos(Tau * 0.5) //  x1 = -1
+      const start_y = Math.sin(Tau * 0.5) //  y1 = 0
+      const end_x = Math.cos(Tau * 1) //      x2 = 1 
+      const end_y = Math.sin(Tau * 1) //      y2 = 0
+
+      So use this formula, to get the results we want:
+    */
+    const transform = (1 / 4) + (i / n) - (i-1 / (2 *n))
 
     result.push([
-      x + r * Math.cos(Tau * thing) * 1,
-      y + r * Math.sin(Tau * thing) * 1
+      x + r * Math.cos(Tau * transform) * 1,
+      y + r * Math.sin(Tau * transform) * 1
     ])
   }
-  console.log(result.join(', '))
   return result
 }
 
@@ -237,6 +233,11 @@ function scaleSize (vertices: Array<Vertex>, scale: number) : Array<Vertex> {
       vertex[1] * scale
     ])
   })
+  return result
+}
+
+function getStartVertices(vertices: Array<Vertex>) : Array<Vertex> {
+  const result : Array<Vertex> = []
   return result
 }
 
