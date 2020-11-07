@@ -35,7 +35,7 @@ type DataPoint = {
 const speed :number = 400
 const size :number = 100
 const n :number = 13
-const colors = ['#9e0142','#d53e4f','#f46d43','#fdae61','#fee08b','#ffffbf','#e6f598','#abdda4','#66c2a5','#3288bd','#5e4fa2']
+const colors = ['#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2']
 
 $.when($.ready).then(function () {
   const chart = new Chart({ // eslint-disable-line
@@ -60,7 +60,7 @@ $.when($.ready).then(function () {
     }
     console.log(allVertices)
 
-    var dataPoints : DataPoint[] = []
+    const dataPoints : DataPoint[] = []
 
     allVertices.forEach((vertices, i) => {
       const distance = finalDistance(vertices)
@@ -70,16 +70,16 @@ $.when($.ready).then(function () {
       const translateTarget = [250, 500]
       const translate = [translateTarget[0] - vertices[0][0], translateTarget[1] - vertices[0][1]]
 
-      var firstVertex :Array<Vertex> = [[0,0],[0,0]]
+      const firstVertex :Array<Vertex> = [[0, 0], [0, 0]]
 
-      var startVertices = i > 0 ? getStartVertices(allVertices[i-1]) : firstVertex
-      
+      let startVertices = i > 0 ? getStartVertices(allVertices[i - 1]) : firstVertex
+
       const s_distance = finalDistance(startVertices)
       const s_ratio = size / s_distance
       startVertices = scaleSize(startVertices, s_ratio)
       const s_translate = [translateTarget[0] - startVertices[0][0], translateTarget[1] - startVertices[0][1]]
 
-      if(i === 0) { s_translate[0] = s_translate[0] + (size / 2) }
+      if (i === 0) { s_translate[0] = s_translate[0] + (size / 2) }
 
       dataPoints.push({
         start: {
@@ -99,43 +99,38 @@ $.when($.ready).then(function () {
       .insert('polyline', 'polyline')
       .classed('.line', true)
       .each((d, i, k) => {
-
-        window.setTimeout(() => {
-          d3.select(k[i])
-          .attr("id", `polyline-${i}`)
+        d3.select(k[i])
+          .attr('id', `polyline-${i}`)
           .attr('points', d.start.vertices.map(d => d.join(',')).join(' '))
           .attr('transform', d.start.transform)
           .attrs({
             fill: colors[i],
-            stroke: 'black'
-          }).transition()
-          .duration(speed)
-          .ease(d3.easeLinear)
-          .attr('points', d.end.vertices.map(d => d.join(',')).join(' '))
-          .attr('transform', d.end.transform)
-          .on('end', (d :DataPoint) => {
-            console.log(d)
-            if(d.start.vertices.length + 1 === n) {
-              callReverse(i)
-            }
+            stroke: 'black',
+            display: 'none'
           })
-        }, speed * i)
       })
+
+    callDraw(0)
   })
 })
+
+function modifiedSpeed (i) :number {
+  const result = Math.pow(n - i, 1.5) * 10 + 200
+  return result
+}
 
 function callReverse (i:number) {
   d3.select('.chart-title').text('Breathe Out')
   d3.select(`#polyline-${i}`)
     .transition()
     .ease(d3.easeLinear)
-    .duration(speed)
+    .duration(modifiedSpeed(i))
     .attr('points', (d: DataPoint) => d.start.vertices.map(d => d.join(',')).join(' '))
     .attr('transform', (d: DataPoint) => d.start.transform)
-    .on('end', (d,j,k) => {
+    .on('end', (d, j, k) => {
       d3.select(k[j]).style('display', 'none')
-      if(i > 0) {
-        callReverse( i - 1)
+      if (i > 0) {
+        callReverse(i - 1)
       } else {
         callDraw(0)
       }
@@ -148,12 +143,12 @@ function callDraw (i:number) {
     .style('display', 'inherit')
     .transition()
     .ease(d3.easeLinear)
-    .duration(speed)
+    .duration(modifiedSpeed(i))
     .attr('points', (d: DataPoint) => d.end.vertices.map(d => d.join(',')).join(' '))
     .attr('transform', (d: DataPoint) => d.end.transform)
-    .on('end', (d,j,k) => {
-      if(i < n - 3) {
-        callDraw( i + 1)
+    .on('end', (d, j, k) => {
+      if (i < n - 3) {
+        callDraw(i + 1)
       } else {
         callReverse(i)
       }
@@ -178,12 +173,12 @@ function poly (n) :Array<Vertex> {
 
       const start_x = Math.cos(Tau * 0.5) //  x1 = -1
       const start_y = Math.sin(Tau * 0.5) //  y1 = 0
-      const end_x = Math.cos(Tau * 1) //      x2 = 1 
+      const end_x = Math.cos(Tau * 1) //      x2 = 1
       const end_y = Math.sin(Tau * 1) //      y2 = 0
 
       So use this formula, to get the results we want:
     */
-    const transform = (1 / 4) + (i / n) - (i-1 / (2 *n))
+    const transform = (1 / 4) + (i / n) - (i - 1 / (2 * n))
 
     result.push([
       x + r * Math.cos(Tau * transform) * 1,
@@ -211,23 +206,22 @@ function scaleSize (vertices: Array<Vertex>, scale: number) : Array<Vertex> {
   return result
 }
 
-function getStartVertices(vertices: Array<Vertex>) : Array<Vertex> {
+function getStartVertices (vertices: Array<Vertex>) : Array<Vertex> {
   const result : Array<Vertex> = []
 
   vertices.forEach(vertex => {
     result.push(vertex)
   })
-  var mid = Math.floor(vertices.length / 2)
+  const mid = Math.floor(vertices.length / 2)
 
   // console.log("vertices", vertices)
 
-  if(vertices.length % 2 === 1) { // odd
+  if (vertices.length % 2 === 1) { // odd
     result.splice(mid, 0, result[mid])
   } else { // even
     // find the middle point of the middle 2, and then insert something
-    var midPoint :Vertex = [
-      (vertices[mid][0] + vertices[mid - 1][0]) / 2
-      ,
+    const midPoint :Vertex = [
+      (vertices[mid][0] + vertices[mid - 1][0]) / 2,
       (vertices[mid][1] + vertices[mid - 1][1]) / 2
     ]
     // console.log(midPoint)
