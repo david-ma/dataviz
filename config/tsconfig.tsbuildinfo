@@ -716,7 +716,7 @@
         "affectsGlobalScope": false
       },
       "./db_bootstrap.ts": {
-        "version": "6d8d1b64b0cf64aca720c565b68492b6b1c6c656f5e07f8048a2fdb98d2d96a5",
+        "version": "6c3fcfd491cd89251b6a3db928678654148fd3942f2c18ae5bf226365fc84910",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },

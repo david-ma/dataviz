@@ -22,8 +22,8 @@ type DataPoint = {
 const Tau = 2 * Math.PI
 
 const size :number = 100
-const n :number = 13
-const colors = ['#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2'] // eslint-disable-line
+const n :number = 14
+const colors = ['#000000', '#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2'] // eslint-disable-line
 
 // d3.interpolate(colors)
 // const interpolatedColors = d3.interpolateHslLong('#9e0142', '#5e4fa2')

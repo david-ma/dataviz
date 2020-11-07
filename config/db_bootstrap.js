@@ -41,7 +41,7 @@ if (true) {
     seq.sequelize.sync({}).then(function (d) {
         const blogposts = [{
                 shortname: 'war',
-                title: 'American wartime',
+                title: 'American Wartime',
                 category: '#MakeoverMonday',
                 summary: 'Nearly a quarter of Americans have never experienced the U.S. in a time of peace according to the Washington Post.',
                 image: 'images/war.jpg',
