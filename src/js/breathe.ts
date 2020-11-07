@@ -1,25 +1,12 @@
 
-import { Chart } from 'chart'
+import { Chart, decorateTable } from 'chart'
 import * as d3 from 'd3'
 import $ from 'jquery'
-// import 'datatables.net';
+import 'datatables.net'
 
 console.log('Running breathe.ts')
 
-type LineData = {
-  start: {
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-  },
-  end: {
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-  }
-}
+type Vertex = [number, number]
 
 type DataPoint = {
   start: {
@@ -32,13 +19,15 @@ type DataPoint = {
   };
 }
 
-type Vertex = [number, number]
-
 const Tau = 2 * Math.PI
 
-const size :number = 110
+const size :number = 100
 const n :number = 13
-const colors = ['#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2']
+const colors = ['#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2'] // eslint-disable-line
+
+// d3.interpolate(colors)
+// const interpolatedColors = d3.interpolateHslLong('#9e0142', '#5e4fa2')
+const interpolatedColors = d3.interpolateHslLong('#810081', '#ffa600') // eslint-disable-line
 
 $.when($.ready).then(function () {
   const chart = new Chart({ // eslint-disable-line
@@ -49,9 +38,7 @@ $.when($.ready).then(function () {
     height: 600,
     nav: false
   }).scratchpad((chart :Chart) => {
-    const svg = chart.svg
-
-    // Put the title on the bottom
+    // Move the title to the bottom
     chart.svg.select('.chart-title')
       .attr('transform', `translate(${chart.width / 2},${chart.height - 15})`)
 
@@ -77,17 +64,17 @@ $.when($.ready).then(function () {
 
       let startVertices = i > 0 ? getStartVertices(allVertices[i - 1]) : firstVertex
 
-      const s_distance = finalDistance(startVertices)
-      const s_ratio = size / s_distance
-      startVertices = scaleSize(startVertices, s_ratio)
-      const s_translate = [translateTarget[0] - startVertices[0][0], translateTarget[1] - startVertices[0][1]]
+      const startDistance = finalDistance(startVertices)
+      const startRatio = size / startDistance
+      startVertices = scaleSize(startVertices, startRatio)
+      const startTranslate = [translateTarget[0] - startVertices[0][0], translateTarget[1] - startVertices[0][1]]
 
-      if (i === 0) { s_translate[0] = s_translate[0] + (size / 2) }
+      if (i === 0) { startTranslate[0] = startTranslate[0] + (size / 2) }
 
       dataPoints.push({
         start: {
           vertices: startVertices,
-          transform: `translate(${s_translate.join(',')})`
+          transform: `translate(${startTranslate.join(',')})`
         },
         end: {
           vertices: vertices,
@@ -108,6 +95,8 @@ $.when($.ready).then(function () {
           .attr('transform', d.start.transform)
           .attrs({
             fill: colors[i],
+            // fill: interpolatedColors(i / (dataPoints.length - 1)),
+            // fill: 'rgba(0,0,0,0)',
             stroke: 'black',
             display: 'none'
           })
@@ -120,9 +109,41 @@ $.when($.ready).then(function () {
 const speed :number = 400
 
 function modifiedSpeed (i) :number {
-  const result = ((2 + Math.cos(Tau * ((i/n)))) * speed)
+  const result = ((2 + Math.cos(Tau * ((i / n)))) * speed)
   // const result = d3.easePoly(i)
   return result
+}
+
+const timingData = []
+
+for (let i = 2; i < n; i++) {
+  timingData.push({
+    Vertices: i,
+    Shape: getName(i),
+    'Drawing time (ms)': Math.floor(modifiedSpeed(i)),
+    // 'Fill Color': interpolatedColors(i / (n - 1))
+    'Fill Color': colors[i - 2]
+  })
+}
+
+decorateTable(timingData, {
+  element: 'table#timing',
+  order: [[0, 'asc']],
+  columnDefs: [{
+    targets: 3,
+    createdCell: function (td, cellData) {
+      $(td).css('background-color', cellData)
+    }
+  }]
+})
+
+function getName (i :number) :string {
+  const names = ['Void', 'Dot', 'Line', 'Triangle', 'Square', 'Pentagon', 'Hexagon', 'Heptagon', 'Octagon', 'Nonagon', 'Decagon']
+  if (i <= 10) {
+    return names[i]
+  } else {
+    return `${i}-gon`
+  }
 }
 
 function callReverse (i:number) {
@@ -136,7 +157,7 @@ function callReverse (i:number) {
     .on('end', (d, j, k) => {
       d3.select(k[j]).style('display', 'none')
       if (i > 0) {
-        callReverse(i - 1)        
+        callReverse(i - 1)
       } else {
         callDraw(0)
       }
@@ -152,13 +173,13 @@ function callDraw (i:number) {
     .duration(modifiedSpeed(i))
     .attr('points', (d: DataPoint) => d.end.vertices.map(d => d.join(',')).join(' '))
     .attr('transform', (d: DataPoint) => d.end.transform)
-    .on('end', (d, j, k) => {
+    .on('end', () => {
       if (i < n - 3) {
         callDraw(i + 1)
       } else {
-        setTimeout(() => { 
+        setTimeout(() => {
           callReverse(i)
-         },
+        },
         speed / 2)
       }
     })

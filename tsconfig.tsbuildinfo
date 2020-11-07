@@ -372,13 +372,13 @@
         "affectsGlobalScope": false
       },
       "./src/js/chart.ts": {
-        "version": "1a057055903f4327810c591885d1a51f83db0bbd8b267ea5acf88ccbbdf83623",
+        "version": "25521d03bf1632e8e56e12622ff9b706805b57a91926c5758199ce933246f7a6",
         "signature": "e28b273fea48f1f4827ed1b4273365a581bc0214824bba097e8fa3c120a5eba6",
         "affectsGlobalScope": false
       },
       "./src/js/breathe.ts": {
-        "version": "d48e94851937807e65bf400d917690cd978a1d16e72182aef5f0bbdb9b3ee791",
-        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+        "version": "becde936b6463b474d4b7768d0bf5a6d44cfe1199de23b1d1ddf64b6ca58be86",
+        "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
       "./src/js/friends.ts": {

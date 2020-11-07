@@ -1112,7 +1112,21 @@ function log(message :string){
 
 
 function decorateTable(dataset:any, newOptions?:any) : DataTables.Api {
-    const element = newOptions ? newOptions.element : "#dataset table";
+  const element = newOptions ? newOptions.element : "#dataset table";
+
+  var columns = dataset.columns
+    ? dataset.columns.map(function (d: any) {
+      return {
+        title: d,
+        data: d
+      };
+    })
+    : Object.keys(dataset[0]).map(function (d: any) {
+      return {
+        title: d,
+        data: d
+      };
+    })
 
     var options: DataTables.Settings = {
         info: false,
@@ -1122,10 +1136,8 @@ function decorateTable(dataset:any, newOptions?:any) : DataTables.Api {
         data: dataset,
         pageLength: 25,
         order: [[0, 'desc']],
-        columns: dataset.columns.map(function(d :any){ return {
-            title: d,
-            data: d
-        };})
+        columns: columns,
+        columnDefs: newOptions.columnDefs || []
     };
     if (newOptions) {
         Object.keys(newOptions).forEach(function(key) {

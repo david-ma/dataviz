@@ -1,10 +1,17 @@
 <section class="blogpost">
-  <br>
   <div class="row" id="contentBox">
-    <div class="col-xs-12 col-md-6" id='breatheDiv'></div>
+    <div class="col-xs-12 col-md-6">
+      <h1>Breathing Polygons</h1>
+      <div id='breatheDiv'></div>
+        <div class="col-xs-12 col-lg-8" id="explain"></div>
+        <div class="col-xs-12 col-lg-4"><img style="width: 100%;" src="/images/breathe/breathe-in-out-A.gif"></div>
+    </div>
+    <div class="col-xs-12 col-md-6">
+      <h2>Timing Data:</h2>
+      <table id='timing'></table>
+    </div>
   </div>
-  <div id="explain"></div>
-  <img src="/images/breathe/breathe-in-out-A.gif">
+
   <br>
   <br>
   <br>
@@ -21,8 +28,7 @@ svg line {
 <script>
   const md = new showdown.Converter({openLinksInNewWindow: true});
 
-  $("#explain").html(md.makeHtml(`#Breathing polygons
-
+  $("#explain").html(md.makeHtml(`
 This gif has been shared around the internet for a bit, but I can't find the original source.
 
 The fuzzy edges and aliasing bothered me so I decided to recreate it in d3.js
@@ -37,5 +43,10 @@ Todo:
 - change size of drawing
 - save output as gif? save output as svg?
 
+svg to gif example:<br>
+[https://bl.ocks.org/veltman/1071413ad6b5b542a1a3](https://bl.ocks.org/veltman/1071413ad6b5b542a1a3)
+
+svg animations help:<br>
+[https://css-tricks.com/guide-svg-animations-smil/](https://css-tricks.com/guide-svg-animations-smil/)
 `))
 </script>
