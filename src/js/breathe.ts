@@ -1,10 +1,10 @@
 
-import { Chart } from 'chart';
-import * as d3 from 'd3';
-import $ from 'jquery';
+import { Chart } from 'chart'
+import * as d3 from 'd3'
+import $ from 'jquery'
 // import 'datatables.net';
 
-console.log("Running breathe.ts")
+console.log('Running breathe.ts')
 
 type LineData = {
   start: {
@@ -21,22 +21,22 @@ type LineData = {
   }
 }
 
-const speed :number = 2000;
-const size :number = 100;
+const speed :number = 2000
+const size :number = 100
 
-$.when( $.ready ).then(function() {
-  const chart = new Chart({
-    title: "Breathe In",
+$.when($.ready).then(function () {
+  const chart = new Chart({ // eslint-disable-line
+    title: 'Breathe In',
     element: 'breatheDiv',
     margin: 40,
     width: 600,
     height: 600,
     nav: false
   }).scratchpad((chart :Chart) => {
-    const svg = chart.svg;
+    const svg = chart.svg
 
     // Put the title on the bottom
-    chart.svg.select(".chart-title")
+    chart.svg.select('.chart-title')
       .attr('transform', `translate(${chart.width / 2},${chart.height - 15})`)
 
     const original :Array<LineData> = [{
@@ -62,7 +62,7 @@ $.when( $.ready ).then(function() {
         y1: chart.height * 0.8,
         x2: chart.width / 2,
         y2: chart.height * 0.8
-      }, 
+      },
       end: {
         x1: (chart.width / 2) - size,
         y1: chart.height * 0.8,
@@ -75,7 +75,7 @@ $.when( $.ready ).then(function() {
         y1: chart.height * 0.8,
         x2: (chart.width / 2) + size,
         y2: chart.height * 0.8
-      }, 
+      },
       end: {
         x1: chart.width / 2,
         y1: (chart.height * 0.8) - triangleHeight,
@@ -125,112 +125,124 @@ $.when( $.ready ).then(function() {
       }
     }]
 
+    svg.selectAll('.originalLine')
+      .data(original)
+      .enter()
+      .append('line')
+      .classed('originalLine', true)
+      .attrs({
+        x1: chart.width / 2,
+        y1: chart.height * 0.8,
+        x2: chart.width / 2,
+        y2: chart.height * 0.8
+      }).transition()
+      .duration(speed)
+      .attrs({
+        x1: (chart.width / 2) - size,
+        x2: (chart.width / 2) + size
+      }).on('end', function () {
+        svg.selectAll('.triangleLine')
+          .data(triangle)
+          .enter()
+          .append('line')
+          .classed('triangleLine', true)
+          .attr('x1', d => d.start.x1)
+          .attr('y1', d => d.start.y1)
+          .attr('x2', d => d.start.x2)
+          .attr('y2', d => d.start.y2)
+          .transition()
+          .duration(2000)
+          .ease(d3.easeLinear)
+          .attr('x1', d => d.end.x1)
+          .attr('y1', d => d.end.y1)
+          .attr('x2', d => d.end.x2)
+          .attr('y2', d => d.end.y2)
+          .on('end', function () {
+            let count = 0
+            svg.selectAll('.squareLine')
+              .data(square)
+              .enter()
+              .append('line')
+              .classed('squareLine', true)
+              .attr('x1', d => d.start.x1)
+              .attr('y1', d => d.start.y1)
+              .attr('x2', d => d.start.x2)
+              .attr('y2', d => d.start.y2)
+              .transition()
+              .duration(speed)
+              .attr('x1', d => d.end.x1)
+              .attr('y1', d => d.end.y1)
+              .attr('x2', d => d.end.x2)
+              .attr('y2', d => d.end.y2)
+              .on('end', () => {
+                count++
+                if (count === square.length) {
+                  callReverse()
+                }
+              })
+          })
+      })
+  })
+})
 
-    svg.selectAll(".originalLine")
-    .data(original)
-    .enter()
-    .append("line")
-    .classed("originalLine", true)
-    .attrs({
-      x1: chart.width / 2,
-      y1: chart.height * 0.8,
-      x2: chart.width / 2,
-      y2: chart.height * 0.8
-    }).transition()
-    .duration(speed)
-    .attrs({
-      x1: (chart.width / 2) - size,
-      x2: (chart.width / 2) + size
-    }).on('end', function(d) {
-      svg.selectAll(".triangleLine")
-        .data(triangle)
-        .enter()
-        .append('line')
-        .classed("triangleLine", true)
+function callReverse () {
+  d3.select('.chart-title').text('Breathe Out')
+
+  reverse(d3.selectAll('.squareLine'))
+    .then(() => reverse(d3.selectAll('.triangleLine')))
+    .then(() => reverse(d3.selectAll('.originalLine')))
+    .then(callDraw)
+
+  function reverse (lines : d3.Selection<SVGLineElement, LineData, HTMLElement, any>) {
+    return new Promise(function (resolve) {
+      lines
+        .transition()
+        .duration(speed)
         .attr('x1', d => d.start.x1)
         .attr('y1', d => d.start.y1)
         .attr('x2', d => d.start.x2)
         .attr('y2', d => d.start.y2)
+        .on('end', () => {
+          lines.style('display', 'none')
+          resolve()
+        })
+    })
+  }
+}
+
+function callDraw () {
+  d3.select('.chart-title').text('Breathe In')
+
+  draw(d3.selectAll('.originalLine'))
+    .then(() => draw(d3.selectAll('.triangleLine')))
+    .then(() => draw(d3.selectAll('.squareLine')))
+    .then(callReverse)
+
+  function draw (lines : d3.Selection<SVGLineElement, LineData, HTMLElement, any>) {
+    return new Promise(function (resolve) {
+      lines
+        .style('display', 'inherit')
         .transition()
-        .duration(2000)
-        .ease(d3.easeLinear)
+        .duration(speed)
         .attr('x1', d => d.end.x1)
         .attr('y1', d => d.end.y1)
         .attr('x2', d => d.end.x2)
         .attr('y2', d => d.end.y2)
-        .on('end', function(d){          
-
-          var count = 0;
-          svg.selectAll(".squareLine")
-            .data(square)
-            .enter()
-            .append('line')
-            .classed("squareLine", true)
-            .attr('x1', d => d.start.x1)
-            .attr('y1', d => d.start.y1)
-            .attr('x2', d => d.start.x2)
-            .attr('y2', d => d.start.y2)
-            .transition()
-            .duration(speed)
-            .attr('x1', d => d.end.x1)
-            .attr('y1', d => d.end.y1)
-            .attr('x2', d => d.end.x2)
-            .attr('y2', d => d.end.y2)
-            .on('end', () =>{
-              count++
-              if(count == square.length) {
-                callReverse()
-              }
-            })
-        })
-    })
-  })
-})
-
-function callReverse() {
-  d3.select(".chart-title").text("Breathe Out")
-
-  reverse(d3.selectAll(".squareLine"))
-  .then( () => reverse(d3.selectAll(".triangleLine")) )
-  .then( () => reverse(d3.selectAll(".originalLine")) )
-  .then(callDraw)
-
-  function reverse(lines : d3.Selection<SVGLineElement, LineData, HTMLElement, any>) {
-    return new Promise(function (resolve) {
-      lines
-      .transition()
-      .duration(speed)
-      .attr('x1', d => d.start.x1)
-      .attr('y1', d => d.start.y1)
-      .attr('x2', d => d.start.x2)
-      .attr('y2', d => d.start.y2)
-      .on("end", () => {
-        lines.style("display", 'none');
-        resolve()
-      })
+        .on('end', resolve)
     })
   }
 }
 
-function callDraw() {
-  d3.select(".chart-title").text("Breathe In")
+type Vertex = [number, number]
 
-  draw(d3.selectAll(".originalLine"))
-  .then( () => draw(d3.selectAll(".triangleLine")) )
-  .then( () => draw(d3.selectAll(".squareLine")) )
-  .then(callReverse)
-
-  function draw(lines : d3.Selection<SVGLineElement, LineData, HTMLElement, any>) {
-    return new Promise(function (resolve) {
-      lines
-      .style("display", 'inherit')
-      .transition()
-      .duration(speed)
-      .attr('x1', d => d.end.x1)
-      .attr('y1', d => d.end.y1)
-      .attr('x2', d => d.end.x2)
-      .attr('y2', d => d.end.y2)
-      .on("end", resolve)
-    })
+function poly (n) :Array<Vertex> {
+  const result :Array<Vertex> = []
+  for (let i = 0; i < n; i++) {
+    const x = 100; const y = 100; const r = 50
+    result.push([x + r * Math.cos(2 * Math.PI * i / n), y + r * Math.sin(2 * Math.PI * i / n)])
+    console.log(result[i])
   }
+  return result
 }
+
+globalThis.poly = poly
