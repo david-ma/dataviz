@@ -32,8 +32,11 @@ type DataPoint = {
   };
 }
 
-const speed :number = 400
-const size :number = 100
+type Vertex = [number, number]
+
+const Tau = 2 * Math.PI
+
+const size :number = 110
 const n :number = 13
 const colors = ['#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2']
 
@@ -114,8 +117,11 @@ $.when($.ready).then(function () {
   })
 })
 
+const speed :number = 400
+
 function modifiedSpeed (i) :number {
-  const result = Math.pow(n - i, 1.5) * 10 + 200
+  const result = ((2 + Math.cos(Tau * ((i/n)))) * speed)
+  // const result = d3.easePoly(i)
   return result
 }
 
@@ -130,7 +136,7 @@ function callReverse (i:number) {
     .on('end', (d, j, k) => {
       d3.select(k[j]).style('display', 'none')
       if (i > 0) {
-        callReverse(i - 1)
+        callReverse(i - 1)        
       } else {
         callDraw(0)
       }
@@ -150,14 +156,13 @@ function callDraw (i:number) {
       if (i < n - 3) {
         callDraw(i + 1)
       } else {
-        callReverse(i)
+        setTimeout(() => { 
+          callReverse(i)
+         },
+        speed / 2)
       }
     })
 }
-
-type Vertex = [number, number]
-
-const Tau = 2 * Math.PI
 
 function poly (n) :Array<Vertex> {
   const result :Array<Vertex> = []
