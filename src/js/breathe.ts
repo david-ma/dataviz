@@ -50,42 +50,70 @@ $.when($.ready).then(function () {
     }
     console.log(allVertices)
 
+    var dataPoints :Array<{
+      start: {
+        vertices: Array<Vertex>;
+        transform: string;
+      };
+      end : {
+        vertices: Array<Vertex>;
+        transform: string;
+      };
+    }> = []
+
+    allVertices.forEach((vertices, i) => {
+      const distance = finalDistance(vertices)
+      const ratio = size / distance
+      vertices = scaleSize(vertices, ratio)
+
+      const translateTarget = [250, 500]
+      const translate = [translateTarget[0] - vertices[0][0], translateTarget[1] - vertices[0][1]]
+
+      var firstVertex :Array<Vertex> = [[0,0],[0,0]]
+
+      var startVertices = i > 0 ? getStartVertices(allVertices[i-1]) : firstVertex
+      
+      const s_distance = finalDistance(startVertices)
+      const s_ratio = size / s_distance
+      startVertices = scaleSize(startVertices, s_ratio)
+      const s_translate = [translateTarget[0] - startVertices[0][0], translateTarget[1] - startVertices[0][1]]
+
+      if(i === 0) { s_translate[0] = s_translate[0] + (size / 2) }
+
+      dataPoints.push({
+        start: {
+          vertices: startVertices,
+          transform: `translate(${s_translate.join(',')})`
+        },
+        end: {
+          vertices: vertices,
+          transform: `translate(${translate.join(',')})`
+        }
+      })
+    })
+
     chart.svg.selectAll('.line')
-      .data(allVertices)
+      .data(dataPoints)
       .enter()
       .append('polyline')
       .classed('.line', true)
       .each((d, i, k) => {
 
-        const distance = finalDistance(d)
-        const ratio = size / distance
-        d = scaleSize(d, ratio)
+        var speed = 500
+        window.setTimeout(() => {
+          d3.select(k[i])
+          .attr('points', d.start.vertices.map(d => d.join(',')).join(' '))
+          .attr('transform', d.start.transform)
+          .attrs({
+            fill: 'rgba(0,0,0,0)',
+            stroke: 'black'
+          }).transition()
+          .duration(speed)
+          .ease(d3.easeLinear)
+          .attr('points', d.end.vertices.map(d => d.join(',')).join(' '))
+          .attr('transform', d.end.transform)
+        }, speed * i)
 
-        const translateTarget = [250, 500]
-        const translate = [translateTarget[0] - d[0][0], translateTarget[1] - d[0][1]]
-
-        var firstVertex :Array<Vertex> = [[0,0],[0,0]]
-
-        var startVertices = i > 0 ? getStartVertices(allVertices[i-1]) : firstVertex
-        
-        const s_distance = finalDistance(startVertices)
-        const s_ratio = size / s_distance
-        startVertices = scaleSize(startVertices, s_ratio)
-        const s_translate = [translateTarget[0] - startVertices[0][0], translateTarget[1] - startVertices[0][1]]
-
-        if(i === 0) { s_translate[0] = s_translate[0] + (size / 2) }
-
-        d3.select(k[i]).attrs({
-          points: d.map(d => d.join(',')).join(' '),
-          fill: 'rgba(0,0,0,0)',
-          stroke: 'black'
-        })
-        .attrs({
-          transform: `translate(${translate.join(',')})`
-        }).transition()
-        .duration(3000)
-        .attr('points', startVertices.map(d => d.join(',')).join(' '))
-        .attr('transform', `translate(${s_translate.join(',')})`)
       })
 
     /*
