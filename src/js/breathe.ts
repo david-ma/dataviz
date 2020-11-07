@@ -2,7 +2,6 @@
 import { Chart } from 'chart'
 import * as d3 from 'd3'
 import $ from 'jquery'
-import { spliceStr } from '../../../../node_modules/sequelize/types/lib/utils'
 // import 'datatables.net';
 
 console.log('Running breathe.ts')
@@ -22,8 +21,20 @@ type LineData = {
   }
 }
 
-const speed :number = 2000
+type DataPoint = {
+  start: {
+    vertices: Array<Vertex>;
+    transform: string;
+  };
+  end : {
+    vertices: Array<Vertex>;
+    transform: string;
+  };
+}
+
+const speed :number = 400
 const size :number = 100
+const n :number = 14
 
 $.when($.ready).then(function () {
   const chart = new Chart({ // eslint-disable-line
@@ -40,26 +51,15 @@ $.when($.ready).then(function () {
     chart.svg.select('.chart-title')
       .attr('transform', `translate(${chart.width / 2},${chart.height - 15})`)
 
-    const n = 14
-
-    const allVertices :Array<Array<Vertex>> = []
+    const allVertices : Array<Vertex[]> = []
 
     for (let i = 2; i < n; i++) {
-      const vertices : Array<Vertex> = poly(i)
+      const vertices : Vertex[] = poly(i)
       allVertices.push(vertices)
     }
     console.log(allVertices)
 
-    var dataPoints :Array<{
-      start: {
-        vertices: Array<Vertex>;
-        transform: string;
-      };
-      end : {
-        vertices: Array<Vertex>;
-        transform: string;
-      };
-    }> = []
+    var dataPoints : DataPoint[] = []
 
     allVertices.forEach((vertices, i) => {
       const distance = finalDistance(vertices)
@@ -99,9 +99,9 @@ $.when($.ready).then(function () {
       .classed('.line', true)
       .each((d, i, k) => {
 
-        var speed = 500
         window.setTimeout(() => {
           d3.select(k[i])
+          .attr("id", `polyline-${i}`)
           .attr('points', d.start.vertices.map(d => d.join(',')).join(' '))
           .attr('transform', d.start.transform)
           .attrs({
@@ -112,118 +112,51 @@ $.when($.ready).then(function () {
           .ease(d3.easeLinear)
           .attr('points', d.end.vertices.map(d => d.join(',')).join(' '))
           .attr('transform', d.end.transform)
-        }, speed * i)
-
-      })
-
-    /*
-    svg.selectAll('.originalLine')
-      .data(original)
-      .enter()
-      .append('line')
-      .classed('originalLine', true)
-      .attrs({
-        x1: chart.width / 2,
-        y1: chart.height * 0.8,
-        x2: chart.width / 2,
-        y2: chart.height * 0.8
-      }).transition()
-      .duration(speed)
-      .attrs({
-        x1: (chart.width / 2) - size,
-        x2: (chart.width / 2) + size
-      }).on('end', function () {
-        svg.selectAll('.triangleLine')
-          .data(triangle)
-          .enter()
-          .append('line')
-          .classed('triangleLine', true)
-          .attr('x1', d => d.start.x1)
-          .attr('y1', d => d.start.y1)
-          .attr('x2', d => d.start.x2)
-          .attr('y2', d => d.start.y2)
-          .transition()
-          .duration(2000)
-          .ease(d3.easeLinear)
-          .attr('x1', d => d.end.x1)
-          .attr('y1', d => d.end.y1)
-          .attr('x2', d => d.end.x2)
-          .attr('y2', d => d.end.y2)
-          .on('end', function () {
-            let count = 0
-            svg.selectAll('.squareLine')
-              .data(square)
-              .enter()
-              .append('line')
-              .classed('squareLine', true)
-              .attr('x1', d => d.start.x1)
-              .attr('y1', d => d.start.y1)
-              .attr('x2', d => d.start.x2)
-              .attr('y2', d => d.start.y2)
-              .transition()
-              .duration(speed)
-              .attr('x1', d => d.end.x1)
-              .attr('y1', d => d.end.y1)
-              .attr('x2', d => d.end.x2)
-              .attr('y2', d => d.end.y2)
-              .on('end', () => {
-                count++
-                if (count === square.length) {
-                  callReverse()
-                }
-              })
+          .on('end', (d :DataPoint) => {
+            console.log(d)
+            if(d.start.vertices.length + 1 === n) {
+              callReverse(i)
+            }
           })
+        }, speed * i)
       })
-      */
   })
 })
 
-function callReverse () {
+function callReverse (i:number) {
   d3.select('.chart-title').text('Breathe Out')
-
-  reverse(d3.selectAll('.squareLine'))
-    .then(() => reverse(d3.selectAll('.triangleLine')))
-    .then(() => reverse(d3.selectAll('.originalLine')))
-    .then(callDraw)
-
-  function reverse (lines : d3.Selection<SVGLineElement, LineData, HTMLElement, any>) {
-    return new Promise(function (resolve) {
-      lines
-        .transition()
-        .duration(speed)
-        .attr('x1', d => d.start.x1)
-        .attr('y1', d => d.start.y1)
-        .attr('x2', d => d.start.x2)
-        .attr('y2', d => d.start.y2)
-        .on('end', () => {
-          lines.style('display', 'none')
-          resolve()
-        })
+  d3.select(`#polyline-${i}`)
+    .transition()
+    .ease(d3.easeLinear)
+    .duration(speed)
+    .attr('points', (d: DataPoint) => d.start.vertices.map(d => d.join(',')).join(' '))
+    .attr('transform', (d: DataPoint) => d.start.transform)
+    .on('end', (d,j,k) => {
+      d3.select(k[j]).style('display', 'none')
+      if(i > 0) {
+        callReverse( i - 1)
+      } else {
+        callDraw(0)
+      }
     })
-  }
 }
 
-function callDraw () {
+function callDraw (i:number) {
   d3.select('.chart-title').text('Breathe In')
-
-  draw(d3.selectAll('.originalLine'))
-    .then(() => draw(d3.selectAll('.triangleLine')))
-    .then(() => draw(d3.selectAll('.squareLine')))
-    .then(callReverse)
-
-  function draw (lines : d3.Selection<SVGLineElement, LineData, HTMLElement, any>) {
-    return new Promise(function (resolve) {
-      lines
-        .style('display', 'inherit')
-        .transition()
-        .duration(speed)
-        .attr('x1', d => d.end.x1)
-        .attr('y1', d => d.end.y1)
-        .attr('x2', d => d.end.x2)
-        .attr('y2', d => d.end.y2)
-        .on('end', resolve)
+  d3.select(`#polyline-${i}`)
+    .style('display', 'inherit')
+    .transition()
+    .ease(d3.easeLinear)
+    .duration(speed)
+    .attr('points', (d: DataPoint) => d.end.vertices.map(d => d.join(',')).join(' '))
+    .attr('transform', (d: DataPoint) => d.end.transform)
+    .on('end', (d,j,k) => {
+      if(i < n - 3) {
+        callDraw( i + 1)
+      } else {
+        callReverse(i)
+      }
     })
-  }
 }
 
 type Vertex = [number, number]
