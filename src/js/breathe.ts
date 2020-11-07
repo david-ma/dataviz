@@ -2,6 +2,7 @@
 import { Chart } from 'chart'
 import * as d3 from 'd3'
 import $ from 'jquery'
+import { spliceStr } from '../../../../node_modules/sequelize/types/lib/utils'
 // import 'datatables.net';
 
 console.log('Running breathe.ts')
@@ -63,7 +64,16 @@ $.when($.ready).then(function () {
         const translateTarget = [250, 500]
         const translate = [translateTarget[0] - d[0][0], translateTarget[1] - d[0][1]]
 
-        var startVertices = i > 0 ? getStartVertices(allVertices[i-1]) : [[0,0],[0,0]]
+        var firstVertex :Array<Vertex> = [[0,0],[0,0]]
+
+        var startVertices = i > 0 ? getStartVertices(allVertices[i-1]) : firstVertex
+        
+        const s_distance = finalDistance(startVertices)
+        const s_ratio = size / s_distance
+        startVertices = scaleSize(startVertices, s_ratio)
+        const s_translate = [translateTarget[0] - startVertices[0][0], translateTarget[1] - startVertices[0][1]]
+
+        if(i === 0) { s_translate[0] = s_translate[0] + (size / 2) }
 
         d3.select(k[i]).attrs({
           points: d.map(d => d.join(',')).join(' '),
@@ -72,7 +82,10 @@ $.when($.ready).then(function () {
         })
         .attrs({
           transform: `translate(${translate.join(',')})`
-        })
+        }).transition()
+        .duration(3000)
+        .attr('points', startVertices.map(d => d.join(',')).join(' '))
+        .attr('transform', `translate(${s_translate.join(',')})`)
       })
 
     /*
@@ -238,6 +251,27 @@ function scaleSize (vertices: Array<Vertex>, scale: number) : Array<Vertex> {
 
 function getStartVertices(vertices: Array<Vertex>) : Array<Vertex> {
   const result : Array<Vertex> = []
+
+  vertices.forEach(vertex => {
+    result.push(vertex)
+  })
+  var mid = Math.floor(vertices.length / 2)
+
+  // console.log("vertices", vertices)
+
+  if(vertices.length % 2 === 1) { // odd
+    result.splice(mid, 0, result[mid])
+  } else { // even
+    // find the middle point of the middle 2, and then insert something
+    var midPoint :Vertex = [
+      (vertices[mid][0] + vertices[mid - 1][0]) / 2
+      ,
+      (vertices[mid][1] + vertices[mid - 1][1]) / 2
+    ]
+    // console.log(midPoint)
+
+    result.splice(mid, 0, midPoint)
+  }
   return result
 }
 
