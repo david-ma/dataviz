@@ -372,12 +372,12 @@
         "affectsGlobalScope": false
       },
       "./src/js/chart.ts": {
-        "version": "d11b2399d1fb4a466b2af4506136eb273fcf9ea7b1180c2968bc2822f6c7d708",
-        "signature": "8ef36798e17cfb4792e06e889ea7270fe213091fca132ba536f8a63cdedd5376",
+        "version": "1a057055903f4327810c591885d1a51f83db0bbd8b267ea5acf88ccbbdf83623",
+        "signature": "e28b273fea48f1f4827ed1b4273365a581bc0214824bba097e8fa3c120a5eba6",
         "affectsGlobalScope": false
       },
       "./src/js/breathe.ts": {
-        "version": "09135ce7996414a2712e213ab4dbb0d1e03faa01946f682c1b43b55077b6ea55",
+        "version": "1d49be8b1f4d8a881717b89a8cffe2750d50a16cf4a5e969bc35192246e3c2dc",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },

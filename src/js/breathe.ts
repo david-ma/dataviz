@@ -26,12 +26,18 @@ const size :number = 100;
 
 $.when( $.ready ).then(function() {
   const chart = new Chart({
-    title: "Breathe in",
+    title: "Breathe In",
     element: 'breatheDiv',
+    margin: 40,
+    width: 600,
+    height: 600,
     nav: false
   }).scratchpad((chart :Chart) => {
     const svg = chart.svg;
 
+    // Put the title on the bottom
+    chart.svg.select(".chart-title")
+      .attr('transform', `translate(${chart.width / 2},${chart.height - 15})`)
 
     const original :Array<LineData> = [{
       start: {
@@ -182,7 +188,7 @@ $.when( $.ready ).then(function() {
 })
 
 function callReverse() {
-  d3.select(".chart-title").text("Breathe out")
+  d3.select(".chart-title").text("Breathe Out")
 
   reverse(d3.selectAll(".squareLine"))
   .then( () => reverse(d3.selectAll(".triangleLine")) )
@@ -207,7 +213,7 @@ function callReverse() {
 }
 
 function callDraw() {
-  d3.select(".chart-title").text("Breathe in")
+  d3.select(".chart-title").text("Breathe In")
 
   draw(d3.selectAll(".originalLine"))
   .then( () => draw(d3.selectAll(".triangleLine")) )

@@ -16,7 +16,7 @@ interface chartOptions {
     yLabel  ?: string;
     width   ?: number;
     height  ?: number;
-    margin  ?: { top: number; right: number; bottom: number; left: number; };
+    margin  ?: number | { top: number; right: number; bottom: number; left: number; };
     colours ?: string[];
     nav     ?: boolean;
 }
@@ -68,7 +68,19 @@ class Chart {
 
         this.width  = opts.width || 960;
         this.height = opts.height || 600;
-        this.margin = opts.margin || { top: 70, right: 70, bottom: 50, left: 70 };
+
+        if ( opts.margin && typeof opts.margin !== 'number') {
+          this.margin = opts.margin
+        } else if(opts.margin && typeof opts.margin === 'number') {
+          this.margin = {
+            top: opts.margin,
+            right: opts.margin,
+            bottom: opts.margin,
+            left: opts.margin
+          }
+        } else {
+          this.margin = { top: 70, right: 70, bottom: 50, left: 70 }
+        }
 
         // Default colours from ColorBrewer 2.0
         // http://colorbrewer2.org/?type=qualitative&scheme=Dark2&n=8
