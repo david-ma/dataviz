@@ -96,7 +96,7 @@ if (true) { // eslint-disable-line
       published: false
     }, {
       shortname: 'breathe',
-      title: "Breathing Polygons",
+      title: 'Breathing Polygons',
       category: '',
       summary: 'D3.js & maths practice by drawing breathing polygons',
       image: 'images/breathe.png',

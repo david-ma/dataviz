@@ -182,7 +182,7 @@
         "affectsGlobalScope": true
       },
       "./src/anomaly/anomaly.ts": {
-        "version": "727555448a4ec6cfd83759e9b87ab08bf3b4f3d69a77387ff7fa22db25ecf3eb",
+        "version": "b93c9542dabfd6dce4e239f3a1ad0b4fcaccc85b8568fd4d82caad31492fe358",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
@@ -372,7 +372,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/smugmug.ts": {
-        "version": "850a6f9719c7a6975451bdcd86eb0174ed0584148d8285d7e959117dd472b9de",
+        "version": "115710e93c5d0242d7b76a4205f957557083b0b5984657a6dcd4380774145a19",
         "signature": "c819a6737cbf2f54ddb286fcfd8455852191a3bed8e1b92f92b5385da9252b2c",
         "affectsGlobalScope": true
       },
