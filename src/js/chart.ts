@@ -5,8 +5,8 @@ import { selection, select } from 'd3-selection'
 
 import $ from 'jquery'
 import 'datatables.net'
-d3[<any>'select'] = select
-d3[<any>'selection'] = selection
+d3[<any>'select'] = select // eslint-disable-line
+d3[<any>'selection'] = selection // eslint-disable-line
 
 interface chartOptions {
     element ?: string;
@@ -50,7 +50,7 @@ class Chart {
     innerWidth : number;
     fullscreen : boolean;
 
-    svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
+    svg: d3.Selection<SVGSVGElement, any, HTMLElement, any>;
     plot: any;
     xScale: d3.ScaleLinear<number, number>;
     yBand: d3.ScaleBand<string>;
@@ -170,7 +170,7 @@ class Chart {
       }
 
       function keydownHandler (e : JQuery.Event) {
-        if (e && e.keyCode && e.keyCode == 27) {
+        if (e && e.keyCode && e.keyCode === 27) {
           shrink()
         }
       }
@@ -197,7 +197,6 @@ class Chart {
 
     cumulativeLineChart () {
       console.log('Drawing cumulative chart', this.data)
-      const svg : any = this.plot
       const data : string = this.data[0]
       const authors : {
                   [author: string] : commit[]
@@ -604,8 +603,6 @@ class Chart {
     }
 
     circle () {
-      const width = this.innerWidth
-      const height = this.innerHeight
       const svg = this.plot
 
       console.log('Drawing a circle...', this.data)
@@ -888,7 +885,8 @@ class Chart {
     }
 
     scratchpad (callback :Function) {
-      callback(this)
+      const chart : Chart = this
+      callback(chart)
     }
 
     venn (options :any) {
@@ -961,7 +959,7 @@ class Chart {
 
       $('.activeShape')
         .addClass('selected')
-        .on('click', function (d) {
+        .on('click', function () {
           const el = $(this)
           el.toggleClass('selected')
 
@@ -1043,7 +1041,7 @@ function sumBySize (d :any) {
   return d.size
 }
 
-function average (array:Array<any>) {
+function average (array:Array<any>) { // eslint-disable-line
   try {
     return array.reduce((a, b) => parseFloat(a) + parseFloat(b)) / array.length
   } catch (e) {
@@ -1055,25 +1053,32 @@ function average (array:Array<any>) {
 function camelize (str :any) {
   return str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function (match :any, index :number) {
     if (+match === 0) return '' // or if (/\s+/.test(match)) for white spaces
-    return index == 0 ? match.toLowerCase() : match.toUpperCase()
+    return index === 0 ? match.toLowerCase() : match.toUpperCase()
   })
 }
 
-function injectStyles (rule :any) {
+function injectStyles (rule :any) { // eslint-disable-line
   const div = $('<div />', {
     html: '&shy;<style>' + rule + '</style>'
   }).appendTo('body')
+  return div
 }
 
-function log (message :string) {
+function log (message :string) { // eslint-disable-line
   'use strict'
   message = message ? ` - ${message}` : ''
   const formatTime = d3.timeFormat('%H:%M:%S')
   const date = new Date()
-  // console.info(`${formatTime(date)}${message}`);
+  console.info(`${formatTime(date)}${message}`)
 }
 
-function decorateTable (dataset:any, newOptions?:any) : DataTables.Api {
+type chartDataTableSettings = DataTables.Settings & {
+  element ?: string;
+  titles ?: any;
+  render ?: any;
+}
+
+function decorateTable (dataset:any, newOptions?:chartDataTableSettings) : DataTables.Api {
   const element = newOptions ? newOptions.element : '#dataset table'
 
   const columns = dataset.columns
@@ -1103,13 +1108,13 @@ function decorateTable (dataset:any, newOptions?:any) : DataTables.Api {
   }
   if (newOptions) {
     Object.keys(newOptions).forEach(function (key) {
-      (<any>options)[key] = newOptions[key]
+      options[key] = newOptions[key]
     })
     if (newOptions.titles) {
-      newOptions.titles.forEach((d :any, i :number) => options.columns[i].title = d)
+      newOptions.titles.forEach((d :any, i :number) => { options.columns[i].title = d })
     }
     if (newOptions.render) {
-      options.columns.forEach((d) => d.render = newOptions.render)
+      options.columns.forEach((d) => { d.render = newOptions.render })
     }
   }
   return $(element).DataTable(options)

@@ -1,11 +1,6 @@
 {
   "program": {
     "fileInfos": {
-      "../../../../.config/yarn/global/node_modules/typescript/lib/lib.es6.d.ts": {
-        "version": "721cec59c3fef87aaf480047d821fb758b3ec9482c4129a54631e6e25e432a31",
-        "signature": "721cec59c3fef87aaf480047d821fb758b3ec9482c4129a54631e6e25e432a31",
-        "affectsGlobalScope": false
-      },
       "../../../../.config/yarn/global/node_modules/typescript/lib/lib.es5.d.ts": {
         "version": "c9a1f03d6ba0fe3c871eb0dd81622e78fbb61ade70878b34d48a341a690c59e9",
         "signature": "c9a1f03d6ba0fe3c871eb0dd81622e78fbb61ade70878b34d48a341a690c59e9",
@@ -39,16 +34,6 @@
       "../../../../.config/yarn/global/node_modules/typescript/lib/lib.dom.iterable.d.ts": {
         "version": "fb0c09b697dc42afa84d1587e3c994a2f554d2a45635e4f0618768d16a86b69a",
         "signature": "fb0c09b697dc42afa84d1587e3c994a2f554d2a45635e4f0618768d16a86b69a",
-        "affectsGlobalScope": true
-      },
-      "../../../../.config/yarn/global/node_modules/typescript/lib/lib.webworker.importscripts.d.ts": {
-        "version": "7fac8cb5fc820bc2a59ae11ef1c5b38d3832c6d0dfaec5acdb5569137d09a481",
-        "signature": "7fac8cb5fc820bc2a59ae11ef1c5b38d3832c6d0dfaec5acdb5569137d09a481",
-        "affectsGlobalScope": true
-      },
-      "../../../../.config/yarn/global/node_modules/typescript/lib/lib.scripthost.d.ts": {
-        "version": "097a57355ded99c68e6df1b738990448e0bf170e606707df5a7c0481ff2427cd",
-        "signature": "097a57355ded99c68e6df1b738990448e0bf170e606707df5a7c0481ff2427cd",
         "affectsGlobalScope": true
       },
       "../../../../.config/yarn/global/node_modules/typescript/lib/lib.es2015.core.d.ts": {
@@ -372,8 +357,8 @@
         "affectsGlobalScope": false
       },
       "./src/js/chart.ts": {
-        "version": "770dfaae5da5ae9a458382147437185da56760b4057d11bc7ec6d322936ebddf",
-        "signature": "e28b273fea48f1f4827ed1b4273365a581bc0214824bba097e8fa3c120a5eba6",
+        "version": "150f6cf24f3334d3e8d4945beeffbab7a57b81d523597e8a999df4d7b01eea56",
+        "signature": "68753bb5c0fc7911467003d7121f83afb09827d9c89acd2dc180f92ed5a33db7",
         "affectsGlobalScope": false
       },
       "./src/js/breathe.ts": {
@@ -825,6 +810,11 @@
       "noImplicitThis": false,
       "noImplicitReturns": false,
       "noUnusedLocals": false,
+      "lib": [
+        "lib.es2015.d.ts",
+        "lib.dom.iterable.d.ts",
+        "lib.dom.d.ts"
+      ],
       "incremental": true,
       "preserveWatchOutput": true,
       "watch": true,
@@ -1863,10 +1853,7 @@
       "../../../../.config/yarn/global/node_modules/typescript/lib/lib.es2018.regexp.d.ts",
       "../../../../.config/yarn/global/node_modules/typescript/lib/lib.es2020.bigint.d.ts",
       "../../../../.config/yarn/global/node_modules/typescript/lib/lib.es5.d.ts",
-      "../../../../.config/yarn/global/node_modules/typescript/lib/lib.es6.d.ts",
       "../../../../.config/yarn/global/node_modules/typescript/lib/lib.esnext.intl.d.ts",
-      "../../../../.config/yarn/global/node_modules/typescript/lib/lib.scripthost.d.ts",
-      "../../../../.config/yarn/global/node_modules/typescript/lib/lib.webworker.importscripts.d.ts",
       "../../node_modules/@types/bluebird/index.d.ts",
       "../../node_modules/@types/cacheable-request/index.d.ts",
       "../../node_modules/@types/d3-array/index.d.ts",

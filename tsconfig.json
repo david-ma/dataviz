@@ -11,7 +11,8 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "noImplicitReturns": false,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "lib": [ "es6", "dom.iterable", "dom"]
   },
   "include": [
     "src/**/*"
