@@ -48,7 +48,7 @@ $.when($.ready).then(function () {
       const vertices : Vertex[] = poly(i)
       allVertices.push(vertices)
     }
-    console.log(allVertices)
+    // console.log(allVertices)
 
     const dataPoints : DataPoint[] = []
 
@@ -102,6 +102,17 @@ $.when($.ready).then(function () {
           })
       })
 
+
+    chart.svg.append('polygon')
+    .attrs({
+      id: "largestShape",
+      points: dataPoints[dataPoints.length - 1].end.vertices.map(d => d.join(',')).join(' '),
+      transform: dataPoints[dataPoints.length - 1].end.transform,
+      stroke: 'lightgrey',
+      'stroke-width': 1,
+      fill: 'rgba(0,0,0,0)'
+    })
+
     callDraw(0)
   })
 })
@@ -125,6 +136,8 @@ for (let i = 2; i < n; i++) {
     'Fill Color': colors[i - 2]
   })
 }
+
+d3.select("table#timing").style("width", "100%");
 
 decorateTable(timingData, {
   element: 'table#timing',
