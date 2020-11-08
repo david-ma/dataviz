@@ -367,7 +367,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/friends.ts": {
-        "version": "a06200d833d5cc8ed5c8acd2f4a51310a08b2fdf1ba8c27341a2f58994362902",
+        "version": "64478480c1a2b57d1c46d6e38a3ef74ce5995c7f83f31f27c7be899dd4be136b",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
