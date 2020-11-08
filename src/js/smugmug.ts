@@ -1,11 +1,13 @@
 /* eslint-disable camelcase */
+/* eslint-disable no-var */
+/* eslint-disable no-redeclare */
 
 const OAUTH_ORIGIN = 'https://api.smugmug.com'
 const REQUEST_TOKEN_URL = OAUTH_ORIGIN + '/services/oauth/1.0a/getRequestToken'
 const ACCESS_TOKEN_URL = OAUTH_ORIGIN + '/services/oauth/1.0a/getAccessToken'
 const AUTHORIZE_URL = OAUTH_ORIGIN + '/services/oauth/1.0a/authorize'
 
-const API_ORIGIN = 'https://api.smugmug.com'
+const API_ORIGIN = 'https://api.smugmug.com' // eslint-disable-line
 
 const consumer_key = 'KEY-GOES-HERE'
 const consumer_secret = 'SECRET-GOES-HERE'
@@ -186,7 +188,7 @@ function viewFolders () {
   })
 }
 
-$(document).ready(function (e) {
+$(document).ready(function () {
   $('#imageUploadForm').on('submit', function (this :HTMLFormElement, e) {
     console.log('hey, clicking ')
 
@@ -307,9 +309,9 @@ function oauthEscape (string :string) {
     return ''
   }
   if (string as any instanceof Array) {
-    throw ('Array passed to _oauthEscape')
+    throw (new Error('Array passed to _oauthEscape'))
   }
-  return encodeURIComponent(string).replace(/\!/g, '%21')
+  return encodeURIComponent(string).replace(/\!/g, '%21') // eslint-disable-line
     .replace(/\*/g, '%2A')
     .replace(/'/g, '%27')
     .replace(/\(/g, '%28')
