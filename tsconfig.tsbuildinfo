@@ -382,7 +382,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/wealth.ts": {
-        "version": "b1267f9b08a0fa5ae41a94c80304a5b4c9f52af210ba4746cf5a6551a453b7b1",
+        "version": "4b329b00bdd1189aaa81f99764e419a5a26695ad817ea08c5773a56b66d739c1",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
