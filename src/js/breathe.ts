@@ -103,15 +103,21 @@ $.when($.ready).then(function () {
       })
 
 
-    chart.svg.append('polygon')
-    .attrs({
-      id: "largestShape",
-      points: dataPoints[dataPoints.length - 1].end.vertices.map(d => d.join(',')).join(' '),
-      transform: dataPoints[dataPoints.length - 1].end.transform,
-      stroke: 'lightgrey',
-      'stroke-width': 1,
-      fill: 'rgba(0,0,0,0)'
-    })
+    chart.svg.selectAll('.polygon')
+      .data(dataPoints)
+      .enter()
+      .insert('polygon', 'polyline')
+      .attrs((d, i) => {
+        return {
+          id: `polygon-${i}`,
+          class: 'polygon',
+          points: d.end.vertices.map(d => d.join(',')).join(' '),
+          transform: d.end.transform,
+          stroke: 'lightgrey',
+          'stroke-width': 1,
+          fill: 'rgba(0,0,0,0)'
+        }
+      })
 
     callDraw(0)
   })
@@ -269,6 +275,10 @@ function getStartVertices (vertices: Array<Vertex>) : Array<Vertex> {
   }
   return result
 }
+
+$('input[name="outlines"]').on("change", function(event :JQuery.ChangeEvent){
+  $(".polygon").toggleClass("hidden");
+})
 
 globalThis.poly = poly
 globalThis.Tau = Tau
