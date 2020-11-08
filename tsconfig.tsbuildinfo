@@ -187,7 +187,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/awesome.ts": {
-        "version": "55c3beaf2fc0a1bf8b8dc8294c5f43f8706721dc2eb2f47a1490ed1d06daf2c8",
+        "version": "e27f5be15b9f0aef8f70a6881f4bf24effe0e29d49542dc69648f630fa13b542",
         "signature": "f9cb46cf83c199e8c67ff2507fba310bb5fccde5299814406bd1689b0cf9f27d",
         "affectsGlobalScope": true
       },
