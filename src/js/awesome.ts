@@ -107,7 +107,7 @@ d3.csv('/melbourne_export_october.csv', function (d) {
           id: `comments-${d.id}`,
           name: `comments-${d.id}`,
           placeholder: 'Write collaborative comments here'
-        }).on('keyup', function (d) {
+        }).on('keyup', function (d :any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
             name: `comments-${d.id}`,
@@ -131,7 +131,7 @@ d3.csv('/melbourne_export_october.csv', function (d) {
           id: `signatures-${d.id}`,
           name: `signatures-${d.id}`,
           placeholder: 'Add comma seperated names to vote. E.g. "David Ma, Jon King, Lauren Gawne, Megan Flamer"'
-        }).on('keyup', function (d) {
+        }).on('keyup', function (d :any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
             name: `signatures-${d.id}`,
@@ -190,7 +190,7 @@ d3.csv('/melbourne_export_october.csv', function (d) {
           id: `debrief-${d.id}`,
           name: `debrief-${d.id}`,
           placeholder: 'What other things could be done for this project, besides money? What advice can we give them?'
-        }).on('keyup', function (d) {
+        }).on('keyup', function (d :any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
             name: `debrief-${d.id}`,

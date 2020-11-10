@@ -6,6 +6,9 @@
     "target": "ES2015",
     "module": "AMD",
     "moduleResolution": "Node",
+    "paths": {
+      "chart": ["js/chart.ts"]
+    },
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "removeComments": true,

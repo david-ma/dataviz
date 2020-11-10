@@ -1,28 +1,27 @@
 <script src="/js/require.js"></script>
 <script>
 
-    require.config({
-        baseUrl: '/js/vendor',
-        enforceDefine: true,
-        paths: {
-            'chart': "/js/chart",
-            'datatables.net': "/js/datatables.min"
-        },
-        shim: {
-            chart: {
-                exports: "Chart",
-                deps: ['d3', 'd3-selection-multi', 'd3-scale', "datatables.net"]
-            },
-            "datatables.net": {
-                deps: ["jquery"]
-            }
-        }
-    });
+require.config({
+  baseUrl: '/js/vendor',
+  enforceDefine: true,
+  paths: {
+    'chart': "/js/chart",
+    'datatables.net': "/js/datatables.min"
+  },
+  shim: {
+    chart: {
+      exports: "Chart",
+      deps: ['d3', 'd3-selection-multi', 'd3-scale', "datatables.net"]
+    },
+    "datatables.net": {
+      deps: ["jquery"]
+    }
+  }
+});
 
-    require(['chart',
-            {{{typescript}}},
-            'datatables.net'
-        ], function(_chart){});
-
+require(['chart',
+  {{{typescript}}},
+  'datatables.net'
+], function(_chart){});
 
 </script>

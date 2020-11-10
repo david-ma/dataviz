@@ -187,7 +187,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/awesome.ts": {
-        "version": "e27f5be15b9f0aef8f70a6881f4bf24effe0e29d49542dc69648f630fa13b542",
+        "version": "4d0d0586ae65a535b444d9d8296ba57a3dd60aa0b42022bfae97ffeff5dfedc5",
         "signature": "f9cb46cf83c199e8c67ff2507fba310bb5fccde5299814406bd1689b0cf9f27d",
         "affectsGlobalScope": true
       },
@@ -392,12 +392,12 @@
         "affectsGlobalScope": false
       },
       "./src/js/breathe.ts": {
-        "version": "2e7540f9b0ef6d87e3ff4b0fe5c66c78ad98a26c1e5768c7b24b23bd4f6f73fe",
+        "version": "b7c6ce80395ea27abc82ada5e6c689156f40ca00f97618c48fe22aa9a1c4e8dc",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
       "./src/js/friends.ts": {
-        "version": "4c302d5936b7af0526e0fc759cdea6ea219e7e0ca61ae8126acb7e3549484e04",
+        "version": "64478480c1a2b57d1c46d6e38a3ef74ce5995c7f83f31f27c7be899dd4be136b",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
@@ -407,12 +407,12 @@
         "affectsGlobalScope": true
       },
       "./src/js/war.ts": {
-        "version": "823e8da44f6eb2ccd70af5d868a43f686fc91316776be711ca85b44ac9b99418",
+        "version": "3acaa73826fef4679f38e8e226cefb16106d1ef7fc54a032edc8e8304480ffb2",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
       "./src/js/wealth.ts": {
-        "version": "0c82f691e658c3d57791d2ee1ee5682916d4a96a254b396b46677aa736ba4d15",
+        "version": "4b329b00bdd1189aaa81f99764e419a5a26695ad817ea08c5773a56b66d739c1",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
@@ -964,6 +964,11 @@
       "target": 2,
       "module": 2,
       "moduleResolution": 2,
+      "paths": {
+        "chart": [
+          "js/chart.ts"
+        ]
+      },
       "allowSyntheticDefaultImports": true,
       "esModuleInterop": true,
       "removeComments": true,
@@ -978,6 +983,8 @@
         "lib.dom.iterable.d.ts",
         "lib.dom.d.ts"
       ],
+      "preserveWatchOutput": true,
+      "watch": true,
       "configFilePath": "./tsconfig.json"
     },
     "referencedMap": {

@@ -1,4 +1,4 @@
-import { Chart } from './chart'
+import { Chart } from 'chart'
 import * as d3 from 'd3'
 import $ from 'jquery'
 import 'datatables.net'
