@@ -1162,14 +1162,14 @@
       "allowSyntheticDefaultImports": true,
       "esModuleInterop": true,
       "removeComments": true,
+      "assumeChangesOnlyAffectDirectDependencies": true,
+      "incremental": true,
       "noImplicitAny": false,
       "noImplicitThis": false,
       "noImplicitReturns": false,
       "noUnusedLocals": false,
-      "incremental": true,
       "preserveWatchOutput": true,
       "watch": true,
-      "assumeChangesOnlyAffectDirectDependencies": true,
       "configFilePath": "./tsconfig.json"
     },
     "referencedMap": {

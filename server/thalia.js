@@ -674,13 +674,13 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
                 });
             }
             if (!spam) {
-                const host = request.headers.host;
+                const host = request.headers['test-host'] || request.headers.host;
                 const proxyConfig = handle.proxies[host];
                 const site = handle.getWebsite(host);
                 const urlObject = url.parse(request.url, true);
                 if (host !== 'www.monetiseyourwebsite.com') {
                     console.log();
-                    console.log(`Request for ${request.headers.host}${urlObject.href} At ${getDateTime()} From ${ip}`);
+                    console.log(`Request for ${host}${urlObject.href} At ${getDateTime()} From ${ip}`);
                 }
                 if (proxyConfig &&
                     (typeof proxyConfig.filter === 'undefined' ||
@@ -730,7 +730,7 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
                     });
                     decodedCookiePassword = decodeBase64(cookies.password);
                 }
-                const host = request.headers.host;
+                const host = request.headers['test-host'] || request.headers.host;
                 const urlObject = url.parse(request.url, true);
                 const proxyConfig = handle.proxies[host];
                 if (urlObject.query.logout) {
@@ -761,7 +761,7 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
         socket_1.socketInit(io, handle);
         return server.on('upgrade', function (request, socket, head) {
             'use strict';
-            const host = request.headers.host;
+            const host = request.headers['test-host'] || request.headers.host;
             const proxyConfig = handle.proxies[host];
             if (proxyConfig) {
                 httpProxy.createProxyServer({
