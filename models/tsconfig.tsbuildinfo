@@ -1140,17 +1140,16 @@
     "options": {
       "target": 7,
       "module": 1,
+      "moduleResolution": 2,
       "allowSyntheticDefaultImports": true,
       "esModuleInterop": true,
       "removeComments": true,
       "assumeChangesOnlyAffectDirectDependencies": true,
-      "composite": true,
+      "incremental": true,
       "noImplicitAny": false,
       "noImplicitThis": false,
       "noImplicitReturns": false,
       "noUnusedLocals": false,
-      "preserveWatchOutput": true,
-      "watch": true,
       "configFilePath": "./tsconfig.json"
     },
     "referencedMap": {
@@ -2490,15 +2489,15 @@
       ],
       "./blogpost.ts": [
         "../../../node_modules/sequelize/types/index.d.ts",
-        "./models.ts"
+        "./models.d.ts"
       ],
       "./camera.ts": [
         "../../../node_modules/sequelize/types/index.d.ts",
-        "./models.ts"
+        "./models.d.ts"
       ],
       "./family.ts": [
         "../../../node_modules/sequelize/types/index.d.ts",
-        "./models.ts"
+        "./models.d.ts"
       ],
       "./index.ts": [
         "../../../node_modules/sequelize/types/index.d.ts",
@@ -2509,7 +2508,7 @@
       ],
       "./scrape.ts": [
         "../../../node_modules/sequelize/types/index.d.ts",
-        "./models.ts"
+        "./models.d.ts"
       ]
     },
     "semanticDiagnosticsPerFile": [
