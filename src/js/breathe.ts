@@ -140,9 +140,9 @@ const timingData = []
 
 for (let i = 2; i < n; i++) {
   timingData.push({
-    Vertices: i,
+    Points: i,
     Shape: getName(i),
-    'Drawing time (ms)': Math.floor(modifiedSpeed(i)),
+    'Draw Time (ms)': Math.floor(modifiedSpeed(i)),
     // 'Fill Color': interpolatedColors(i / (n - 1))
     'Fill Color': colors[i - 2]
   })
