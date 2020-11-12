@@ -5,7 +5,7 @@
 }
 </style>
 
-<section class="blogpost">
+<section id="breathe" class="blogpost">
   <div class="row" id="contentBox">
     <div class="col-xs-12 col-md-6">
       <h1>Breathing Polygons</h1>
@@ -16,13 +16,23 @@
     <div class="col-xs-12 col-md-6">
       <h2>Options:</h2>
       <div id='options'>
-        {{! <input type="radio" id="showOutlines" name="outlines" value="showOutlines" checked="true">
-        <label for="showOutlines">Show Outlines</label><br>
+        <div class="option">
+          <input type="radio" id="showOutlines" name="outlines" value="showOutlines" checked="true">
+          <label for="showOutlines">Show Outlines</label><br>
 
-        <input type="radio" id="hideOutlines" name="outlines" value="hideOutlines">
-        <label for="hideOutlines">Hide Outlines</label><br> }}
+          <input type="radio" id="hideOutlines" name="outlines" value="hideOutlines">
+          <label for="hideOutlines">Hide Outlines</label><br>
+        </div>
 
-        <input type="button" value="Toggle Outlines" onclick='$(".polygon").toggleClass("hidden");'>
+        <div class="option">
+          <label for="hideOutlines">Speed:</label><br>
+
+          <input id="speedSlider" type="range" min="1" max="100" value="50">
+          <div><div pseudo="-webkit-slider-runnable-track" id="track"><div id="thumb"></div></div></div>
+          </input>
+        </div>
+
+        {{!-- <input type="button" value="Toggle Outlines" onclick='$(".polygon").toggleClass("hidden");'> --}}
       </div>
 
       <h2>Timing Data:</h2>
@@ -61,6 +71,8 @@ Todo:
 - change number of shapes
 - change size of drawing
 - save output as gif? save output as svg?
+- Update the table when user changes the speed
+- Put options directly under the polygon when in mobile/narrow mode
 
 svg to gif example:<br>
 [bl.ocks.org/veltman](https://bl.ocks.org/veltman/1071413ad6b5b542a1a3)

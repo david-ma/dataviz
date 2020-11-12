@@ -102,7 +102,6 @@ $.when($.ready).then(function () {
           })
       })
 
-
     chart.svg.selectAll('.polygon')
       .data(dataPoints)
       .enter()
@@ -123,7 +122,13 @@ $.when($.ready).then(function () {
   })
 })
 
-const speed :number = 400
+let speed :number = 400
+d3.select('#speedSlider').on('change', function () {
+  const input :number = parseInt($('#speedSlider').val() as string)
+  speed = (101 - input) * 8
+
+  // This should probably update the Timing Data table as well
+})
 
 function modifiedSpeed (i) :number {
   const result = ((2 + Math.cos(Tau * ((i / n)))) * speed)
@@ -143,7 +148,7 @@ for (let i = 2; i < n; i++) {
   })
 }
 
-d3.select("#timing table").style("width", "100%");
+d3.select('#timing table').style('width', '100%')
 
 decorateTable(timingData, {
   element: '#timing table',
@@ -276,8 +281,8 @@ function getStartVertices (vertices: Array<Vertex>) : Array<Vertex> {
   return result
 }
 
-$('input[name="outlines"]').on("change", function(event :JQuery.ChangeEvent){
-  $(".polygon").toggleClass("hidden");
+$('input[name="outlines"]').on('change', () => {
+  $('.polygon').toggleClass('hidden')
 })
 
 globalThis.poly = poly
