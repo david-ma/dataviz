@@ -98,10 +98,51 @@ input[type='radio'], label {
 }
 
 section#breathe.blogpost {
+  #tabs {
+    width: 100%;
+    border-bottom: solid 1px black;
+    padding: 7px;
+    input[type="radio"] {
+      display: none;
+    }
+    input:checked + label {
+      background: hsl(0, 0%, 80%);
+    }
+    label {
+      float: left;
+      font-weight: 700;
+      border: solid 1px black;
+      border-bottom: none;
+      padding: 3px 8px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      background: hsl(0, 0%, 90%);
+      margin: 0 5px;
+      &:hover {
+        background: hsl(0, 0%, 85%);
+      }
+    }
+    display: none;
+  }
+
+  @media (max-width: 992px) {
+    #tabs {
+      display: inherit;
+    }
+    .tabbedContent {
+      display: none;
+    }
+    .tabbedContent.selected {
+      display: inherit;
+    }
+  }
+
   #options .option {
+    float: left;
     border: solid 1px grey;
     padding: 3px;
     width: 50%;
+    margin-bottom: 15px;
     input[type='range'] {
       width: 100%;
     }

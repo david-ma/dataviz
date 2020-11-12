@@ -285,5 +285,9 @@ $('input[name="outlines"]').on('change', () => {
   $('.polygon').toggleClass('hidden')
 })
 
+$('input[name="tabs"]').on('change', () => {
+  $('.tabbedContent').toggleClass('selected')
+})
+
 globalThis.poly = poly
 globalThis.Tau = Tau
