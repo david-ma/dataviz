@@ -1120,4 +1120,4 @@ function decorateTable (dataset:any, newOptions?:chartDataTableSettings) : DataT
   return $(element).DataTable(options)
 }
 
-export { Chart as default, Chart, decorateTable }
+export { Chart, decorateTable }

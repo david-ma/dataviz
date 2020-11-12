@@ -271,7 +271,7 @@
         "affectsGlobalScope": false
       },
       "../../../server/requesthandlers.ts": {
-        "version": "fb0540548ade4326b90e1fb71e41cd4cd4df78e31a8db45d9b995b2a44d496b9",
+        "version": "5fadc722168e59242974638e10a414ba90e8d241afed67f05e882255a77ff1e5",
         "signature": "ca03bc3459a9c78ba13000ff0bb4cdb3a2e509a2739b9ef60a1458e581697380",
         "affectsGlobalScope": false
       },
@@ -716,7 +716,7 @@
         "affectsGlobalScope": false
       },
       "./db_bootstrap.ts": {
-        "version": "d41d2a164aeb0c1bc41924ce2d2d30652359662e35d4f6b2e6d7c19c1e37a0bc",
+        "version": "e041d92ebda38418d85a507e7b16b748f8064672ffe63bcd4e682306c8a7ffca",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },
@@ -1159,6 +1159,7 @@
     "options": {
       "target": 7,
       "module": 1,
+      "moduleResolution": 2,
       "allowSyntheticDefaultImports": true,
       "esModuleInterop": true,
       "removeComments": true,

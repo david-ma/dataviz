@@ -387,12 +387,12 @@
         "affectsGlobalScope": false
       },
       "./src/js/chart.ts": {
-        "version": "150f6cf24f3334d3e8d4945beeffbab7a57b81d523597e8a999df4d7b01eea56",
-        "signature": "68753bb5c0fc7911467003d7121f83afb09827d9c89acd2dc180f92ed5a33db7",
+        "version": "7a038287cc465543b3a749c10925d0af64ada44dabb2d8d61958655cb944162f",
+        "signature": "f13c4654d62aa1c50de00b890baec17f6c14e06710d139fc098f2a1c95f69540",
         "affectsGlobalScope": false
       },
       "./src/js/breathe.ts": {
-        "version": "b7c6ce80395ea27abc82ada5e6c689156f40ca00f97618c48fe22aa9a1c4e8dc",
+        "version": "1ad606f91bd1ada07dfd4c62889bca49063341f5add1d7376189102f10db02ee",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },

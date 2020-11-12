@@ -89,7 +89,6 @@ if (true) {
                 published: true
             }];
         blogposts.forEach(function (blogpost) {
-            console.log(`Adding ${blogpost.shortname}`);
             models_1.Blogpost.findOne({
                 where: {
                     shortname: blogpost.shortname

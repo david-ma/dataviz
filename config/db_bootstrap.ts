@@ -105,7 +105,7 @@ if (true) { // eslint-disable-line
     }]
 
     blogposts.forEach(function (blogpost) {
-      console.log(`Adding ${blogpost.shortname}`)
+      // console.log(`Adding ${blogpost.shortname}`)
       Blogpost.findOne({
         where: {
           shortname: blogpost.shortname

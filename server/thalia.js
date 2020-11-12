@@ -267,6 +267,7 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                 });
             }));
             // Load all the other partials we may need
+            // Todo: Check folder exists and is not empty?
             fsPromise.readdir(`${folder}/partials/`)
                 .then(function (d) {
                 d.forEach(function (filename) {
@@ -517,8 +518,12 @@ define("router", ["require", "exports", "fs", "mime", "zlib"], function (require
                         response.setHeader('Cache-Control', 'no-cache');
                         if (website.cache) {
                             if (stats.size > 10240) { // cache files bigger than 10kb?
-                                response.setHeader('Cache-Control', 'public, max-age=31536000'); // ex. 1 year in seconds
-                                response.setHeader('Expires', new Date(Date.now() + 31536000000).toUTCString()); // in ms.
+                                // You should only use a 1 year cache for versioned resources!!! Not "everything over 10kb"
+                                // response.setHeader('Cache-Control', 'public, max-age=31536000') // ex. 1 year in seconds
+                                // response.setHeader('Expires', new Date(Date.now() + 31536000000).toUTCString()) // in ms.
+                                // https://web.dev/http-cache/
+                                response.setHeader('Cache-Control', 'public, max-age=600'); // store for 10 mins
+                                response.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString()); // expire 1 day from now
                             }
                         }
                         if (filetype && (filetype.slice(0, 4) === 'text' ||
@@ -618,7 +623,7 @@ define("socket", ["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.socketInit = void 0;
     function socketInit(io, handle) {
-        console.log('Initialising Socket.io');
+        // console.log('Initialising Socket.io for site: ') // Which sites?
         Object.keys(handle.websites).forEach((siteName) => {
             io.of(`/${siteName}`).use((socket, next) => {
                 const host = socket.handshake.headers.host;

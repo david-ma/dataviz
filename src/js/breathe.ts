@@ -143,11 +143,11 @@ for (let i = 2; i < n; i++) {
   })
 }
 
-d3.select("table#timing").style("width", "100%");
+d3.select("#timing table").style("width", "100%");
 
 decorateTable(timingData, {
-  element: 'table#timing',
-  order: [[0, 'asc']],
+  element: '#timing table',
+  order: [0, 'asc'],
   columnDefs: [{
     targets: 3,
     createdCell: function (td, cellData) {
