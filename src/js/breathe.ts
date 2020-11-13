@@ -90,16 +90,19 @@ function modifiedSpeed (i) :number {
   return result
 }
 
-const timingData = []
+const timingData = calculateTimingData(n)
 
-for (let i = 2; i < n; i++) {
-  timingData.push({
-    Points: i,
-    Shape: getName(i),
-    'Draw Time (ms)': modifiedSpeed(i),
-    // 'Fill Color': interpolatedColors(i / (n - 1))
-    'Fill Color': colors[(i - 2) % colors.length]
-  })
+function calculateTimingData (n:number) : any[] {
+  const timingData = []
+  for (let i = 2; i < n; i++) {
+    timingData.push({
+      Points: i,
+      Shape: getName(i),
+      'Draw Time (ms)': modifiedSpeed(i),
+      'Fill Color': colors[(i - 2) % colors.length]
+    })
+  }
+  return timingData
 }
 
 d3.select('#timing table').style('width', '100%')
@@ -278,6 +281,11 @@ d3.select('#verticesSlider').on('change', function () {
   size = 1400 / n
 
   const dataPoints :DataPoint[] = calculateDataPoints(n)
+
+  const timingData = calculateTimingData(n)
+
+  dataTable.rows().remove()
+  dataTable.rows.add(timingData).draw()
 
   currentTransition.interrupt()
 
