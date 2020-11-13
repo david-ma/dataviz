@@ -134,11 +134,19 @@ d3.select('#speedSlider').on('change', function () {
   const input :number = parseInt($('#speedSlider').val() as string)
   speed = (101 - input) * 8
 
-  // This should probably update the Timing Data table as well
+  timingData.forEach((d, i) => {
+    timingData[i]['Draw Time (ms)'] = modifiedSpeed(i)
+  })
+
+  dataTable
+    .cells(':nth-child(3)')
+    .every(function(i) {
+      this.data(modifiedSpeed(i))
+    })
 })
 
 function modifiedSpeed (i) :number {
-  const result = ((2 + Math.cos(Tau * ((i / n)))) * speed)
+  const result = Math.floor(((2 + Math.cos(Tau * ((i / n)))) * speed))
   // const result = d3.easePoly(i)
   return result
 }
@@ -149,7 +157,7 @@ for (let i = 2; i < n; i++) {
   timingData.push({
     Points: i,
     Shape: getName(i),
-    'Draw Time (ms)': Math.floor(modifiedSpeed(i)),
+    'Draw Time (ms)': modifiedSpeed(i),
     // 'Fill Color': interpolatedColors(i / (n - 1))
     'Fill Color': colors[i - 2]
   })
