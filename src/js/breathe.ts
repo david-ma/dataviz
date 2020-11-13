@@ -20,13 +20,15 @@ type DataPoint = {
   };
 }
 
+var dataTable : DataTables.Api
+
 const Tau = 2 * Math.PI
 
 const size :number = 100
 const n :number = 14
 
 const pastels = ['#000000', '#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2'] // eslint-disable-line
-const monochrome = [...Array(n).keys()].map( i => `hsl(0,0%,${100 * (i/(n-1))}%)`)
+const monochrome = [...Array(n).keys()].map( i => `hsl(0,0%,${Math.floor(100 * (i/(n-1)))}%)`)
 let colors = pastels;
 
 // d3.interpolate(colors)
@@ -141,7 +143,7 @@ function modifiedSpeed (i) :number {
   return result
 }
 
-const timingData = []
+let timingData = []
 
 for (let i = 2; i < n; i++) {
   timingData.push({
@@ -155,13 +157,15 @@ for (let i = 2; i < n; i++) {
 
 d3.select('#timing table').style('width', '100%')
 
-decorateTable(timingData, {
+dataTable = decorateTable(timingData, {
   element: '#timing table',
   order: [0, 'asc'],
   columnDefs: [{
     targets: 3,
     createdCell: function (td, cellData) {
-      $(td).css('background-color', cellData)
+      $(td)
+        .addClass('colorCell')
+        .css('background-color', cellData)
     }
   }]
 })
@@ -295,17 +299,30 @@ $('input[name="tabs"]').on('change', () => {
 })
 
 $('input[name="colors"]').on('change', () => {
+  if($("input[name='colors']:checked").val() === 'pastels') {
+    colors = pastels;
+  } else {
+    colors = monochrome;
+  }
+
   d3.selectAll<SVGPolylineElement, DataPoint>('polyline')
-  .each(function(d, i, k) {
-    console.log(d);
-    d3.select(k[i]).attr("fill", () => {
-      if($("input[name='colors']:checked").val() === 'pastels') {
-        return pastels[d.index]
-      } else {
-        return monochrome[d.index]
-      }
-    });
+    .each(function(d, i, k) {
+      d3.select(k[i]).attr("fill", colors[d.index]);
+    })
+
+  timingData.forEach((d, i) => {
+    timingData[i]["Fill Color"] = colors[i]
   })
+
+  dataTable
+    .cells('.colorCell')
+    .every(function(i) {
+      this.data(colors[i])
+      $(this.node())
+        .css('background-color', colors[i])
+    })
+
+
 })
 
 

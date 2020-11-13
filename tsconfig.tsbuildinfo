@@ -392,7 +392,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/breathe.ts": {
-        "version": "f0015ca9d6059318c784c5841e240d43faa5a796238a63da16ea061e5a3bc9e7",
+        "version": "3a57ff29c3144724abfe5e0bfddbea4bdba5ab96eb484c9cfe7c8b519a9deaa1",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
