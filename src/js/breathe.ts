@@ -20,7 +20,7 @@ type DataPoint = {
   };
 }
 
-var dataTable : DataTables.Api
+let dataTable : DataTables.Api = null
 
 const Tau = 2 * Math.PI
 
@@ -28,8 +28,8 @@ let n :number = 14
 let size :number = 1400 / n
 
 const pastels = ['#660b77', '#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2'] // eslint-disable-line
-const monochrome = [...Array(n).keys()].map( i => `hsl(0,0%,${Math.floor(100 * (i/(n-1)))}%)`)
-let colors = pastels;
+const monochrome = [...Array(n).keys()].map(i => `hsl(0,0%,${Math.floor(100 * (i / (n - 1)))}%)`)
+let colors = pastels
 
 // d3.interpolate(colors)
 // const interpolatedColors = d3.interpolateHslLong('#9e0142', '#5e4fa2')
@@ -78,8 +78,9 @@ d3.select('#speedSlider').on('change', function () {
 
   dataTable
     .cells(':nth-child(3)')
-    .every(function(i) {
+    .every(function (i) {
       this.data(modifiedSpeed(i))
+      return this
     })
 })
 
@@ -89,7 +90,7 @@ function modifiedSpeed (i) :number {
   return result
 }
 
-let timingData = []
+const timingData = []
 
 for (let i = 2; i < n; i++) {
   timingData.push({
@@ -247,27 +248,28 @@ $('input[name="tabs"]').on('change', () => {
 })
 
 $('input[name="colors"]').on('change', () => {
-  if($("input[name='colors']:checked").val() === 'pastels') {
-    colors = pastels;
+  if ($("input[name='colors']:checked").val() === 'pastels') {
+    colors = pastels
   } else {
-    colors = monochrome;
+    colors = monochrome
   }
 
   d3.selectAll<SVGPolylineElement, DataPoint>('polyline')
-    .each(function(d, i, k) {
-      d3.select(k[i]).attr("fill", colors[d.index % colors.length]);
+    .each(function (d, i, k) {
+      d3.select(k[i]).attr('fill', colors[d.index % colors.length])
     })
 
   timingData.forEach((d, i) => {
-    timingData[i]["Fill Color"] = colors[i % colors.length]
+    timingData[i]['Fill Color'] = colors[i % colors.length]
   })
 
   dataTable
     .cells('.colorCell')
-    .every(function(i) {
+    .every(function (i) {
       this.data(colors[i % colors.length])
       $(this.node())
         .css('background-color', colors[i % colors.length])
+      return this
     })
 })
 
@@ -279,7 +281,7 @@ d3.select('#verticesSlider').on('change', function () {
 
   currentTransition.interrupt()
 
-  d3.select("svg").selectAll(".polyline")
+  d3.select('svg').selectAll('.polyline')
     .data(dataPoints, (d :DataPoint) => d.index)
     .each(updatePolylines)
     .enter()
@@ -287,19 +289,19 @@ d3.select('#verticesSlider').on('change', function () {
     .classed('polyline', true)
     .each(updatePolylines)
 
-  d3.select("svg").selectAll(".polyline")
+  d3.select('svg').selectAll('.polyline')
     .data(dataPoints, (d :DataPoint) => d.index)
     .exit()
     .remove()
 
-  d3.select("svg").selectAll(".polygon")
+  d3.select('svg').selectAll('.polygon')
     .data(dataPoints, (d :DataPoint) => d.index)
     .each(updatePolygons)
     .enter()
     .insert('polygon', 'polyline')
     .each(updatePolygons)
 
-  d3.select("svg").selectAll(".polygon")
+  d3.select('svg').selectAll('.polygon')
     .data(dataPoints, (d :DataPoint) => d.index)
     .exit()
     .remove()
@@ -307,17 +309,17 @@ d3.select('#verticesSlider').on('change', function () {
   callDraw(0)
 })
 
-function updatePolylines(d,i,arr) {
+function updatePolylines (d, i, arr) {
   d3.select(arr[i])
     .attr('id', `polyline-${i}`)
     .attr('points', d.start.vertices.map(d => d.join(',')).join(' '))
     .attr('transform', d.start.transform)
-    .attr("fill", colors[i % colors.length])
-    .attr("stroke", "black")
-    .style("display", "none")
+    .attr('fill', colors[i % colors.length])
+    .attr('stroke', 'black')
+    .style('display', 'none')
 }
 
-function updatePolygons(d,i,arr) {
+function updatePolygons (d, i, arr) {
   d3.select<SVGPolygonElement, DataPoint>(arr[i])
     .attrs((d, i) => {
       return {
@@ -332,7 +334,7 @@ function updatePolygons(d,i,arr) {
     })
 }
 
-function calculateDataPoints(vertices: number): DataPoint[] {
+function calculateDataPoints (n : number): DataPoint[] {
   const allVertices: Array<Vertex[]> = []
   const dataPoints : DataPoint[] = []
 
