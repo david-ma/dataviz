@@ -27,7 +27,7 @@ const Tau = 2 * Math.PI
 let n :number = 14
 let size :number = 1400 / n
 
-const pastels = ['#000000', '#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2'] // eslint-disable-line
+const pastels = ['#660b77', '#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2'] // eslint-disable-line
 const monochrome = [...Array(n).keys()].map( i => `hsl(0,0%,${Math.floor(100 * (i/(n-1)))}%)`)
 let colors = pastels;
 
@@ -101,7 +101,7 @@ $.when($.ready).then(function () {
           .attr('points', d.start.vertices.map(d => d.join(',')).join(' '))
           .attr('transform', d.start.transform)
           .attrs({
-            fill: colors[i],
+            fill: colors[i % colors.length],
             // fill: interpolatedColors(i / (dataPoints.length - 1)),
             // fill: 'rgba(0,0,0,0)',
             stroke: 'black',
@@ -159,7 +159,7 @@ for (let i = 2; i < n; i++) {
     Shape: getName(i),
     'Draw Time (ms)': modifiedSpeed(i),
     // 'Fill Color': interpolatedColors(i / (n - 1))
-    'Fill Color': colors[i - 2]
+    'Fill Color': colors[(i - 2) % colors.length]
   })
 }
 
@@ -315,19 +315,19 @@ $('input[name="colors"]').on('change', () => {
 
   d3.selectAll<SVGPolylineElement, DataPoint>('polyline')
     .each(function(d, i, k) {
-      d3.select(k[i]).attr("fill", colors[d.index]);
+      d3.select(k[i]).attr("fill", colors[d.index % colors.length]);
     })
 
   timingData.forEach((d, i) => {
-    timingData[i]["Fill Color"] = colors[i]
+    timingData[i]["Fill Color"] = colors[i % colors.length]
   })
 
   dataTable
     .cells('.colorCell')
     .every(function(i) {
-      this.data(colors[i])
+      this.data(colors[i % colors.length])
       $(this.node())
-        .css('background-color', colors[i])
+        .css('background-color', colors[i % colors.length])
     })
 })
 
