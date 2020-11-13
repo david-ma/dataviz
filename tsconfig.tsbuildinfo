@@ -396,6 +396,11 @@
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
+      "./src/js/example.ts": {
+        "version": "e4cdbf6bb55fcb81b6f9a11ccba433e43b5355d1acef423d24a927263f75df4c",
+        "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
+        "affectsGlobalScope": false
+      },
       "./src/js/friends.ts": {
         "version": "64478480c1a2b57d1c46d6e38a3ef74ce5995c7f83f31f27c7be899dd4be136b",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
@@ -1552,6 +1557,11 @@
         "../../node_modules/@types/d3/index.d.ts",
         "../../node_modules/@types/jquery/index.d.ts"
       ],
+      "./src/js/example.ts": [
+        "../../node_modules/@types/d3/index.d.ts",
+        "../../node_modules/@types/jquery/index.d.ts",
+        "./src/js/chart.ts"
+      ],
       "./src/js/friends.ts": [
         "../../node_modules/@types/d3/index.d.ts",
         "../../node_modules/@types/jquery/index.d.ts",
@@ -2298,6 +2308,7 @@
       "./src/js/awesome.ts",
       "./src/js/breathe.ts",
       "./src/js/chart.ts",
+      "./src/js/example.ts",
       "./src/js/friends.ts",
       "./src/js/go.ts",
       "./src/js/smugmug.ts",
