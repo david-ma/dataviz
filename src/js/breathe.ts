@@ -51,14 +51,14 @@ $.when($.ready).then(function () {
     const dataPoints : DataPoint[] = calculateDataPoints(n)
 
     chart.svg.selectAll('.line')
-      .data(dataPoints)
+      .data(dataPoints, (d :DataPoint) => d.index)
       .enter()
       .insert('polyline', 'polyline')
       .classed('polyline', true)
       .each(updatePolylines)
 
     chart.svg.selectAll('.polygon')
-      .data(dataPoints)
+      .data(dataPoints, (d :DataPoint) => d.index)
       .enter()
       .insert('polygon', 'polyline')
       .each(updatePolygons)
@@ -271,6 +271,34 @@ $('input[name="colors"]').on('change', () => {
 
 d3.select('#verticesSlider').on('change', function () {
   n = parseInt($('#verticesSlider').val() as string)
+  size = 1400 / n
+
+  const dataPoints :DataPoint[] = calculateDataPoints(n)
+
+  d3.select("svg").selectAll(".polyline")
+    .data(dataPoints, (d :DataPoint) => d.index)
+    .each(updatePolylines)
+    .enter()
+    .insert('polyline', 'polyline')
+    .classed('polyline', true)
+    .each(updatePolylines)
+
+  d3.select("svg").selectAll(".polyline")
+    .data(dataPoints, (d :DataPoint) => d.index)
+    .exit()
+    .remove()
+
+  d3.select("svg").selectAll(".polygon")
+    .data(dataPoints, (d :DataPoint) => d.index)
+    .each(updatePolygons)
+    .enter()
+    .insert('polygon', 'polyline')
+    .each(updatePolygons)
+
+  d3.select("svg").selectAll(".polygon")
+    .data(dataPoints, (d :DataPoint) => d.index)
+    .exit()
+    .remove()
 })
 
 function updatePolylines(d,i,arr) {
