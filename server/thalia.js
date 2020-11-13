@@ -326,7 +326,7 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
         });
     }
 });
-define("router", ["require", "exports", "fs", "mime", "zlib"], function (require, exports, fs, mime, zlib) {
+define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (require, exports, fs, mime, zlib, url) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.router = void 0;
@@ -518,12 +518,20 @@ define("router", ["require", "exports", "fs", "mime", "zlib"], function (require
                         response.setHeader('Cache-Control', 'no-cache');
                         if (website.cache) {
                             if (stats.size > 10240) { // cache files bigger than 10kb?
-                                // You should only use a 1 year cache for versioned resources!!! Not "everything over 10kb"
-                                // response.setHeader('Cache-Control', 'public, max-age=31536000') // ex. 1 year in seconds
-                                // response.setHeader('Expires', new Date(Date.now() + 31536000000).toUTCString()) // in ms.
                                 // https://web.dev/http-cache/
                                 response.setHeader('Cache-Control', 'public, max-age=600'); // store for 10 mins
                                 response.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString()); // expire 1 day from now
+                                try {
+                                    const queryObject = url.parse(request.url, true).query;
+                                    if (queryObject.v) {
+                                        // Set cache to 1 year if a cache busting query string is included
+                                        response.setHeader('Cache-Control', 'public, max-age=31536000');
+                                        response.setHeader('Expires', new Date(Date.now() + 31536000000).toUTCString());
+                                    }
+                                }
+                                catch (e) {
+                                    console.error(e);
+                                }
                             }
                         }
                         if (filetype && (filetype.slice(0, 4) === 'text' ||
