@@ -48,82 +48,20 @@ $.when($.ready).then(function () {
     chart.svg.select('.chart-title')
       .attr('transform', `translate(${chart.width / 2},${chart.height - 15})`)
 
-    const allVertices : Array<Vertex[]> = []
-
-    for (let i = 2; i < n; i++) {
-      const vertices : Vertex[] = poly(i)
-      allVertices.push(vertices)
-    }
-    // console.log(allVertices)
-
-    const dataPoints : DataPoint[] = []
-
-    allVertices.forEach((vertices, i) => {
-      const distance = finalDistance(vertices)
-      const ratio = size / distance
-      vertices = scaleSize(vertices, ratio)
-
-      const translateTarget = [300 - size/2, 500]
-      const translate = [translateTarget[0] - vertices[0][0], translateTarget[1] - vertices[0][1]]
-
-      const firstVertex :Array<Vertex> = [[0, 0], [0, 0]]
-
-      let startVertices = i > 0 ? getStartVertices(allVertices[i - 1]) : firstVertex
-
-      const startDistance = finalDistance(startVertices)
-      const startRatio = size / startDistance
-      startVertices = scaleSize(startVertices, startRatio)
-      const startTranslate = [translateTarget[0] - startVertices[0][0], translateTarget[1] - startVertices[0][1]]
-
-      if (i === 0) { startTranslate[0] = startTranslate[0] + (size / 2) }
-
-      dataPoints.push({
-        index: i,
-        start: {
-          vertices: startVertices,
-          transform: `translate(${startTranslate.join(',')})`
-        },
-        end: {
-          vertices: vertices,
-          transform: `translate(${translate.join(',')})`
-        }
-      })
-    })
+    const dataPoints : DataPoint[] = calculateDataPoints(n)
 
     chart.svg.selectAll('.line')
       .data(dataPoints)
       .enter()
       .insert('polyline', 'polyline')
       .classed('polyline', true)
-      .each((d, i, k) => {
-        d3.select(k[i])
-          .attr('id', `polyline-${i}`)
-          .attr('points', d.start.vertices.map(d => d.join(',')).join(' '))
-          .attr('transform', d.start.transform)
-          .attrs({
-            fill: colors[i % colors.length],
-            // fill: interpolatedColors(i / (dataPoints.length - 1)),
-            // fill: 'rgba(0,0,0,0)',
-            stroke: 'black',
-            display: 'none'
-          })
-      })
+      .each(updatePolylines)
 
     chart.svg.selectAll('.polygon')
       .data(dataPoints)
       .enter()
       .insert('polygon', 'polyline')
-      .attrs((d, i) => {
-        return {
-          id: `polygon-${i}`,
-          class: 'polygon',
-          points: d.end.vertices.map(d => d.join(',')).join(' '),
-          transform: d.end.transform,
-          stroke: 'lightgrey',
-          'stroke-width': 1,
-          fill: 'rgba(0,0,0,0)'
-        }
-      })
+      .each(updatePolygons)
 
     callDraw(0)
   })
@@ -335,6 +273,76 @@ d3.select('#verticesSlider').on('change', function () {
   n = parseInt($('#verticesSlider').val() as string)
 })
 
+function updatePolylines(d,i,arr) {
+  d3.select(arr[i])
+    .attr('id', `polyline-${i}`)
+    .attr('points', d.start.vertices.map(d => d.join(',')).join(' '))
+    .attr('transform', d.start.transform)
+    .attrs({
+      fill: colors[i % colors.length],
+      stroke: 'black',
+      display: 'none'
+    })
+}
+
+function updatePolygons(d,i,arr) {
+  d3.select<SVGPolygonElement, DataPoint>(arr[i])
+    .attrs((d, i) => {
+      return {
+        id: `polygon-${i}`,
+        class: 'polygon',
+        points: d.end.vertices.map(d => d.join(',')).join(' '),
+        transform: d.end.transform,
+        stroke: 'lightgrey',
+        'stroke-width': 1,
+        fill: 'rgba(0,0,0,0)'
+      }
+    })
+}
+
+function calculateDataPoints(vertices: number): DataPoint[] {
+  const allVertices: Array<Vertex[]> = []
+  const dataPoints : DataPoint[] = []
+
+  for (let i = 2; i < n; i++) {
+    const vertices: Vertex[] = poly(i)
+    allVertices.push(vertices)
+  }
+
+  allVertices.forEach((vertices, i) => {
+    const distance = finalDistance(vertices)
+    const ratio = size / distance
+    vertices = scaleSize(vertices, ratio)
+
+    const translateTarget = [300 - size / 2, 500]
+    const translate = [translateTarget[0] - vertices[0][0], translateTarget[1] - vertices[0][1]]
+
+    const firstVertex: Array<Vertex> = [[0, 0], [0, 0]]
+
+    let startVertices = i > 0 ? getStartVertices(allVertices[i - 1]) : firstVertex
+
+    const startDistance = finalDistance(startVertices)
+    const startRatio = size / startDistance
+    startVertices = scaleSize(startVertices, startRatio)
+    const startTranslate = [translateTarget[0] - startVertices[0][0], translateTarget[1] - startVertices[0][1]]
+
+    if (i === 0) { startTranslate[0] = startTranslate[0] + (size / 2) }
+
+    dataPoints.push({
+      index: i,
+      start: {
+        vertices: startVertices,
+        transform: `translate(${startTranslate.join(',')})`
+      },
+      end: {
+        vertices: vertices,
+        transform: `translate(${translate.join(',')})`
+      }
+    })
+  })
+
+  return dataPoints
+}
 
 globalThis.poly = poly
 globalThis.Tau = Tau
