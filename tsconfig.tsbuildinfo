@@ -401,6 +401,11 @@
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
+      "./src/js/go.ts": {
+        "version": "234e5e3e2e92b118c47cbfe3aa02b192e375afa8dc31f1ae1fa574c056983473",
+        "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
+        "affectsGlobalScope": false
+      },
       "./src/js/smugmug.ts": {
         "version": "115710e93c5d0242d7b76a4205f957557083b0b5984657a6dcd4380774145a19",
         "signature": "c819a6737cbf2f54ddb286fcfd8455852191a3bed8e1b92f92b5385da9252b2c",
@@ -1552,6 +1557,11 @@
         "../../node_modules/@types/jquery/index.d.ts",
         "./src/js/chart.ts"
       ],
+      "./src/js/go.ts": [
+        "../../node_modules/@types/d3/index.d.ts",
+        "../../node_modules/@types/jquery/index.d.ts",
+        "./src/js/chart.ts"
+      ],
       "./src/js/war.ts": [
         "../../node_modules/@types/d3/index.d.ts",
         "../../node_modules/@types/jquery/index.d.ts",
@@ -2289,6 +2299,7 @@
       "./src/js/breathe.ts",
       "./src/js/chart.ts",
       "./src/js/friends.ts",
+      "./src/js/go.ts",
       "./src/js/smugmug.ts",
       "./src/js/war.ts",
       "./src/js/wealth.ts"
