@@ -24,8 +24,8 @@ var dataTable : DataTables.Api
 
 const Tau = 2 * Math.PI
 
-const size :number = 100
-const n :number = 14
+let n :number = 14
+let size :number = 1400 / n
 
 const pastels = ['#000000', '#9e0142', '#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#ffffbf', '#e6f598', '#abdda4', '#66c2a5', '#3288bd', '#5e4fa2'] // eslint-disable-line
 const monochrome = [...Array(n).keys()].map( i => `hsl(0,0%,${Math.floor(100 * (i/(n-1)))}%)`)
@@ -63,7 +63,7 @@ $.when($.ready).then(function () {
       const ratio = size / distance
       vertices = scaleSize(vertices, ratio)
 
-      const translateTarget = [250, 500]
+      const translateTarget = [300 - size/2, 500]
       const translate = [translateTarget[0] - vertices[0][0], translateTarget[1] - vertices[0][1]]
 
       const firstVertex :Array<Vertex> = [[0, 0], [0, 0]]
@@ -329,10 +329,11 @@ $('input[name="colors"]').on('change', () => {
       $(this.node())
         .css('background-color', colors[i])
     })
-
-
 })
 
+d3.select('#verticesSlider').on('change', function () {
+  n = parseInt($('#verticesSlider').val() as string)
+})
 
 
 globalThis.poly = poly

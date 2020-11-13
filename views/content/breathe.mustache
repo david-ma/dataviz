@@ -51,6 +51,15 @@
           <label for="monochrome">Monochrome</label>
         </div>
 
+        <div class="option">
+          <label for="hideOutlines">Number of points on largest shape:</label><br>
+
+          <input id="verticesSlider" type="range" min="4" max="25" value="14">
+          <div><div pseudo="-webkit-slider-runnable-track" id="track"><div id="thumb"></div></div></div>
+          </input>
+        </div>
+
+
         {{!-- <input type="button" value="Toggle Outlines" onclick='$(".polygon").toggleClass("hidden");'> --}}
       </div>
 
