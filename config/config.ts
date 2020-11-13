@@ -20,6 +20,12 @@ if (scrapingToolsLoaded) {
   tabletojson = require('tabletojson')
 }
 
+let gitHash :string = (new Date()).getTime().toString() // use the start up time as fallback if a proper git hash is unavailable
+try {
+  const rawGitHash = fs.readFileSync(path.resolve(__dirname, 'git-commit-version.txt'), 'utf8');
+  gitHash = rawGitHash.split('-').pop().trim()
+} catch(e){}
+
 // Asynchronous for each, doing a limited number of things at a time.
 async function asyncForEach (array, limit, callback) {
   let i = 0
@@ -284,6 +290,7 @@ let config :Thalia.WebsiteConfig = {
       Promise.all(promises).then(function ([views, allCameras, model, scrape]) {
         if (model) {
           const data = {
+            gitHash: gitHash,
             model: model.dataValues,
             scrape: scrape.dataValues,
             cameraData: JSON.stringify(model.dataValues),
@@ -320,7 +327,9 @@ let config :Thalia.WebsiteConfig = {
       }))
 
       Promise.all(promises).then(function ([views, cameras, familes] :[any, any, any]) {
-        const data :any = {}
+        const data :any = {
+          gitHash: gitHash
+        }
         data.cameras = JSON.stringify(cameras)
         data.brand = type
         data.familes = JSON.stringify(familes)
@@ -427,7 +436,9 @@ let config :Thalia.WebsiteConfig = {
     '': function homepage (router) {
       const promises = [loadTemplates('homepage.mustache')]
       Promise.all(promises).then(function ([views]: [any]) {
-        const data: any = {}
+        const data: any = {
+          gitHash: gitHash
+        }
         router.db.Blogpost.findAll({
           where: {
             published: true
@@ -444,7 +455,9 @@ let config :Thalia.WebsiteConfig = {
     blog: function blogpost (router) {
       const promises = [loadTemplates('blog.mustache', router.path)]
       Promise.all(promises).then(function ([views]: [any]) {
-        const data: any = {}
+        const data: any = {
+          gitHash: gitHash
+        }
         router.db.Blogpost.findAll({
           where: {
             published: true
@@ -467,7 +480,9 @@ let config :Thalia.WebsiteConfig = {
     experiment: function (router) {
       const promises = [loadTemplates('upload_experiment.mustache')]
       Promise.all(promises).then(function ([views] :[any]) {
-        const data = {}
+        const data = {
+          gitHash: gitHash
+        }
 
         const output = mustache.render(views.template, data, views)
         router.res.end(output)
@@ -477,7 +492,9 @@ let config :Thalia.WebsiteConfig = {
       const promises = [loadTemplates('stickers.mustache')]
 
       Promise.all(promises).then(function ([views] :[any]) {
-        const data = {}
+        const data = {
+          gitHash: gitHash
+        }
 
         const output = mustache.render(views.template, data, views)
         router.res.end(output)

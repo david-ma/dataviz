@@ -20,6 +20,12 @@ if (scrapingToolsLoaded) {
     request = require('request');
     tabletojson = require('tabletojson');
 }
+let gitHash = (new Date()).getTime().toString();
+try {
+    const rawGitHash = fs_1.default.readFileSync(path_1.default.resolve(__dirname, 'git-commit-version.txt'), 'utf8');
+    gitHash = rawGitHash.split('-').pop().trim();
+}
+catch (e) { }
 async function asyncForEach(array, limit, callback) {
     let i = 0;
     for (; i < limit; i++) {
@@ -229,6 +235,7 @@ let config = {
             Promise.all(promises).then(function ([views, allCameras, model, scrape]) {
                 if (model) {
                     const data = {
+                        gitHash: gitHash,
                         model: model.dataValues,
                         scrape: scrape.dataValues,
                         cameraData: JSON.stringify(model.dataValues),
@@ -264,7 +271,9 @@ let config = {
                 }
             }));
             Promise.all(promises).then(function ([views, cameras, familes]) {
-                const data = {};
+                const data = {
+                    gitHash: gitHash
+                };
                 data.cameras = JSON.stringify(cameras);
                 data.brand = type;
                 data.familes = JSON.stringify(familes);
@@ -352,7 +361,9 @@ let config = {
         '': function homepage(router) {
             const promises = [loadTemplates('homepage.mustache')];
             Promise.all(promises).then(function ([views]) {
-                const data = {};
+                const data = {
+                    gitHash: gitHash
+                };
                 router.db.Blogpost.findAll({
                     where: {
                         published: true
@@ -368,7 +379,9 @@ let config = {
         blog: function blogpost(router) {
             const promises = [loadTemplates('blog.mustache', router.path)];
             Promise.all(promises).then(function ([views]) {
-                const data = {};
+                const data = {
+                    gitHash: gitHash
+                };
                 router.db.Blogpost.findAll({
                     where: {
                         published: true
@@ -390,7 +403,9 @@ let config = {
         experiment: function (router) {
             const promises = [loadTemplates('upload_experiment.mustache')];
             Promise.all(promises).then(function ([views]) {
-                const data = {};
+                const data = {
+                    gitHash: gitHash
+                };
                 const output = mustache_1.default.render(views.template, data, views);
                 router.res.end(output);
             });
@@ -398,7 +413,9 @@ let config = {
         stickers: function (router) {
             const promises = [loadTemplates('stickers.mustache')];
             Promise.all(promises).then(function ([views]) {
-                const data = {};
+                const data = {
+                    gitHash: gitHash
+                };
                 const output = mustache_1.default.render(views.template, data, views);
                 router.res.end(output);
             });
