@@ -33,7 +33,7 @@ let colors = pastels;
 
 // d3.interpolate(colors)
 // const interpolatedColors = d3.interpolateHslLong('#9e0142', '#5e4fa2')
-const interpolatedColors = d3.interpolateHslLong('#810081', '#ffa600') // eslint-disable-line
+// const interpolatedColors = d3.interpolateHslLong('#810081', '#ffa600') // eslint-disable-line
 
 $.when($.ready).then(function () {
   const chart = new Chart({ // eslint-disable-line
@@ -125,16 +125,18 @@ function getName (i :number) :string {
   }
 }
 
+let currentTransition : d3.Selection<SVGPolylineElement, DataPoint, HTMLElement, any>
+
 function callReverse (i:number) {
   d3.select('.chart-title').text('Breathe Out')
-  d3.select(`#polyline-${i}`)
-    .transition()
+  currentTransition = d3.select<SVGPolylineElement, DataPoint>(`#polyline-${i}`)
+  currentTransition.transition()
     .ease(d3.easeLinear)
     .duration(modifiedSpeed(i))
-    .attr('points', (d: DataPoint) => d.start.vertices.map(d => d.join(',')).join(' '))
-    .attr('transform', (d: DataPoint) => d.start.transform)
-    .on('end', (d, j, k) => {
-      d3.select(k[j]).style('display', 'none')
+    .attr('points', d => d.start.vertices.map(d => d.join(',')).join(' '))
+    .attr('transform', d => d.start.transform)
+    .on('end', (d, j, arr) => {
+      d3.select(arr[j]).style('display', 'none')
       if (i > 0) {
         callReverse(i - 1)
       } else {
@@ -145,13 +147,13 @@ function callReverse (i:number) {
 
 function callDraw (i:number) {
   d3.select('.chart-title').text('Breathe In')
-  d3.select(`#polyline-${i}`)
-    .style('display', 'inherit')
+  currentTransition = d3.select<SVGPolylineElement, DataPoint>(`#polyline-${i}`)
+  currentTransition.style('display', 'inherit')
     .transition()
     .ease(d3.easeLinear)
     .duration(modifiedSpeed(i))
-    .attr('points', (d: DataPoint) => d.end.vertices.map(d => d.join(',')).join(' '))
-    .attr('transform', (d: DataPoint) => d.end.transform)
+    .attr('points', d => d.end.vertices.map(d => d.join(',')).join(' '))
+    .attr('transform', d => d.end.transform)
     .on('end', () => {
       if (i < n - 3) {
         callDraw(i + 1)
@@ -275,6 +277,8 @@ d3.select('#verticesSlider').on('change', function () {
 
   const dataPoints :DataPoint[] = calculateDataPoints(n)
 
+  currentTransition.interrupt()
+
   d3.select("svg").selectAll(".polyline")
     .data(dataPoints, (d :DataPoint) => d.index)
     .each(updatePolylines)
@@ -299,6 +303,8 @@ d3.select('#verticesSlider').on('change', function () {
     .data(dataPoints, (d :DataPoint) => d.index)
     .exit()
     .remove()
+
+  callDraw(0)
 })
 
 function updatePolylines(d,i,arr) {
@@ -306,11 +312,9 @@ function updatePolylines(d,i,arr) {
     .attr('id', `polyline-${i}`)
     .attr('points', d.start.vertices.map(d => d.join(',')).join(' '))
     .attr('transform', d.start.transform)
-    .attrs({
-      fill: colors[i % colors.length],
-      stroke: 'black',
-      display: 'none'
-    })
+    .attr("fill", colors[i % colors.length])
+    .attr("stroke", "black")
+    .style("display", "none")
 }
 
 function updatePolygons(d,i,arr) {
