@@ -407,7 +407,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/go.ts": {
-        "version": "234e5e3e2e92b118c47cbfe3aa02b192e375afa8dc31f1ae1fa574c056983473",
+        "version": "971e1e1d35214396d7002cee88c30e1c9115d7c1a401705d0a453e961e22838e",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
