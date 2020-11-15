@@ -98,6 +98,10 @@ input[type='radio'], label {
 }
 
 section#breathe.blogpost {
+  .dataTables_wrapper {
+    overflow: scroll;
+  }
+
   #tabs {
     margin-top: 15px;
     width: 100%;
