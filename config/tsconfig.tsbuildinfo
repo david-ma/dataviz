@@ -271,7 +271,7 @@
         "affectsGlobalScope": false
       },
       "../../../server/requesthandlers.ts": {
-        "version": "5fadc722168e59242974638e10a414ba90e8d241afed67f05e882255a77ff1e5",
+        "version": "0140c1e136a3c4db018bdc8f9ead521307868d0c1ba75d7662a496a135e21a0e",
         "signature": "ca03bc3459a9c78ba13000ff0bb4cdb3a2e509a2739b9ef60a1458e581697380",
         "affectsGlobalScope": false
       },
@@ -501,8 +501,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/assert.d.ts": {
-        "version": "d0c575d48d6dad75648017ff18762eb97f9398cc9486541b3070e79ce12719e6",
-        "signature": "d0c575d48d6dad75648017ff18762eb97f9398cc9486541b3070e79ce12719e6",
+        "version": "ce71d002806f66f9b2ee0d440ade1af5231c40902f85d2e45517c5ddd7744fab",
+        "signature": "ce71d002806f66f9b2ee0d440ade1af5231c40902f85d2e45517c5ddd7744fab",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/base.d.ts": {
@@ -720,6 +720,11 @@
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },
+      "./go.ts": {
+        "version": "ac0882ff2d618a2f4331ca222bc5b70a2bac8ac9149aada6939c349a99d6074a",
+        "signature": "185884e109bc53b9988bcf45de6ce2845648cee72fa1f381db2cdb980276a992",
+        "affectsGlobalScope": false
+      },
       "../../../node_modules/@babel/types/lib/index.d.ts": {
         "version": "cd5a5fd244fa901f9c331e45b833ea5a4efa162acdc129c6e52e5d74e924752b",
         "signature": "cd5a5fd244fa901f9c331e45b833ea5a4efa162acdc129c6e52e5d74e924752b",
@@ -741,8 +746,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/babel__template/index.d.ts": {
-        "version": "3e0a34f7207431d967dc32d593d1cda0c23975e9484bc8895b39d96ffca4a0d8",
-        "signature": "3e0a34f7207431d967dc32d593d1cda0c23975e9484bc8895b39d96ffca4a0d8",
+        "version": "3051751533eee92572241b3cef28333212401408c4e7aa21718714b793c0f4ed",
+        "signature": "3051751533eee92572241b3cef28333212401408c4e7aa21718714b793c0f4ed",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/babel__core/index.d.ts": {
@@ -1136,8 +1141,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/xml2js/index.d.ts": {
-        "version": "232a20dbd107baa091280c321f417c715f328a5b2d896bec7399630ff85270f7",
-        "signature": "232a20dbd107baa091280c321f417c715f328a5b2d896bec7399630ff85270f7",
+        "version": "7a7404d4a96b8d81b0e6697eb7455138ba0b34fa41f91004d12b58f42244043c",
+        "signature": "7a7404d4a96b8d81b0e6697eb7455138ba0b34fa41f91004d12b58f42244043c",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/yargs-parser/index.d.ts": {
@@ -1855,6 +1860,10 @@
         "../../../node_modules/sequelize/types/index.d.ts",
         "../models/index.ts"
       ],
+      "./go.ts": [
+        "../../../node_modules/@types/lodash/index.d.ts",
+        "../../../server/thalia.d.ts"
+      ],
       "./smugmug.ts": [
         "../../../node_modules/@types/formidable/index.d.ts",
         "../../../node_modules/@types/lodash/index.d.ts",
@@ -2562,6 +2571,9 @@
       "./config.ts": [
         "../../../server/thalia.d.ts"
       ],
+      "./go.ts": [
+        "../../../server/thalia.d.ts"
+      ],
       "./smugmug.ts": [
         "../../../server/thalia.d.ts"
       ],
@@ -2816,6 +2828,7 @@
       "./awesome.ts",
       "./config.ts",
       "./db_bootstrap.ts",
+      "./go.ts",
       "./smugmug.ts",
       "../models/blogpost.ts",
       "../models/camera.ts",

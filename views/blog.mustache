@@ -1,49 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    {{#blogpost}}
-    <title>{{title}}</title>
+  {{#blogpost}}
+  <title>{{title}}</title>
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:creator"    content="@frostickle" />
-    <meta name="twitter:title"      content="{{title}}" />
-    <meta name="twitter:description" content="{{summary}}" />
-    <meta name="twitter:image"      content="https://dataviz.david-ma.net/{{{image}}}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:creator"    content="@frostickle" />
+  <meta name="twitter:title"      content="{{title}}" />
+  <meta name="twitter:description" content="{{summary}}" />
+  <meta name="twitter:image"      content="https://dataviz.david-ma.net/{{{image}}}" />
 
-    <meta property="og:url"         content="https://dataviz.david-ma.net/blog/{{shortname}}/" />
-    <meta property="og:type"        content="article" />
-    <meta property="og:title"       content="{{title}}" />
-    <meta property="og:description" content="{{summary}}" />
-    <meta property="og:image"       content="https://dataviz.david-ma.net/{{{image}}}" />
-    <meta property="og:image:width"  content="1212px" />
-    <meta property="og:image:height" content="830px" />
-    <meta property="fb:app_id"   content="793893040633491" />
+  <meta property="og:url"         content="https://dataviz.david-ma.net/blog/{{shortname}}/" />
+  <meta property="og:type"        content="article" />
+  <meta property="og:title"       content="{{title}}" />
+  <meta property="og:description" content="{{summary}}" />
+  <meta property="og:image"       content="https://dataviz.david-ma.net/{{{image}}}" />
+  <meta property="og:image:width"  content="1212px" />
+  <meta property="og:image:height" content="830px" />
+  <meta property="fb:app_id"   content="793893040633491" />
 
-    <meta name="author"             content="David Ma" />
-    <meta property="article:author" content="http://www.facebook.com/frostickle" />
-    {{/blogpost}}
+  <meta name="author"             content="David Ma" />
+  <meta property="article:author" content="http://www.facebook.com/frostickle" />
+  {{/blogpost}}
 
-    {{> assets}}
-    {{> styles }}
+{{> assets}}
+{{> styles }}
 </head>
 <body>
-    {{> header}}
+{{> header}}
 
-    <div id="dataviz_blog" class="container-fluid page">
-        <div class="row equal">
-            {{> nav}}
+  <div id="dataviz_blog" class="container-fluid page">
+    <div class="row equal">
+{{> nav}}
 
-            <div class="col-xs-12 col-sm-9 col-md-10" style="margin: 0 auto;">
-                {{> content }}
-            </div>
-        </div>
+      <div class="col-xs-12 col-sm-9 col-md-10" style="margin: 0 auto;">
+{{> content }}
+      </div>
     </div>
+  </div>
 
-    {{> footer}}
+{{> footer}}
 
 
 {{> scripts }}

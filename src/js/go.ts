@@ -81,6 +81,10 @@ $.when($.ready).then(function () {
               fill: d.color
             }
           })
+          .on('click', function(d,i,arr){
+            var rect = d3.select(arr[i])
+            rect.attr("fill", "red")
+          })
       })
 
   })

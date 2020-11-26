@@ -6,7 +6,7 @@
 
 <div id="mobile_nav" class="visible-xs">
     <div id="title">
-        <h1>David's Dataviz</h1>
+        <h1><a href="/">David's Dataviz</a></h1>
     </div>
     {{! 
     <div id="search">
@@ -32,3 +32,14 @@
         </ul>
     </ul>
 </div>
+
+<script>
+  const md = new showdown.Converter({openLinksInNewWindow: true});
+  $("#aboutMe").html(md.makeHtml(`
+Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in Melbourne, Australia. This is my sandbox for experimenting & practicing with d3js. You can see all the source code on [github](https://github.com/david-ma/dataviz). It runs on my framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
+
+These data visualisations are mostly part of the [#MakeoverMonday](https://www.makeovermonday.co.uk/) series. And I am aiming to do one each week!
+
+I'm [@Frostickle](https://twitter.com/frostickle) on Twitter!`));
+
+</script>

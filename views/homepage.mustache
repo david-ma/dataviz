@@ -1,56 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>#MakeoverMonday</title>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>#MakeoverMonday</title>
 
-        {{> assets}}
-        <style></style>
+{{> assets}}
+    <style></style>
 
-    </head>
-    <body>
-        {{> header}}
+  </head>
+  <body>
+{{> header}}
 
-        <div id="dataviz_homepage" class="container page">
-            <div class="row equal">
-                {{> nav}}
+    <div id="dataviz_homepage" class="container page">
+      <div class="row equal">
+{{> nav}} 
 
-                <div class="col-xs-12 col-sm-9">
+        <div class="col-xs-12 col-sm-9">
 
-                    <h1 class="hidden-xs">#MakeoverMonday</h1>
+          <h1 class="hidden-xs">#MakeoverMonday</h1>
 
-                    <div id="vizPreviews">
-                    {{#blogposts}}
-                        <div class="preview col-xl-3 col-lg-4 col-md-6 col-xs-12">
-                            <h2>{{title}}</h2>
-                            <span class="subtitle">{{category}} {{publish_date}}</span>
-                            <p>{{summary}}</p>
-                            <a href="/blog/{{shortname}}"><img src="{{image}}"></a>
-                        </div>
-                    {{/blogposts}}
-                    </div>
-
-                </div>
+          <div id="vizPreviews">
+          {{#blogposts}}
+            <div class="preview col-xl-3 col-lg-4 col-md-6 col-xs-12">
+              <h2>{{title}}</h2>
+              <span class="subtitle">{{category}} {{publish_date}}</span>
+              <p>{{summary}}</p>
+              <a href="/blog/{{shortname}}"><img src="{{image}}"></a>
             </div>
-        </div>
+          {{/blogposts}}
+          </div>
 
-        {{> footer}}
+          </div>
+      </div>
+    </div>
 
-        <script>
+{{> footer}}
 
-            const md = new showdown.Converter({openLinksInNewWindow: true});
-
-            $("#aboutMe").html(md.makeHtml(`
-Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in Melbourne, Australia. This is my sandbox for experimenting & practicing with d3js. You can see all the source code on [github](https://github.com/david-ma/dataviz). It runs on my framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
-
-These data visualisations are mostly part of the [#MakeoverMonday](https://www.makeovermonday.co.uk/) series. And I am aiming to do one each week!
-
-I'm [@Frostickle](https://twitter.com/frostickle) on Twitter!
-`));
-
-        </script>
-    </body>
+  </body>
 </html>
