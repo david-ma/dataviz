@@ -46,7 +46,7 @@
 
 <script>
 
-    const md = new showdown.Converter({openLinksInNewWindow: true});
+    var md = new showdown.Converter({openLinksInNewWindow: true});
 
     $("#explain").html(md.makeHtml(`
 I redrew Philip Bump's diagram from his article "Nearly a quarter of Americans have never experienced the U.S. in a time of peace" as an exercise to practice d3.js.

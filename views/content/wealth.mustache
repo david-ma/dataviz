@@ -71,7 +71,7 @@
 
 <script>
 
-    const md = new showdown.Converter({openLinksInNewWindow: true});
+    var md = new showdown.Converter({openLinksInNewWindow: true});
 
     $("#explain").html(md.makeHtml(`
 Data taken from the [2019 Credit Suisse Research Institute wealth report](https://www.credit-suisse.com/about-us/en/reports-research/global-wealth-report.html).

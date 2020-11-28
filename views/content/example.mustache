@@ -8,3 +8,15 @@
 </section>
 
 {{> require}}
+
+
+
+<script>
+  var md = new showdown.Converter({openLinksInNewWindow: true});
+
+  $("#exampleDiv").html(md.makeHtml(
+`#Blogpost
+Write a blog post here`
+  ));
+
+</script>

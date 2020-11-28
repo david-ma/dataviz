@@ -83,7 +83,7 @@ svg line {
 {{> require}}
 
 <script>
-  const md = new showdown.Converter({openLinksInNewWindow: true});
+  var md = new showdown.Converter({openLinksInNewWindow: true});
 
   $("#explain").html(md.makeHtml(`
 This gif has been shared around the internet for a bit, but I can't find the original source.

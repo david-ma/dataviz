@@ -34,7 +34,7 @@
 </div>
 
 <script>
-  const md = new showdown.Converter({openLinksInNewWindow: true});
+  var md = new showdown.Converter({openLinksInNewWindow: true});
   $("#aboutMe").html(md.makeHtml(`
 Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in Melbourne, Australia. This is my sandbox for experimenting & practicing with d3js. You can see all the source code on [github](https://github.com/david-ma/dataviz). It runs on my framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
 
