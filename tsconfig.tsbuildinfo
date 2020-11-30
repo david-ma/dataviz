@@ -402,7 +402,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/fistula.ts": {
-        "version": "edb66443b7273e34668a7f36b73e9469f3d50bf712a41b8f6ff55fea0d3ee2df",
+        "version": "e63b5a048511c1e5262925a047d92c75c4e255d02ba16763cf270cd290d9b25d",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
