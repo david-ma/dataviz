@@ -401,6 +401,11 @@
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
+      "./src/js/fistula.ts": {
+        "version": "33c08c9dda55c1e0518916a735a54ed8a5e6b0d0086b3aead47775a17ca4d5a3",
+        "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
+        "affectsGlobalScope": false
+      },
       "./src/js/friends.ts": {
         "version": "64478480c1a2b57d1c46d6e38a3ef74ce5995c7f83f31f27c7be899dd4be136b",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
@@ -1562,6 +1567,11 @@
         "../../node_modules/@types/jquery/index.d.ts",
         "./src/js/chart.ts"
       ],
+      "./src/js/fistula.ts": [
+        "../../node_modules/@types/d3/index.d.ts",
+        "../../node_modules/@types/jquery/index.d.ts",
+        "./src/js/chart.ts"
+      ],
       "./src/js/friends.ts": [
         "../../node_modules/@types/d3/index.d.ts",
         "../../node_modules/@types/jquery/index.d.ts",
@@ -2313,6 +2323,7 @@
       "./src/js/breathe.ts",
       "./src/js/chart.ts",
       "./src/js/example.ts",
+      "./src/js/fistula.ts",
       "./src/js/friends.ts",
       "./src/js/go.ts",
       "./src/js/smugmug.ts",

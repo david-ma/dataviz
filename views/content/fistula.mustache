@@ -1,0 +1,38 @@
+<section id="example" class="blogpost">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-md-6">
+      <br>
+      <div id="exampleDiv"></div>
+    </div>
+  </div>
+</section>
+
+{{> require}}
+
+
+
+<script>
+  var md = new showdown.Converter({openLinksInNewWindow: true});
+
+  $("#exampleDiv").html(md.makeHtml(
+`#Operation Fistula
+December 2020: A Special Viz5 for Giving Tuesday
+This month, Viz5 is asking for your help! On Tuesday, December 1, the world will come
+together to raise funds for charities and organizations like Operation Fistula. This #GivingTuesday, your #Viz5 submissions will help us raise funds that will enable fistula patients
+to access the care and treatment they urgently need.
+
+
+For this month’s Viz5 campaign, we’re asking the #Viz5 #MakeoverMonday community to
+develop data visualizations that will help us fundraise for our new performance-based funding
+program. The data visualizations you produce this month will tell the stories of the women
+whose care was funded through our funding program. We hope to show the world and our
+supporters how impactful their donations to this program can be.
+
+
+You’ll be directly supporting the mission of Operation Fistula, and enabling us to deliver our
+work to end fistula for every woman, everywhere. Your visualizations will help to raise
+awareness of fistula, share news of how our funding tool increases capacity and breaks down
+barriers, and encourage people to donate to support this critically important work.`
+  ));
+
+</script>
