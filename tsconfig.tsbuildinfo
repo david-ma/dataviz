@@ -402,7 +402,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/fistula.ts": {
-        "version": "33c08c9dda55c1e0518916a735a54ed8a5e6b0d0086b3aead47775a17ca4d5a3",
+        "version": "edb66443b7273e34668a7f36b73e9469f3d50bf712a41b8f6ff55fea0d3ee2df",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
@@ -1570,6 +1570,7 @@
       "./src/js/fistula.ts": [
         "../../node_modules/@types/d3/index.d.ts",
         "../../node_modules/@types/jquery/index.d.ts",
+        "../../node_modules/@types/node/path.d.ts",
         "./src/js/chart.ts"
       ],
       "./src/js/friends.ts": [
