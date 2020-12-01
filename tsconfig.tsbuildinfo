@@ -187,8 +187,8 @@
         "affectsGlobalScope": false
       },
       "./src/js/awesome.ts": {
-        "version": "4d0d0586ae65a535b444d9d8296ba57a3dd60aa0b42022bfae97ffeff5dfedc5",
-        "signature": "f9cb46cf83c199e8c67ff2507fba310bb5fccde5299814406bd1689b0cf9f27d",
+        "version": "f15d5ca332a26a8cef1bdc86c32edbaa77ebc5cbfc7f525d6646815a9416396c",
+        "signature": "357a975e085a5b73ff18c63ba276d9e08329ee815cac0a929f23a9440413d19f",
         "affectsGlobalScope": true
       },
       "../../node_modules/@types/d3-array/index.d.ts": {

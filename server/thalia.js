@@ -521,11 +521,13 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                 let router = function (file) {
                     response.writeHead(200);
                     response.end(file);
+                    return;
                 };
                 fs.stat(filename, function (err, stats) {
                     if (err) {
                         response.writeHead(503);
                         response.end(err);
+                        return;
                     }
                     else {
                         response.setHeader('Cache-Control', 'no-cache');
