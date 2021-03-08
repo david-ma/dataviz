@@ -40,7 +40,7 @@ const config :Thalia.WebsiteConfig = {
         }
 
         Object.keys(files).forEach((inputfield) => {
-          const file = files[inputfield]
+          const file: any = files[inputfield]
           const newLocation = path.resolve(uploadFolder, file.name)
 
           fs.rename(file.path, newLocation, function (err) {

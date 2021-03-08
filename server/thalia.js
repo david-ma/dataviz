@@ -81,14 +81,17 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                 console.log('Only load %s', handle.index.localhost);
                 const site = handle.index.localhost;
                 console.log('Adding site: ' + site);
-                let config;
+                let config = {};
                 try {
                     const start = Date.now();
                     if (fs.existsSync(path.resolve(__dirname, '..', 'websites', site, 'config.js'))) {
                         config = require(path.resolve(__dirname, '..', 'websites', site, 'config')).config;
                     }
-                    else {
+                    else if (fs.existsSync(path.resolve(__dirname, '..', 'websites', site, 'config', 'config.js'))) {
                         config = require(path.resolve(__dirname, '..', 'websites', site, 'config', 'config')).config;
+                    }
+                    else {
+                        console.log(`No config provided for ${site}, just serving the public folder`);
                     }
                     console.log(`${Date.now() - start} ms - config.js for ${site}`);
                 }
@@ -110,13 +113,16 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                 fs.readdirSync('websites/').forEach(function (site) {
                     if (fs.lstatSync('websites/' + site).isDirectory()) {
                         console.log('Adding site: ' + site);
-                        let config;
+                        let config = {};
                         try {
                             if (fs.existsSync(path.resolve(__dirname, '..', 'websites', site, 'config.js'))) {
                                 config = require(path.resolve(__dirname, '..', 'websites', site, 'config')).config;
                             }
-                            else {
+                            else if (fs.existsSync(path.resolve(__dirname, '..', 'websites', site, 'config', 'config.js'))) {
                                 config = require(path.resolve(__dirname, '..', 'websites', site, 'config', 'config')).config;
+                            }
+                            else {
+                                console.log(`No config provided for ${site}, just serve the public folder`);
                             }
                         }
                         catch (err) {
@@ -128,7 +134,7 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                             else {
                                 // Note, we want this to be silent if config.js is missing, because we can just serve the public/dist folders.
                                 // but log an error if config.js requires something that is not available.
-                                if (err.requireStack[0].indexOf('thalia.js') > 0) {
+                                if (err.requireStack && err.requireStack[0].indexOf('thalia.js') > 0) {
                                     console.log(`${site} does not use config.js, just serve the public folder`);
                                 }
                                 else {
@@ -162,6 +168,8 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
             });
             // Add the site to the index
             handle.index[site + '.david-ma.net'] = site;
+            handle.index[`${site}.com`] = site;
+            handle.index[`${site}.net`] = site;
             handle.websites[site].domains.forEach(function (domain) {
                 handle.index[domain] = site;
             });
@@ -517,7 +525,12 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                 }
                 const acceptedEncoding = request.headers['accept-encoding'] || '';
                 const filetype = mime.getType(filename);
-                response.setHeader('Content-Type', filetype);
+                try {
+                    response.setHeader('Content-Type', filetype);
+                }
+                catch (e) {
+                    console.error(e);
+                }
                 let router = function (file) {
                     response.writeHead(200);
                     response.end(file);
@@ -530,13 +543,18 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                         return;
                     }
                     else {
-                        response.setHeader('Cache-Control', 'no-cache');
+                        try {
+                            response.setHeader('Cache-Control', 'no-cache');
+                        }
+                        catch (e) {
+                            console.error(e);
+                        }
                         if (website.cache) {
                             if (stats.size > 10240) { // cache files bigger than 10kb?
                                 // https://web.dev/http-cache/
-                                response.setHeader('Cache-Control', 'public, max-age=600'); // store for 10 mins
-                                response.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString()); // expire 1 day from now
                                 try {
+                                    response.setHeader('Cache-Control', 'public, max-age=600'); // store for 10 mins
+                                    response.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString()); // expire 1 day from now
                                     const queryObject = url.parse(request.url, true).query;
                                     if (queryObject.v) {
                                         // Set cache to 1 year if a cache busting query string is included
@@ -552,7 +570,12 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                         if (filetype && (filetype.slice(0, 4) === 'text' ||
                             filetype === 'application/json' ||
                             filetype === 'application/javascript')) {
-                            response.setHeader('Content-Type', `${filetype}; charset=UTF-8`);
+                            try {
+                                response.setHeader('Content-Type', `${filetype}; charset=UTF-8`);
+                            }
+                            catch (e) {
+                                console.error(e);
+                            }
                             router = function (file) {
                                 if (acceptedEncoding.indexOf('gzip') >= 0) {
                                     zlib.gzip(file, function (err, result) {

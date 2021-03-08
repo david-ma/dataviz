@@ -71,18 +71,24 @@ async function loadTemplates (template, content = '') {
         fsPromise.readFile(path.resolve(__dirname, '..', 'views', 'content', content + '.mustache'), {
           encoding: 'utf8'
         }).then(result => {
-          const scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g
-          const styleEx = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/g
+          try {
+            const scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g
+            const styleEx = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/g
 
-          const scripts = [...result.matchAll(scriptEx)].map(d => d[0])
-          const styles = [...result.matchAll(styleEx)].map(d => d[0])
+            const scripts = [...result.matchAll(scriptEx)].map(d => d[0])
+            const styles = [...result.matchAll(styleEx)].map(d => d[0])
 
-          resolve({
-            content: result.replace(scriptEx, '').replace(styleEx, ''),
-            scripts: scripts.join('\n'),
-            styles: styles.join('\n')
-          })
-        }).catch(() => {
+            resolve({
+              content: result.replace(scriptEx, '').replace(styleEx, ''),
+              scripts: scripts.join('\n'),
+              styles: styles.join('\n')
+            })
+          } catch (e) {
+            resolve({
+              content: result
+            })
+          }
+        }).catch((e) => {
           // fsPromise.readFile(`${__dirname}/../views/404.mustache`, {
           fsPromise.readFile(path.resolve(__dirname, '..', 'views', '404.mustache'), {
             encoding: 'utf8'

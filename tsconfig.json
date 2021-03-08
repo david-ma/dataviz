@@ -3,6 +3,8 @@
     "rootDir": "src",
     "baseUrl": "src",
     "outDir": "dist",
+    // "types": ["node"],
+    // "typeRoots": ["../../node_modules/@types/d3-selection-multi/index.d.ts"],
     "target": "ES2015",
     "module": "AMD",
     "moduleResolution": "Node",

@@ -16,7 +16,7 @@ let seqOptions :sequelize.Options = {
   password: process.env.DB_PASSWORD || '',
   port: 3306,
   dialect: 'mariadb',
-  timezone: 'Australia/Melbourne',
+  // timezone: 'Australia/Melbourne',
   dialectOptions: {
     timezone: 'Australia/Melbourne',
     decimalNumbers: true

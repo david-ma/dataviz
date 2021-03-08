@@ -1,5 +1,6 @@
 import { Chart } from 'chart'
 import * as d3 from 'd3'
+// import * as d3 from 'd3-selection-multi'
 import $ from 'jquery'
 import 'datatables.net'
 
@@ -15,7 +16,7 @@ type friend = {
 let bins = []
 const buckets : friend[][] = []
 
-const dateOpts = { year: 'numeric', month: 'long', day: 'numeric' }
+const dateOpts: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' }
 
 let test = null
 globalThis.test = test
