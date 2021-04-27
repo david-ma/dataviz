@@ -287,18 +287,18 @@
         "affectsGlobalScope": false
       },
       "../../../server/requesthandlers.ts": {
-        "version": "b5ec4c08eb95ffc5b749e7e262aef554342a8ffd89ad74f0a2a25fbbfeddb633",
-        "signature": "ca03bc3459a9c78ba13000ff0bb4cdb3a2e509a2739b9ef60a1458e581697380",
+        "version": "4d475aac7995564e7239c67d52949178918cad8a48139271da980a59bb884b85",
+        "signature": "fa78b16975be4f93193cc23c60d226ccf0078f01d43fafd717fc6b0690048a14",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/globals.d.ts": {
-        "version": "25b4a0c4fab47c373ee49df4c239826ee3430019fc0c1b5e59edc3e398b7468d",
-        "signature": "25b4a0c4fab47c373ee49df4c239826ee3430019fc0c1b5e59edc3e398b7468d",
+        "version": "583b4bd4e441916be4bf152ee323c4ffa6e178fd25df2ee2215ef05c7feb5ad4",
+        "signature": "583b4bd4e441916be4bf152ee323c4ffa6e178fd25df2ee2215ef05c7feb5ad4",
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/node/async_hooks.d.ts": {
-        "version": "7698983d080f951eaf53ff81e5c7bd61abc02e4a1a21266f1bd79ea85c0dc641",
-        "signature": "7698983d080f951eaf53ff81e5c7bd61abc02e4a1a21266f1bd79ea85c0dc641",
+        "version": "d20f08527645f62facb2d66c2b7bd31ea964b59c897d00bddb1efe8c13890b72",
+        "signature": "d20f08527645f62facb2d66c2b7bd31ea964b59c897d00bddb1efe8c13890b72",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/buffer.d.ts": {
@@ -307,8 +307,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/child_process.d.ts": {
-        "version": "89a3409a743c2a408d02bd68255a61d8416225b76c2c66d8e2e74dad3e00bc5d",
-        "signature": "89a3409a743c2a408d02bd68255a61d8416225b76c2c66d8e2e74dad3e00bc5d",
+        "version": "674bedbfd2004e233e2a266a3d2286e524f0d58787a98522d834d6ccda1d215a",
+        "signature": "674bedbfd2004e233e2a266a3d2286e524f0d58787a98522d834d6ccda1d215a",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/cluster.d.ts": {
@@ -327,8 +327,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/crypto.d.ts": {
-        "version": "64813a6beff756b9e3f3c06d1b648d55e7c90af2b55c64d13a69d6c7f573643d",
-        "signature": "64813a6beff756b9e3f3c06d1b648d55e7c90af2b55c64d13a69d6c7f573643d",
+        "version": "d53b352a01645c470a0d8c31bf290ba791fc28ade0ce187a4a50f5c2f826f75e",
+        "signature": "d53b352a01645c470a0d8c31bf290ba791fc28ade0ce187a4a50f5c2f826f75e",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/dgram.d.ts": {
@@ -362,13 +362,13 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/http.d.ts": {
-        "version": "1f08bd8305d4a789a68f71ab622156dfff993aa51a2aa58b9ccf166cc6f9fcf7",
-        "signature": "1f08bd8305d4a789a68f71ab622156dfff993aa51a2aa58b9ccf166cc6f9fcf7",
+        "version": "37eed30fc8318b8ac76eac6f41d0758a9d0bffd8f3ff353e3ad0f8717dd08d92",
+        "signature": "37eed30fc8318b8ac76eac6f41d0758a9d0bffd8f3ff353e3ad0f8717dd08d92",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/http2.d.ts": {
-        "version": "4c260129d649d69f0608cd123e7016e61364b553a5ca2de9b66b0398594959cf",
-        "signature": "4c260129d649d69f0608cd123e7016e61364b553a5ca2de9b66b0398594959cf",
+        "version": "9aff68f1b847b846d3d50a58c9f8f99389bedd0258d1b1c201f11b97ecfd36f8",
+        "signature": "9aff68f1b847b846d3d50a58c9f8f99389bedd0258d1b1c201f11b97ecfd36f8",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/https.d.ts": {
@@ -407,8 +407,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/process.d.ts": {
-        "version": "06c004006016a51c4d1855527a523562c329dc44c473931c65f10373281f730e",
-        "signature": "06c004006016a51c4d1855527a523562c329dc44c473931c65f10373281f730e",
+        "version": "fcb95c45150c717706119f12f2a3639d51baa041cd5bb441eb8501e04b52c501",
+        "signature": "fcb95c45150c717706119f12f2a3639d51baa041cd5bb441eb8501e04b52c501",
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/node/punycode.d.ts": {
@@ -432,8 +432,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/stream.d.ts": {
-        "version": "d84300d886b45a198c346158e4ff7ae361cc7bc1c3deab44afb3db7de56b5d25",
-        "signature": "d84300d886b45a198c346158e4ff7ae361cc7bc1c3deab44afb3db7de56b5d25",
+        "version": "74594bec8a9fa1a2cd40268f9ab95d0c44b6080345da6e8b913939d19b1d57ae",
+        "signature": "74594bec8a9fa1a2cd40268f9ab95d0c44b6080345da6e8b913939d19b1d57ae",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/string_decoder.d.ts": {
@@ -477,8 +477,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/vm.d.ts": {
-        "version": "66679e8ffbf1fddef1796c60757e54e6e6551dd9823f75ef2f80176473bdaaff",
-        "signature": "66679e8ffbf1fddef1796c60757e54e6e6551dd9823f75ef2f80176473bdaaff",
+        "version": "141a943e5690105898a67537a470f70b56d0e183441b56051d929e902376b7b2",
+        "signature": "141a943e5690105898a67537a470f70b56d0e183441b56051d929e902376b7b2",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/worker_threads.d.ts": {
@@ -489,11 +489,6 @@
       "../../../node_modules/@types/node/zlib.d.ts": {
         "version": "515ef1d99036ff0dafa5bf738e02222edea94e0d97a0aa0ff277ac5e96b57977",
         "signature": "515ef1d99036ff0dafa5bf738e02222edea94e0d97a0aa0ff277ac5e96b57977",
-        "affectsGlobalScope": false
-      },
-      "../../../node_modules/@types/node/ts3.4/base.d.ts": {
-        "version": "d44028ae0127eb3e9fcfa5f55a8b81d64775ce15aca1020fe25c511bbb055834",
-        "signature": "d44028ae0127eb3e9fcfa5f55a8b81d64775ce15aca1020fe25c511bbb055834",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/globals.global.d.ts": {
@@ -507,8 +502,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/ts3.6/base.d.ts": {
-        "version": "ad1ae5ae98eceb9af99061e83e867b9897d267aebc8f3b938c9424deabadf4bb",
-        "signature": "ad1ae5ae98eceb9af99061e83e867b9897d267aebc8f3b938c9424deabadf4bb",
+        "version": "ae68a04912ee5a0f589276f9ec60b095f8c40d48128a4575b3fdd7d93806931c",
+        "signature": "ae68a04912ee5a0f589276f9ec60b095f8c40d48128a4575b3fdd7d93806931c",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/node/assert.d.ts": {
@@ -542,8 +537,8 @@
         "affectsGlobalScope": false
       },
       "../../../server/thalia.d.ts": {
-        "version": "615f3c180465b32b8075bf9c573a8d1a4986359b7323581e64a61612a7024925",
-        "signature": "615f3c180465b32b8075bf9c573a8d1a4986359b7323581e64a61612a7024925",
+        "version": "7313ee08e06b94591181c63cd6b234dc28e3ca1458d5389fc4a52e67b1eeb25a",
+        "signature": "7313ee08e06b94591181c63cd6b234dc28e3ca1458d5389fc4a52e67b1eeb25a",
         "affectsGlobalScope": false
       },
       "./awesome.ts": {
@@ -551,23 +546,23 @@
         "signature": "185884e109bc53b9988bcf45de6ce2845648cee72fa1f381db2cdb980276a992",
         "affectsGlobalScope": false
       },
-      "../../../node_modules/@types/formidable/index.d.ts": {
-        "version": "5fd66f10e468ad3a89250eae624ef20e7d549e11f04026d94466cfbaddd2359f",
-        "signature": "5fd66f10e468ad3a89250eae624ef20e7d549e11f04026d94466cfbaddd2359f",
-        "affectsGlobalScope": false
-      },
       "../../../node_modules/@types/mime/index.d.ts": {
         "version": "be27a64e821a3e5af838650e4aa25805c60f057d0c37a9762c378d19d364b3e6",
         "signature": "be27a64e821a3e5af838650e4aa25805c60f057d0c37a9762c378d19d364b3e6",
         "affectsGlobalScope": false
       },
+      "../../../node_modules/@types/formidable/index.d.ts": {
+        "version": "8b0ce3abe306a564d0b5e7f1c07c9347515c500bcb7e0786edfbeef6f55b05b8",
+        "signature": "8b0ce3abe306a564d0b5e7f1c07c9347515c500bcb7e0786edfbeef6f55b05b8",
+        "affectsGlobalScope": false
+      },
       "./smugmug.ts": {
-        "version": "663cdc3e83556543d32319b2cc7f0684e738d88278a38a0b74eb6dacadaedb29",
+        "version": "a0bb4bac5e0a8d9116750bc3d0d1ff71dac0f074aa14e6b4d96d7f46f74d5979",
         "signature": "185884e109bc53b9988bcf45de6ce2845648cee72fa1f381db2cdb980276a992",
         "affectsGlobalScope": false
       },
       "./config.ts": {
-        "version": "4ebb2d351bf70b024c8e54d183b83db7a07dcabb6a65078c3fb3323e1d087de5",
+        "version": "9e3213a3088450a7505ab60d02fd0c705a1753730865d82166503034c4498b05",
         "signature": "aab0d9864bdeac0cb386147afcbebe1d66b411861fc1f9524b2b8d430af7eddf",
         "affectsGlobalScope": false
       },
@@ -622,8 +617,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/associations/belongs-to-many.d.ts": {
-        "version": "96b5683ddbaeee3afd722c265b1d8388b8d3ed65e32c0efc3607695086562b90",
-        "signature": "96b5683ddbaeee3afd722c265b1d8388b8d3ed65e32c0efc3607695086562b90",
+        "version": "e7ee4c14d55c72f3f96db22196670b47e863fae9d9fc071f71f513ba84039bbc",
+        "signature": "e7ee4c14d55c72f3f96db22196670b47e863fae9d9fc071f71f513ba84039bbc",
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/associations/index.d.ts": {
@@ -637,8 +632,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/model-manager.d.ts": {
-        "version": "6b41e2c79936d58d2cc9749264df7e9f5e93866d450a89cb5d880ca4c9ff9e5e",
-        "signature": "6b41e2c79936d58d2cc9749264df7e9f5e93866d450a89cb5d880ca4c9ff9e5e",
+        "version": "8945026bbc531fd9e4cb3b3ab9ae3931ee988b8b08609b9884512b4b8ea54350",
+        "signature": "8945026bbc531fd9e4cb3b3ab9ae3931ee988b8b08609b9884512b4b8ea54350",
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/transaction.d.ts": {
@@ -652,8 +647,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/query-interface.d.ts": {
-        "version": "c4699a41413a80fc3b5a84dc3a07f1415180cfe4eea6a5e92dc8993bce9cf6f9",
-        "signature": "c4699a41413a80fc3b5a84dc3a07f1415180cfe4eea6a5e92dc8993bce9cf6f9",
+        "version": "79a954dd11f8dcb561eb6cbb85438bb56b45c8ce9ef0ea854b9870a6d4231d21",
+        "signature": "79a954dd11f8dcb561eb6cbb85438bb56b45c8ce9ef0ea854b9870a6d4231d21",
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/connection-manager.d.ts": {
@@ -662,28 +657,28 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/sequelize.d.ts": {
-        "version": "482b5e1c8de757eaf759b83caaaed019a785a3f7a7fdee03f3edbae4db1fedca",
-        "signature": "482b5e1c8de757eaf759b83caaaed019a785a3f7a7fdee03f3edbae4db1fedca",
+        "version": "7244aca07e0aa01e3de42a0af338c03046d251ca160993acce49d06bebe321ba",
+        "signature": "7244aca07e0aa01e3de42a0af338c03046d251ca160993acce49d06bebe321ba",
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/hooks.d.ts": {
-        "version": "75c4007b453ce04b45de5b07034aa12ca78c270efe20e5ab1a7ade5183e6fefc",
-        "signature": "75c4007b453ce04b45de5b07034aa12ca78c270efe20e5ab1a7ade5183e6fefc",
+        "version": "939e79ac806c30a353a8e4f235153b8cfd3b48bf8a1e6a3c504abfb24b627ebe",
+        "signature": "939e79ac806c30a353a8e4f235153b8cfd3b48bf8a1e6a3c504abfb24b627ebe",
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/model.d.ts": {
-        "version": "ac818561c5fc6311095db8d5efbd2c000725bded3b2c4cdf14b738bf76dd326d",
-        "signature": "ac818561c5fc6311095db8d5efbd2c000725bded3b2c4cdf14b738bf76dd326d",
+        "version": "2603cfa5719b807dafd1b9534462ebf72424a75337664576714e127a0dd81c7c",
+        "signature": "2603cfa5719b807dafd1b9534462ebf72424a75337664576714e127a0dd81c7c",
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/utils.d.ts": {
-        "version": "abc08bf57b4cc17510dd3b32675700574892a7611fc19227a1f00974a43bc7ee",
-        "signature": "abc08bf57b4cc17510dd3b32675700574892a7611fc19227a1f00974a43bc7ee",
+        "version": "386cfe0ea446603f5f25ece294b0575a5d2a72c1b87d834426e552e8b73de0c8",
+        "signature": "386cfe0ea446603f5f25ece294b0575a5d2a72c1b87d834426e552e8b73de0c8",
         "affectsGlobalScope": false
       },
       "../../../node_modules/sequelize/types/lib/errors.d.ts": {
-        "version": "9c5062d7febf5228522af9f2d44d2e16f1f5e40c596f732e9a5fb0b4ff1e182b",
-        "signature": "9c5062d7febf5228522af9f2d44d2e16f1f5e40c596f732e9a5fb0b4ff1e182b",
+        "version": "586de92120969ae9bf47a848d8d72a726559a3c5295ab4cfd886405e73eb9859",
+        "signature": "586de92120969ae9bf47a848d8d72a726559a3c5295ab4cfd886405e73eb9859",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/validator/index.d.ts": {
@@ -1107,8 +1102,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/jest/index.d.ts": {
-        "version": "71f30fba971582dc744373cbc8b06c1eb64dc24a6ccbc9b457f94fb68c67cb4e",
-        "signature": "71f30fba971582dc744373cbc8b06c1eb64dc24a6ccbc9b457f94fb68c67cb4e",
+        "version": "ce2169125f42515a26fa60977b6d56ae407f3462e28832fbf6a9013f6a828bab",
+        "signature": "ce2169125f42515a26fa60977b6d56ae407f3462e28832fbf6a9013f6a828bab",
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/json-schema/index.d.ts": {
@@ -1126,6 +1121,11 @@
         "signature": "c9ad058b2cc9ce6dc2ed92960d6d009e8c04bef46d3f5312283debca6869f613",
         "affectsGlobalScope": false
       },
+      "../../../node_modules/@types/parse-json/index.d.ts": {
+        "version": "2b8264b2fefd7367e0f20e2c04eed5d3038831fe00f5efbc110ff0131aab899b",
+        "signature": "2b8264b2fefd7367e0f20e2c04eed5d3038831fe00f5efbc110ff0131aab899b",
+        "affectsGlobalScope": false
+      },
       "../../../node_modules/@types/prettier/index.d.ts": {
         "version": "d916cd19ddfd778aaa1dbfad1adbc5cddf5172b42cbc85964084556ea5eaace5",
         "signature": "d916cd19ddfd778aaa1dbfad1adbc5cddf5172b42cbc85964084556ea5eaace5",
@@ -1134,11 +1134,6 @@
       "../../../node_modules/@types/puppeteer/index.d.ts": {
         "version": "66858b90c4b60a4b4259e8b09d914c37a0570b156789d949634a6147170e1e88",
         "signature": "66858b90c4b60a4b4259e8b09d914c37a0570b156789d949634a6147170e1e88",
-        "affectsGlobalScope": false
-      },
-      "../../../node_modules/@types/q/index.d.ts": {
-        "version": "f9a2dd6a6084665f093ed0e9664b8e673be2a45e342a59dd4e0e4e552e68a9ad",
-        "signature": "f9a2dd6a6084665f093ed0e9664b8e673be2a45e342a59dd4e0e4e552e68a9ad",
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/sequelize/index.d.ts": {
@@ -1152,8 +1147,8 @@
         "affectsGlobalScope": false
       },
       "../../../node_modules/@types/socket.io-client/index.d.ts": {
-        "version": "3fab06880dca03fb8dd2e9780de71196a66f743d995ec9427c47837efd816ce3",
-        "signature": "3fab06880dca03fb8dd2e9780de71196a66f743d995ec9427c47837efd816ce3",
+        "version": "1f2aeddad94bedd84380217ed8d64bba9566d20a87360617f2616013e1e77540",
+        "signature": "1f2aeddad94bedd84380217ed8d64bba9566d20a87360617f2616013e1e77540",
         "affectsGlobalScope": true
       },
       "../../../node_modules/@types/stack-utils/index.d.ts": {
@@ -1697,7 +1692,7 @@
       "../../../node_modules/@types/node/trace_events.d.ts": [
         "../../../node_modules/@types/node/trace_events.d.ts"
       ],
-      "../../../node_modules/@types/node/ts3.4/base.d.ts": [
+      "../../../node_modules/@types/node/ts3.6/base.d.ts": [
         "../../../node_modules/@types/node/async_hooks.d.ts",
         "../../../node_modules/@types/node/buffer.d.ts",
         "../../../node_modules/@types/node/child_process.d.ts",
@@ -1712,6 +1707,7 @@
         "../../../node_modules/@types/node/fs.d.ts",
         "../../../node_modules/@types/node/fs/promises.d.ts",
         "../../../node_modules/@types/node/globals.d.ts",
+        "../../../node_modules/@types/node/globals.global.d.ts",
         "../../../node_modules/@types/node/http.d.ts",
         "../../../node_modules/@types/node/http2.d.ts",
         "../../../node_modules/@types/node/https.d.ts",
@@ -1736,13 +1732,9 @@
         "../../../node_modules/@types/node/util.d.ts",
         "../../../node_modules/@types/node/v8.d.ts",
         "../../../node_modules/@types/node/vm.d.ts",
+        "../../../node_modules/@types/node/wasi.d.ts",
         "../../../node_modules/@types/node/worker_threads.d.ts",
         "../../../node_modules/@types/node/zlib.d.ts"
-      ],
-      "../../../node_modules/@types/node/ts3.6/base.d.ts": [
-        "../../../node_modules/@types/node/globals.global.d.ts",
-        "../../../node_modules/@types/node/ts3.4/base.d.ts",
-        "../../../node_modules/@types/node/wasi.d.ts"
       ],
       "../../../node_modules/@types/node/tty.d.ts": [
         "../../../node_modules/@types/node/net.d.ts",
@@ -1877,7 +1869,11 @@
         "../../../node_modules/sequelize/types/lib/associations/has-many.d.ts",
         "../../../node_modules/sequelize/types/lib/associations/has-one.d.ts"
       ],
+      "../../../node_modules/sequelize/types/lib/errors.d.ts": [
+        "../../../node_modules/sequelize/types/lib/model.d.ts"
+      ],
       "../../../node_modules/sequelize/types/lib/hooks.d.ts": [
+        "../../../node_modules/sequelize/types/index.d.ts",
         "../../../node_modules/sequelize/types/lib/instance-validator.d.ts",
         "../../../node_modules/sequelize/types/lib/model.d.ts",
         "../../../node_modules/sequelize/types/lib/sequelize.d.ts"
@@ -1904,6 +1900,7 @@
       ],
       "../../../node_modules/sequelize/types/lib/query-interface.d.ts": [
         "../../../node_modules/sequelize/types/lib/data-types.d.ts",
+        "../../../node_modules/sequelize/types/lib/deferrable.d.ts",
         "../../../node_modules/sequelize/types/lib/model.d.ts",
         "../../../node_modules/sequelize/types/lib/query-types.d.ts",
         "../../../node_modules/sequelize/types/lib/sequelize.d.ts",
@@ -1951,6 +1948,7 @@
         "../../../server/thalia.d.ts"
       ],
       "./config.ts": [
+        "../../../node_modules/@types/formidable/index.d.ts",
         "../../../node_modules/@types/lodash/index.d.ts",
         "../../../node_modules/@types/mustache/index.d.ts",
         "../../../node_modules/@types/node/fs.d.ts",
@@ -2501,7 +2499,7 @@
       "../../../node_modules/@types/node/trace_events.d.ts": [
         "../../../node_modules/@types/node/trace_events.d.ts"
       ],
-      "../../../node_modules/@types/node/ts3.4/base.d.ts": [
+      "../../../node_modules/@types/node/ts3.6/base.d.ts": [
         "../../../node_modules/@types/node/async_hooks.d.ts",
         "../../../node_modules/@types/node/buffer.d.ts",
         "../../../node_modules/@types/node/child_process.d.ts",
@@ -2516,6 +2514,7 @@
         "../../../node_modules/@types/node/fs.d.ts",
         "../../../node_modules/@types/node/fs/promises.d.ts",
         "../../../node_modules/@types/node/globals.d.ts",
+        "../../../node_modules/@types/node/globals.global.d.ts",
         "../../../node_modules/@types/node/http.d.ts",
         "../../../node_modules/@types/node/http2.d.ts",
         "../../../node_modules/@types/node/https.d.ts",
@@ -2540,13 +2539,9 @@
         "../../../node_modules/@types/node/util.d.ts",
         "../../../node_modules/@types/node/v8.d.ts",
         "../../../node_modules/@types/node/vm.d.ts",
+        "../../../node_modules/@types/node/wasi.d.ts",
         "../../../node_modules/@types/node/worker_threads.d.ts",
         "../../../node_modules/@types/node/zlib.d.ts"
-      ],
-      "../../../node_modules/@types/node/ts3.6/base.d.ts": [
-        "../../../node_modules/@types/node/globals.global.d.ts",
-        "../../../node_modules/@types/node/ts3.4/base.d.ts",
-        "../../../node_modules/@types/node/wasi.d.ts"
       ],
       "../../../node_modules/@types/node/tty.d.ts": [
         "../../../node_modules/@types/node/net.d.ts",
@@ -2681,7 +2676,11 @@
         "../../../node_modules/sequelize/types/lib/associations/has-many.d.ts",
         "../../../node_modules/sequelize/types/lib/associations/has-one.d.ts"
       ],
+      "../../../node_modules/sequelize/types/lib/errors.d.ts": [
+        "../../../node_modules/sequelize/types/lib/model.d.ts"
+      ],
       "../../../node_modules/sequelize/types/lib/hooks.d.ts": [
+        "../../../node_modules/sequelize/types/index.d.ts",
         "../../../node_modules/sequelize/types/lib/instance-validator.d.ts",
         "../../../node_modules/sequelize/types/lib/model.d.ts",
         "../../../node_modules/sequelize/types/lib/sequelize.d.ts"
@@ -2708,6 +2707,7 @@
       ],
       "../../../node_modules/sequelize/types/lib/query-interface.d.ts": [
         "../../../node_modules/sequelize/types/lib/data-types.d.ts",
+        "../../../node_modules/sequelize/types/lib/deferrable.d.ts",
         "../../../node_modules/sequelize/types/lib/model.d.ts",
         "../../../node_modules/sequelize/types/lib/query-types.d.ts",
         "../../../node_modules/sequelize/types/lib/sequelize.d.ts",
@@ -2948,7 +2948,6 @@
       "../../../node_modules/@types/node/timers.d.ts",
       "../../../node_modules/@types/node/tls.d.ts",
       "../../../node_modules/@types/node/trace_events.d.ts",
-      "../../../node_modules/@types/node/ts3.4/base.d.ts",
       "../../../node_modules/@types/node/ts3.6/base.d.ts",
       "../../../node_modules/@types/node/tty.d.ts",
       "../../../node_modules/@types/node/url.d.ts",
@@ -2959,9 +2958,9 @@
       "../../../node_modules/@types/node/worker_threads.d.ts",
       "../../../node_modules/@types/node/zlib.d.ts",
       "../../../node_modules/@types/normalize-package-data/index.d.ts",
+      "../../../node_modules/@types/parse-json/index.d.ts",
       "../../../node_modules/@types/prettier/index.d.ts",
       "../../../node_modules/@types/puppeteer/index.d.ts",
-      "../../../node_modules/@types/q/index.d.ts",
       "../../../node_modules/@types/responselike/index.d.ts",
       "../../../node_modules/@types/sequelize/index.d.ts",
       "../../../node_modules/@types/showdown/index.d.ts",

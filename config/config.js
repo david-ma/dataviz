@@ -12,7 +12,7 @@ const fs_1 = __importDefault(require("fs"));
 const mustache_1 = __importDefault(require("mustache"));
 const lodash_1 = __importDefault(require("lodash"));
 const fsPromise = fs_1.default.promises;
-const formidable = require('formidable');
+const formidable_1 = __importDefault(require("formidable"));
 let xray, request, tabletojson;
 let scrapingToolsLoaded = false;
 if (scrapingToolsLoaded) {
@@ -314,7 +314,7 @@ let config = {
         },
         upload: function (res, req) {
             const uploadFolder = 'websites/dataviz/data/campjs/';
-            const form = formidable();
+            const form = new formidable_1.default.IncomingForm();
             form.parse(req, (err, fields, files) => {
                 if (err) {
                     console.log('Error uploading!');

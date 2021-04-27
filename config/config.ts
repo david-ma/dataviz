@@ -9,7 +9,8 @@ import fs from 'fs'
 import mustache from 'mustache'
 import _ from 'lodash'
 const fsPromise = fs.promises
-const formidable = require('formidable')
+// const formidable = require('formidable')
+import Formidable from 'formidable'
 
 // These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.
 let xray, request, tabletojson
@@ -379,7 +380,7 @@ let config :Thalia.WebsiteConfig = {
     },
     upload: function (res, req) {
       const uploadFolder = 'websites/dataviz/data/campjs/'
-      const form = formidable()
+      const form = new Formidable.IncomingForm();
       form.parse(req, (err, fields, files) => {
         if (err) {
           console.log('Error uploading!')
@@ -387,7 +388,7 @@ let config :Thalia.WebsiteConfig = {
           res.end(err)
         } else {
           Object.keys(files).forEach((inputfield) => {
-            const file = files[inputfield]
+            const file = files[inputfield] as Formidable.File
             const newLocation = uploadFolder + file.name
 
             fs.rename(file.path, newLocation, function (err) {

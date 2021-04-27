@@ -1,5 +1,4 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { IncomingForm } from 'formidable'
 import { Thalia } from '../../../server/thalia'
 
 // const _ = require('lodash')
@@ -13,11 +12,11 @@ const tokens :{
     'oauth_token_secret': string;
 } = require('./config.json').smugmug
 
-const formidable = require('formidable')
 import fs = require('fs');
 import https = require('https');
 import mime = require('mime');
 import crypto = require('crypto');
+import Formidable = require('formidable')
 
 const config :Thalia.WebsiteConfig = {
   services: {
@@ -28,7 +27,7 @@ const config :Thalia.WebsiteConfig = {
       // const uploadFolder = `${__dirname}/../data/tmp/`
       const uploadFolder = path.resolve(__dirname, '..', 'data', 'tmp')
 
-      const form :IncomingForm = formidable({
+      const form = new Formidable({
         maxFileSize: 25 * 1024 * 1024 // 25 megabytes. Note we're also putting this size limit in nginx.conf
       })
       // console.log("uploading files to ", uploadFolder);

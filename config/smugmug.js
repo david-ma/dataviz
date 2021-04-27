@@ -7,11 +7,11 @@ exports.config = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const path_1 = __importDefault(require("path"));
 const tokens = require('./config.json').smugmug;
-const formidable = require('formidable');
 const fs = require("fs");
 const https = require("https");
 const mime = require("mime");
 const crypto = require("crypto");
+const Formidable = require("formidable");
 const config = {
     services: {
         test: function (res, req) {
@@ -19,7 +19,7 @@ const config = {
         },
         uploadPhoto: function (res, req) {
             const uploadFolder = path_1.default.resolve(__dirname, '..', 'data', 'tmp');
-            const form = formidable({
+            const form = new Formidable({
                 maxFileSize: 25 * 1024 * 1024
             });
             form.parse(req, (err, fields, files) => {
