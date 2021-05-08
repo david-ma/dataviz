@@ -430,4 +430,10 @@ let config = {
     }
 };
 exports.config = config;
-exports.config = config = lodash_1.default.merge(config, smugmug_1.config, awesome_1.config);
+if (fs_1.default.existsSync(path_1.default.resolve(__dirname, 'config.json'))) {
+    exports.config = config = lodash_1.default.merge(config, smugmug_1.config);
+}
+else {
+    console.warn("config.json not provided, skipping smugmug stuff");
+}
+exports.config = config = lodash_1.default.merge(config, awesome_1.config);

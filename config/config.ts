@@ -510,6 +510,12 @@ let config :Thalia.WebsiteConfig = {
   }
 }
 
-config = _.merge(config, smugmugConfig, awesomeConfig)
+if(fs.existsSync(path.resolve(__dirname, 'config.json'))) {
+  config = _.merge(config, smugmugConfig)
+} else {
+  console.warn("config.json not provided, skipping smugmug stuff")
+}
+
+config = _.merge(config, awesomeConfig)
 
 export { config }
