@@ -106,6 +106,14 @@ async function loadTemplates(template, content = '') {
 const base = 'https://www.digicamdb.com/';
 let config = {
     services: {
+        fridge_magnet_images: function (res, req, db) {
+            const filter = [".DS_Store", "index.html"];
+            fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'public', 'fridge_magnets', 'images'))
+                .then(function (images) {
+                images = images.filter(d => filter.indexOf(d) === -1);
+                res.end(JSON.stringify(images));
+            });
+        },
         scrapeAllCameras: function (res, req, db) {
             if (!scrapingToolsLoaded) {
                 scrapingToolsLoaded = true;

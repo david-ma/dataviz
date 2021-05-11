@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Fridge Magnets</title>
+  </head>
+
+  <body>
+    <div id="box"></div>
+
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+
+    <style>
+      div.magnet {
+        width: 2.8cm;
+        height: 2.8cm;
+        float: left;
+        border: solid 2px lightgrey;
+        margin: 2px;
+        padding: 5px;
+        text-align: center;
+        display: block;
+      }
+      div.magnet p {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 0.8em;
+        text-transform: capitalize;
+        position: relative;
+        bottom: 5px;
+      }
+      img {
+        max-width: 2cm;
+        max-height: 2cm;
+      }
+    </style>
+    <script>
+      d3.json('/fridge_magnet_images').then((images) => {
+        var box = d3.select('#box').selectAll('div')
+
+        var boxes = box
+          .data(images)
+          .enter()
+          .append('div')
+          .classed('magnet', true)
+
+        boxes.each((d, i, all) => {
+          var magnet = d3.select(all[i])
+
+          magnet.append('img').attrs((image) => {
+            return {
+              src: `images/${image}`,
+            }
+          })
+          magnet
+            .append('p')
+            .html(d.split('.')[0].replace(/\d/, '').replace('_', '&nbsp;'))
+        })
+      })
+    </script>
+  </body>
+</html>
