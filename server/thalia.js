@@ -692,12 +692,8 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                                     filename += 'index.html';
                                 }
                                 else {
-                                    if (filename.indexOf('?') !== -1) {
-                                        filename = filename.split('?')[0] + '/index.html';
-                                    }
-                                    else {
-                                        filename += '/index.html';
-                                    }
+                                    redirect(request.url.replace(/(^\/.*?)\/?(\?$|$)/, '$1/$2'));
+                                    return;
                                 }
                                 // Note we don't have content type, caching, or zipping!!!!
                                 fs.readFile(filename, (e, file) => router(file));
