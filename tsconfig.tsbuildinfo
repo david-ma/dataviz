@@ -497,7 +497,7 @@
         "affectsGlobalScope": true
       },
       "./src/js/war.ts": {
-        "version": "1e60d7e1767ffc571b6079a531b855db5c2e67a7e146ee2e0aef617c4c90918d",
+        "version": "d1fdf94346c1c4b2333192cad1b3ca6bdae9022f406329def6664e2413b7efb0",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },

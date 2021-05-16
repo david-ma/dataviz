@@ -1,10 +1,9 @@
-<script src="/js/require.js"></script>
 <script>
-
-require.config({
+var require = {
   baseUrl: '/js/vendor',
   urlArgs: 'v={{gitHash}}',
   enforceDefine: false,
+  deps: ['chart', 'datatables.net', {{{ typescript }}}],
   paths: {
     'chart': "/js/chart",
     'datatables.net': "/js/datatables.min"
@@ -18,11 +17,6 @@ require.config({
       deps: ["jquery"]
     }
   }
-});
-
-require(['chart',
-  {{{typescript}}},
-  'datatables.net'
-], function(){});
-
+};
 </script>
+<script src="/js/require.js"></script>

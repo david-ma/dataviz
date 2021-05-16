@@ -1,4 +1,4 @@
-import { Chart, decorateTable, d3, $ } from 'chart'
+import { Chart, decorateTable, d3 } from 'chart'
 
 const currentYear = new Date().getFullYear()
 
