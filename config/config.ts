@@ -136,10 +136,10 @@ const base = 'https://www.digicamdb.com/'
 
 let config :Thalia.WebsiteConfig = {
   services: {
-    fridge_magnet_images: function(res, req, db) {
+    fridge_images: function(res, req, db) {
       const filter = [".DS_Store", "index.html"]
 
-      fsPromise.readdir(path.resolve(__dirname, '..', 'public', 'fridge_magnets', 'images'))
+      fsPromise.readdir(path.resolve(__dirname, '..', 'public', 'fridge', 'images'))
         .then(function(images){
           images = images.filter(d => filter.indexOf(d) === -1)
           res.end(JSON.stringify(images))
