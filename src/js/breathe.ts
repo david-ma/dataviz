@@ -1,7 +1,5 @@
 
-import { Chart, decorateTable } from 'chart'
-import * as d3 from 'd3'
-import $ from 'jquery'
+import { Chart, decorateTable, $, d3 } from 'chart'
 import 'datatables.net'
 
 console.log('Running breathe.ts')

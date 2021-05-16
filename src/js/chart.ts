@@ -2,12 +2,13 @@
 
 import * as d3 from 'd3'
 import { selection, select } from 'd3-selection'
-
-import _ from 'lodash'
-import $ from 'jquery'
-import 'datatables.net'
 d3[<any>'select'] = select // eslint-disable-line
 d3[<any>'selection'] = selection // eslint-disable-line
+
+import $ from 'jquery'
+import 'datatables.net'
+
+import _ from 'lodash'
 
 interface chartOptions {
     element ?: string;
@@ -1120,5 +1121,9 @@ function decorateTable (dataset:any, newOptions?:chartDataTableSettings) : DataT
   }
   return $(element).DataTable(options)
 }
+
+console.debug(`D3 version: ${d3.version}`)
+console.debug(`jQuery version: ${$.fn.jquery}`)
+console.debug(`lodash version: ${_.VERSION}`)
 
 export { Chart, decorateTable, _, $, d3 }

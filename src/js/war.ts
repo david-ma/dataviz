@@ -1,8 +1,4 @@
-
-import { Chart, decorateTable } from 'chart'
-import * as d3 from 'd3'
-import $ from 'jquery'
-import 'datatables.net'
+import { Chart, decorateTable, d3, $ } from 'chart'
 
 const currentYear = new Date().getFullYear()
 

@@ -452,12 +452,12 @@
         "affectsGlobalScope": true
       },
       "./src/js/chart.ts": {
-        "version": "d33cd1216879932821d192a5c6295f94f652d8c8a865de350f1d69b72a5dfe89",
-        "signature": "c53a06db5159c768f9c01a250b98035d242c84b97351dece65f87f9b66eab8bb",
+        "version": "86e368c1d906f1451218a644efd81bdd4dacd2d4a61b57b2659f0b3241356bdd",
+        "signature": "c3ccd14a72fa6a839431e111344942be9ac04a481f89e1aa1b5737c955f0a35e",
         "affectsGlobalScope": false
       },
       "./src/js/breathe.ts": {
-        "version": "b33e8804e251e0a8fb9a17d20ba11dba97059d4a3c7e0e3bc52b4446f599897d",
+        "version": "36c1c0aef2cf12ff8a1e1158d1cd2e647cff7cabef5f7855104374fa0ac642a1",
         "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
         "affectsGlobalScope": false
       },
@@ -472,7 +472,7 @@
         "affectsGlobalScope": false
       },
       "./src/js/fridge.ts": {
-        "version": "07601eda0983a24c7bd478a9516b9f1adefa5d91b923eb086b7bf61636bd1134",
+        "version": "91a8473e1da87a29235d7fcc884227a182dfe9ed716b92b0c3ec3526ddc22681",
         "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },
@@ -497,13 +497,13 @@
         "affectsGlobalScope": true
       },
       "./src/js/war.ts": {
-        "version": "3acaa73826fef4679f38e8e226cefb16106d1ef7fc54a032edc8e8304480ffb2",
-        "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
+        "version": "1e60d7e1767ffc571b6079a531b855db5c2e67a7e146ee2e0aef617c4c90918d",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },
       "./src/js/wealth.ts": {
-        "version": "4b329b00bdd1189aaa81f99764e419a5a26695ad817ea08c5773a56b66d739c1",
-        "signature": "b2e979452d2e237eaba3dc693b93d652943686f52ccfb5b32f6f665b362536b0",
+        "version": "089dd5b02a6aa62dd9274848a333bb42fa832f161def1ec399ce5c2427237075",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
         "affectsGlobalScope": false
       },
       "../../node_modules/@babel/types/lib/index.d.ts": {
@@ -1623,8 +1623,6 @@
         "../../node_modules/pretty-format/build/types.d.ts"
       ],
       "./src/js/breathe.ts": [
-        "../../node_modules/@types/d3/index.d.ts",
-        "../../node_modules/@types/jquery/index.d.ts",
         "./src/js/chart.ts"
       ],
       "./src/js/chart.ts": [
@@ -1664,12 +1662,9 @@
         "./src/js/chart.ts"
       ],
       "./src/js/war.ts": [
-        "../../node_modules/@types/d3/index.d.ts",
-        "../../node_modules/@types/jquery/index.d.ts",
         "./src/js/chart.ts"
       ],
       "./src/js/wealth.ts": [
-        "../../node_modules/@types/d3/index.d.ts",
         "./src/js/chart.ts"
       ]
     },
