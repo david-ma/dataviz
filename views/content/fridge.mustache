@@ -1,0 +1,25 @@
+<section class="blogpost">
+  <div class="row">
+    <div id="explain" class="col-xs-6"></div>
+  </div>
+  <div class="row">
+    <div id="fridge" class="col-xs-12"></div>
+  </div>
+</section>
+
+{{> require}}
+
+<script>
+
+  var md = new showdown.Converter({ openLinksInNewWindow: true });
+
+  $("#explain").html(md.makeHtml(`
+I'm quite bad at remembering to eat my perishable foods before they go bad, so I've created a set of fridge magnets which will allow me to quickly see at a glance:
+* What food needs to be eaten more urgently
+* Give me ideas on what to cook or snack on
+* Remind me what I need to buy more of
+
+Print your own magnets [here](/fridge).
+`));
+
+</script>
