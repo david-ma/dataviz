@@ -472,9 +472,9 @@
         "affectsGlobalScope": false
       },
       "./src/js/fridge.ts": {
-        "version": "67fceded1ecc113d7cb10dff1096d893d69eb30d992f5e34d27ed81587d0c290",
-        "signature": "bd773698251f0a750a2e3584b05336e45c87e16c82566bea3572e4cb6b64e4a8",
-        "affectsGlobalScope": true
+        "version": "588331af2c993c148b05c5d010b280faa755b164d9c26e8c299197cc302ee842",
+        "signature": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+        "affectsGlobalScope": false
       },
       "./src/js/friends.ts": {
         "version": "491e71c18761f9035e8f022681a05d87ca84fcaf046a7f33fe2c8fdd460eb7c7",
@@ -1640,6 +1640,9 @@
         "../../node_modules/@types/d3/index.d.ts",
         "../../node_modules/@types/jquery/index.d.ts",
         "../../node_modules/@types/node/path.d.ts",
+        "./src/js/chart.ts"
+      ],
+      "./src/js/fridge.ts": [
         "./src/js/chart.ts"
       ],
       "./src/js/friends.ts": [
