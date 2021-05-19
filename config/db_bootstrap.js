@@ -9,7 +9,8 @@ const seq = {
     Camera: models_1.Camera,
     Family: models_1.Family
 };
-if (false) {
+// Family.get()
+if (false) { // eslint-disable-line
     models_1.Camera.findAll({
         where: {
             model: {
@@ -23,6 +24,9 @@ if (false) {
             }
         }).then(family => {
             cameras.forEach(camera => {
+                // camera.setFamily(family);
+                // camera.addFamily(family);
+                // console.log(camera);
                 camera.update({
                     family: family
                 });
@@ -30,15 +34,19 @@ if (false) {
         });
     });
 }
-if (false) {
+if (false) { // eslint-disable-line
     models_1.Family.create({
         brand: 'Nikon',
         name: 'Coolpix',
         description: 'None'
     });
 }
-if (true) {
-    seq.sequelize.sync({}).then(function (d) {
+// rebuild entire database & reload data..?
+if (true) { // eslint-disable-line
+    seq.sequelize.sync({
+    // force: true
+    }).then(function (d) {
+        // Add blog posts
         const blogposts = [{
                 shortname: 'war',
                 title: 'American Wartime',
@@ -89,6 +97,7 @@ if (true) {
                 published: true
             }];
         blogposts.forEach(function (blogpost) {
+            // console.log(`Adding ${blogpost.shortname}`)
             models_1.Blogpost.findOne({
                 where: {
                     shortname: blogpost.shortname

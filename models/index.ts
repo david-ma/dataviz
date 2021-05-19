@@ -2,12 +2,13 @@ import * as sequelize from 'sequelize'
 // import { UserFactory } from "./user-model";
 // import { SkillsFactory } from "./skills-model";
 // import { WorksheetFactory } from './worksheet';
+// import _ = require( 'lodash')
 import _ from 'lodash'
 import { ScrapeFactory } from './scrape'
 import { FamilyFactory } from './family'
 import { CameraFactory } from './camera'
 import { BlogpostFactory } from './blogpost'
-import path from 'path'
+import path = require('path')
 
 // Default options
 let seqOptions :sequelize.Options = {
@@ -33,7 +34,9 @@ try {
   // const configOptions = require(__dirname + '/../config/config.json')[env]
   const configOptions = require(path.resolve(__dirname, '..', 'config', 'config.json'))[env]
   seqOptions = _.merge(seqOptions, configOptions)
-} catch (e) { console.error('No config.json provided for Sequelize') }
+} catch (e) {
+  console.error('No config.json provided for Sequelize', e)
+}
 
 // Do NOT log your password on production!!!
 if (env === 'development') { console.log('Initialising Sequelize with options:', seqOptions) }

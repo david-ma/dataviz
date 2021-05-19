@@ -1,7 +1,7 @@
 import { Model, Op, Sequelize } from 'sequelize'
 import { dbConfig, Blogpost, Scrape, Camera, Family } from '../models'
 
-interface seqObject {
+export interface seqObject {
     [key: string] : Model | any | Sequelize;
     sequelize :Sequelize;
 }

@@ -29,7 +29,7 @@ const scrape_1 = require("./scrape");
 const family_1 = require("./family");
 const camera_1 = require("./camera");
 const blogpost_1 = require("./blogpost");
-const path_1 = __importDefault(require("path"));
+const path = require("path");
 let seqOptions = {
     database: process.env.DB_NAME || 'typescript_test',
     username: process.env.DB_USER || 'root',
@@ -47,11 +47,11 @@ let seqOptions = {
 };
 const env = process.env.NODE_ENV || 'development';
 try {
-    const configOptions = require(path_1.default.resolve(__dirname, '..', 'config', 'config.json'))[env];
+    const configOptions = require(path.resolve(__dirname, '..', 'config', 'config.json'))[env];
     seqOptions = lodash_1.default.merge(seqOptions, configOptions);
 }
 catch (e) {
-    console.error('No config.json provided for Sequelize');
+    console.error('No config.json provided for Sequelize', e);
 }
 if (env === 'development') {
     console.log('Initialising Sequelize with options:', seqOptions);

@@ -11,6 +11,7 @@ function FamilyFactory(sequelize) {
             }
         },
         brand: sequelize_1.DataTypes.STRING,
+        // camera_identifier: DataTypes.STRING,
         name: sequelize_1.DataTypes.STRING,
         description: sequelize_1.DataTypes.STRING
     });

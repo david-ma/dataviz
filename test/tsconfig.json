@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    // "allowSyntheticDefaultImports": true,
+    // "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "skipLibCheck": false,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "incremental": true,
+    "target": "ES2020"
+  }
+}
