@@ -53,7 +53,6 @@ var site = 'dataviz'
 describe('Test blogposts', () => {
   var blogposts: any[]
   var browser: puppeteer.Browser
-  var page: puppeteer.Page
 
   beforeAll(async () => {
     await database.Blogpost.findAll({
@@ -66,15 +65,23 @@ describe('Test blogposts', () => {
     })
 
     browser = await puppeteer.launch({
-      headless: false,
-      slowMo: 250,
+      // headless: false,
+      // slowMo: 250,
     })
-    page = await browser.newPage()
+
+    // .then(newBrowser => {
+    //   newBrowser.pages().then(pages => {
+    //     console.log("pages", pages)
+    //     page = pages[0]
+    //   })
+    //   return newBrowser
+    // })
   })
 
   afterAll(() => {
-    // page.close()
-    // browser.close()
+    setTimeout(function () {
+      browser.close()
+    }, 10000)
   })
 
   test(
@@ -82,53 +89,44 @@ describe('Test blogposts', () => {
     async () => {
       return await new Promise((resolve, reject) => {
         let promises: Array<Promise<any>>
-        page.on('error', (msg) => console.error('PAGE LOG:', msg.message))
+        // page.on('error', (msg) => console.error('PAGE LOG:', msg.message))
         promises = [
-          page.setExtraHTTPHeaders({
-            'x-host': `${site}.com`,
-          }),
-          page.setViewport({
-            width: 1920,
-            height: 1080,
-            isMobile: false,
-          }),
-          browser.newPage().then((newPage) => {
-            newPage.goto(`http://localhost:1337/blog/breathe`, {
-              waitUntil: 'networkidle2',
-            })
-          }),
-          browser.newPage().then((newPage) => {
-            newPage.goto(`http://localhost:1337/blog/war`, {
-              waitUntil: 'networkidle2',
-            })
-          }),
-          browser.newPage().then((newPage) => {
-            newPage.goto(`http://localhost:1337/blog/wealth`, {
-              waitUntil: 'networkidle2',
-            })
-          }),
-          // page.goto('http://localhost:1337/blog/breathe'),
+          // page.setExtraHTTPHeaders({
+          //   'x-host': `${site}.com`,
+          // }),
+          // page.setViewport({
+          //   width: 1920,
+          //   height: 1080,
+          //   isMobile: false,
+          // }),
+          // page.goto(`http://localhost:1337`)
         ]
 
-        Promise.all(promises).then(() => {
-          console.log(blogposts)
-          resolve(true)
-          //   blogposts.forEach(function (blogpost) {
-          //     await page
-          //       .goto(`http://localhost:1337/blog/${blogpost.shortname}`, {
-          //         waitUntil: 'networkidle2',
-          //       })
-          //       .then((d) => {
-          //         console.log("it's ok")
-          //       })
-          //       .catch((e) => {
-          //         console.error(e)
-          //         // reject(e)
-          //       })
-          //   })
-
-          //   // resolve(true)
+        blogposts.forEach((blogpost) => {
+          promises.push(
+            browser.newPage().then((page) => {
+              page.on('error', (msg) => console.error('PAGE LOG:', msg.message))
+              page.setExtraHTTPHeaders({
+                'x-host': `${site}.com`,
+              })
+              page.setViewport({
+                width: 1920,
+                height: 1080,
+                isMobile: false,
+              })
+              page.goto(`http://localhost:1337/blog/${blogpost.shortname}`, {
+                waitUntil: 'networkidle2',
+              })
+            })
+          )
         })
+
+        Promise.all(promises)
+          .then(() => {
+            console.log(blogposts)
+            resolve(true)
+          })
+          .catch((error) => console.error(error))
       })
     },
     timeout
