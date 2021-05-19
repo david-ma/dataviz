@@ -18,13 +18,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Blogpost = exports.Camera = exports.Family = exports.Scrape = exports.dbConfig = void 0;
 const sequelize = __importStar(require("sequelize"));
-const lodash_1 = __importDefault(require("lodash"));
+const _ = require("lodash");
 const scrape_1 = require("./scrape");
 const family_1 = require("./family");
 const camera_1 = require("./camera");
@@ -48,7 +45,7 @@ let seqOptions = {
 const env = process.env.NODE_ENV || 'development';
 try {
     const configOptions = require(path.resolve(__dirname, '..', 'config', 'config.json'))[env];
-    seqOptions = lodash_1.default.merge(seqOptions, configOptions);
+    seqOptions = _.merge(seqOptions, configOptions);
 }
 catch (e) {
     console.error('No config.json provided for Sequelize', e);

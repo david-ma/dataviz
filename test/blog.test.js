@@ -54,18 +54,18 @@ describe('Test blogposts', () => {
         });
         browser = await puppeteer.launch({
             headless: false,
-            slowMo: 250
+            slowMo: 250,
         });
         page = await browser.newPage();
     });
     afterAll(() => {
-        page.close();
-        browser.close();
+        // page.close()
+        // browser.close()
     });
     test(`Test dataviz blogposts`, async () => {
         return await new Promise((resolve, reject) => {
             let promises;
-            page.on('console', msg => console.log('PAGE LOG:', msg.text));
+            page.on('error', (msg) => console.error('PAGE LOG:', msg.message));
             promises = [
                 page.setExtraHTTPHeaders({
                     'x-host': `${site}.com`,
@@ -75,22 +75,40 @@ describe('Test blogposts', () => {
                     height: 1080,
                     isMobile: false,
                 }),
+                browser.newPage().then((newPage) => {
+                    newPage.goto(`http://localhost:1337/blog/breathe`, {
+                        waitUntil: 'networkidle2',
+                    });
+                }),
+                browser.newPage().then((newPage) => {
+                    newPage.goto(`http://localhost:1337/blog/war`, {
+                        waitUntil: 'networkidle2',
+                    });
+                }),
+                browser.newPage().then((newPage) => {
+                    newPage.goto(`http://localhost:1337/blog/wealth`, {
+                        waitUntil: 'networkidle2',
+                    });
+                }),
                 // page.goto('http://localhost:1337/blog/breathe'),
             ];
             Promise.all(promises).then(() => {
-                blogposts.forEach(function (blogpost) {
-                    page
-                        .goto(`http://localhost:1337/blog/${blogpost.shortname}`, {
-                        waitUntil: 'networkidle2',
-                    })
-                        .then((d) => {
-                        console.log("it's ok");
-                    })
-                        .catch((e) => {
-                        reject(e);
-                    });
-                });
+                console.log(blogposts);
                 resolve(true);
+                //   blogposts.forEach(function (blogpost) {
+                //     await page
+                //       .goto(`http://localhost:1337/blog/${blogpost.shortname}`, {
+                //         waitUntil: 'networkidle2',
+                //       })
+                //       .then((d) => {
+                //         console.log("it's ok")
+                //       })
+                //       .catch((e) => {
+                //         console.error(e)
+                //         // reject(e)
+                //       })
+                //   })
+                //   // resolve(true)
             });
         });
     }, timeout);

@@ -2,8 +2,8 @@ import * as sequelize from 'sequelize'
 // import { UserFactory } from "./user-model";
 // import { SkillsFactory } from "./skills-model";
 // import { WorksheetFactory } from './worksheet';
-// import _ = require( 'lodash')
-import _ from 'lodash'
+import _ = require( 'lodash')
+// import _ from 'lodash'
 import { ScrapeFactory } from './scrape'
 import { FamilyFactory } from './family'
 import { CameraFactory } from './camera'
