@@ -3,3 +3,4 @@ dist
 old-public
 node_modules
 git-commit-version.txt
+tsconfig.tsbuildinfo
