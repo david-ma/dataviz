@@ -18,37 +18,6 @@ var database: seqObject = require(path.resolve(
 )).seq
 
 var site = 'dataviz'
-// database.Blogpost.findAll({
-//   where: {
-//     published: true,
-//   },
-//   order: [['publish_date', 'DESC']],
-// }).then((results: any) => {
-//   results.forEach((result: any) => {
-//     test(`Test blogposts: ${result.dataValues.title}`, async () => {
-//       return await new Promise((resolve, reject) => {
-//         let promises: Array<Promise<any>>
-
-//         puppeteer.launch().then((browser) => {
-//           browser.newPage().then((page) => {
-//             promises = [
-//               page.setExtraHTTPHeaders({
-//                 'x-host': `${site}.com`,
-//               }),
-//               page.setViewport({ width: 1920, height: 1080, isMobile: false }),
-//             ]
-
-//             Promise.all(promises).then(() => {
-//               console.log('hey')
-
-//               resolve(true)
-//             })
-//           })
-//         })
-//       })
-//     })
-//   })
-// })
 
 describe('Test blogposts', () => {
   var blogposts: any[]
@@ -68,44 +37,30 @@ describe('Test blogposts', () => {
       // headless: false,
       // slowMo: 250,
     })
-
-    // .then(newBrowser => {
-    //   newBrowser.pages().then(pages => {
-    //     console.log("pages", pages)
-    //     page = pages[0]
-    //   })
-    //   return newBrowser
-    // })
   })
 
   afterAll(() => {
     setTimeout(function () {
-      browser.close()
-    }, 10000)
+      browser.close().catch((e) => console.log(e))
+    }, 15000)
   })
 
   test(
     `Test dataviz blogposts`,
     async () => {
       return await new Promise((resolve, reject) => {
-        let promises: Array<Promise<any>>
-        // page.on('error', (msg) => console.error('PAGE LOG:', msg.message))
-        promises = [
-          // page.setExtraHTTPHeaders({
-          //   'x-host': `${site}.com`,
-          // }),
-          // page.setViewport({
-          //   width: 1920,
-          //   height: 1080,
-          //   isMobile: false,
-          // }),
-          // page.goto(`http://localhost:1337`)
-        ]
+        const promises: Array<Promise<any>> = []
 
         blogposts.forEach((blogpost) => {
           promises.push(
             browser.newPage().then((page) => {
-              page.on('error', (msg) => console.error('PAGE LOG:', msg.message))
+              page.on('error', (err) => {
+                console.error('PAGE LOG:', err.message)
+              })
+              page.on('pageerror', (err) => {
+                console.error('PAGE LOG:', err.message)
+              })
+
               page.setExtraHTTPHeaders({
                 'x-host': `${site}.com`,
               })
@@ -115,7 +70,7 @@ describe('Test blogposts', () => {
                 isMobile: false,
               })
               page.goto(`http://localhost:1337/blog/${blogpost.shortname}`, {
-                waitUntil: 'networkidle2',
+                waitUntil: 'networkidle0',
               })
             })
           )
@@ -123,10 +78,13 @@ describe('Test blogposts', () => {
 
         Promise.all(promises)
           .then(() => {
-            console.log(blogposts)
+            console.log('Done!')
             resolve(true)
           })
-          .catch((error) => console.error(error))
+          .catch((error) => {
+            console.error(error)
+            reject(error)
+          })
       })
     },
     timeout
