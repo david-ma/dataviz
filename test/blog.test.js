@@ -57,9 +57,7 @@ describe('Test blogposts', () => {
                         height: 1080,
                         isMobile: false,
                     });
-                    await page.goto(`http://localhost:1337/blog/${blogpost.shortname}`, {
-                        waitUntil: 'networkidle0',
-                    });
+                    await page.goto(`http://localhost:1337/blog/${blogpost.shortname}`);
                 }));
             });
             Promise.all(promises)

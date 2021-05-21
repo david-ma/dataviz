@@ -79,10 +79,7 @@ describe('Test blogposts', () => {
                 isMobile: false,
               })
               await page.goto(
-                `http://localhost:1337/blog/${blogpost.shortname}`,
-                {
-                  waitUntil: 'networkidle0',
-                }
+                `http://localhost:1337/blog/${blogpost.shortname}`
               )
             })
           )
