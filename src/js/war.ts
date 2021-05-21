@@ -18,7 +18,6 @@ type war = {
     length : number;
 }
 
-console.log('Calling csv stuff')
 d3.csv('/blogposts/AmericanWars.csv', <any> function (d :war) {
   d.start = parseInt(d.start as string)
   d.end = parseInt(d.end as string) || ''
@@ -26,10 +25,8 @@ d3.csv('/blogposts/AmericanWars.csv', <any> function (d :war) {
 
   return d
 }).then(function (data) {
-  console.log(data)
   AmericanWars = data
-  //    AmericanWars.columns.push("length");
-  console.log('Start async stuff')
+
   decorateTable(AmericanWars, {
     element: '#AmericanWars table',
     order: [1, 'asc'],
@@ -37,14 +34,16 @@ d3.csv('/blogposts/AmericanWars.csv', <any> function (d :war) {
   })
 
   drawPieChart()
-  //        log("Finish async stuff");
 })
 
-$('#birthyear').on('keyup', function (e) {
+$('#birthyear, #deathyear').on('keyup', function (e) {
   if (e.keyCode === 13) {
+    console.log("hey we've got a keyup?")
     drawPieChart()
   }
 })
+
+globalThis.drawPieChart = drawPieChart
 
 function drawPieChart () {
   //        if(warChart) warChart.remove();
@@ -127,10 +126,6 @@ function drawPieChart () {
     }
   })
 
-  console.log('stack', data)
-
-  console.log('Data is', data)
-
   new Chart({
     element: 'war_chart',
     data: data,
@@ -147,7 +142,6 @@ function drawPieChart () {
       .sort(null) // Do not sort group by size
       .value(function (d :any) { return d.value.length })
     const dataReady = pie((<any>d3).entries(data).reverse())
-    console.log(dataReady)
 
     // The arc generator
     const arc = d3.arc()
@@ -231,8 +225,6 @@ function drawPieChart () {
       .attr('stroke', 'white')
       .style('stroke-width', '2px')
       .style('opacity', (d) => d.index % 2 === 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3)
-
-    console.log('drawing legend...')
 
     const legend = c.plot.append('g').attr('transform', 'translate(220,0)')
     legend.selectAll('.legendLabel')
