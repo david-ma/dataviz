@@ -54,8 +54,10 @@ function drawPieChart () {
   const death = parseInt($('#deathyear').val() as string) || currentYear
 
   if (birth > currentYear) {
+    console.error("You haven't been born yet.")
     alert("You haven't been born yet.")
   } else if (death < birth) {
+    console.error('You died before you were born???')
     alert('You died before you were born???')
   }
 

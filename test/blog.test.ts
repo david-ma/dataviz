@@ -40,9 +40,9 @@ describe('Test blogposts', () => {
   })
 
   afterAll(() => {
-    setTimeout(function () {
+    // setTimeout(function () {
       browser.close().catch((e) => console.log(e))
-    }, timeout)
+    // }, timeout / 5)
   })
 
   test(
@@ -97,4 +97,33 @@ describe('Test blogposts', () => {
     },
     timeout
   )
+
+  test(`war blog`, async (done) => {
+
+    const page = await browser.newPage()
+
+    page.on('console', (mes) => {
+      if (mes.type() === 'error') {
+        // console.error("ERROR!", mes.text())
+        done(mes.text())
+      }
+    })
+
+    await page.goto('http://localhost:1337/blog/war')
+    await page.setViewport({ width: 1920, height: 1080, isMobile: false })
+    await page.screenshot({
+      path: './tmp/war.jpeg',
+      type: 'jpeg' 
+    })
+
+    await page.type('#birthyear', '1988')
+    // await page.type('#deathyear', '1925') // cause an error on purpose?
+    await page.click('input[type="button"]#drawPieChart')
+
+    done()
+
+  }, timeout)
+
+
+
 })
