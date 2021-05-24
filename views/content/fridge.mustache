@@ -3,12 +3,19 @@
     <div id="explain" class="col-xs-6"></div>
   </div>
   <div class="row">
-    <div id="fridge" class="col-xs-12"></div>
+    <div id="fridge" class="col-xs-6"></div>
   </div>
 </section>
+<style>
+#fridge {
+  border: solid 1px black;
+  {{!-- height: 100%; --}}
+  {{!-- width: 100%; --}}
+  padding: 0;
+}
+</style>
 
 {{> require}}
-
 <script>
 
   var md = new showdown.Converter({ openLinksInNewWindow: true });
