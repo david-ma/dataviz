@@ -38,7 +38,6 @@ $.when($.ready).then(function () {
 
 drawMap(-17, 131, "asdf")
 
-// drawMarker();
 
 var x = document.getElementById("demo");
 function getLocation() {
@@ -135,6 +134,54 @@ function drawMap(lat, long, place) {
   })
 }
 
+drawMarker(-23, 131, 'hello');
+function drawMarker(lat, long, place) {
+  console.log('Drawing marker', {
+    lat: lat,
+    long: long,
+    place: place
+  })
+
+  // Width and height
+  const w = 600
+  const h = 600
+
+  // Define map projection
+  const projection = d3.geoMercator()
+    .center([Math.floor(long), Math.floor(lat)])
+    .translate([w / 2, h / 2])
+    .scale(1000)
+
+  // Define path generator
+  const path = d3.geoPath()
+    .projection(projection)
+
+  const color = d3.scaleOrdinal()
+    .range(['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', '#d9d9d9'])
+
+  // Create SVG
+  const svg = d3.select('#map-canvas svg')
+
+  // Append the name
+  svg.append('text')
+    .attr('x', w / 2)
+    .attr('y', h / 2 - 15)
+    .attr('font-size', 16)
+    .attr('font-weight', 'bold')
+    .attr('font-family', 'FontAwesome')
+    .attr('text-anchor', 'middle')
+    .classed('fa fa-map-marker', true)
+    .text('\uf041')
+
+  svg.append('text')
+    .attr('x', w / 2)
+    .attr('y', h / 2)
+    .attr('font-size', 16)
+    .attr('font-weight', 'bold')
+    .attr('font-family', 'Roboto')
+    .attr('text-anchor', 'middle')
+    .text(place)
+}
 globalThis.drawMap = drawMap
 
 
