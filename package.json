@@ -19,6 +19,8 @@
     "mime": "^2.4.6",
     "mustache": "^4.0.1",
     "sequelize": "^6.3.5",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.4.1",
+    "tabletojson": "^2.0.6",
+    "x-ray": "^2.3.4"
   }
 }

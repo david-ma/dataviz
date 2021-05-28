@@ -27,7 +27,7 @@ const config :Thalia.WebsiteConfig = {
       // const uploadFolder = `${__dirname}/../data/tmp/`
       const uploadFolder = path.resolve(__dirname, '..', 'data', 'tmp')
 
-      const form = new Formidable({
+      const form = Formidable({
         maxFileSize: 25 * 1024 * 1024 // 25 megabytes. Note we're also putting this size limit in nginx.conf
       })
       // console.log("uploading files to ", uploadFolder);

@@ -19,7 +19,7 @@ const config = {
         },
         uploadPhoto: function (res, req) {
             const uploadFolder = path_1.default.resolve(__dirname, '..', 'data', 'tmp');
-            const form = new Formidable({
+            const form = Formidable({
                 maxFileSize: 25 * 1024 * 1024
             });
             form.parse(req, (err, fields, files) => {
