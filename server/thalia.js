@@ -1,11 +1,3 @@
-// moduleShim.ts
-/**
- * This shim is required at the start of the thalia.js bundle
- * so that the AMD modules work properly.
- * And index.js must come after the modules have been defined.
- * Use 'files' in tsconfig to ensure correct order.
- * DKGM 12-Oct-2020
- */
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
@@ -18,8 +10,8 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
         constructor(site, config) {
             if (typeof config === 'object') {
                 this.name = site;
-                this.data = ''; // Used to be false. Todo: Check if this is ok
-                this.dist = ''; // Used to be false. Todo: Check if this is ok
+                this.data = '';
+                this.dist = '';
                 this.cache = typeof config.cache === 'boolean' ? config.cache : true;
                 this.folder =
                     typeof config.folder === 'string'
@@ -148,14 +140,11 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                                 console.log();
                             }
                             else {
-                                // Note, we want this to be silent if config.js is missing, because we can just serve the public/dist folders.
-                                // but log an error if config.js requires something that is not available.
                                 if (err.requireStack &&
                                     err.requireStack[0].indexOf('thalia.js') > 0) {
                                     console.log(`${site} does not use config.js, just serve the public folder`);
                                 }
                                 else {
-                                    // Do we want errors to appear in standard error? Or standard log??? Both???
                                     console.error(`Error loading config for ${site}`);
                                     console.log(err);
                                     console.log();
@@ -167,22 +156,18 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                 });
             }
         },
-        // TODO: Make all of this asynchronous?
-        // Add a site to the handle
         addWebsite: function (site, config) {
             config = config || {};
             handle.websites[site] = new Website(site, config);
             const baseUrl = config.standAlone
                 ? path.resolve(__dirname, '..')
                 : path.resolve(__dirname, '..', 'websites', site);
-            // If dist or data exist, enable them.
             if (fs.existsSync(path.resolve(baseUrl, 'data'))) {
                 handle.websites[site].data = path.resolve(baseUrl, 'data');
             }
             if (fs.existsSync(path.resolve(baseUrl, 'dist'))) {
                 handle.websites[site].dist = path.resolve(baseUrl, 'dist');
             }
-            // Proxy things
             if (Array.isArray(handle.websites[site].proxies)) {
                 ;
                 handle.websites[site].proxies.forEach(function (proxy) {
@@ -215,7 +200,6 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                 }
                 return proxies;
             }
-            // If sequelize is set up, add it.
             if (fs.existsSync(path.resolve(baseUrl, 'db_bootstrap.js'))) {
                 try {
                     const start = Date.now();
@@ -236,10 +220,8 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                     console.log(e);
                 }
             }
-            // If website has views, load them.
             if (fs.existsSync(path.resolve(baseUrl, 'views'))) {
                 handle.websites[site].views = true;
-                // Stupid hack for development if you don't want to cache the views :(
                 handle.websites[site].readAllViews = function (cb) {
                     readAllViews(path.resolve(baseUrl, 'views')).then((d) => cb(d));
                 };
@@ -274,14 +256,6 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                         .catch((e) => console.log(e));
                 });
             }
-            // Unused feature? Commenting it out DKGM 2020-10-29
-            // If the site has any startup actions, do them
-            // if(config.startup){
-            //     config.startup.forEach(function(action:any){
-            //         action(handle.websites[site]);
-            //     });
-            // }
-            // Add the site to the index
             handle.index[site + '.david-ma.net'] = site;
             handle.index[`${site}.com`] = site;
             handle.index[`${site}.net`] = site;
@@ -292,12 +266,10 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
         getWebsite: function (domain) {
             let site = handle.index.localhost;
             if (domain) {
-                // if (handle.index.hasOwnProperty(domain)) {
                 if (Object.prototype.hasOwnProperty.call(handle.index, domain)) {
                     site = handle.index[domain];
                 }
                 domain = domain.replace('www.', '');
-                // if (handle.index.hasOwnProperty(domain)) {
                 if (Object.prototype.hasOwnProperty.call(handle.index, domain)) {
                     site = handle.index[domain];
                 }
@@ -308,16 +280,13 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
     };
     exports.handle = handle;
     handle.addWebsite('default', {});
-    // TODO: handle rejection & errors?
     async function readTemplate(template, folder, content = '') {
         return new Promise((resolve) => {
             const promises = [];
             const filenames = ['template', 'content'];
-            // Load the mustache template (outer layer)
             promises.push(fsPromise.readFile(`${folder}/${template}`, {
                 encoding: 'utf8',
             }));
-            // Load the mustache content (innermost layer)
             promises.push(new Promise((resolve) => {
                 if (Array.isArray(content) && content[0])
                     content = content[0];
@@ -346,8 +315,6 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                     });
                 });
             }));
-            // Load all the other partials we may need
-            // Todo: Check folder exists and is not empty?
             fsPromise.readdir(`${folder}/partials/`).then(function (d) {
                 d.forEach(function (filename) {
                     if (filename.indexOf('.mustache') > 0) {
@@ -395,7 +362,6 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                                 readAllViews(`${folder}/${filename}`).then((d) => resolve(d));
                             }
                             else {
-                                // console.log(`${filename} is not a folder`);
                                 resolve({});
                             }
                         });
@@ -431,10 +397,6 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                     });
                 }
                 data.words = pathname.split('/');
-                // This should not be lowercase??? Keys are case sensitive!
-                // .map(function(d){
-                //     return d.toLowerCase();
-                // });
                 resolve(data);
             }
             catch (err) {
@@ -442,18 +404,6 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                 reject(err);
             }
         });
-        /**
-         * The router should check what sort of route we're doing, and act appropriately.
-         * Check:
-         * - Security
-         * - Redirects to outside websites
-         * - Internal page alias
-         * - Services / functions
-         * - /data/ folder might have a file
-         * - otherwise, we serve the file normally
-         *
-         * - When serving the file normally, we need to check the header to see if it can be zipped or should be zipped.
-         */
         route
             .then(function (d) {
             if (typeof website.security !== 'undefined' &&
@@ -461,19 +411,15 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                 website.services.login(response, request);
             }
             else {
-                // If a page substitution exists, substitute it.
                 if (typeof website.pages[d.words[1]] !== 'undefined') {
                     pathname = website.pages[d.words[1]];
                 }
-                // If there's a redirect, go to it
+                pathname = decodeURIComponent(pathname);
                 if (typeof website.redirects[pathname] !== 'undefined') {
                     redirect(website.redirects[pathname]);
-                    // if there's a service, use it
                 }
                 else if (typeof website.services[d.words[1]] === 'function') {
                     website.services[d.words[1]](response, request, website.seq, d.words[2]);
-                    // if there are controllers, call the right one
-                    // Note, this includes any top level mustache files, since they're loaded as generic, dataless controllers
                 }
                 else if (typeof website.controllers[d.words[1]] === 'function') {
                     website.controllers[d.words[1]]({
@@ -518,19 +464,16 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                         readTemplate: website.readTemplate,
                         path: d.words.slice(2),
                     });
-                    // if there is a matching data file
                 }
                 else if (website.data &&
                     fs.existsSync(website.data.concat(pathname)) &&
                     fs.lstatSync(website.data.concat(pathname)).isFile()) {
                     routeFile(website.data.concat(pathname));
-                    // if there is a matching .gz file in the data folder
                 }
                 else if (website.data &&
                     fs.existsSync(website.data.concat(pathname).concat('.gz'))) {
                     response.setHeader('Content-Encoding', 'gzip');
                     routeFile(website.data.concat(pathname, '.gz'));
-                    // if there is a matching compiled file
                 }
                 else if ((website.dist &&
                     fs.existsSync(website.dist.concat(pathname)) &&
@@ -541,7 +484,6 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                     routeFile(website.dist.concat(pathname));
                 }
                 else {
-                    // Otherwise, route as normal to the public folder
                     routeFile(website.folder.concat(pathname));
                 }
             }
@@ -576,15 +518,6 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                 response.end('501 URL Not Found\n');
             }
         }
-        /**
-         * Given a filename, serve it.
-         *
-         * Check that the file exists
-         * Check the headers..?
-         * zip/unzip if needed
-         *
-         * @param filename
-         */
         function routeFile(filename) {
             fs.exists(filename, function (exists) {
                 if (!exists) {
@@ -621,14 +554,11 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                         }
                         if (website.cache) {
                             if (stats.size > 10240) {
-                                // cache files bigger than 10kb?
-                                // https://web.dev/http-cache/
                                 try {
-                                    response.setHeader('Cache-Control', 'public, max-age=600'); // store for 10 mins
-                                    response.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString()); // expire 1 day from now
+                                    response.setHeader('Cache-Control', 'public, max-age=600');
+                                    response.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString());
                                     const queryObject = url.parse(request.url, true).query;
                                     if (queryObject.v) {
-                                        // Set cache to 1 year if a cache busting query string is included
                                         response.setHeader('Cache-Control', 'public, max-age=31536000');
                                         response.setHeader('Expires', new Date(Date.now() + 31536000000).toUTCString());
                                     }
@@ -695,7 +625,6 @@ define("router", ["require", "exports", "fs", "mime", "zlib", "url"], function (
                                     redirect(request.url.replace(/(^\/.*?)\/?(\?$|$)/, '$1/$2'));
                                     return;
                                 }
-                                // Note we don't have content type, caching, or zipping!!!!
                                 fs.readFile(filename, (e, file) => router(file));
                             }
                             else {
@@ -740,7 +669,6 @@ define("socket", ["require", "exports"], function (require, exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.socketInit = void 0;
     function socketInit(io, handle) {
-        // console.log('Initialising Socket.io for site: ') // Which sites?
         Object.keys(handle.websites).forEach((siteName) => {
             io.of(`/${siteName}`)
                 .use((socket, next) => {
@@ -756,7 +684,6 @@ define("socket", ["require", "exports"], function (require, exports) {
                 .on('connection', function (socket) {
                 const host = socket.handshake.headers.host;
                 const website = handle.getWebsite(host);
-                // Simple logging
                 console.log('Socket connection ' +
                     socket.id +
                     ' from ' +
@@ -784,7 +711,6 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
         console.log('This is the blacklist:', blacklist);
     }
     catch (e) { }
-    // This part of the server starts the server on port 80 and logs stuff to the std.out
     function start(router, handle, port) {
         let server = null;
         function onRequest(request, response) {
@@ -796,13 +722,11 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
             if (ip) {
                 if (!host || blacklist.some((thing) => ip.includes(thing))) {
                     spam = true;
-                    // console.log(`Spam request from ${ip}`);
                     response.writeHead(403);
                     response.end('Go away');
                 }
             }
             if (!spam) {
-                // let port = host.split(":")[1] ? parseInt(host.split(":")[1]) : 80
                 const hostname = host.split(':')[0];
                 const site = handle.getWebsite(hostname);
                 const urlObject = url.parse(request.url, true);
@@ -836,11 +760,6 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
                 const message = config.message || 'Error, server is down.';
                 const target = `http://${config.host || '127.0.0.1'}:${config.port || 80}`;
                 const proxyServer = httpProxy.createProxyServer({
-                    // preserveHeaderKeyCase: true,
-                    // autoRewrite: true,
-                    // followRedirects: true,
-                    // protocolRewrite: "http",
-                    // changeOrigin: true,
                     target: target,
                 });
                 proxyServer.on('error', function (err, req, res) {
@@ -889,13 +808,11 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
         }
         console.log('Server has started on port: ' + port);
         server = http.createServer(onRequest).listen(port);
-        // const io = new socketIO.listen(server, {})
         const io = socketIO.listen(server, {});
         socket_1.socketInit(io, handle);
         return server.on('upgrade', function (request, socket, head) {
             'use strict';
             let host = request.headers['x-host'] || request.headers.host;
-            // let port = host.split(":")[1] ? parseInt(host.split(":")[1]) : 80
             host = host.split(':')[0];
             const proxies = handle.proxies[host];
             let filterWord = url.parse(request.url).pathname.split('/')[1];
@@ -921,9 +838,7 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
     }
     exports.start = start;
     function getDateTime() {
-        //    var date = new Date();
         const date = new Date(Date.now() + 36000000);
-        // add 10 hours... such a shitty way to make it australian time...
         let hour = date.getHours();
         hour = (hour < 10 ? '0' : '') + hour;
         let min = date.getMinutes();
@@ -949,7 +864,6 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
     const salt = Math.floor(Math.random() * 999);
     function encode(string) {
         'use strict';
-        // const buff = new Buffer(string)
         const buff = Buffer.from(string);
         return buff.toString('base64') + salt;
     }
@@ -978,13 +892,12 @@ div {
 </body>
 </html>`;
 });
-// index.ts
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 define(function (require) {
     require(['server', 'router', 'requestHandlers', 'fs'], function (server, router, requestHandlers, fs) {
-        let port = '1337'; // change the port here?
+        let port = '1337';
         const pattern = /^\d{0,5}$/;
         let workspace = 'default';
         if (process.argv[2] !== null && pattern.exec(process.argv[2])) {
@@ -993,7 +906,6 @@ define(function (require) {
         else if (process.argv[3] !== null && pattern.exec(process.argv[3])) {
             port = process.argv[3];
         }
-        // Todo: we should check that the workspace exists, otherwise leave it as default
         if (process.argv[2] !== null &&
             process.argv[2] !== undefined &&
             !pattern.exec(process.argv[2])) {
