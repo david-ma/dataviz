@@ -1,13 +1,102 @@
+<link href="https://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.min.css" rel="stylesheet" type="text/css"
+  media="all" />
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"
+  media="all" />
+<link rel="stylesheet" href="/pedigreejs/pedigreejs.2.0.0-rc2.min.css" />
 
+<style>
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
+  }
+
+  .container {
+    width: 90%;
+    max-width: 1140px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  #ped {
+    text-align: center;
+  }
+
+  .btn {
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 4px;
+  }
+
+  #opts {
+    background-color: #F5F5F5;
+    padding: 10px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    line-height: 1.42857143;
+    overflow: auto;
+    word-wrap: normal;
+    border-radius: 4px;
+  }
+
+  #history_ex1 {
+    padding: 10px;
+  }
+
+  .text-center {
+    text-align: center;
+    padding: 0 20px;
+  }
+</style>
 
 <section>
   <h1>Pedigree stuff</h1>
-  <div></div>
+  <div>
+    <textarea></textarea>
+    <div id="node_properties"></div>
+    <div class="text-center">
+      <h2>Example 1</h2>
+      <label class="btn">
+        <input id="load" type="file" style="display: none;" />Load
+      </label>
+      <label class="btn">
+        <input id="save" type="button" style="display: none;" />Save
+      </label>
+      <label class="btn">
+        <input id="print" type="button" style="display: none;" />Print
+      </label>
+      <label class="btn">
+        <input id="svg_download" type="button" style="display: none;" />SVG
+      </label>
+      <label class="btn">
+        <input id="png_download" type="button" style="display: none;">PNG
+      </label>
+      <div id='history_ex1'></div>
+      <div id="ped"></div>
+      <div id="node_properties"></div>
+    </div>
+
+    <div class="container">
+      <br>
+      <p>This is an example of defining diabetes as the disease. It is using the browsers
+        <a href="https://www.w3schools.com/html/html5_webstorage.asp">session storage</a> (if supported by the
+        web-browser)
+        to record the history and it stores for one session, <i>i.e.</i>data is lost when the browser tab is closed.
+        These are the options used:
+      </p>
+      <pre style="overflow: auto;word-wrap: normal;" id="opts"></pre>
+    </div>
+
+
+  </div>
 </section>
 
 
 {{> require}}
-
-
-
-
