@@ -59,10 +59,13 @@
 <section>
   <h1>Pedigree stuff</h1>
   <div>
-    <textarea></textarea>
+    <textarea>
+
+    </textarea>
     <div id="node_properties"></div>
+
     <div class="text-center">
-      <h2>Example 1</h2>
+      <h2>Example 4</h2>
       <label class="btn">
         <input id="load" type="file" style="display: none;" />Load
       </label>
@@ -78,21 +81,28 @@
       <label class="btn">
         <input id="png_download" type="button" style="display: none;">PNG
       </label>
-      <div id='history_ex1'></div>
-      <div id="ped"></div>
+      <div id='history_ex4'></div>
+      <div id="pedigrees"></div>
       <div id="node_properties"></div>
     </div>
 
     <div class="container">
       <br>
-      <p>This is an example of defining diabetes as the disease. It is using the browsers
-        <a href="https://www.w3schools.com/html/html5_webstorage.asp">session storage</a> (if supported by the
-        web-browser)
-        to record the history and it stores for one session, <i>i.e.</i>data is lost when the browser tab is closed.
-        These are the options used:
+      <p>The example displayed is of a loaded <a href="https://www.cog-genomics.org/plink/1.9/formats#ped">PED file</a>.
       </p>
+      <pre style="overflow: auto;word-wrap: normal;">
+fam1 1 6 7 2 2 0 1 0 0
+fam1 2 4 5 1 1 0 0 0 0
+fam1 3 2 1 2 1 0 0 0 1
+fam1 4 0 0 1 1 0 0 0 0
+fam1 5 0 0 2 2 0 0 0 1
+fam1 6 0 0 1 1 0 0 0 0
+fam1 7 0 0 2 2 0 1 0 1
+</pre>
+      <p>These are the options used:</p>
       <pre style="overflow: auto;word-wrap: normal;" id="opts"></pre>
     </div>
+
 
 
   </div>
