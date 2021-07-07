@@ -56,54 +56,66 @@
   }
 </style>
 
+<style>
+  textarea {
+    width: 100%;
+    height: 600px;
+    font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+  }
+</style>
 <section>
   <h1>Pedigree stuff</h1>
-  <div>
-    <textarea>
+  <div class="row">
 
-    </textarea>
-    <div id="node_properties"></div>
-
-    <div class="text-center">
-      <h2>Example 4</h2>
-      <label class="btn">
-        <input id="load" type="file" style="display: none;" />Load
-      </label>
-      <label class="btn">
-        <input id="save" type="button" style="display: none;" />Save
-      </label>
-      <label class="btn">
-        <input id="print" type="button" style="display: none;" />Print
-      </label>
-      <label class="btn">
-        <input id="svg_download" type="button" style="display: none;" />SVG
-      </label>
-      <label class="btn">
-        <input id="png_download" type="button" style="display: none;">PNG
-      </label>
-      <div id='history_ex4'></div>
-      <div id="pedigrees"></div>
-      <div id="node_properties"></div>
-    </div>
-
-    <div class="container">
-      <br>
-      <p>The example displayed is of a loaded <a href="https://www.cog-genomics.org/plink/1.9/formats#ped">PED file</a>.
-      </p>
-      <pre style="overflow: auto;word-wrap: normal;">
-fam1 1 6 7 2 2 0 1 0 0
+    <div class="col-xs-3">
+      <textarea id="pedInput">fam1 1 6 7 2 2 0 1 0 0
 fam1 2 4 5 1 1 0 0 0 0
 fam1 3 2 1 2 1 0 0 0 1
 fam1 4 0 0 1 1 0 0 0 0
 fam1 5 0 0 2 2 0 0 0 1
 fam1 6 0 0 1 1 0 0 0 0
-fam1 7 0 0 2 2 0 1 0 1
-</pre>
-      <p>These are the options used:</p>
-      <pre style="overflow: auto;word-wrap: normal;" id="opts"></pre>
+fam1 7 0 0 2 2 0 1 0 1</textarea>
     </div>
+    <div class="col-xs-9">
+
+      <div id="node_properties"></div>
+
+      <div class="text-center">
+        <h2>Example 4</h2>
+        <label class="btn">
+          <input id="load" type="file" style="display: none;" />Load
+        </label>
+        <label class="btn">
+          <input id="save" type="button" style="display: none;" />Save
+        </label>
+        <label class="btn">
+          <input id="print" type="button" style="display: none;" />Print
+        </label>
+        <label class="btn">
+          <input id="svg_download" type="button" style="display: none;" />SVG
+        </label>
+        <label class="btn">
+          <input id="png_download" type="button" style="display: none;">PNG
+        </label>
+        <div id='history_ex4'></div>
+        <div id="pedigrees"></div>
+        <div id="node_properties"></div>
+      </div>
+
+      <div class="container">
+        <br>
+        <p>The example displayed is of a loaded <a href="https://www.cog-genomics.org/plink/1.9/formats#ped">PED
+            file</a>.
+        </p>
+        <pre style="overflow: auto;word-wrap: normal;">
+
+</pre>
+        <p>These are the options used:</p>
+        <pre style="overflow: auto;word-wrap: normal;" id="opts"></pre>
+      </div>
 
 
+    </div>
 
   </div>
 </section>

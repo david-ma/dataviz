@@ -62,4 +62,22 @@ $(document).ready(function () {
   opts = pedigreejs.pedigreejs.build(opts);
   $('#history_ex4').css('max-width', svg_width);
   $('#history_ex4').css('margin', 'auto');
+
+
+
+
+  $("#pedInput").on("change", function(d){
+    console.log("Changing!");
+    console.log($(this).val());
+
+    var pedfile = $(this).val();
+    opts.dataset = pedigreejs.io.readLinkage(pedfile)
+    // opts.dataset = $(this).val();
+    // opts = pedigreejs.pedigreejs.build(opts);
+    pedigreejs.pedigreejs.rebuild(opts);
+  
+  })
+  console.log(opts);
+
+
 });
