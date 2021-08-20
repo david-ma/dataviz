@@ -1,0 +1,38 @@
+
+<style>
+.polygon.hidden {
+  display: none;
+}
+</style>
+
+<section id="breathe" class="blogpost">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-md-10">
+      <h1>Australian Income 2018-2019</h1>
+      <div id='income'></div>
+      <div id='explain'></div>
+    </div>
+  </div>
+
+  <br>
+  <br>
+  <br>
+</section>
+
+<style>
+svg line {
+  stroke: black;
+  stroke-width: 2;
+}
+</style>
+{{> require}}
+
+<script>
+  var md = new showdown.Converter({openLinksInNewWindow: true});
+
+  $("#explain").html(md.makeHtml(`
+The ABC published [this article](https://www.abc.net.au/news/2021-06-20/are-you-middle-income-see-how-you-compare/100226488) on Australian Incomes, but did not provide a decent graph. They just dumped the data in a table.
+
+So I've made a graph for it.`))
+
+</script>
