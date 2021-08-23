@@ -4,6 +4,11 @@ import 'datatables.net'
 console.log("Australian Income stuff");
 
 
+
+
+
+
+
 d3.csv('/blogposts/AusIncome.csv', function(d:d3.DSVRowString<string>) {
 
   var blob = {
@@ -13,9 +18,21 @@ d3.csv('/blogposts/AusIncome.csv', function(d:d3.DSVRowString<string>) {
     income: d['Ranged Taxable Income'].replace(/[$,]/g, '').match(/\d+/g).map(d => parseInt(d))
   }
   return blob
-}).then((d) => {
-  console.log(d)
+}).then((data) => {
+  console.log(data)
+
+
+
+  new Chart({
+    element: 'income',
+    title: "Australian Income",
+    data: data,
+    nav: false,
+  }).scratchpad(chart => {
+
+  })
 })
+
 
 // "Number of individuals ": "80274"
 // Percentile: "95"
