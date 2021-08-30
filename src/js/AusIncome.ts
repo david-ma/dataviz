@@ -6,22 +6,24 @@ console.log("Australian Income stuff");
 
 
 d3.csv('/blogposts/AusIncome.csv', function(d:d3.DSVRowString<string>) {
-
   var blob = {
     percentile: parseInt(d.Percentile),
     sex: d.Sex,
     count: parseInt(d['Number of individuals ']),
     income: d['Ranged Taxable Income'].replace(/[$,]/g, '').match(/\d+/g).map(d => parseInt(d))
   }
+
   return blob
 }).then((data) => {
 
   new Chart({
     element: 'income',
-    title: "Australian Income",
+    title: "Australian Income line graph",
+    xLabel: "Percentile",
+    yLabel: "Count",
     data: data,
     nav: false,
-  }).scratchpad(chart => {
+  }).scratchpad((chart) => {
     console.log('Drawing double line chart', chart.data);
 
     // set the ranges
@@ -42,16 +44,30 @@ d3.csv('/blogposts/AusIncome.csv', function(d:d3.DSVRowString<string>) {
     chart.plot.append('path')
       .data([chart.data.filter(d => d.sex === "Male")])
       .attr('class', 'line')
-      .style('stroke', 'black')
+      .style('stroke', 'blue')
       .attr('d', valueline.x(function (d:any) { return x(d.percentile) }))
 
-      chart.plot.append('path')
+    chart.plot.append('path')
       .data([chart.data.filter(d => d.sex === "Female")])
       .attr('class', 'line')
-      .style('stroke', 'black')
+      .style('stroke', 'red')
       .attr('d', valueline.x(function (d:any) { return x(d.percentile) }))
 
+    chart.plot.append('g')
+      .attr('class', 'axis')
+      .attr('transform', 'translate(0,' + chart.innerHeight + ')')
+      .call(d3.axisBottom(x))
+
+      // Add the Y Axis
+    chart.plot.append('g')
+      .attr('class', 'axis')
+      .call(d3.axisLeft(y))
+
   })
+
+  return data;
+}).then(data => {
+  console.log("data", data)
 })
 
 
