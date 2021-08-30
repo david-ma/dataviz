@@ -261,7 +261,16 @@ class Chart {
         .call(d3.axisLeft(y))
     }
 
-    generalisedLineChart(options) {
+    generalisedLineChart(options : {
+      xField : string;
+      yField : string;
+      filter : string;
+      rounding : number;
+      types : {
+        label : string;
+        color : string;
+      }[];
+    }) {
       const chart = this;
       const data = this.data;
 
@@ -275,9 +284,9 @@ class Chart {
         .x(function (d:any) { return x(d[options.xField]) })
         .y(function (d:any) { return y(d[options.yField]) })
   
-      x.domain(d3.extent(data, (d :number[]) => d[options.xField]))
+      x.domain(d3.extent(data, (d) => d[options.xField] as number))
       y.domain([0,
-          Math.round((1.1 * d3.max(data, function (d) { return d[options.yField] as number })) / 10000) * 10000
+          Math.round((1.1 * d3.max(data, function (d) { return d[options.yField] as number })) / options.rounding) * options.rounding
         ])
   
       const types = options.types
@@ -290,7 +299,7 @@ class Chart {
         .attr('d', valueline.x(function (d:any) { return x(d[options.xField]) }))
   
       chart.plot.append('text')
-        .data(chart.data.filter(d => d[options.filter] === type.label).filter(d => d[options.xField] === 100))
+        .data(chart.data.filter(d => d[options.filter] === type.label).filter(d => d[options.xField] === x.domain()[1]))
         .text(type.label)
         .style('color', type.color)
         .attrs((d) => {
