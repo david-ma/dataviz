@@ -352,11 +352,11 @@ class Chart {
             .filter((d) => d[options.xField] === x.domain()[1])
         )
         .text(type.label)
-        .style('color', type.color)
+        .attr('fill', type.color)
         .attrs((d) => {
           return {
             x: chart.innerWidth + 10,
-            y: y(d.count) + 5,
+            y: y(d[options.yField]) + 5,
           }
         })
     })
