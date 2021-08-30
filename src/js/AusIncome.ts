@@ -320,7 +320,7 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
 
     new Chart({
       element: 'pie',
-      title: 'Pie Chart',
+      title: 'Income going to Men vs Women',
       data: data,
       nav: false,
     }).scratchpad((chart) => {
@@ -368,6 +368,50 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
         .attr('fill', (d) => colors[d.index ? 'Female' : 'Male'])
         .attr('stroke', 'white')
         .style('stroke-width', '2px')
+
+      // Legend
+      chart.plot
+        .append('text')
+        .text('Legend')
+        .attrs({
+          x: 30,
+          y: 30,
+        })
+        .style('font-size', '24px')
+
+      chart.plot.append('rect').attrs({
+        x: 30,
+        y: 50,
+        width: 50,
+        height: 50,
+        fill: colors.Male,
+      })
+
+      chart.plot
+        .append('text')
+        .text('Male')
+        .attrs({
+          x: 90,
+          y: 80,
+        })
+        .style('font-size', '24px')
+
+      chart.plot.append('rect').attrs({
+        x: 30,
+        y: 110,
+        width: 50,
+        height: 50,
+        fill: colors.Female,
+      })
+
+      chart.plot
+        .append('text')
+        .text('Female')
+        .attrs({
+          x: 90,
+          y: 140,
+        })
+        .style('font-size', '24px')
     })
   })
 
