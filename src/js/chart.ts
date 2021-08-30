@@ -346,16 +346,16 @@ class Chart {
 
       chart.plot
         .append('text')
-        .data(
+        .datum(
           chart.data
             .filter((d) => d[options.filter] === type.label)
-            .filter((d) => d[options.xField] === x.domain()[1])
+            .pop()
         )
         .text(type.label)
         .attr('fill', type.color)
         .attrs((d) => {
           return {
-            x: chart.innerWidth + 10,
+            x: x(d[options.xField]) + 10,
             y: y(d[options.yField]) + 5,
           }
         })

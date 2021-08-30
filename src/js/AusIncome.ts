@@ -4,6 +4,11 @@ import 'datatables.net'
 console.log('Australian Income stuff')
 
 var total = {}
+var cumulativePopulation = {
+  Male: 0,
+  Female: 0,
+  Total: 0
+}
 
 d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
   var blob = {
@@ -15,17 +20,22 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
       .match(/\d+/g)
       .map((d) => parseInt(d)),
     income: 0,
+    cumulativePopulation: 0,
   }
 
   blob.income = blob.rawIncome[1]
     ? (blob.rawIncome[0] + blob.rawIncome[1]) / 2
     : blob.rawIncome[0]
 
+  blob.cumulativePopulation = cumulativePopulation[blob.sex] += blob.count
+  
   if (total[blob.percentile]) {
     total[blob.percentile].count += blob.count
+    total[blob.percentile].cumulativePopulation = cumulativePopulation.Total += blob.count
   } else {
     total[blob.percentile] = _.cloneDeep(blob)
     total[blob.percentile].sex = 'Total'
+    total[blob.percentile].cumulativePopulation = cumulativePopulation.Total += blob.count
   }
 
   return blob
@@ -78,10 +88,43 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
       xField: 'percentile',
       filter: 'sex',
       rounding: 10000,
-      yFormat: "$,",
+      yFormat: '$,',
     })
 
     return data
+  })
+  .then((data) => {
+    console.log(data)
+
+    new Chart({
+      element: 'cumulative',
+      title: 'Australian income by cumulative population',
+      xLabel: 'Cumulative Population',
+      yLabel: 'Income',
+      data: data,
+      nav: false,
+    }).generalisedLineChart({
+      yField: 'income',
+      xField: 'cumulativePopulation',
+      filter: 'sex',
+      rounding: 10000,
+      xFormat: ',',
+      yFormat: '$,',
+      types: [
+        {
+          label: 'Male',
+          color: 'Blue',
+        },
+        {
+          label: 'Female',
+          color: 'Red',
+        },
+        {
+          label: 'Total',
+          color: 'black',
+        },
+      ],
+    })
   })
 
 // "Number of individuals ": "80274"
