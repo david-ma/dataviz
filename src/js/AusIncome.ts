@@ -38,25 +38,11 @@ d3.csv('/blogposts/AusIncome.csv', function(d:d3.DSVRowString<string>) {
     yLabel: "Count",
     data: data,
     nav: false,
-  }).scratchpad((chart) => {
-    console.log('Drawing double line chart', chart.data);
-
-    // set the ranges
-    const x = d3.scaleLinear().range([0, chart.innerWidth])
-    const y = d3.scaleLinear().range([chart.innerHeight, 0])
-
-    // define the line
-    const valueline = d3.line()
-    // .curve(d3.curveBasis)
-      .x(function (d:any) { return x(d.percentile) })
-      .y(function (d:any) { return y(d.count) })
-
-    x.domain(d3.extent(data, function (d) { return d.percentile }))
-    y.domain([0,
-        Math.round((1.1 * d3.max(data, function (d) { return d.count })) / 10000) * 10000
-      ])
-
-    var types = [{
+  }).generalisedLineChart({
+    yField: "count",
+    xField: "percentile",
+    filter: "sex",
+    types: [{
       label: "Male",
       color: "Blue"
     },{
@@ -66,37 +52,7 @@ d3.csv('/blogposts/AusIncome.csv', function(d:d3.DSVRowString<string>) {
       label: "Total",
       color: "black"
     }]
-
-    types.forEach(type => {
-      chart.plot.append('path')
-      .data([chart.data.filter(d => d.sex === type.label)])
-      .attr('class', 'line')
-      .style('stroke', type.color)
-      .attr('d', valueline.x(function (d:any) { return x(d.percentile) }))
-
-    chart.plot.append('text')
-      .data(chart.data.filter(d => d.sex === type.label).filter(d => d.percentile === 100))
-      .text(type.label)
-      .style('color', type.color)
-      .attrs((d) => {
-        return {
-          x: chart.innerWidth + 10,
-          y: y(d.count) + 5,
-        };
-      })
-    })
-
-    chart.plot.append('g')
-      .attr('class', 'axis')
-      .attr('transform', 'translate(0,' + chart.innerHeight + ')')
-      .call(d3.axisBottom(x))
-
-      // Add the Y Axis
-    chart.plot.append('g')
-      .attr('class', 'axis')
-      .call(d3.axisLeft(y))
-
-  })
+  });
 
   return data;
 }).then(data => {
