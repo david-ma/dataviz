@@ -1,9 +1,11 @@
 import { Chart, decorateTable, $, d3 } from 'chart'
 import 'datatables.net'
+import _ from 'lodash';
 
 console.log("Australian Income stuff");
 
 
+var total = {};
 
 d3.csv('/blogposts/AusIncome.csv', function(d:d3.DSVRowString<string>) {
   var blob = {
@@ -13,8 +15,21 @@ d3.csv('/blogposts/AusIncome.csv', function(d:d3.DSVRowString<string>) {
     income: d['Ranged Taxable Income'].replace(/[$,]/g, '').match(/\d+/g).map(d => parseInt(d))
   }
 
+  if(total[blob.percentile]) {
+    total[blob.percentile].count += blob.count;
+  } else {
+    total[blob.percentile] = {
+      percentile: parseInt(d.Percentile),
+      sex: "Total",
+      count: parseInt(d['Number of individuals ']),
+      income: d['Ranged Taxable Income'].replace(/[$,]/g, '').match(/\d+/g).map(d => parseInt(d))
+    };
+  }
+
   return blob
 }).then((data) => {
+
+  data = _.union(data, _.flatMap(total)) as any;
 
   new Chart({
     element: 'income',
@@ -37,21 +52,39 @@ d3.csv('/blogposts/AusIncome.csv', function(d:d3.DSVRowString<string>) {
       .y(function (d:any) { return y(d.count) })
 
     x.domain(d3.extent(data, function (d) { return d.percentile }))
-    y.domain([0, d3.max(data, function (d) { return d.count })])
+    y.domain([0,
+        Math.round((1.1 * d3.max(data, function (d) { return d.count })) / 10000) * 10000
+      ])
 
+    var types = [{
+      label: "Male",
+      color: "Blue"
+    },{
+      label: "Female",
+      color: "Red"
+    },{
+      label: "Total",
+      color: "black"
+    }]
 
-    // y.domain([0, d3.max(months, function (d:any) { return d.value })])
-    chart.plot.append('path')
-      .data([chart.data.filter(d => d.sex === "Male")])
+    types.forEach(type => {
+      chart.plot.append('path')
+      .data([chart.data.filter(d => d.sex === type.label)])
       .attr('class', 'line')
-      .style('stroke', 'blue')
+      .style('stroke', type.color)
       .attr('d', valueline.x(function (d:any) { return x(d.percentile) }))
 
-    chart.plot.append('path')
-      .data([chart.data.filter(d => d.sex === "Female")])
-      .attr('class', 'line')
-      .style('stroke', 'red')
-      .attr('d', valueline.x(function (d:any) { return x(d.percentile) }))
+    chart.plot.append('text')
+      .data(chart.data.filter(d => d.sex === type.label).filter(d => d.percentile === 100))
+      .text(type.label)
+      .style('color', type.color)
+      .attrs((d) => {
+        return {
+          x: chart.innerWidth + 10,
+          y: y(d.count) + 5,
+        };
+      })
+    })
 
     chart.plot.append('g')
       .attr('class', 'axis')
