@@ -282,12 +282,16 @@ class Chart {
     this.plot.append('g').attr('class', 'axis').call(d3.axisLeft(y))
   }
 
+  /**
+   * Written August 2021 for AusIncome
+   */
   generalisedLineChart(options: {
     xField: string
     yField: string
     rounding: number
     yFormat?: string
     xFormat?: string
+    loggedX?: boolean
     filter: string
     types?: {
       label: string
@@ -298,7 +302,9 @@ class Chart {
     const data = this.data
 
     // set the ranges
-    const x = d3.scaleLinear().range([0, chart.innerWidth])
+    const x = options.loggedX ? d3.scaleLog() : d3.scaleLinear()
+    x.range([0, chart.innerWidth])
+
     const y = d3.scaleLinear().range([chart.innerHeight, 0])
 
     // define the line

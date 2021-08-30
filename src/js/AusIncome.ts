@@ -3,6 +3,12 @@ import 'datatables.net'
 
 console.log('Australian Income stuff')
 
+var colors = {
+  Male: '#31a885',
+  Female: '#fd9e83',
+  Total: '#1e1e1e',
+}
+
 var total = {}
 var cumulativePopulation = {
   Male: 0,
@@ -102,7 +108,7 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
       xLabel: 'Cumulative Population',
       yLabel: 'Income',
       // data: data,
-      data: data.filter(d => d.sex !== 'Total'),
+      data: data.filter((d) => d.sex !== 'Total'),
       nav: false,
     }).generalisedLineChart({
       yField: 'income',
@@ -120,10 +126,6 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
           label: 'Female',
           color: 'Red',
         },
-        // {
-        //   label: 'Total',
-        //   color: 'black',
-        // },
       ],
     })
 
@@ -131,17 +133,18 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
   })
   .then((data) => {
     new Chart({
-      element: 'population',
-      title: 'Australian population by income',
+      element: 'cumulativePopulation',
+      title: 'Australian Cumulative Population by income',
       yLabel: 'Cumulative Population',
-      xLabel: 'Income',
+      xLabel: 'Income (log scale)',
       // data: data,
-      data: data.filter(d => d.sex !== 'Total'),
+      data: data.filter((d) => d.sex !== 'Total'),
       nav: false,
     }).generalisedLineChart({
       xField: 'income',
       yField: 'cumulativePopulation',
       filter: 'sex',
+      loggedX: true,
       rounding: 10000,
       yFormat: ',',
       xFormat: '$,',
@@ -154,18 +157,43 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
           label: 'Female',
           color: 'Red',
         },
-        // {
-        //   label: 'Total',
-        //   color: 'black',
-        // },
       ],
     })
 
     return data
   })
   .then((data) => {
-    console.log(data)
+    new Chart({
+      element: 'population',
+      title: 'Australian Population by income',
+      yLabel: 'Population',
+      xLabel: 'Income (log scale)',
+      // data: data,
+      data: data.filter((d) => d.sex !== 'Total'),
+      nav: false,
+    }).generalisedLineChart({
+      xField: 'income',
+      yField: 'count',
+      filter: 'sex',
+      rounding: 10000,
+      loggedX: true,
+      yFormat: ',',
+      xFormat: '$,',
+      types: [
+        {
+          label: 'Male',
+          color: 'Blue',
+        },
+        {
+          label: 'Female',
+          color: 'Red',
+        },
+      ],
+    })
 
+    return data
+  })
+  .then((data) => {
     new Chart({
       element: 'percentile',
       title: 'Australian income by percentile',
@@ -242,7 +270,10 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
           .attr(
             'd',
             valueline.x(function (d: any) {
-              return x( 100 * d.cumulativePopulation / cumulativePopulation[type.label] )
+              return x(
+                (100 * d.cumulativePopulation) /
+                  cumulativePopulation[type.label]
+              )
             })
           )
 
@@ -270,6 +301,73 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
         .append('g')
         .attr('class', 'axis')
         .call(d3.axisLeft(y).tickFormat(d3.format(options.yFormat || '')))
+    })
+    return data
+  })
+  .then((data) => {
+    // Draw a pie chart
+
+    var pieData = {
+      Male: 0,
+      Female: 0,
+    }
+
+    data
+      .filter((d) => d.sex !== 'Total')
+      .forEach((d) => {
+        pieData[d.sex] += d.income * d.count
+      })
+
+    new Chart({
+      element: 'pie',
+      title: 'Pie Chart',
+      data: data,
+      nav: false,
+    }).scratchpad((chart) => {
+      const midX = chart.innerWidth / 2,
+        midY = chart.innerHeight / 2
+
+      const svg = chart.plot
+        .append('g')
+        .attr('transform', `translate(${midX},${midY})`)
+      const height = chart.innerHeight
+
+      const radius = height / 2.5
+
+      // Compute the position of each group on the pie:
+      const pie = d3
+        .pie()
+        .sort(null) // Do not sort group by size
+        .value(function (d: any) {
+          return d
+        })
+      const dataReady = pie(_.flatMap(pieData))
+
+      console.log('dataReady', dataReady)
+
+      // The arc generator
+      const arc = d3
+        .arc()
+        .innerRadius(radius * 0) // This is the size of the donut hole
+        .outerRadius(radius * 0.8)
+
+      // Another arc that won't be drawn. Just for labels positioning
+      const outerArc = d3
+        .arc()
+        .innerRadius(radius * 0.9)
+        .outerRadius(radius * 0.9)
+
+      // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+      svg
+        .selectAll('allSlices')
+        .data(dataReady)
+        .enter()
+        .append('path')
+        //                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
+        .attr('d', arc)
+        .attr('fill', (d) => colors[d.index ? 'Female' : 'Male'])
+        .attr('stroke', 'white')
+        .style('stroke-width', '2px')
     })
   })
 
