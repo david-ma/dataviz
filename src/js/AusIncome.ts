@@ -1,6 +1,5 @@
-import { Chart, decorateTable, $, d3 } from 'chart'
+import { Chart, _, d3 } from 'chart'
 import 'datatables.net'
-import _ from 'lodash'
 
 console.log('Australian Income stuff')
 
