@@ -332,9 +332,12 @@ class Chart {
     ]
 
     types.forEach((type) => {
+      const typeData = chart.data.filter(
+        (d) => d[options.filter] === type.label
+      )
       chart.plot
         .append('path')
-        .data([chart.data.filter((d) => d[options.filter] === type.label)])
+        .datum(typeData)
         .attr('class', 'line')
         .style('stroke', type.color)
         .attr(
@@ -346,11 +349,7 @@ class Chart {
 
       chart.plot
         .append('text')
-        .datum(
-          chart.data
-            .filter((d) => d[options.filter] === type.label)
-            .pop()
-        )
+        .datum(typeData.pop())
         .text(type.label)
         .attr('fill', type.color)
         .attrs((d) => {
