@@ -1,0 +1,17 @@
+{
+  "tabWidth": 2,
+  "useTabs": false,
+  "spaceBeforeFunctionParen": true,
+  "generatorStarSpacing": true,
+  "yieldStarSpacing": true,
+  "singleQuote": true,
+  "semi": false,
+  "overrides": [
+    {
+      "files": "*.mustache",
+      "options": {
+        "singleQuote": true
+      }
+    }
+  ]
+}
