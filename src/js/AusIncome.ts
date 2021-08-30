@@ -10,24 +10,22 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
     percentile: parseInt(d.Percentile),
     sex: d.Sex,
     count: parseInt(d['Number of individuals ']),
-    income: d['Ranged Taxable Income']
+    rawIncome: d['Ranged Taxable Income']
       .replace(/[$,]/g, '')
       .match(/\d+/g)
       .map((d) => parseInt(d)),
+    income: 0,
   }
+
+  blob.income = blob.rawIncome[1]
+    ? (blob.rawIncome[0] + blob.rawIncome[1]) / 2
+    : blob.rawIncome[0]
 
   if (total[blob.percentile]) {
     total[blob.percentile].count += blob.count
   } else {
-    total[blob.percentile] = {
-      percentile: parseInt(d.Percentile),
-      sex: 'Total',
-      count: parseInt(d['Number of individuals ']),
-      income: d['Ranged Taxable Income']
-        .replace(/[$,]/g, '')
-        .match(/\d+/g)
-        .map((d) => parseInt(d)),
-    }
+    total[blob.percentile] = _.cloneDeep(blob)
+    total[blob.percentile].sex = 'Total'
   }
 
   return blob
@@ -37,7 +35,7 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
 
     new Chart({
       element: 'income',
-      title: 'Australian Income line graph',
+      title: 'Australians in each income percentile',
       xLabel: 'Percentile',
       yLabel: 'Count',
       data: data,
@@ -66,7 +64,29 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
     return data
   })
   .then((data) => {
-    console.log('data', data)
+    // Median income vs percentile
+
+    new Chart({
+      element: 'median',
+      title: 'Australian income by percentile',
+      xLabel: 'Percentile',
+      yLabel: 'Income',
+      data: data,
+      nav: false,
+    }).generalisedLineChart({
+      yField: 'income',
+      xField: 'percentile',
+      filter: 'sex',
+      rounding: 10000,
+      types: [
+        {
+          label: 'Total',
+          color: 'black',
+        },
+      ],
+    })
+
+    return data
   })
 
 // "Number of individuals ": "80274"
