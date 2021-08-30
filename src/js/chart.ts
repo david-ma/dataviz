@@ -285,9 +285,11 @@ class Chart {
   generalisedLineChart(options: {
     xField: string
     yField: string
-    filter: string
     rounding: number
-    types: {
+    yFormat?: string
+    xFormat?: string
+    filter: string
+    types?: {
       label: string
       color: string
     }[]
@@ -322,7 +324,12 @@ class Chart {
       ) * options.rounding,
     ])
 
-    const types = options.types
+    const types = options.types || [
+      {
+        label: 'Total',
+        color: 'black',
+      },
+    ]
 
     types.forEach((type) => {
       chart.plot
@@ -358,10 +365,13 @@ class Chart {
       .append('g')
       .attr('class', 'axis')
       .attr('transform', 'translate(0,' + chart.innerHeight + ')')
-      .call(d3.axisBottom(x))
+      .call(d3.axisBottom(x).tickFormat(d3.format(options.xFormat || '')))
 
     // Add the Y Axis
-    chart.plot.append('g').attr('class', 'axis').call(d3.axisLeft(y))
+    chart.plot
+      .append('g')
+      .attr('class', 'axis')
+      .call(d3.axisLeft(y).tickFormat(d3.format(options.yFormat || '')))
   }
 
   lineChart() {

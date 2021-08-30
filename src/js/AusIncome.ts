@@ -78,12 +78,7 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
       xField: 'percentile',
       filter: 'sex',
       rounding: 10000,
-      types: [
-        {
-          label: 'Total',
-          color: 'black',
-        },
-      ],
+      yFormat: "$,",
     })
 
     return data
