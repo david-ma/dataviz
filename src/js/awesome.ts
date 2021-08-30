@@ -46,7 +46,7 @@ socket.on('overwriteText', (packet) => {
   if (type === 'signatures') countVotes(packet.name)
 })
 
-d3.csv('/melbourne_export_october.csv', function (d) {
+d3.csv('/melbourne_export.csv', function (d) {
   if (d.hidden_at === '') {
     // console.log(d);
     return d
