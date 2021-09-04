@@ -3,7 +3,7 @@ import { Chart, decorateTable, d3 } from 'chart'
 const currentYear = new Date().getFullYear()
 
 globalThis.celebrity = celebrity
-function celebrity (birth, death) {
+function celebrity(birth, death) {
   $('#birthyear').val(birth)
   $('#deathyear').val(death)
   drawPieChart()
@@ -12,16 +12,16 @@ function celebrity (birth, death) {
 let AmericanWars = null
 
 type war = {
-    name : string;
-    start : string | number;
-    end : string | number;
-    length : number;
+  name: string
+  start: string | number
+  end: string | number
+  length: number
 }
 
-d3.csv('/blogposts/AmericanWars.csv', <any> function (d :war) {
+d3.csv('/blogposts/AmericanWars.csv', <any>function (d: war) {
   d.start = parseInt(d.start as string)
   d.end = parseInt(d.end as string) || ''
-  d.length = (d.end as any || currentYear) - d.start
+  d.length = ((d.end as any) || currentYear) - d.start
 
   return d
 }).then(function (data) {
@@ -30,7 +30,7 @@ d3.csv('/blogposts/AmericanWars.csv', <any> function (d :war) {
   decorateTable(AmericanWars, {
     element: '#AmericanWars table',
     order: [1, 'asc'],
-    titles: ['War', 'Start', 'End']
+    titles: ['War', 'Start', 'End'],
   })
 
   drawPieChart()
@@ -45,7 +45,7 @@ $('#birthyear, #deathyear').on('keyup', function (e) {
 
 globalThis.drawPieChart = drawPieChart
 
-function drawPieChart () {
+function drawPieChart() {
   //        if(warChart) warChart.remove();
   d3.select('#war_chart svg').remove()
 
@@ -65,13 +65,13 @@ function drawPieChart () {
   let longestWar = 0
 
   const data = {}
-  const totals :{
-        peace : number;
-        war : number;
-    } = {
-      peace: 0,
-      war: 0
-    }
+  const totals: {
+    peace: number
+    war: number
+  } = {
+    peace: 0,
+    war: 0,
+  }
   let totalYears = 0
 
   // Get a list of peacetime & wars for the person's life.
@@ -89,7 +89,7 @@ function drawPieChart () {
         name: `peace-${i}`,
         start: peaceStart,
         end: thisWar.start,
-        length: thisWar.start - peaceStart
+        length: thisWar.start - peaceStart,
       }
 
       // if you were born during the war... change the lengths of the peacetime & the war
@@ -123,7 +123,7 @@ function drawPieChart () {
         totalYears += peacetime.length
       }
       if (thisWar.length > 0) {
-        data[(2 * i) + 1] = thisWar
+        data[2 * i + 1] = thisWar
       }
     }
   })
@@ -131,7 +131,7 @@ function drawPieChart () {
   new Chart({
     element: 'war_chart',
     data: data,
-    nav: false
+    nav: false,
     //            title: "Number of years USA was at war, during your lifetime"
   }).scratchpad(function (c) {
     const svg = c.plot.append('g').attr('transform', 'translate(370,250)')
@@ -140,18 +140,23 @@ function drawPieChart () {
     const radius = height / 2.5
 
     // Compute the position of each group on the pie:
-    const pie = d3.pie()
+    const pie = d3
+      .pie()
       .sort(null) // Do not sort group by size
-      .value(function (d :any) { return d.value.length })
+      .value(function (d: any) {
+        return d.value.length
+      })
     const dataReady = pie((<any>d3).entries(data).reverse())
 
     // The arc generator
-    const arc = d3.arc()
+    const arc = d3
+      .arc()
       .innerRadius(radius * 0.7) // This is the size of the donut hole
       .outerRadius(radius * 0.8)
 
     // Another arc that won't be drawn. Just for labels positioning
-    const outerArc = d3.arc()
+    const outerArc = d3
+      .arc()
       .innerRadius(radius * 0.9)
       .outerRadius(radius * 0.9)
 
@@ -161,13 +166,17 @@ function drawPieChart () {
       .data(dataReady)
       .enter()
       .append('path')
-    //                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
+      //                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
       .attr('d', arc)
       .attr('fill', 'red')
       .attr('fill', 'black')
       .attr('stroke', 'white')
       .style('stroke-width', '2px')
-      .style('opacity', (d) => data[d.data.key].name.indexOf('peace') === 0 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3)
+      .style('opacity', (d) =>
+        data[d.data.key].name.indexOf('peace') === 0
+          ? 0.1
+          : (d.value / longestWar) * 0.5 + 0.3
+      )
 
     // Add the polylines between chart and labels:
     svg
@@ -175,7 +184,9 @@ function drawPieChart () {
       .data(dataReady)
       .enter()
       .append('polyline')
-      .style('display', (d) => data[d.data.key].name.indexOf('peace') === 0 ? 'none' : '')
+      .style('display', (d) =>
+        data[d.data.key].name.indexOf('peace') === 0 ? 'none' : ''
+      )
       .attr('stroke', 'black')
       .style('fill', 'none')
       .attr('stroke-width', 1)
@@ -194,7 +205,9 @@ function drawPieChart () {
       .data(dataReady)
       .enter()
       .append('text')
-      .style('display', (d) => data[d.data.key].name.indexOf('peace') === 0 ? 'none' : '')
+      .style('display', (d) =>
+        data[d.data.key].name.indexOf('peace') === 0 ? 'none' : ''
+      )
       .text((d) => data[d.data.key].name)
       .attr('transform', function (d) {
         const pos = outerArc.centroid(d)
@@ -204,16 +217,15 @@ function drawPieChart () {
       })
       .style('text-anchor', function (d) {
         const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
-        return (midangle < Math.PI ? 'start' : 'end')
+        return midangle < Math.PI ? 'start' : 'end'
       })
 
-    const myPie = pie.value((d:any) => d.value)
+    const myPie = pie.value((d: any) => d.value)
     const innerData = myPie((<any>d3).entries(totals as object).reverse())
 
     // The arc generator
     //            var arc = d3.arc()
-    arc.innerRadius(radius * 0)
-      .outerRadius(radius * 0.65)
+    arc.innerRadius(radius * 0).outerRadius(radius * 0.65)
 
     // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
     svg
@@ -221,31 +233,41 @@ function drawPieChart () {
       .data(innerData)
       .enter()
       .append('path')
-    //                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
+      //                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
       .attr('d', arc)
       .attr('fill', 'maroon')
       .attr('stroke', 'white')
       .style('stroke-width', '2px')
-      .style('opacity', (d) => d.index % 2 === 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3)
+      .style('opacity', (d) =>
+        d.index % 2 === 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3
+      )
 
     const legend = c.plot.append('g').attr('transform', 'translate(220,0)')
-    legend.selectAll('.legendLabel')
+    legend
+      .selectAll('.legendLabel')
       .data(innerData)
       .enter()
       .append('g')
       .classed('legendLabel', true)
       .append('rect')
       .attr('x', 50)
-      .attr('y', (d, i) => 20 + (30 * i))
+      .attr('y', (d, i) => 20 + 30 * i)
       .attr('height', 20)
       .attr('width', 20)
       .attr('fill', 'maroon')
-      .style('opacity', (d) => d.index % 2 === 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3)
+      .style('opacity', (d) =>
+        d.index % 2 === 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3
+      )
 
     d3.selectAll('.legendLabel')
       .append('text')
       .attr('x', 75)
-      .attr('y', (d, i) => 35 + (30 * i))
-      .text((d :any) => `${d.value} years of ${d.index % 2 === 1 ? 'peace' : 'war'}: ${d3.format('.0%')(d.value / totalYears)}`)
+      .attr('y', (d, i) => 35 + 30 * i)
+      .text(
+        (d: any) =>
+          `${d.value} years of ${
+            d.index % 2 === 1 ? 'peace' : 'war'
+          }: ${d3.format('.0%')(d.value / totalYears)}`
+      )
   })
 }

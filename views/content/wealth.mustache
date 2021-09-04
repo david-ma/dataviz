@@ -1,54 +1,65 @@
-
 <style>
-#dataset {
-    border: solid 1px grey; padding: 5px;
-}
-#dataset table {
-    border: solid 1px grey; margin: 5px 0;
-}
-#dataset td {
-    border: solid 1px lightgrey;
-}
-#wealth th {
-    padding: 3px;
-}
-#wealth tr {
-    line-height: 1em;
-    filter: brightness(1.15);
-}
-#wealth table {
-    width: 100% !important;
-}
-#wealth .paginate_button {
-    padding: 3px 6px;
-    flex: auto;
-}
-#wealth .dataTables_paginate {
-    display: flex;
-    width: 100%;
-}
-#wealth .dataTables_paginate .ellipsis {
-    padding: 0;
-}
-.country.highlight {
-    stroke-width: 5;
-}
+    #dataset {
+        border: solid 1px grey;
+        padding: 5px;
+    }
 
-#wealth tr.highlight {
-    filter: brightness(1);
-}
-#wealth tr.highlight td {
-    border-top: solid 3px black;
-    border-bottom: solid 3px black;
-}
-#wealth tr.highlight td:first-child {
-    border-left: solid 3px black;
-}
-#wealth tr.highlight td:last-child {
-    border-right: solid 3px black;
-}
+    #dataset table {
+        border: solid 1px grey;
+        margin: 5px 0;
+    }
 
+    #dataset td {
+        border: solid 1px lightgrey;
+    }
 
+    #wealth th {
+        padding: 3px;
+    }
+
+    #wealth tr {
+        line-height: 1em;
+        filter: brightness(1.15);
+    }
+
+    #wealth table {
+        width: 100% !important;
+    }
+
+    #wealth .paginate_button {
+        padding: 3px 6px;
+        flex: auto;
+    }
+
+    #wealth .dataTables_paginate {
+        display: flex;
+        width: 100%;
+    }
+
+    #wealth .dataTables_paginate .ellipsis {
+        padding: 0;
+    }
+
+    .country.highlight {
+        stroke-width: 5;
+    }
+
+    #wealth tr.highlight {
+        filter: brightness(1);
+    }
+
+    #wealth tr.highlight td {
+        border-top: solid 3px black;
+        border-bottom: solid 3px black;
+    }
+
+    #wealth tr.highlight td:first-child {
+        border-left: solid 3px black;
+    }
+
+    #wealth tr.highlight td:last-child {
+        border-right: solid 3px black;
+    }
 </style>
 
 <section class="blogpost">
@@ -71,7 +82,7 @@
 
 <script>
 
-    var md = new showdown.Converter({openLinksInNewWindow: true});
+    var md = new showdown.Converter({ openLinksInNewWindow: true });
 
     $("#explain").html(md.makeHtml(`
 Data taken from the [2019 Credit Suisse Research Institute wealth report](https://www.credit-suisse.com/about-us/en/reports-research/global-wealth-report.html).

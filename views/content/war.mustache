@@ -2,13 +2,15 @@
     <div class="row">
         <div class="col-xs-12">
             <h1>Number of years USA was at war, during your lifetime</h1>
-            <h2>Originally on <a target="_blank" href="https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/">The Washington Post</a> by <a target="_blank" href="https://twitter.com/pbump">@pbump</a></h2>
+            <h2>Originally on <a target="_blank"
+                    href="https://www.washingtonpost.com/politics/2020/01/08/nearly-quarter-americans-have-never-experienced-us-time-peace/">The
+                    Washington Post</a> by <a target="_blank" href="https://twitter.com/pbump">@pbump</a></h2>
         </div>
     </div>
 
     <div class="row" id="AmericanWars">
         <div class="col-xs-12 col-md-6">
-                <div id="war_chart"></div>
+            <div id="war_chart"></div>
 
             <div>
                 <input type="button" value="George Washington" onclick="celebrity(1732,1799)">
@@ -46,7 +48,7 @@
 
 <script>
 
-    var md = new showdown.Converter({openLinksInNewWindow: true});
+    var md = new showdown.Converter({ openLinksInNewWindow: true });
 
     $("#explain").html(md.makeHtml(`
 I redrew Philip Bump's diagram from his article "Nearly a quarter of Americans have never experienced the U.S. in a time of peace" as an exercise to practice d3.js.

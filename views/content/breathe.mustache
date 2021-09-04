@@ -1,8 +1,7 @@
-
 <style>
-.polygon.hidden {
-  display: none;
-}
+  .polygon.hidden {
+    display: none;
+  }
 </style>
 
 <section id="breathe" class="blogpost">
@@ -39,7 +38,11 @@
           <label for="hideOutlines">Speed:</label><br>
 
           <input id="speedSlider" type="range" min="1" max="100" value="50">
-          <div><div pseudo="-webkit-slider-runnable-track" id="track"><div id="thumb"></div></div></div>
+          <div>
+            <div pseudo="-webkit-slider-runnable-track" id="track">
+              <div id="thumb"></div>
+            </div>
+          </div>
           </input>
         </div>
 
@@ -55,7 +58,11 @@
           <label for="hideOutlines">Number of shapes:</label><br>
 
           <input id="verticesSlider" type="range" min="4" max="25" value="14">
-          <div><div pseudo="-webkit-slider-runnable-track" id="track"><div id="thumb"></div></div></div>
+          <div>
+            <div pseudo="-webkit-slider-runnable-track" id="track">
+              <div id="thumb"></div>
+            </div>
+          </div>
           </input>
         </div>
 
@@ -64,7 +71,9 @@
       </div>
 
       <h2>Timing Data:</h2>
-      <div id='timing'><table></table></div>
+      <div id='timing'>
+        <table></table>
+      </div>
       <div id="colorExplain"></div>
     </div>
   </div>
@@ -75,15 +84,15 @@
 </section>
 
 <style>
-svg line {
-  stroke: black;
-  stroke-width: 2;
-}
+  svg line {
+    stroke: black;
+    stroke-width: 2;
+  }
 </style>
 {{> require}}
 
 <script>
-  var md = new showdown.Converter({openLinksInNewWindow: true});
+  var md = new showdown.Converter({ openLinksInNewWindow: true });
 
   $("#explain").html(md.makeHtml(`
 This gif has been shared around the internet for a bit, but I can't find the original source.
