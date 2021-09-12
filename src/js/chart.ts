@@ -72,7 +72,7 @@ class Chart {
 
     if (opts.margin && typeof opts.margin !== 'number') {
       this.margin = opts.margin
-    } else if (opts.margin && typeof opts.margin === 'number') {
+    } else if (opts.margin !== null && typeof opts.margin === 'number') {
       this.margin = {
         top: opts.margin,
         right: opts.margin,
