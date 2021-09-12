@@ -23,14 +23,22 @@ class Column {
     this.col = opts.col
     this.lines = opts.lines
     this.board = opts.board
-    this.curLine = 0
-    this.step()
+    this.curLine = null
   }
 
   step() {
-    const letter = randomChar()
-    this.drawChar(this.curLine, this.col, letter)
-    this.curLine++
+    if (this.curLine !== null) {
+      const letter = randomChar()
+      this.drawChar(this.curLine, this.col, letter)
+      this.curLine++
+      if (this.curLine > this.lines) {
+        this.curLine = null
+      }
+    }
+  }
+
+  start() {
+    this.curLine = 0
   }
 
   drawChar(line, col, char) {
@@ -45,25 +53,32 @@ class Column {
   }
 }
 class Matrix {
-  columns: Array<number>
+  columns: Array<Column>
 
   constructor(opts: { board: Board; lines: number; cols: number }) {
-    // this.columns = [cols]
+    this.columns = []
 
-    var testCol = new Column({
-      col: 5,
-      lines: opts.lines,
-      board: opts.board,
-    })
-
-    setInterval(function () {
-      testCol.step()
-    }, 40)
+    for (var i = 0; i < opts.cols; i++) {
+      this.columns.push(
+        new Column({
+          col: i,
+          lines: opts.lines,
+          board: opts.board,
+        })
+      )
+    }
   }
 
-  addRandomDrop() {}
+  addRandomDrop() {
+    var col = Math.floor(Math.random() * this.columns.length)
+    this.columns[col].start()
+  }
 
-  animate() {}
+  animate() {
+    this.columns.forEach((col) => {
+      col.step()
+    })
+  }
 }
 
 new Chart({
@@ -91,14 +106,8 @@ new Chart({
     board: board,
   })
 
-  function drawChar(line, col, char) {
-    board
-      .append('text')
-      .text(char)
-      .attrs({
-        x: 2 + col * 6,
-        y: 10 * (line + 1),
-        fill: green,
-      })
-  }
+  setInterval(function () {
+    matrix.animate()
+    matrix.addRandomDrop()
+  }, 40)
 })
