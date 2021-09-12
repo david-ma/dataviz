@@ -8,9 +8,24 @@ const green = '#00c200',
   boldChance = 0.1
 
 const charset =
-  'ﾘｸ日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸ日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸ日ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'.split(
+  'ﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'.split(
     ''
   )
+const rabbit = `                              __
+                     /\    .-" /
+                    /  ; .'  .' 
+                   :   :/  .'   
+                    \  ;-.'     
+       .--""""--..__/     \`.    
+     .'           .'    \`o  \   
+    /                    \`   ;  
+   :                  \      :  
+ .-;        -.         \`.__.-'  
+:  ;          \     ,   ;       
+'._:           ;   :   (        
+    \/  .__    ;    \   \`-.     
+     ;     "-,/_..--"\`-..__)    
+     '""--.._:`
 
 function randomChar() {
   return charset[Math.floor(Math.random() * charset.length)]
@@ -93,6 +108,9 @@ class Column {
       }
       this.curLine++
       if (this.curLine >= this.lines || Math.random() < haltChance) {
+        if (this.curLine === this.lines) {
+          this.chars[this.curLine - 1].lowlight()
+        }
         this.curLine = null
       }
     }
@@ -134,10 +152,16 @@ class Matrix {
       col.step()
     })
   }
+
+  write(string: string) {
+    console.log('Writing', string)
+  }
 }
 
 new Chart({
   element: 'matrix',
+  height: window.screen.height * 0.5,
+  width: window.screen.width * 0.5,
   margin: 0,
   nav: false,
 }).scratchpad((chart) => {
@@ -160,6 +184,8 @@ new Chart({
     cols: cols,
     board: board,
   })
+
+  globalThis.matrix = matrix
 
   setInterval(function () {
     matrix.animate()
