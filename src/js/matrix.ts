@@ -1,4 +1,4 @@
-import { Chart, d3 } from 'chart'
+import { Chart, _, d3 } from 'chart'
 
 const green = '#00c200',
   brightgreen = '#5ff967',
@@ -11,9 +11,9 @@ const charset =
   'ﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'.split(
     ''
   )
-const rabbit = `                              __
-                     /\    .-" /
-                    /  ; .'  .' 
+const rabbit = ` Neo                          __
+ Follow the          /\    .-" /
+ white rabbit       /  ; .'  .' 
                    :   :/  .'   
                     \  ;-.'     
        .--""""--..__/     \`.    
@@ -24,11 +24,12 @@ const rabbit = `                              __
 :  ;          \     ,   ;       
 '._:           ;   :   (        
     \/  .__    ;    \   \`-.     
-     ;     "-,/_..--"\`-..__)    
+ bug ;     "-,/_..--"\`-..__)    
      '""--.._:`
+globalThis.rabbit = rabbit
 
 function randomChar() {
-  return charset[Math.floor(Math.random() * charset.length)]
+  return _.sample(charset)
 }
 
 type Board = d3.Selection<SVGSVGElement, any, HTMLElement, any>
@@ -51,7 +52,7 @@ class Char {
 
   setChar(char: string) {
     this.hiddenChar = char
-    this.burndown = 15
+    this.burndown = 10
   }
 
   drawChar(char: string) {
@@ -71,7 +72,7 @@ class Char {
     return this
   }
   lowlight() {
-    if (this.burndown || Math.random() < boldChance) {
+    if (Math.random() < boldChance) {
       this.self.attrs({
         'font-weight': 900,
         fill: brightgreen,
@@ -171,18 +172,24 @@ class Matrix {
     })
   }
 
-  write(string: string) {
+  write(string: string, noTrim?: boolean) {
     console.log('Writing', string)
     var lines = string.split('\n')
     var line = Math.floor(Math.random() * this.nLines),
       col = Math.floor(Math.random() * this.columns.length)
+    if (line + lines.length > this.nLines) {
+      line = this.nLines - lines.length - 1
+    }
 
     lines.forEach((string, j) => {
-      var array = string.trim().split('')
-      array.unshift(' ')
-      array.push(' ')
+      if (!noTrim) {
+        string = string.trim()
+      }
+      var array = string.split('')
+      // array.unshift(' ')
+      // array.push(' ')
       if (col + array.length > this.columns.length) {
-        col = this.columns.length - array.length - 3
+        col = this.columns.length - array.length - 1
       }
 
       array.forEach((char, i) => {
@@ -235,13 +242,16 @@ new Chart({
     "They're watching you, Neo.",
     `I know a lot about you. I\'ve been
     wanting to meet you for some time.`,
+    `How about I just give you the finger
+    And you give me my phone call!`,
+    'You have been living inside a dreamworld, Neo.',
   ]
 
   setInterval(function () {
     matrix.animate()
     matrix.addRandomDrop()
-    if (phrases[0]) {
-      matrix.write(phrases.pop())
+    if (Math.random() < 0.01) {
+      matrix.write(_.sample(phrases))
     }
   }, speed)
 })
