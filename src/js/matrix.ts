@@ -30,6 +30,17 @@ class Char {
 
   drawChar(char: string) {
     this.self.text(char)
+    return this
+  }
+  highlight() {
+    this.self.attrs({
+      fill: 'white',
+    })
+  }
+  lowlight() {
+    this.self.attrs({
+      fill: green,
+    })
   }
 }
 class Column {
@@ -60,7 +71,10 @@ class Column {
   step() {
     if (this.curLine !== null) {
       const letter = randomChar()
-      this.chars[this.curLine].drawChar(letter)
+      this.chars[this.curLine].drawChar(letter).highlight()
+      if (this.curLine - 1 >= 0) {
+        this.chars[this.curLine - 1].lowlight()
+      }
       this.curLine++
       if (this.curLine >= this.lines) {
         this.curLine = null
