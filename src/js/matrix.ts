@@ -1,13 +1,30 @@
 import { Chart, _, d3 } from 'chart'
 
-const green = "#00c200",
-    brightgreen = "#5ff967"
+const green = '#00c200',
+  brightgreen = '#5ff967'
+
+class Matrix {
+  columns: Array<number>
+
+  constructor(opts: {
+    board: d3.Selection<SVGSVGElement, any, HTMLElement, any>
+    lines: number
+    cols: number
+  }) {
+    // this.columns = [cols]
+  }
+
+  addRandomDrop() {}
+
+  animate() {}
+}
 
 new Chart({
   element: 'matrix',
   margin: 0,
   nav: false,
 }).scratchpad((chart) => {
+  // set background
   chart.svg.append('rect').attrs({
     x: 0,
     y: 0,
@@ -16,28 +33,26 @@ new Chart({
     fill: 'black',
   })
 
-  chart.svg.append("text").text("Hello World").attrs({
-    x: 2,
-    y: 10,
-    fill: green
-  });
+  var lines = Math.floor(chart.innerHeight / 10), // 60
+    cols = Math.floor(chart.innerWidth / 6) // 160
 
+  var board: d3.Selection<SVGSVGElement, any, HTMLElement, any> =
+    chart.svg.append('g')
 
-
-  var board = chart.svg.append("g");
-  
-  var word = "Hello World"
-
-  word.split("").forEach((char, col) => {
-    drawChar(1, col, char);
+  var matrix = new Matrix({
+    lines: lines,
+    cols: cols,
+    board: board,
   })
 
   function drawChar(line, col, char) {
-    board.append('text').text(char).attrs({
-      x: 2 + (col * 6),
-      y: 10 * (line + 1),
-      fill: green
-    })
+    board
+      .append('text')
+      .text(char)
+      .attrs({
+        x: 2 + col * 6,
+        y: 10 * (line + 1),
+        fill: green,
+      })
   }
-
 })
