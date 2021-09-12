@@ -13,25 +13,56 @@ function randomChar() {
 }
 
 type Board = d3.Selection<SVGSVGElement, any, HTMLElement, any>
+
+class Char {
+  board: Board
+  self: any
+
+  constructor(opts: { board: Board; col: number; line: number }) {
+    this.board = opts.board
+
+    this.self = this.board.append('text').attrs({
+      x: 2 + opts.col * 6,
+      y: 10 * (opts.line + 1),
+      fill: green,
+    })
+  }
+
+  drawChar(char: string) {
+    this.self.text(char)
+  }
+}
 class Column {
   board: Board
   lines: number
   col: number
   curLine: number
+  chars: Array<Char>
 
   constructor(opts: { col: number; lines: number; board: Board }) {
     this.col = opts.col
     this.lines = opts.lines
     this.board = opts.board
     this.curLine = null
+
+    this.chars = []
+    for (var i = 0; i < this.lines; i++) {
+      this.chars.push(
+        new Char({
+          line: i,
+          col: this.col,
+          board: this.board,
+        })
+      )
+    }
   }
 
   step() {
     if (this.curLine !== null) {
       const letter = randomChar()
-      this.drawChar(this.curLine, this.col, letter)
+      this.chars[this.curLine].drawChar(letter)
       this.curLine++
-      if (this.curLine > this.lines) {
+      if (this.curLine >= this.lines) {
         this.curLine = null
       }
     }
@@ -39,17 +70,6 @@ class Column {
 
   start() {
     this.curLine = 0
-  }
-
-  drawChar(line, col, char) {
-    this.board
-      .append('text')
-      .text(char)
-      .attrs({
-        x: 2 + col * 6,
-        y: 10 * (line + 1),
-        fill: green,
-      })
   }
 }
 class Matrix {
