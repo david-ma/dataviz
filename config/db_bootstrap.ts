@@ -118,6 +118,15 @@ if (true) {
           publish_date: '2020-11-07',
           published: true,
         },
+        {
+          shortname: 'AusIncome',
+          title: 'Australian Income',
+          category: '',
+          summary: 'Graphs from ATO income stats 2018',
+          image: 'images/ausIncome.png',
+          publish_date: '2021-08-30',
+          published: true,
+        }
       ]
 
       blogposts.forEach(function (blogpost) {
