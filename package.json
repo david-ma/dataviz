@@ -23,5 +23,8 @@
     "socket.io": "^2.4.1",
     "tabletojson": "^2.0.7",
     "x-ray": "^2.3.4"
+  },
+  "resolutions": {
+    "css-what": "5.0.1"
   }
 }
