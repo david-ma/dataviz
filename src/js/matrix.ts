@@ -1,7 +1,11 @@
-import { Chart, _, d3 } from 'chart'
+import { Chart, d3 } from 'chart'
 
 const green = '#00c200',
-  brightgreen = '#5ff967'
+  brightgreen = '#5ff967',
+  speed = 40,
+  haltChance = 0.025,
+  eraseChance = 0.05,
+  boldChance = 0.1
 
 const charset =
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'.split(
@@ -40,8 +44,7 @@ class Char {
     return this
   }
   lowlight() {
-    if (Math.random() < 0.1) {
-      console.log('bright green!')
+    if (Math.random() < boldChance) {
       this.self.attrs({
         'font-weight': 900,
         fill: brightgreen,
@@ -61,6 +64,7 @@ class Column {
   col: number
   curLine: number
   chars: Array<Char>
+  eraseLine: boolean
 
   constructor(opts: { col: number; lines: number; board: Board }) {
     this.col = opts.col
@@ -82,13 +86,13 @@ class Column {
 
   step() {
     if (this.curLine !== null) {
-      const letter = randomChar()
+      const letter = this.eraseLine ? '' : randomChar()
       this.chars[this.curLine].drawChar(letter).highlight()
       if (this.curLine - 1 >= 0) {
         this.chars[this.curLine - 1].lowlight()
       }
       this.curLine++
-      if (this.curLine >= this.lines) {
+      if (this.curLine >= this.lines || Math.random() < haltChance) {
         this.curLine = null
       }
     }
@@ -96,6 +100,11 @@ class Column {
 
   start() {
     this.curLine = 0
+    if (this.eraseLine === null || this.eraseLine === true) {
+      this.eraseLine = false
+    } else if (Math.random() < eraseChance) {
+      this.eraseLine = true
+    }
   }
 }
 class Matrix {
@@ -155,5 +164,5 @@ new Chart({
   setInterval(function () {
     matrix.animate()
     matrix.addRandomDrop()
-  }, 40)
+  }, speed)
 })
