@@ -143,9 +143,11 @@ class Column {
 }
 class Matrix {
   columns: Array<Column>
+  nLines: number
 
   constructor(opts: { board: Board; lines: number; cols: number }) {
     this.columns = []
+    this.nLines = opts.lines
 
     for (var i = 0; i < opts.cols; i++) {
       this.columns.push(
@@ -171,14 +173,23 @@ class Matrix {
 
   write(string: string) {
     console.log('Writing', string)
-    var array = string.split('')
-    var line = 5,
-      col = 3
+    var lines = string.split('\n')
+    var line = Math.floor(Math.random() * this.nLines),
+      col = Math.floor(Math.random() * this.columns.length)
 
-    array.forEach((char, i) => {
-      this.columns[col + i].setChar({
-        line: line,
-        char: array[i],
+    lines.forEach((string, j) => {
+      var array = string.trim().split('')
+      array.unshift(' ')
+      array.push(' ')
+      if (col + array.length > this.columns.length) {
+        col = this.columns.length - array.length - 3
+      }
+
+      array.forEach((char, i) => {
+        this.columns[col + i].setChar({
+          line: line + j,
+          char: array[i],
+        })
       })
     })
   }
@@ -213,8 +224,24 @@ new Chart({
 
   globalThis.matrix = matrix
 
+  var phrases = [
+    'The Matrix has you',
+    'Hello, Neo',
+    'Shitshitshit.',
+    'Holy shit!',
+    `The answer is coming, Neo.
+    There is a window in front of you.
+    Open it.`,
+    "They're watching you, Neo.",
+    `I know a lot about you. I\'ve been
+    wanting to meet you for some time.`,
+  ]
+
   setInterval(function () {
     matrix.animate()
     matrix.addRandomDrop()
+    if (phrases[0]) {
+      matrix.write(phrases.pop())
+    }
   }, speed)
 })
