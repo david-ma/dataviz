@@ -36,6 +36,8 @@ type Board = d3.Selection<SVGSVGElement, any, HTMLElement, any>
 class Char {
   board: Board
   self: any
+  burndown: number
+  hiddenChar: string
 
   constructor(opts: { board: Board; col: number; line: number }) {
     this.board = opts.board
@@ -47,8 +49,18 @@ class Char {
     })
   }
 
+  setChar(char: string) {
+    this.hiddenChar = char
+    this.burndown = 15
+  }
+
   drawChar(char: string) {
-    this.self.text(char)
+    if (this.burndown) {
+      this.self.text(this.hiddenChar)
+      this.burndown--
+    } else {
+      this.self.text(char)
+    }
     return this
   }
   highlight() {
@@ -59,7 +71,7 @@ class Char {
     return this
   }
   lowlight() {
-    if (Math.random() < boldChance) {
+    if (this.burndown || Math.random() < boldChance) {
       this.self.attrs({
         'font-weight': 900,
         fill: brightgreen,
@@ -116,6 +128,10 @@ class Column {
     }
   }
 
+  setChar(opts: { line: number; char: string }) {
+    this.chars[opts.line].setChar(opts.char)
+  }
+
   start() {
     this.curLine = 0
     if (this.eraseLine === null || this.eraseLine === true) {
@@ -155,6 +171,16 @@ class Matrix {
 
   write(string: string) {
     console.log('Writing', string)
+    var array = string.split('')
+    var line = 5,
+      col = 3
+
+    array.forEach((char, i) => {
+      this.columns[col + i].setChar({
+        line: line,
+        char: array[i],
+      })
+    })
   }
 }
 
