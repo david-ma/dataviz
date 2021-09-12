@@ -34,13 +34,25 @@ class Char {
   }
   highlight() {
     this.self.attrs({
+      'font-weight': 900,
       fill: 'white',
     })
+    return this
   }
   lowlight() {
-    this.self.attrs({
-      fill: green,
-    })
+    if (Math.random() < 0.1) {
+      console.log('bright green!')
+      this.self.attrs({
+        'font-weight': 900,
+        fill: brightgreen,
+      })
+    } else {
+      this.self.attrs({
+        'font-weight': 300,
+        fill: green,
+      })
+    }
+    return this
   }
 }
 class Column {
