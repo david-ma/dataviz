@@ -44,6 +44,7 @@ class Char {
     this.board = opts.board
 
     this.self = this.board.append('text').attrs({
+      class: 'char',
       x: 2 + opts.col * 6,
       y: 10 * (opts.line + 1),
       fill: green,
@@ -69,6 +70,7 @@ class Char {
       'font-weight': 900,
       fill: 'white',
     })
+    this.self.classed('fadeout', false)
     return this
   }
   lowlight() {
@@ -84,6 +86,9 @@ class Char {
       })
     }
     return this
+  }
+  fadeout() {
+    this.self.classed('fadeout', true)
   }
 }
 class Column {
@@ -114,8 +119,12 @@ class Column {
 
   step() {
     if (this.curLine !== null) {
-      const letter = this.eraseLine ? '' : randomChar()
-      this.chars[this.curLine].drawChar(letter).highlight()
+      if (!this.eraseLine) {
+        const letter = randomChar()
+        this.chars[this.curLine].drawChar(letter).highlight()
+      } else {
+        this.chars[this.curLine].fadeout()
+      }
       if (this.curLine - 1 >= 0) {
         this.chars[this.curLine - 1].lowlight()
       }
@@ -173,7 +182,7 @@ class Matrix {
   }
 
   write(string: string, noTrim?: boolean) {
-    console.log('Writing', string)
+    // console.log('Writing', string)
     var lines = string.split('\n')
     var line = Math.floor(Math.random() * this.nLines),
       col = Math.floor(Math.random() * this.columns.length)
