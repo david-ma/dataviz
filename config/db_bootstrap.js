@@ -9,7 +9,9 @@ const seq = {
     Camera: models_1.Camera,
     Family: models_1.Family,
 };
+// Family.get()
 if (false) {
+    // eslint-disable-line
     models_1.Camera.findAll({
         where: {
             model: {
@@ -23,6 +25,9 @@ if (false) {
             },
         }).then((family) => {
             cameras.forEach((camera) => {
+                // camera.setFamily(family);
+                // camera.addFamily(family);
+                // console.log(camera);
                 camera.update({
                     family: family,
                 });
@@ -31,16 +36,23 @@ if (false) {
     });
 }
 if (false) {
+    // eslint-disable-line
     models_1.Family.create({
         brand: 'Nikon',
         name: 'Coolpix',
         description: 'None',
     });
 }
+// rebuild entire database & reload data..?
 if (true) {
+    // eslint-disable-line
     seq.sequelize
-        .sync({})
+        .sync({
+    // force: true
+    })
         .then(function (d) {
+        // eslint-disable-line
+        // Add blog posts
         const blogposts = [
             {
                 shortname: 'war',
@@ -110,12 +122,13 @@ if (true) {
                 title: 'Matrix code',
                 category: '',
                 summary: 'The raining code from the movie The Matrix (1999)',
-                image: 'images/matrix.png',
+                image: 'images/matrix.jpg',
                 publish_date: '2021-09-12',
                 published: true,
             },
         ];
         blogposts.forEach(function (blogpost) {
+            // console.log(`Adding ${blogpost.shortname}`)
             models_1.Blogpost.findOne({
                 where: {
                     shortname: blogpost.shortname,

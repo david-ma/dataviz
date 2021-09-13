@@ -132,7 +132,7 @@ if (true) {
           title: 'Matrix code',
           category: '',
           summary: 'The raining code from the movie The Matrix (1999)',
-          image: 'images/matrix.png',
+          image: 'images/matrix.jpg',
           publish_date: '2021-09-12',
           published: true,
         },
