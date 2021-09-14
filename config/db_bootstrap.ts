@@ -112,7 +112,7 @@ if (true) {
         {
           shortname: 'breathe',
           title: 'Breathing Polygons',
-          category: '',
+          category: 'animation',
           summary: 'D3.js & maths practice by drawing breathing polygons',
           image: 'images/breathe.png',
           publish_date: '2020-11-07',
@@ -121,7 +121,7 @@ if (true) {
         {
           shortname: 'AusIncome',
           title: 'Australian Income',
-          category: '',
+          category: 'charts',
           summary: 'Graphs from ATO income stats 2018',
           image: 'images/ausIncome.png',
           publish_date: '2021-08-30',
@@ -130,10 +130,19 @@ if (true) {
         {
           shortname: 'matrix',
           title: 'Matrix code',
-          category: '',
+          category: 'animation',
           summary: 'The raining code from the movie The Matrix (1999)',
           image: 'images/matrix.jpg',
           publish_date: '2021-09-12',
+          published: true,
+        },
+        {
+          shortname: 'winamp',
+          title: 'Winamp vis',
+          category: 'animation',
+          summary: 'A simple animation, reminiscent of the old winamp visualisations',
+          image: 'images/winamp.jpg',
+          publish_date: '2021-09-15',
           published: true,
         },
       ]
