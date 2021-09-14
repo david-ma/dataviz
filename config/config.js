@@ -59,13 +59,11 @@ async function loadTemplates(template, content = '') {
             }).then(result => {
                 try {
                     const scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g;
-                    const styleEx = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/g;
+                    const styleEx = /<style\b.*>([^<]*(?:(?!<\/style>)<[^<]*)*)<\/style>/g;
                     const scripts = [...result.matchAll(scriptEx)].map(d => d[0]);
-                    const styles = [...result.matchAll(styleEx)].map(d => d[0]);
-                    const between = /<style>(.*)<\/style>/gms;
-                    const trimmedStyles = [...styles[0].matchAll(between)].map(d => d[1]);
+                    const styles = [...result.matchAll(styleEx)].map(d => d[1]);
                     sass_1.default.render({
-                        data: trimmedStyles.join('\n'),
+                        data: styles.join('\n'),
                         outputStyle: 'compressed',
                     }, function (err, sassResult) {
                         resolve({
