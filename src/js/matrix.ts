@@ -11,10 +11,10 @@ const charset =
   'ﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'.split(
     ''
   )
-const rabbit = ` Neo                          __
- Follow the          /\    .-" /
- white rabbit       /  ; .'  .' 
-                   :   :/  .'   
+const rabbit = (globalThis.rabbit = `                              __
+ Neo                 /\    .-" /
+ Follow the         /  ; .'  .' 
+ white rabbit      :   :/  .'   
                     \  ;-.'     
        .--""""--..__/     \`.    
      .'           .'    \`o  \   
@@ -25,8 +25,31 @@ const rabbit = ` Neo                          __
 '._:           ;   :   (        
     \/  .__    ;    \   \`-.     
  bug ;     "-,/_..--"\`-..__)    
-     '""--.._:`
-globalThis.rabbit = rabbit
+     '""--.._:`)
+
+const quotes = [
+  'The Matrix has you',
+  'Hello, Neo',
+  'Holy shit!',
+  `The answer is coming, Neo.
+  There is a window in front of you.
+  Open it.`,
+  "They're watching you, Neo.",
+  `I know a lot about you. I've been
+  wanting to meet you for some time.`,
+  `How about I just give you the finger
+  And you give me my phone call!`,
+  'You have been living inside a dreamworld, Neo.',
+  `Written and Directed by
+  the Wachowski Sisters`,
+  'Operator.',
+  `We have the name of their next target.
+  The name is Neo.`,
+  "You're the One, Neo.",
+  'Morpheus is fighting Neo!',
+  'What does it mean?',
+  'Everyone falls the first time',
+]
 
 function randomChar() {
   return _.sample(charset)
@@ -138,6 +161,10 @@ class Column {
     }
   }
 
+  /**
+   * Set a hidden character, so that it will appear next time it is drawn.
+   * Will also stick around for a set number of ticks
+   */
   setChar(opts: { line: number; char: string }) {
     this.chars[opts.line].setChar(opts.char)
   }
@@ -227,40 +254,22 @@ new Chart({
     fill: 'black',
   })
 
-  var lines = Math.floor(chart.innerHeight / 10), // 60
-    cols = Math.floor(chart.innerWidth / 6) // 160
-
-  var board: Board = chart.svg.append('g')
-
-  var matrix = new Matrix({
-    lines: lines,
-    cols: cols,
-    board: board,
-  })
+  const lines = Math.floor(chart.innerHeight / 10), // 60
+    cols = Math.floor(chart.innerWidth / 6), // 160
+    board: Board = chart.svg.append('g'),
+    matrix = new Matrix({
+      lines: lines,
+      cols: cols,
+      board: board,
+    })
 
   globalThis.matrix = matrix
-
-  var phrases = [
-    'The Matrix has you',
-    'Hello, Neo',
-    'Shitshitshit.',
-    'Holy shit!',
-    `The answer is coming, Neo.
-    There is a window in front of you.
-    Open it.`,
-    "They're watching you, Neo.",
-    `I know a lot about you. I\'ve been
-    wanting to meet you for some time.`,
-    `How about I just give you the finger
-    And you give me my phone call!`,
-    'You have been living inside a dreamworld, Neo.',
-  ]
 
   setInterval(function () {
     matrix.animate()
     matrix.addRandomDrop()
     if (Math.random() < 0.01) {
-      matrix.write(_.sample(phrases))
+      matrix.write(_.sample(quotes))
     }
   }, speed)
 })
