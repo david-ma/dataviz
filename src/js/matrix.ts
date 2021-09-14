@@ -52,7 +52,7 @@ const quotes = [
   'Everyone falls the first time',
 ]
 
-type Board = d3.Selection<SVGSVGElement, any, HTMLElement, any>
+type Board = d3.Selection<SVGGElement, any, HTMLElement, any>
 
 class Char {
   board: Board
