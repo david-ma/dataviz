@@ -9,6 +9,7 @@ const awesome_1 = require("./awesome");
 const path_1 = __importDefault(require("path"));
 const http_1 = __importDefault(require("http"));
 const fs_1 = __importDefault(require("fs"));
+const sass_1 = __importDefault(require("sass"));
 const mustache_1 = __importDefault(require("mustache"));
 const lodash_1 = __importDefault(require("lodash"));
 const fsPromise = fs_1.default.promises;
@@ -61,10 +62,17 @@ async function loadTemplates(template, content = '') {
                     const styleEx = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/g;
                     const scripts = [...result.matchAll(scriptEx)].map(d => d[0]);
                     const styles = [...result.matchAll(styleEx)].map(d => d[0]);
-                    resolve({
-                        content: result.replace(scriptEx, '').replace(styleEx, ''),
-                        scripts: scripts.join('\n'),
-                        styles: styles.join('\n')
+                    const between = /<style>(.*)<\/style>/gms;
+                    const trimmedStyles = [...styles[0].matchAll(between)].map(d => d[1]);
+                    sass_1.default.render({
+                        data: trimmedStyles.join('\n'),
+                        outputStyle: 'compressed',
+                    }, function (err, sassResult) {
+                        resolve({
+                            content: result.replace(scriptEx, '').replace(styleEx, ''),
+                            scripts: scripts.join('\n'),
+                            styles: `<style>${sassResult.css.toString()}</style>`
+                        });
                     });
                 }
                 catch (e) {
