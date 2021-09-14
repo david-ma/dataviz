@@ -15,31 +15,31 @@ const seq: seqObject = {
 }
 
 // Family.get()
-if (false) {
-  // eslint-disable-line
-  Camera.findAll({
-    where: {
-      model: {
-        [Op.like]: '%Coolpix%',
-      },
-    },
-  }).then(function (cameras) {
-    Family.findOne({
-      where: {
-        name: 'Coolpix',
-      },
-    }).then((family) => {
-      cameras.forEach((camera) => {
-        // camera.setFamily(family);
-        // camera.addFamily(family);
-        // console.log(camera);
-        camera.update({
-          family: family,
-        })
-      })
-    })
-  })
-}
+// if (false) {
+//   // eslint-disable-line
+//   Camera.findAll({
+//     where: {
+//       model: {
+//         [Op.like]: '%Coolpix%',
+//       },
+//     },
+//   }).then(function (cameras) {
+//     Family.findOne({
+//       where: {
+//         name: 'Coolpix',
+//       },
+//     }).then((family) => {
+//       cameras.forEach((camera) => {
+//         // camera.setFamily(family);
+//         // camera.addFamily(family);
+//         // console.log(camera);
+//         // camera.update({
+//         //   family: family,
+//         // })
+//       })
+//     })
+//   })
+// }
 
 if (false) {
   // eslint-disable-line
@@ -129,7 +129,7 @@ if (true) {
         },
         {
           shortname: 'matrix',
-          title: 'Matrix code',
+          title: 'Matrix Raining Code',
           category: 'animation',
           summary: 'The raining code from the movie The Matrix (1999)',
           image: 'images/matrix.jpg',
@@ -138,7 +138,7 @@ if (true) {
         },
         {
           shortname: 'winamp',
-          title: 'Winamp vis',
+          title: 'Winamp Animation',
           category: 'animation',
           summary: 'A simple animation, reminiscent of the old winamp visualisations',
           image: 'images/winamp.jpg',

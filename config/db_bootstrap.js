@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const sequelize_1 = require("sequelize");
 const models_1 = require("../models");
 const seq = {
     sequelize: models_1.dbConfig,
@@ -9,27 +8,6 @@ const seq = {
     Camera: models_1.Camera,
     Family: models_1.Family,
 };
-if (false) {
-    models_1.Camera.findAll({
-        where: {
-            model: {
-                [sequelize_1.Op.like]: '%Coolpix%',
-            },
-        },
-    }).then(function (cameras) {
-        models_1.Family.findOne({
-            where: {
-                name: 'Coolpix',
-            },
-        }).then((family) => {
-            cameras.forEach((camera) => {
-                camera.update({
-                    family: family,
-                });
-            });
-        });
-    });
-}
 if (false) {
     models_1.Family.create({
         brand: 'Nikon',
@@ -107,7 +85,7 @@ if (true) {
             },
             {
                 shortname: 'matrix',
-                title: 'Matrix code',
+                title: 'Matrix Raining Code',
                 category: 'animation',
                 summary: 'The raining code from the movie The Matrix (1999)',
                 image: 'images/matrix.jpg',
@@ -116,7 +94,7 @@ if (true) {
             },
             {
                 shortname: 'winamp',
-                title: 'Winamp vis',
+                title: 'Winamp Animation',
                 category: 'animation',
                 summary: 'A simple animation, reminiscent of the old winamp visualisations',
                 image: 'images/winamp.jpg',
