@@ -11,6 +11,7 @@ const charset =
   'ﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'.split(
     ''
   )
+
 const rabbit = (globalThis.rabbit = `                              __
  Neo                 /\    .-" /
  Follow the         /  ; .'  .' 
@@ -51,10 +52,6 @@ const quotes = [
   'Everyone falls the first time',
 ]
 
-function randomChar() {
-  return _.sample(charset)
-}
-
 type Board = d3.Selection<SVGSVGElement, any, HTMLElement, any>
 
 class Char {
@@ -79,23 +76,22 @@ class Char {
     this.burndown = 10
   }
 
-  drawChar(char: string) {
+  drawChar() {
     if (this.burndown) {
       this.self.text(this.hiddenChar)
       this.burndown--
     } else {
-      this.self.text(char)
+      this.self.text(_.sample(charset))
     }
+    this.self
+      .attrs({
+        'font-weight': 900,
+        fill: 'white',
+      })
+      .classed('fadeout', false)
     return this
   }
-  highlight() {
-    this.self.attrs({
-      'font-weight': 900,
-      fill: 'white',
-    })
-    this.self.classed('fadeout', false)
-    return this
-  }
+
   lowlight() {
     if (Math.random() < boldChance) {
       this.self.attrs({
@@ -114,6 +110,7 @@ class Char {
     this.self.classed('fadeout', true)
   }
 }
+
 class Column {
   board: Board
   lines: number
@@ -129,7 +126,7 @@ class Column {
     this.curLine = null
 
     this.chars = []
-    for (var i = 0; i < this.lines; i++) {
+    for (let i = 0; i < this.lines; i++) {
       this.chars.push(
         new Char({
           line: i,
@@ -143,8 +140,7 @@ class Column {
   step() {
     if (this.curLine !== null) {
       if (!this.eraseLine) {
-        const letter = randomChar()
-        this.chars[this.curLine].drawChar(letter).highlight()
+        this.chars[this.curLine].drawChar()
       } else {
         this.chars[this.curLine].fadeout()
       }
@@ -178,6 +174,7 @@ class Column {
     }
   }
 }
+
 class Matrix {
   columns: Array<Column>
   nLines: number
@@ -186,7 +183,7 @@ class Matrix {
     this.columns = []
     this.nLines = opts.lines
 
-    for (var i = 0; i < opts.cols; i++) {
+    for (let i = 0; i < opts.cols; i++) {
       this.columns.push(
         new Column({
           col: i,
@@ -198,8 +195,7 @@ class Matrix {
   }
 
   addRandomDrop() {
-    var col = Math.floor(Math.random() * this.columns.length)
-    this.columns[col].start()
+    _.sample(this.columns).start()
   }
 
   animate() {
@@ -209,9 +205,8 @@ class Matrix {
   }
 
   write(string: string, noTrim?: boolean) {
-    // console.log('Writing', string)
-    var lines = string.split('\n')
-    var line = Math.floor(Math.random() * this.nLines),
+    const lines = string.split('\n')
+    let line = Math.floor(Math.random() * this.nLines),
       col = Math.floor(Math.random() * this.columns.length)
     if (line + lines.length > this.nLines) {
       line = this.nLines - lines.length - 1
@@ -221,9 +216,7 @@ class Matrix {
       if (!noTrim) {
         string = string.trim()
       }
-      var array = string.split('')
-      // array.unshift(' ')
-      // array.push(' ')
+      const array = string.split('')
       if (col + array.length > this.columns.length) {
         col = this.columns.length - array.length - 1
       }
