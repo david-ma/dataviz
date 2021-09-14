@@ -1,7 +1,7 @@
 <section>
   <p>Someone <a href="https://redd.it/otdq7c">on reddit</a> asked how to remake this winamp type visualsation in d3js,
     so here's my attempt</p>
-  <video draggable="false" playsinline="" autoplay="" loop="" class="" style="width: 960px; height: 369px;">
+  <video draggable="false" playsinline="" autoplay="" loop="" class="" style="width: 600px; height: 400px;">
     <source type="video/mp4" src="https://i.imgur.com/KV3Egcm.mp4">
   </video>
   <p>d3js version:</p>
@@ -16,7 +16,19 @@
 
 <style>
   #viz {
-    width: 960px;
-    height: 600px;
+    width: 600px;
+    height: 400px;
+  }
+
+  #viz line {
+    stroke: #48fff4;
+    opacity: 0.5;
+  }
+  #viz {
+    background-image: radial-gradient(farthest-corner at 40px 40px,
+      #f35 0%, #43e 100%);
+  }
+  #viz rect {
+    display: none;
   }
 </style>
