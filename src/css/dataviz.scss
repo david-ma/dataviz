@@ -4,7 +4,8 @@
   #aboutMe.hidden {
     display: none;
   }
-  section.blogpost {
+  section.blogpost,
+  section:first-child {
     @media (max-width: 767px) {
       margin-top: 55px;
       min-height: calc(100vh - 105px);

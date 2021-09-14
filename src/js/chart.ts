@@ -1127,9 +1127,8 @@ class Chart {
     }
   }
 
-  scratchpad(callback: Function) {
-    const chart: Chart = this
-    callback(chart)
+  scratchpad(callback: (chart: Chart) => void) {
+    callback(this)
   }
 
   venn(options: any) {
