@@ -2,257 +2,243 @@
  * David Ma - March 2018
  */
 
-
-
 #big-chart {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: white;
+  z-index: 1000;
+  svg {
     height: 100%;
     width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: white;
-    z-index: 1000;
-    svg {
-        height: 100%;
-        width: 100%;
-    }
+  }
 }
 
 .chart {
-    font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
-    .chart-title {
-        text-anchor: middle;
-        font-size: 24px;
-    }
+  .chart-title {
+    text-anchor: middle;
+    font-size: 24px;
+  }
 
-    .line {
-        fill: none;
-        stroke: steelblue;
-        stroke-width: 2px;
-    }
+  .line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+  }
 
-    /* Axes */
-    path {
-        stroke: none;
-    }
-    .y.axis text {
-        font-size: 14px;
-    }
-    .y.axis line {
-        //display: none;
-    }
-    .x.axis text {
-        font-size: 12px;
-        fill: #333333;
-    }
-    .x.axis line {
-        stroke-width: 1;
-        stroke: #D3D3D3;
-        shape-rendering: crispEdges;
-    }
+  /* Axes */
+  path {
+    stroke: none;
+  }
+  .y.axis text {
+    font-size: 14px;
+  }
+  .y.axis line {
+    //display: none;
+  }
+  .x.axis text {
+    font-size: 12px;
+    fill: #333333;
+  }
+  .x.axis line {
+    stroke-width: 1;
+    stroke: #d3d3d3;
+    shape-rendering: crispEdges;
+  }
 
-    &:hover {
-        .chart-nav {
-            background: linear-gradient(to bottom,rgba(255,255,255,0),rgba(0,0,0,.3));
-            .expander {
-                display: block;
-            }
-        }
-    }
-
+  &:hover {
     .chart-nav {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        height: 50px;
-
-        .expander {
-            cursor: pointer;
-            height: 100%;
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            background: white;
-            padding: 5px;
-            border: solid 1px black;
-            border-radius: 5px;
-            height: 30px;
-            width: 30px;
-            text-align: center;
-            margin: 10px;
-            display: none;
-            &:hover {
-                border: solid 2px black;
-            }
-        }
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0),
+        rgba(0, 0, 0, 0.3)
+      );
+      .expander {
+        display: block;
+      }
     }
+  }
 
-    $venn-left: hsl(0, 100%, 60%);
-    $venn-mid: hsl(300, 40%, 40%);
-    $venn-right: hsl(220, 100%, 60%);
+  .chart-nav {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
 
-    //$venn-left: rgba(255,63,45,1);
-    //$venn-mid: rgba(181,36,162,1);
-    //$venn-right: rgba(59,121,255,1);
-
-
-
-
-
-    .vennDiagram {
-        .activeShape {
-            cursor: pointer;
-            text {
-                fill: black;
-            }
-        }
-        .left {
-            fill: lighten($venn-left, 30%);
-            &.selected {
-                fill: darken( $venn-left, 15% );
-            }
-            &:hover {
-                fill: lighten( $venn-left, 15% );
-            }
-        }
-        .mid {
-            fill: lighten($venn-mid, 30%);
-            &.selected {
-                fill: darken( $venn-mid, 15% );
-            }
-            &:hover {
-                fill: lighten( $venn-mid, 15% );
-            }
-        }
-        .right {
-            fill: lighten($venn-right, 30%);
-            &.selected {
-                fill: darken( $venn-right, 15% );
-            }
-            &:hover {
-                fill: lighten( $venn-right, 15% );
-            }
-        }
-
+    .expander {
+      cursor: pointer;
+      height: 100%;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      background: white;
+      padding: 5px;
+      border: solid 1px black;
+      border-radius: 5px;
+      height: 30px;
+      width: 30px;
+      text-align: center;
+      margin: 10px;
+      display: none;
+      &:hover {
+        border: solid 2px black;
+      }
     }
+  }
 
+  $venn-left: hsl(0, 100%, 60%);
+  $venn-mid: hsl(300, 40%, 40%);
+  $venn-right: hsl(220, 100%, 60%);
 
+  //$venn-left: rgba(255,63,45,1);
+  //$venn-mid: rgba(181,36,162,1);
+  //$venn-right: rgba(59,121,255,1);
 
+  .vennDiagram {
+    .activeShape {
+      cursor: pointer;
+      text {
+        fill: black;
+      }
+    }
+    .left {
+      fill: lighten($venn-left, 30%);
+      &.selected {
+        fill: darken($venn-left, 15%);
+      }
+      &:hover {
+        fill: lighten($venn-left, 15%);
+      }
+    }
+    .mid {
+      fill: lighten($venn-mid, 30%);
+      &.selected {
+        fill: darken($venn-mid, 15%);
+      }
+      &:hover {
+        fill: lighten($venn-mid, 15%);
+      }
+    }
+    .right {
+      fill: lighten($venn-right, 30%);
+      &.selected {
+        fill: darken($venn-right, 15%);
+      }
+      &:hover {
+        fill: lighten($venn-right, 15%);
+      }
+    }
+  }
 }
-
 
 .dataviz-page {
-    section {
-        padding-bottom: 40px;
-        border-bottom: 1px solid lightgrey;
-        margin-bottom: 20px;
+  section {
+    padding-bottom: 40px;
+    border-bottom: 1px solid lightgrey;
+    margin-bottom: 20px;
 
-        &.hidden {
-            display: none;
-        }
+    &.hidden {
+      display: none;
+    }
+  }
+
+  #dataset {
+    .largeTable {
+      overflow: scroll;
+      border: 1px solid grey;
+      border-radius: 3px;
+      margin-top: 10px;
+      padding: 10px;
+
+      .dataTables_wrapper {
+        width: 100vw;
+      }
+      .dataTables_info,
+      .dataTables_length,
+      .download_csv_link {
+        position: sticky;
+        left: 10px;
+      }
+      .dataTables_paginate {
+        position: sticky;
+        right: 0;
+      }
+      .dataTables_filter {
+        position: sticky;
+        right: 10px;
+      }
+
+      &.hidden {
+        display: none;
+      }
     }
 
-    #dataset {
-        .largeTable {
-            overflow: scroll;
-            border: 1px solid grey;
-            border-radius: 3px;
-            margin-top: 10px;
-            padding: 10px;
+    table tbody {
+      line-height: 1em;
+      font-size: 12px;
+      font-family: 'Source Code Pro', Monaco, Menlo, Consolas, 'Courier New',
+        monospace;
 
-            .dataTables_wrapper {
-                width: 100vw;
-            }
-            .dataTables_info, .dataTables_length, .download_csv_link {
-                position: sticky;
-                left: 10px;
-            }
-            .dataTables_paginate {
-                position: sticky;
-                right: 0;
-            }
-            .dataTables_filter {
-                position: sticky;
-                right: 10px;
-            }
+      tr:nth-child(even) {
+        //background: #edd4fa;
+      }
+      tr:hover {
+        background: #ddd;
+      }
 
-            &.hidden {
-                display: none;
-            }
-        }
+      td {
+        padding: 2px 3px;
+        border: 1px solid #eee;
+        white-space: nowrap;
+      }
+    }
+  }
 
-        table tbody {
-            line-height: 1em;
-            font-size: 12px;
-            font-family: "Source Code Pro", Monaco, Menlo, Consolas, "Courier New", monospace;
+  img {
+    width: 100%;
+    border: 1px solid grey;
+  }
 
-            tr:nth-child(even) {
-                //background: #edd4fa;
-            }
-            tr:hover {
-                background: #ddd;
-            }
+  h1 {
+    font-size: 30px;
+  }
+  h2 {
+    font-size: 20px;
+  }
+  h1 + h2,
+  h2 + h2 {
+    margin-top: 0;
+  }
 
-            td {
-                padding: 2px 3px;
-                border: 1px solid #eee;
-                white-space: nowrap;
-            }
-        }
+  blockquote p {
+    margin: 1px;
+    font-size: 0.8em;
+  }
 
+  .world-map {
+    path.country {
+      fill: lightgrey;
+      stroke: darkgrey;
     }
 
-    img {
-        width: 100%;
-        border: 1px solid grey;
+    .graticule {
+      fill: none;
+      stroke: #777;
+      stroke-width: 0.5px;
+      stroke-opacity: 0.5;
     }
 
-    h1 {
-        font-size: 30px;
+    .boundary {
+      fill: none;
+      stroke: #000;
+      stroke-width: 3px;
     }
-    h2 {
-        font-size: 20px;
-    }
-    h1+h2, h2+h2 {
-        margin-top: 0;
-    }
-
-    blockquote p{
-        margin: 1px;
-        font-size: 0.8em;
-    }
-
-    .world-map {
-        path.country {
-            fill: lightgrey;
-            stroke: darkgrey;
-        }
-
-        .graticule {
-            fill: none;
-            stroke: #777;
-            stroke-width: .5px;
-            stroke-opacity: .5;
-        }
-
-        .boundary {
-            fill: none;
-            stroke: #000;
-            stroke-width: 3px;
-        }
-    }
-
-
+  }
 }
-
-
-
-
-
-
-
-
