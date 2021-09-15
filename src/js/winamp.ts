@@ -4,7 +4,7 @@ const speed = 3000
 
 new Chart({
   element: 'viz',
-  margin: 1,
+  margin: 0,
   height: 340,
   width: 600,
   nav: false,
@@ -19,7 +19,7 @@ new Chart({
         x1: i * 5,
         y1: 0,
         x2: i * 15,
-        y2: chart.innerHeight,
+        y2: chart.height,
       }
     })
 
