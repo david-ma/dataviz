@@ -2,8 +2,8 @@
   <h1>Winamp Dataviz</h1>
   <p>Someone <a href="https://redd.it/otdq7c">on reddit</a> asked how to remake this winamp type visualsation in d3js,
     so here's my attempt.</p>
-    <p>Video (mp4) version:</p>
-  <video draggable="false" playsinline="" autoplay="" loop="" class="" style="width: 600px; height: 340px;">
+  <p>Video (mp4) version:</p>
+  <video draggable="false" controls="" playsinline="" autoplay="" loop="" class="">
     <source type="video/mp4" src="https://i.imgur.com/KV3Egcm.mp4">
   </video>
   <p>Javascript version written with d3js:</p>
@@ -17,11 +17,14 @@
 {{> require}}
 
 <style>
+  #viz,
+  video {
+    max-width: 600px;
+    max-height: 340px;
+  }
+
   #viz {
-    width: 600px;
-    height: 340px;
-    background-image: radial-gradient(farthest-corner at 40px 40px,
-        #f35 0%, #43e 100%);
+    background-image: radial-gradient(farthest-corner at 40px 40px, #f35 0%, #43e 100%);
 
     rect {
       display: none;
