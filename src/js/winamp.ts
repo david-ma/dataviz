@@ -5,7 +5,7 @@ const speed = 3000
 new Chart({
   element: 'viz',
   margin: 1,
-  height: 400,
+  height: 340,
   width: 600,
   nav: false,
 }).scratchpad((chart) => {

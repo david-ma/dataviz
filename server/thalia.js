@@ -1,7 +1,7 @@
 if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
-define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], function (require, exports, fs, mustache, path) {
+define("requestHandlers", ["require", "exports", "fs", "mustache", "path", "sass"], function (require, exports, fs, mustache, path, sass) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Website = exports.handle = void 0;
@@ -296,13 +296,18 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path"], func
                 })
                     .then((result) => {
                     const scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g;
-                    const styleEx = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/g;
+                    const styleEx = /<style\b.*>([^<]*(?:(?!<\/style>)<[^<]*)*)<\/style>/g;
                     const scripts = [...result.matchAll(scriptEx)].map((d) => d[0]);
                     const styles = [...result.matchAll(styleEx)].map((d) => d[0]);
-                    resolve({
-                        content: result.replace(scriptEx, '').replace(styleEx, ''),
-                        scripts: scripts.join('\n'),
-                        styles: styles.join('\n'),
+                    sass.render({
+                        data: styles.join('\n'),
+                        outputStyle: 'compressed',
+                    }, function (err, sassResult) {
+                        resolve({
+                            content: result.replace(scriptEx, '').replace(styleEx, ''),
+                            scripts: scripts.join('\n'),
+                            styles: `<style>${sassResult.css.toString()}</style>`
+                        });
                     });
                 })
                     .catch(() => {
