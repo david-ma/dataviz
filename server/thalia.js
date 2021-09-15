@@ -63,8 +63,7 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path", "sass
                         config = require(path.resolve(__dirname, '..', 'config')).config;
                     }
                     else {
-                        config = require(path.resolve(__dirname, '..', 'config', 'config'))
-                            .config;
+                        config = require(path.resolve(__dirname, '..', 'config', 'config')).config;
                     }
                     console.log(`Loading time: ${Date.now() - start} ms - config.js`);
                 }
@@ -299,14 +298,22 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path", "sass
                     const styleEx = /<style\b.*>([^<]*(?:(?!<\/style>)<[^<]*)*)<\/style>/g;
                     const scripts = [...result.matchAll(scriptEx)].map((d) => d[0]);
                     const styles = [...result.matchAll(styleEx)].map((d) => d[0]);
+                    let styleData = styles.join('\n');
                     sass.render({
-                        data: styles.join('\n'),
+                        data: styleData,
                         outputStyle: 'compressed',
                     }, function (err, sassResult) {
+                        if (err) {
+                            console.error(`Error reading SCSS from file: ${folder}/content/${content}.mustache`);
+                            console.error(err);
+                        }
+                        else {
+                            styleData = sassResult.css.toString();
+                        }
                         resolve({
                             content: result.replace(scriptEx, '').replace(styleEx, ''),
                             scripts: scripts.join('\n'),
-                            styles: `<style>${sassResult.css.toString()}</style>`
+                            styles: `<style>${styleData}</style>`,
                         });
                     });
                 })

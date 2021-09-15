@@ -62,14 +62,22 @@ async function loadTemplates(template, content = '') {
                     const styleEx = /<style\b.*>([^<]*(?:(?!<\/style>)<[^<]*)*)<\/style>/g;
                     const scripts = [...result.matchAll(scriptEx)].map(d => d[0]);
                     const styles = [...result.matchAll(styleEx)].map(d => d[1]);
+                    let styleData = styles.join('\n');
                     sass_1.default.render({
-                        data: styles.join('\n'),
+                        data: styleData,
                         outputStyle: 'compressed',
                     }, function (err, sassResult) {
+                        if (err) {
+                            console.error(`Error reading SCSS from file: ${content}.mustache`);
+                            console.error(err);
+                        }
+                        else {
+                            styleData = sassResult.css.toString();
+                        }
                         resolve({
                             content: result.replace(scriptEx, '').replace(styleEx, ''),
                             scripts: scripts.join('\n'),
-                            styles: `<style>${sassResult.css.toString()}</style>`
+                            styles: `<style>${styleData}</style>`
                         });
                     });
                 }
