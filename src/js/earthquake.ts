@@ -5,11 +5,13 @@ console.log('hello world')
 
 new Chart({
   element: 'map',
+  width: 600,
+  height: 600,
   margin: 0,
   nav: false,
 }).scratchpad((chart) => {
-  var lat = -37,
-    long = 143,
+  var lat = -36,
+    long = 145,
     w = chart.width,
     h = chart.height
 
@@ -44,15 +46,66 @@ new Chart({
     ([json, twitter]: [any, any]) => {
       drawMap(json)
       svg.append('g').attr('id', 'pings')
+      // svg
+      //   .append('g')
+      //   .attr('id', 'tweets')
+      //   .attr('transform', 'translate(600, 0)')
+      //   .append('rect')
+      //   .attrs({
+      //     x: 0,
+      //     y: 0,
+      //     height: 600,
+      //     width: 200,
+      //     fill: 'lightgrey',
+      //     stroke: 'black',
+      //   })
 
       console.log(twitter)
-      twitter.tweets.forEach((tweet) => {
+      twitter.tweets.forEach((tweet, i) => {
+        // var tweet = twitter.tweets[tweetId]
         const [lat, long, range] = tweet.geocode.split(',')
 
+        console.log(tweet.geocodes)
+
         pingMap(lat, long)
+        drawTweet(tweet, twitter.users[tweet.userId], i)
       })
+      // var tweet = twitter.tweets[0]
+      // drawTweet(tweet, twitter.users[tweet.userId])
     }
   )
+
+  const timeFormat = d3.timeFormat("%-I:%M %p · %b %-d, %Y")
+
+  function drawTweet(data, user, i = 0) {
+    console.log(data)
+    console.log(user)
+    var tweets = d3.select('#tweets')
+    // var user = twitter.u
+
+    var tweet = tweets.append('div').classed("tweet", true)
+
+    tweet.append('img').attrs({
+      x: 0,
+      y: 0,
+      height: 50,
+      width: 50,
+      src: user.profile_image_url_https,
+    }).styles({
+      'border-radius': '50%',
+      border: 'solid 1px lightgrey',      
+    })
+
+    var name = tweet.append('p')
+    name.append('span').text(user.name)
+      .classed('name', true)
+    name.append('span').text('@'+user.screen_name)
+      .classed('username', true)
+
+    tweet.append('p').text(data.full_text)
+    tweet.append('a').text(timeFormat(new Date(data.created_at)))
+      .attr('href', `https://twitter.com/${user.screen_name}/status/${data.id_str}`)
+  }
 
   function pingMap(lat: number, long: number) {
     d3.select('#pings')
@@ -96,8 +149,7 @@ new Chart({
       .append('text')
       .attr('fill', 'darkslategray')
       .attr('transform', function (d: any) {
-        console.log(d)
-        return 'translate(' + path.centroid(d) + ')'
+        return `translate(${path.centroid(d)})`
       })
       .attr('text-anchor', 'middle')
       .attr('dy', '.35em')

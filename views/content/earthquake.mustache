@@ -1,13 +1,27 @@
 <section>
   <h1>Melbourne Earthquake!!!</h1>
   <div id="map"></div>
+  <div id="tweets"></div>
 </section>
 
 
 {{> require}}
 
 <style>
-#map {
-  border: 1px solid black;
-}
+  #map {
+    border: 1px solid black;
+    max-width: 600px;
+  }
+
+  #tweets {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    .tweet {
+      border: solid 1px black;
+
+      .name {
+        font-weight: 700;
+      }
+    }
+  }
 </style>

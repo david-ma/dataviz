@@ -161,8 +161,25 @@ let config :Thalia.WebsiteConfig = {
         })
       ]).then(([user, tweet]) => {
         res.end(JSON.stringify({
-          users: user,
+          users: user.reduce((acc, val) => {
+            acc[val.id_str] = val
+            return acc
+          }, {}),
           tweets: tweet
+          // tweets: tweet.reduce((acc, val) => {
+
+          //   var result = acc[val.id_str] || val
+
+          //   if(result.geocodes) {
+          //     result.geocodes.push(val.geocode)
+          //   } else {
+          //     result.geocodes = [val.geocode]
+          //   }
+
+          //   acc[val.id_str] = result
+
+          //   return acc
+          // }, {}),
         }))
       })
     },

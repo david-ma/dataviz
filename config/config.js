@@ -131,7 +131,10 @@ let config = {
                 })
             ]).then(([user, tweet]) => {
                 res.end(JSON.stringify({
-                    users: user,
+                    users: user.reduce((acc, val) => {
+                        acc[val.id_str] = val;
+                        return acc;
+                    }, {}),
                     tweets: tweet
                 }));
             });
