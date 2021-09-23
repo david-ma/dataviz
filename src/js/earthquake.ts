@@ -51,11 +51,10 @@ new Chart({
       twitter.tweets.forEach((tweet, i) => {
         // Object.keys(twitter.tweets).forEach((tweetId, i) => {
         //   var tweet = twitter.tweets[tweetId]
-        const [lat, long, range] = tweet.geocode.split(',')
+        const geocodes = twitter.geocodes[tweet.id_str]
+        const point = geocodesCenter(geocodes)
 
-        console.log('geocodes', twitter.geocodes[tweet.id_str])
-
-        pingMap(lat, long)
+        pingMap(point[0], point[1])
         drawTweet(tweet, twitter.users[tweet.userId], i)
       })
       // var tweet = twitter.tweets[0]
@@ -66,10 +65,7 @@ new Chart({
   const timeFormat = d3.timeFormat('%-I:%M %p · %b %-d, %Y')
 
   function drawTweet(data, user, i = 0) {
-    console.log(data)
-    console.log(user)
     var tweets = d3.select('#tweets')
-    // var user = twitter.u
 
     var tweet = tweets.append('div').classed('tweet', true)
 
@@ -156,3 +152,15 @@ new Chart({
       })
   }
 })
+
+function geocodesCenter(geocodes) {
+  let totalLat = 0,
+    totalLong = 0
+  geocodes.forEach((geocode) => {
+    const [lat, long] = geocode.split(',')
+    totalLat += parseInt(lat)
+    totalLong += parseInt(long)
+  })
+
+  return [totalLat / geocodes.length, totalLong / geocodes.length]
+}

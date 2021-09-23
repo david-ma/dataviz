@@ -125,7 +125,6 @@ let config = {
             Promise.all([
                 database_1.User.findAll(),
                 database_1.Tweet.findAll({
-                    limit: 100,
                     order: [
                         ['created_at', 'ASC']
                     ],

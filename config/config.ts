@@ -155,7 +155,7 @@ let config :Thalia.WebsiteConfig = {
       Promise.all([
         User.findAll(),
         Tweet.findAll({
-          limit: 100,
+          // limit: 100,
           order: [
             ['created_at', 'ASC']
           ],
