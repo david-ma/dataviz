@@ -155,12 +155,20 @@ new Chart({
 
 function geocodesCenter(geocodes) {
   let totalLat = 0,
-    totalLong = 0
+    totalLong = 0,
+    weight = geocodes.length
   geocodes.forEach((geocode) => {
-    const [lat, long] = geocode.split(',')
+    let [lat, long, range] = geocode.split(',')
+    range = parseInt(range.slice(0, -2))
+
     totalLat += parseInt(lat)
     totalLong += parseInt(long)
+    if (range < 30) {
+      totalLat += parseInt(lat)
+      totalLong += parseInt(long)
+      weight++
+    }
   })
 
-  return [totalLat / geocodes.length, totalLong / geocodes.length]
+  return [totalLat / weight, totalLong / weight]
 }
