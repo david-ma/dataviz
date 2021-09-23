@@ -41,7 +41,7 @@ new Chart({
   // Create SVG
   const svg = chart.svg
 
-  Promise.all([d3.json('/aust.json'), d3.json('/earthquakeTweets')]).then(
+  Promise.all([d3.json('/aust.json'), d3.json('/earthquakeTweets.json')]).then(
     ([json, twitter]: [any, any]) => {
       drawMap(json)
       svg.append('g').attr('id', 'pings')
@@ -106,6 +106,9 @@ new Chart({
         'href',
         `https://twitter.com/${user.screen_name}/status/${data.id_str}`
       )
+    setTimeout( () => {
+      tweet.remove()
+    }, 1000)
   }
 
   function pingMap(lat: number, long: number) {
@@ -118,12 +121,17 @@ new Chart({
       .attrs({
         cx: 0,
         cy: 0,
-        r: 5,
-        fill: '#FF000022',
+        r: 0,
+        fill: '#FF0000',
+        'fill-opacity': 1,
       })
       .attr('transform', (d: any) => {
         return `translate(${projection([long, lat])})`
       })
+      .transition()
+      .duration(2000)
+      .attr('r', 20)
+      .attr('fill-opacity', 0.01)
   }
 
   function drawMap(json) {

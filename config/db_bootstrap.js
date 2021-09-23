@@ -8,17 +8,50 @@ const seq = {
     Camera: models_1.Camera,
     Family: models_1.Family,
 };
+// Family.get()
+// if (false) {
+//   // eslint-disable-line
+//   Camera.findAll({
+//     where: {
+//       model: {
+//         [Op.like]: '%Coolpix%',
+//       },
+//     },
+//   }).then(function (cameras) {
+//     Family.findOne({
+//       where: {
+//         name: 'Coolpix',
+//       },
+//     }).then((family) => {
+//       cameras.forEach((camera) => {
+//         // camera.setFamily(family);
+//         // camera.addFamily(family);
+//         // console.log(camera);
+//         // camera.update({
+//         //   family: family,
+//         // })
+//       })
+//     })
+//   })
+// }
 if (false) {
+    // eslint-disable-line
     models_1.Family.create({
         brand: 'Nikon',
         name: 'Coolpix',
         description: 'None',
     });
 }
+// rebuild entire database & reload data..?
 if (true) {
+    // eslint-disable-line
     seq.sequelize
-        .sync({})
+        .sync({
+    // force: true
+    })
         .then(function (d) {
+        // eslint-disable-line
+        // Add blog posts
         const blogposts = [
             {
                 shortname: 'war',
@@ -101,8 +134,18 @@ if (true) {
                 publish_date: '2021-09-15',
                 published: true,
             },
+            {
+                shortname: 'earthquake',
+                title: 'Melbourne Earthquake',
+                category: 'animation',
+                summary: 'A visualisation of the twitter activity when Melbourne had an earthquake',
+                image: 'images/earthquake.jpg',
+                publish_date: '2021-09-23',
+                published: true,
+            },
         ];
         blogposts.forEach(function (blogpost) {
+            // console.log(`Adding ${blogpost.shortname}`)
             models_1.Blogpost.findOne({
                 where: {
                     shortname: blogpost.shortname,

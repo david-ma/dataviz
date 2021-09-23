@@ -145,6 +145,15 @@ if (true) {
           publish_date: '2021-09-15',
           published: true,
         },
+        {
+          shortname: 'earthquake',
+          title: 'Melbourne Earthquake',
+          category: 'animation',
+          summary: 'A visualisation of the twitter activity when Melbourne had an earthquake',
+          image: 'images/earthquake.jpg',
+          publish_date: '2021-09-23',
+          published: true,
+        },
       ]
 
       blogposts.forEach(function (blogpost) {
