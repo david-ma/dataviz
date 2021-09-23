@@ -42,26 +42,30 @@ new Chart({
 
   // Load in GeoJSON data
   d3.json('/aust.json').then((json: any) => {
-
     // Bind data and create one path per GeoJSON feature
     svg
+      .append('g')
+      .attr('id', 'shapes')
       .selectAll('path')
       .data(json.features)
       .enter()
       .append('path')
       .attr('d', path)
-      .attr('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
+      .style('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
       .attr('fill', function (d, i) {
         return color(i.toString())
       })
 
     svg
+      .append('g')
+      .attr('id', 'state_labels')
       .selectAll('text')
       .data(json.features)
       .enter()
       .append('text')
       .attr('fill', 'darkslategray')
       .attr('transform', function (d: any) {
+        console.log(d)
         return 'translate(' + path.centroid(d) + ')'
       })
       .attr('text-anchor', 'middle')
