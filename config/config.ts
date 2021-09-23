@@ -13,6 +13,8 @@ const fsPromise = fs.promises
 // const formidable = require('formidable')
 import Formidable from 'formidable'
 
+import { User, Tweet, sequelize } from "../../../../chickenrice/database";
+
 // These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.
 let xray, request, tabletojson
 let scrapingToolsLoaded = false
@@ -149,6 +151,17 @@ const base = 'https://www.digicamdb.com/'
 
 let config :Thalia.WebsiteConfig = {
   services: {
+    earthquakeTweets: function(res, req, db) {
+      Promise.all([
+        User.findAll(),
+        Tweet.findAll()
+      ]).then(([user, tweet]) => {
+        res.end(JSON.stringify({
+          users: user,
+          tweets: tweet
+        }))
+      })
+    },
     fridge_images: function(res, req, db) {
       const filter = [".DS_Store", "index.html"]
 

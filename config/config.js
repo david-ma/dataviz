@@ -14,6 +14,7 @@ const mustache_1 = __importDefault(require("mustache"));
 const lodash_1 = __importDefault(require("lodash"));
 const fsPromise = fs_1.default.promises;
 const formidable_1 = __importDefault(require("formidable"));
+const database_1 = require("../../../../chickenrice/database");
 let xray, request, tabletojson;
 let scrapingToolsLoaded = false;
 if (scrapingToolsLoaded) {
@@ -120,6 +121,17 @@ async function loadTemplates(template, content = '') {
 const base = 'https://www.digicamdb.com/';
 let config = {
     services: {
+        earthquakeTweets: function (res, req, db) {
+            Promise.all([
+                database_1.User.findAll(),
+                database_1.Tweet.findAll()
+            ]).then(([user, tweet]) => {
+                res.end(JSON.stringify({
+                    users: user,
+                    tweets: tweet
+                }));
+            });
+        },
         fridge_images: function (res, req, db) {
             const filter = [".DS_Store", "index.html"];
             fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'public', 'fridge', 'images'))
