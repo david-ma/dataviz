@@ -155,31 +155,34 @@ let config :Thalia.WebsiteConfig = {
       Promise.all([
         User.findAll(),
         Tweet.findAll({
+          limit: 100,
           order: [
             ['created_at', 'ASC']
-          ]
+          ],
+          group: 'id_str'
+        }),
+        Tweet.findAll({
+          attributes: ['id_str', 'geocode']
         })
-      ]).then(([user, tweet]) => {
+      ]).then(([user, tweet, geocodes]) => {
         res.end(JSON.stringify({
           users: user.reduce((acc, val) => {
             acc[val.id_str] = val
             return acc
           }, {}),
-          tweets: tweet
           // tweets: tweet.reduce((acc, val) => {
-
-          //   var result = acc[val.id_str] || val
-
-          //   if(result.geocodes) {
-          //     result.geocodes.push(val.geocode)
-          //   } else {
-          //     result.geocodes = [val.geocode]
-          //   }
-
-          //   acc[val.id_str] = result
-
+          //   acc[val.id_str] = val
           //   return acc
           // }, {}),
+          tweets: tweet,
+          geocodes: geocodes.reduce((acc, val) => {
+            if(acc[val.id_str]) {
+              acc[val.id_str].push(val.geocode)
+            } else {
+              acc[val.id_str] = [val.geocode]
+            }
+            return acc
+          }, {}),
         }))
       })
     },

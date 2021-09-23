@@ -46,26 +46,14 @@ new Chart({
     ([json, twitter]: [any, any]) => {
       drawMap(json)
       svg.append('g').attr('id', 'pings')
-      // svg
-      //   .append('g')
-      //   .attr('id', 'tweets')
-      //   .attr('transform', 'translate(600, 0)')
-      //   .append('rect')
-      //   .attrs({
-      //     x: 0,
-      //     y: 0,
-      //     height: 600,
-      //     width: 200,
-      //     fill: 'lightgrey',
-      //     stroke: 'black',
-      //   })
 
       console.log(twitter)
       twitter.tweets.forEach((tweet, i) => {
-        // var tweet = twitter.tweets[tweetId]
+        // Object.keys(twitter.tweets).forEach((tweetId, i) => {
+        //   var tweet = twitter.tweets[tweetId]
         const [lat, long, range] = tweet.geocode.split(',')
 
-        console.log(tweet.geocodes)
+        console.log('geocodes', twitter.geocodes[tweet.id_str])
 
         pingMap(lat, long)
         drawTweet(tweet, twitter.users[tweet.userId], i)
@@ -75,7 +63,7 @@ new Chart({
     }
   )
 
-  const timeFormat = d3.timeFormat("%-I:%M %p · %b %-d, %Y")
+  const timeFormat = d3.timeFormat('%-I:%M %p · %b %-d, %Y')
 
   function drawTweet(data, user, i = 0) {
     console.log(data)
@@ -83,28 +71,37 @@ new Chart({
     var tweets = d3.select('#tweets')
     // var user = twitter.u
 
-    var tweet = tweets.append('div').classed("tweet", true)
+    var tweet = tweets.append('div').classed('tweet', true)
 
-    tweet.append('img').attrs({
-      x: 0,
-      y: 0,
-      height: 50,
-      width: 50,
-      src: user.profile_image_url_https,
-    }).styles({
-      'border-radius': '50%',
-      border: 'solid 1px lightgrey',      
-    })
+    tweet
+      .append('img')
+      .attrs({
+        x: 0,
+        y: 0,
+        height: 50,
+        width: 50,
+        src: user.profile_image_url_https,
+      })
+      .styles({
+        'border-radius': '50%',
+        border: 'solid 1px lightgrey',
+      })
 
     var name = tweet.append('p')
-    name.append('span').text(user.name)
-      .classed('name', true)
-    name.append('span').text('@'+user.screen_name)
+    name.append('span').text(user.name).classed('name', true)
+    name
+      .append('span')
+      .text('@' + user.screen_name)
       .classed('username', true)
 
     tweet.append('p').text(data.full_text)
-    tweet.append('a').text(timeFormat(new Date(data.created_at)))
-      .attr('href', `https://twitter.com/${user.screen_name}/status/${data.id_str}`)
+    tweet
+      .append('a')
+      .text(timeFormat(new Date(data.created_at)))
+      .attr(
+        'href',
+        `https://twitter.com/${user.screen_name}/status/${data.id_str}`
+      )
   }
 
   function pingMap(lat: number, long: number) {

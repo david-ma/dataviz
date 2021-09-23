@@ -125,17 +125,31 @@ let config = {
             Promise.all([
                 database_1.User.findAll(),
                 database_1.Tweet.findAll({
+                    limit: 100,
                     order: [
                         ['created_at', 'ASC']
-                    ]
+                    ],
+                    group: 'id_str'
+                }),
+                database_1.Tweet.findAll({
+                    attributes: ['id_str', 'geocode']
                 })
-            ]).then(([user, tweet]) => {
+            ]).then(([user, tweet, geocodes]) => {
                 res.end(JSON.stringify({
                     users: user.reduce((acc, val) => {
                         acc[val.id_str] = val;
                         return acc;
                     }, {}),
-                    tweets: tweet
+                    tweets: tweet,
+                    geocodes: geocodes.reduce((acc, val) => {
+                        if (acc[val.id_str]) {
+                            acc[val.id_str].push(val.geocode);
+                        }
+                        else {
+                            acc[val.id_str] = [val.geocode];
+                        }
+                        return acc;
+                    }, {}),
                 }));
             });
         },
