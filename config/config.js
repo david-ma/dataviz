@@ -124,7 +124,11 @@ let config = {
         earthquakeTweets: function (res, req, db) {
             Promise.all([
                 database_1.User.findAll(),
-                database_1.Tweet.findAll()
+                database_1.Tweet.findAll({
+                    order: [
+                        ['created_at', 'ASC']
+                    ]
+                })
             ]).then(([user, tweet]) => {
                 res.end(JSON.stringify({
                     users: user,

@@ -154,7 +154,11 @@ let config :Thalia.WebsiteConfig = {
     earthquakeTweets: function(res, req, db) {
       Promise.all([
         User.findAll(),
-        Tweet.findAll()
+        Tweet.findAll({
+          order: [
+            ['created_at', 'ASC']
+          ]
+        })
       ]).then(([user, tweet]) => {
         res.end(JSON.stringify({
           users: user,

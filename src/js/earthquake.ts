@@ -40,8 +40,39 @@ new Chart({
   // Create SVG
   const svg = chart.svg
 
-  // Load in GeoJSON data
-  d3.json('/aust.json').then((json: any) => {
+  Promise.all([d3.json('/aust.json'), d3.json('/earthquakeTweets')]).then(
+    ([json, twitter]: [any, any]) => {
+      drawMap(json)
+      svg.append('g').attr('id', 'pings')
+
+      console.log(twitter)
+      twitter.tweets.forEach((tweet) => {
+        const [lat, long, range] = tweet.geocode.split(',')
+
+        pingMap(lat, long)
+      })
+    }
+  )
+
+  function pingMap(lat: number, long: number) {
+    d3.select('#pings')
+      .append('circle')
+      .datum({
+        lat: lat,
+        long: long,
+      })
+      .attrs({
+        cx: 0,
+        cy: 0,
+        r: 5,
+        fill: '#FF000022',
+      })
+      .attr('transform', (d: any) => {
+        return `translate(${projection([long, lat])})`
+      })
+  }
+
+  function drawMap(json) {
     // Bind data and create one path per GeoJSON feature
     svg
       .append('g')
@@ -74,5 +105,5 @@ new Chart({
       .text(function (d: any) {
         return d.properties.STATE_NAME
       })
-  })
+  }
 })
