@@ -1,7 +1,6 @@
 import { Chart, _, d3 } from 'chart'
 
-console.log('hello world')
-// drawMap(-33, 151, 'lol')
+const earthquakeDay = new Date('2021-09-21T23:13:40.000Z')
 
 new Chart({
   element: 'map',
@@ -47,18 +46,24 @@ new Chart({
       drawMap(json)
       svg.append('g').attr('id', 'pings')
 
-      console.log(twitter)
+      let timestamp = earthquakeDay.getTime()
+
       twitter.tweets.forEach((tweet, i) => {
-        // Object.keys(twitter.tweets).forEach((tweetId, i) => {
-        //   var tweet = twitter.tweets[tweetId]
+        if (new Date(tweet.created_at) < earthquakeDay) {
+          return
+        }
+
         const geocodes = twitter.geocodes[tweet.id_str]
         const point = geocodesCenter(geocodes)
 
-        pingMap(point[0], point[1])
-        drawTweet(tweet, twitter.users[tweet.userId], i)
+        const waitTime =
+          (new Date(tweet.created_at).getTime() - timestamp) / 100
+        setTimeout(() => {
+          console.log('drawing tweet', i)
+          pingMap(point[0], point[1])
+          drawTweet(tweet, twitter.users[tweet.userId], i)
+        }, waitTime)
       })
-      // var tweet = twitter.tweets[0]
-      // drawTweet(tweet, twitter.users[tweet.userId])
     }
   )
 
@@ -84,7 +89,10 @@ new Chart({
       })
 
     var name = tweet.append('p')
-    name.append('span').text(user.name).classed('name', true)
+    name
+      .append('span')
+      .text(user.name + ' ')
+      .classed('name', true)
     name
       .append('span')
       .text('@' + user.screen_name)
