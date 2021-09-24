@@ -1,14 +1,29 @@
 <style>
-#desktopSearch .blogSearch {
-    width: 100%;
-}
+    #desktopSearch .blogSearch {
+        width: 100%;
+    }
+
+    #blogpostList {
+        list-style: '> ';
+        padding-left: 4px;
+    }
+
+    div.sidebar bold {
+        line-height: 2em;
+        font-weight: 900;
+    }
+
+    #aboutMe {
+        background: lavender;
+        padding: 2px;
+    }
 </style>
 
 <div id="mobile_nav" class="visible-xs">
     <div id="title">
         <h1><a href="/">David's Dataviz</a></h1>
     </div>
-    {{! 
+    {{!
     <div id="search">
         <input class="blogSearch" placeholder="Search">
         <i class="fas fa-search fa-2x"></i>
@@ -16,7 +31,7 @@
     <div id="hamburger">
         <i class="fas fa-bars fa-2x"></i>
     </div>
-     }}
+    }}
 </div>
 <div class="col-md-2 col-sm-3 hidden-xs sidebar">
     <ul>
@@ -25,20 +40,21 @@
             <div id="aboutMe" class='hidden'></div>
         </li>
         {{! <li id="desktopSearch"><input class="blogSearch" placeholder="Search"></li> }}
-        <ul>
+        <bold>Blogposts:</bold>
+        <ul id="blogpostList">
             {{#blogposts}}
-                <li><a href="/blog/{{shortname}}">{{title}}</a></li>
+            <li><a href="/blog/{{shortname}}">{{title}}</a></li>
             {{/blogposts}}
         </ul>
     </ul>
 </div>
 
 <script>
-  var md = new showdown.Converter({openLinksInNewWindow: true});
-  $("#aboutMe").html(md.makeHtml(`
-Hi! I'm David Ma, a bioinformatician from the Peter MacCallum Cancer Centre in Melbourne, Australia. This is my sandbox for experimenting & practicing with d3js. You can see all the source code on [github](https://github.com/david-ma/dataviz). It runs on my framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
+    var md = new showdown.Converter({ openLinksInNewWindow: true });
+    $("#aboutMe").html(md.makeHtml(`
+Hi! I'm David Ma, a bioinformatician from the Murdoch Children's Research Institute in Melbourne, Australia. This is my sandbox for experimenting with d3js. You can see all the source code on [github](https://github.com/david-ma/dataviz). It runs on a framework [Thalia](https://github.com/david-ma/Thalia), which I wrote to practice my nodejs skills.
 
-These data visualisations are mostly part of the [#MakeoverMonday](https://www.makeovermonday.co.uk/) series. And I am aiming to do one each week!
+These data visualisations are mostly part of the [#MakeoverMonday](https://www.makeovermonday.co.uk/) series.
 
 I'm [@Frostickle](https://twitter.com/frostickle) on Twitter!`));
 

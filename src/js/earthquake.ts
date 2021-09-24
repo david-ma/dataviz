@@ -174,7 +174,7 @@ function geocodesCenter(geocodes: string[]) {
     totalLong = 0,
     weight: number = geocodes.length
   geocodes.forEach((geocode) => {
-    let [lat, long, range]: number[] = geocode.split(',').map(parseFloat)
+    const [lat, long, range]: number[] = geocode.split(',').map(parseFloat)
 
     totalLat += lat
     totalLong += long
