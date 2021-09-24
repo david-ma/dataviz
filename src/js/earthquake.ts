@@ -59,7 +59,7 @@ new Chart({
         const waitTime =
           (new Date(tweet.created_at).getTime() - timestamp) / 100
         setTimeout(() => {
-          console.log('drawing tweet', i)
+          // console.log('drawing tweet', i)
           pingMap(point[0], point[1])
           drawTweet(tweet, twitter.users[tweet.userId], i)
         }, waitTime)
@@ -106,6 +106,19 @@ new Chart({
         'href',
         `https://twitter.com/${user.screen_name}/status/${data.id_str}`
       )
+
+    const bottom = tweet.append('div').append('p')
+
+    bottom.append('span').append('i').attrs({
+      class: 'fa fa-retweet',
+    })
+    bottom.append('span').text(data.retweet_count)
+
+    bottom.append('span').append('i').attrs({
+      class: 'fa fa-heart',
+    })
+    bottom.append('span').text(data.favorite_count)
+
     setTimeout(() => {
       tweet.remove()
     }, 1000)
