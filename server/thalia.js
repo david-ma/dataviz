@@ -713,10 +713,11 @@ define("socket", ["require", "exports"], function (require, exports) {
     }
     exports.socketInit = socketInit;
 });
-define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "socket.io", "formidable"], function (require, exports, socket_1, http, url, httpProxy, socketIO, formidable) {
+define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "socket.io", "formidable"], function (require, exports, socket_1, http, url, httpProxy, socket_io_1, formidable) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.start = void 0;
+    const socketIO = new socket_io_1.Server({});
     let blacklist = [];
     try {
         blacklist = require('../blacklist').blacklist;
