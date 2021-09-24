@@ -1,4 +1,4 @@
-import { Model, Op, Sequelize } from 'sequelize'
+import { Model, Sequelize } from 'sequelize'
 import { dbConfig, Blogpost, Scrape, Camera, Family } from '../models'
 
 export interface seqObject {

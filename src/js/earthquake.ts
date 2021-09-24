@@ -1,4 +1,4 @@
-import { Chart, _, d3 } from 'chart'
+import { Chart, d3 } from 'chart'
 
 const earthquakeDay = new Date('2021-09-21T23:13:40.000Z')
 
@@ -106,7 +106,7 @@ new Chart({
         'href',
         `https://twitter.com/${user.screen_name}/status/${data.id_str}`
       )
-    setTimeout( () => {
+    setTimeout(() => {
       tweet.remove()
     }, 1000)
   }
@@ -169,19 +169,23 @@ new Chart({
   }
 })
 
-function geocodesCenter(geocodes) {
+function geocodesCenter(geocodes: string[]) {
   let totalLat = 0,
     totalLong = 0,
-    weight = geocodes.length
+    weight: number = geocodes.length
   geocodes.forEach((geocode) => {
-    let [lat, long, range] = geocode.split(',')
-    range = parseInt(range.slice(0, -2))
+    let [lat, long, range]: number[] = geocode.split(',').map(parseFloat)
 
-    totalLat += parseInt(lat)
-    totalLong += parseInt(long)
+    totalLat += lat
+    totalLong += long
     if (range < 30) {
-      totalLat += parseInt(lat)
-      totalLong += parseInt(long)
+      totalLat += lat
+      totalLong += long
+      weight++
+    }
+    if (range < 15) {
+      totalLat += lat
+      totalLong += long
       weight++
     }
   })

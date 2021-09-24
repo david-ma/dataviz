@@ -13,7 +13,7 @@ const fsPromise = fs.promises
 // const formidable = require('formidable')
 import Formidable from 'formidable'
 
-import { User, Tweet, sequelize } from "../../../../chickenrice/database";
+// import { User, Tweet, sequelize } from "../../../../chickenrice/database";
 
 // These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.
 let xray, request, tabletojson
@@ -151,41 +151,41 @@ const base = 'https://www.digicamdb.com/'
 
 let config :Thalia.WebsiteConfig = {
   services: {
-    earthquakeTweets: function(res, req, db) {
-      Promise.all([
-        User.findAll(),
-        Tweet.findAll({
-          // limit: 100,
-          order: [
-            ['created_at', 'ASC']
-          ],
-          group: 'id_str'
-        }),
-        Tweet.findAll({
-          attributes: ['id_str', 'geocode']
-        })
-      ]).then(([user, tweet, geocodes]) => {
-        res.end(JSON.stringify({
-          users: user.reduce((acc, val) => {
-            acc[val.id_str] = val
-            return acc
-          }, {}),
-          // tweets: tweet.reduce((acc, val) => {
-          //   acc[val.id_str] = val
-          //   return acc
-          // }, {}),
-          tweets: tweet,
-          geocodes: geocodes.reduce((acc, val) => {
-            if(acc[val.id_str]) {
-              acc[val.id_str].push(val.geocode)
-            } else {
-              acc[val.id_str] = [val.geocode]
-            }
-            return acc
-          }, {}),
-        }))
-      })
-    },
+    // earthquakeTweets: function(res, req, db) {
+    //   Promise.all([
+    //     User.findAll(),
+    //     Tweet.findAll({
+    //       // limit: 100,
+    //       order: [
+    //         ['created_at', 'ASC']
+    //       ],
+    //       group: 'id_str'
+    //     }),
+    //     Tweet.findAll({
+    //       attributes: ['id_str', 'geocode']
+    //     })
+    //   ]).then(([user, tweet, geocodes]) => {
+    //     res.end(JSON.stringify({
+    //       users: user.reduce((acc, val) => {
+    //         acc[val.id_str] = val
+    //         return acc
+    //       }, {}),
+    //       // tweets: tweet.reduce((acc, val) => {
+    //       //   acc[val.id_str] = val
+    //       //   return acc
+    //       // }, {}),
+    //       tweets: tweet,
+    //       geocodes: geocodes.reduce((acc, val) => {
+    //         if(acc[val.id_str]) {
+    //           acc[val.id_str].push(val.geocode)
+    //         } else {
+    //           acc[val.id_str] = [val.geocode]
+    //         }
+    //         return acc
+    //       }, {}),
+    //     }))
+    //   })
+    // },
     fridge_images: function(res, req, db) {
       const filter = [".DS_Store", "index.html"]
 
