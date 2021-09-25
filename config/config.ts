@@ -154,7 +154,7 @@ let config :Thalia.WebsiteConfig = {
           where: {
             published: true
           },
-          order: [['published', 'DESC']]
+          order: [['publish_date', 'DESC']]
         }).then((results) => {
           data.blogposts = results.map(d => d.dataValues)
           data.blogpost = data.blogposts.filter(d => d.shortname === router.path[0])
