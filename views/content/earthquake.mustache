@@ -5,6 +5,15 @@
   <p>Basically, this is an animation of all the tweets from the Melbourne Earthquake. It's something like 100x faster
     than normal speed. I should probably have it closer to real-time at the start of the Earthquake.</p>
   <p>Lots of improvements to be made, but I'm tired now.</p>
+
+  <p>Graphing tweets basically only shows a population map, and doesn't show how strong the earthquake was in any given
+    area. The earlier tweets might show the speed at which the earthquake spread, assuming that people are roughly just
+    as fast with their phones no matter where they live.</p>
+
+  <a href="https://xkcd.com/1138/">
+    <img id="xkcd" src="https://imgs.xkcd.com/comics/heatmap_2x.png">
+  </a>
+
   <div id="map"></div>
   <div id="tweets"></div>
 </section>
@@ -13,6 +22,10 @@
 {{> require }}
 
 <style>
+  img#xkcd {
+    max-width: 300px;
+  }
+
   #map {
     border: 1px solid black;
     max-width: 600px;
