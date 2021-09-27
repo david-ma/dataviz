@@ -1,8 +1,16 @@
-#Dataviz Sandbox
+# Dataviz Sandbox
 
 Hello World!
 
 This is [David Ma](https://twitter.com/frostickle)'s Data Visualisation Sandbox. A place for experimenting with html, javascript and css ...and typescript, mustache templates, nodejs, open auth, git hooks, apis, twitter cards, facebook open graph and everything else you "need to know" to develop for the modern web.
+
+---
+## Quickstart
+
+```
+npm install
+npm run start
+```
 
 ---
 
