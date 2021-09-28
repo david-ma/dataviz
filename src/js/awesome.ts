@@ -1,5 +1,7 @@
 
 var md = new showdown.Converter({ openLinksInNewWindow: true })
+
+// @ts-ignore
 const socket = io('/dataviz')
 
 /**
