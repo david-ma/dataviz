@@ -1,0 +1,100 @@
+<script src="https://lonekorean.github.io/highlight-within-textarea/jquery.highlight-within-textarea.js"></script>
+<link rel="stylesheet" href="https://lonekorean.github.io/highlight-within-textarea/jquery.highlight-within-textarea.css">
+
+
+
+<div class="ui huge block attached header VariantSearchFormPanels__ToggleHeader-ijwSRj gDEBu active title"><i
+    aria-hidden="true" class="dropdown icon"></i>
+  <div class="ui grid">
+    <div class="row">
+      <div class="middle aligned eleven wide column">Location</div>
+      <div
+        class="right aligned right floated five wide column VariantSearchFormPanels__ToggleHeaderFieldColumn-hsSNpv jBDvEq">
+        <div>
+          <div class="inline field"><label>Gene List</label>
+            <div role="listbox" aria-expanded="false" class="ui selection dropdown" tabindex="0">
+              <div class="text" role="alert" aria-live="polite" aria-atomic="true">DSD_candidate</div><i
+                aria-hidden="true" class="dropdown icon"></i>
+              <div class="menu transition">
+                <div role="option" aria-checked="false" aria-selected="false" class="item" style="pointer-events: all;">
+                  <span class="text">None</span></div>
+                <div role="option" aria-checked="false" aria-selected="false" class="item" style="pointer-events: all;">
+                </div>
+                <div role="option" aria-checked="false" aria-selected="false" class="item" style="pointer-events: all;">
+                  <span class="text">POI Candidate genes</span></div>
+                <div role="option" aria-checked="false" aria-selected="false" class="item" style="pointer-events: all;">
+                  <span class="text">POI_diagnostic</span></div>
+                <div role="option" aria-checked="true" aria-selected="true" class="active selected item"
+                  style="pointer-events: all;"><span class="text">DSD_candidate</span></div>
+                <div role="option" aria-checked="false" aria-selected="false" class="item" style="pointer-events: all;">
+                  <span class="text">DSD_clinical gene list</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="ui attached padded center aligned segment content active">
+  <div><i>Filter by variant location. Entries can be either gene symbols (e.g. CFTR) or intervals in the form
+      &lt;chrom&gt;:&lt;start&gt;-&lt;end&gt; (e.g. 4:6935002-87141054) or separated by tab. Variant entries can be
+      either rsIDs (e.g. rs61753695) or variants in the form &lt;chrom&gt;-&lt;pos&gt;-&lt;ref&gt;-&lt;alt&gt; (e.g.
+      4-88047328-C-T). Entries can be separated by commas or whitespace. <div style="height: 20px;"></div></i>
+    <div class="equal width fields">
+      <div class="two wide field"></div>
+      <div class="seven wide field"><label> Genes/ Intervals <i aria-hidden="true"
+            class="question circle outline icon"></i></label><textarea aria-invalid="true" meta="[object Object]"
+          name="search.locus.rawItems"
+          rows="8">AC005747.1, ARID4A, ARID4B, ATP6AP2, BMP7, CBX2, CBX5, CHUK, CITED1, CITED2, CTU2, CXXC5, CYB5A, DMRT1, DMRT2, DMRT3, EFNB2, EMX2, ENTPD5, ESR2, FBLN1, FBLN2, FGF9, FGFR2, FLNB, FOXF2, FOXL2, GADD45G, GPR37, HHAT, HMGCS2, IGF1, IGF1R, INHA, INHBA, INHBB, INSR, INSRR, LGR4, LHX9, MMP2, NEDD4, NEDD9, NOBOX, NR0B2, NR2F2, PBX1, PDGFRA, PINX1, PTGDR2, PTGDS, RUNX1, RXFP2, SART3, SIX1, SIX4, SMAD4, SNX19, SOX10, SOX3, SOX8, TBX2, TBX3, TCF21, TLE3, TRPC3, TYRO3, VAMP7, VCAM1, WNT5A, WWOX</textarea>
+      </div>
+      <div class="four wide field"><label> Variants <i aria-hidden="true"
+            class="question circle outline icon"></i></label><textarea aria-invalid="true" meta="[object Object]"
+          name="search.locus.rawVariantItems" rows="8"></textarea></div>
+      <div class="three wide field">
+        <div meta="[object Object]" class="ui checkbox"><input aria-invalid="true" class="hidden"
+            name="search.locus.excludeLocations" readonly="" tabindex="0" type="checkbox" value=""><label> Exclude
+            locations <i aria-hidden="true" class="question circle outline icon"></i></label></div>
+      </div>
+      <div role="list" class="ui list">
+        <div role="listitem" class="item">
+          <div class="header">
+            <div class="three wide field">
+              <div meta="[object Object]" class="ui checked checkbox"><input aria-invalid="true" class="hidden"
+                  name="search.locus.panelApp" readonly="" tabindex="0" type="checkbox" value=""><label>Panel
+                  App</label></div>
+            </div>
+          </div>
+          <div class="list">
+            <div role="listitem" class="item">
+              <div class="three wide field">
+                <div meta="[object Object]" class="ui checked checkbox"><input aria-invalid="true" class="hidden"
+                    name="search.locus.panelApp" readonly="" tabindex="0" type="checkbox" value=""><label>Green</label>
+                </div>
+              </div>
+            </div>
+            <div role="listitem" class="item">
+              <div class="three wide field">
+                <div meta="[object Object]" class="ui checked checkbox"><input aria-invalid="true" class="hidden"
+                    name="search.locus.panelApp" readonly="" tabindex="0" type="checkbox" value=""><label>Amber</label>
+                </div>
+              </div>
+            </div>
+            <div role="listitem" class="item">
+              <div class="three wide field">
+                <div meta="[object Object]" class="ui checked checkbox"><input aria-invalid="true" class="hidden"
+                    name="search.locus.panelApp" readonly="" tabindex="0" type="checkbox" value=""><label>Red</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="two wide field"></div>
+    </div>
+  </div>
+</div>
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,400,900">
