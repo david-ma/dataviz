@@ -3,9 +3,20 @@
   href="https://lonekorean.github.io/highlight-within-textarea/jquery.highlight-within-textarea.css">
 
 <link rel="stylesheet" href="https://seqr.broadinstitute.org/static/app.3823e78f.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+  integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
 
 <style>
+  .sidebar {
+    display: none;
+  }
+
+  textarea {
+    width: 300px;
+  }
+
   .dropdown.icon {
     display: inline-block;
     float: none;
@@ -93,22 +104,13 @@
         &lt;chrom&gt;:&lt;start&gt;-&lt;end&gt; (e.g. 4:6935002-87141054) or separated by tab. Variant entries can be
         either rsIDs (e.g. rs61753695) or variants in the form &lt;chrom&gt;-&lt;pos&gt;-&lt;ref&gt;-&lt;alt&gt; (e.g.
         4-88047328-C-T). Entries can be separated by commas or whitespace. <div style="height: 20px;"></div></i>
-      <div class="equal width fields">
-        <div class="two wide field"></div>
-        <div class="seven wide field"><label> Genes/ Intervals <i aria-hidden="true"
-              class="question circle outline icon"></i></label><textarea aria-invalid="true" meta="[object Object]"
-            name="search.locus.rawItems"
-            rows="8">AC005747.1, ARID4A, ARID4B, ATP6AP2, BMP7, CBX2, CBX5, CHUK, CITED1, CITED2, CTU2, CXXC5, CYB5A, DMRT1, DMRT2, DMRT3, EFNB2, EMX2, ENTPD5, ESR2, FBLN1, FBLN2, FGF9, FGFR2, FLNB, FOXF2, FOXL2, GADD45G, GPR37, HHAT, HMGCS2, IGF1, IGF1R, INHA, INHBA, INHBB, INSR, INSRR, LGR4, LHX9, MMP2, NEDD4, NEDD9, NOBOX, NR0B2, NR2F2, PBX1, PDGFRA, PINX1, PTGDR2, PTGDS, RUNX1, RXFP2, SART3, SIX1, SIX4, SMAD4, SNX19, SOX10, SOX3, SOX8, TBX2, TBX3, TCF21, TLE3, TRPC3, TYRO3, VAMP7, VCAM1, WNT5A, WWOX</textarea>
-        </div>
-        <div class="four wide field"><label> Variants <i aria-hidden="true"
-              class="question circle outline icon"></i></label><textarea aria-invalid="true" meta="[object Object]"
-            name="search.locus.rawVariantItems" rows="8"></textarea></div>
-        <div class="three wide field">
-          <div meta="[object Object]" class="ui checkbox"><input aria-invalid="true" class="hidden"
-              name="search.locus.excludeLocations" readonly="" tabindex="0" type="checkbox" value=""><label> Exclude
-              locations <i aria-hidden="true" class="question circle outline icon"></i></label></div>
-        </div>
-        <div role="list" class="ui list">
+
+
+
+      <div class="equal width fields row">
+
+
+        <div role="list" class="col-xs-2 ui list">
           <div role="listitem" class="item">
             <div class="header">
               <div class="three wide field">
@@ -143,6 +145,20 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="col-xs-3 seven wide field">
+          <label> Genes/ Intervals <i aria-hidden="true" class="question circle outline icon"></i></label>
+          <textarea aria-invalid="true" meta="[object Object]" name="search.locus.rawItems"
+            rows="8">AC005747.1, ARID4A, ARID4B, ATP6AP2, BMP7, CBX2, CBX5, CHUK, CITED1, CITED2, CTU2, CXXC5, CYB5A, DMRT1, DMRT2, DMRT3, EFNB2, EMX2, ENTPD5, ESR2, FBLN1, FBLN2, FGF9, FGFR2, FLNB, FOXF2, FOXL2, GADD45G, GPR37, HHAT, HMGCS2, IGF1, IGF1R, INHA, INHBA, INHBB, INSR, INSRR, LGR4, LHX9, MMP2, NEDD4, NEDD9, NOBOX, NR0B2, NR2F2, PBX1, PDGFRA, PINX1, PTGDR2, PTGDS, RUNX1, RXFP2, SART3, SIX1, SIX4, SMAD4, SNX19, SOX10, SOX3, SOX8, TBX2, TBX3, TCF21, TLE3, TRPC3, TYRO3, VAMP7, VCAM1, WNT5A, WWOX</textarea>
+        </div>
+        <div class="col-xs-3 four wide field"><label> Variants <i aria-hidden="true"
+              class="question circle outline icon"></i></label><textarea aria-invalid="true" meta="[object Object]"
+            name="search.locus.rawVariantItems" rows="8"></textarea></div>
+        <div class="col-xs-3 three wide field">
+          <div meta="[object Object]" class="ui checkbox"><input aria-invalid="true" class="hidden"
+              name="search.locus.excludeLocations" readonly="" tabindex="0" type="checkbox" value=""><label> Exclude
+              locations <i aria-hidden="true" class="question circle outline icon"></i></label></div>
         </div>
         <div class="two wide field"></div>
       </div>
