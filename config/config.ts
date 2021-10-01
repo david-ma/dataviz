@@ -17,7 +17,7 @@ import Formidable from 'formidable'
 let config :Thalia.WebsiteConfig = {
   services: {
     fridge_images: function(res, req, db) {
-      const filter = [".DS_Store", "index.html"]
+      const filter = [".DS_Store", "index.html", "printed"]
 
       fsPromise.readdir(path.resolve(__dirname, '..', 'public', 'fridge', 'images'))
         .then(function(images){
