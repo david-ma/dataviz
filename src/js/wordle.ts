@@ -5,6 +5,7 @@ var bannedLetters = ''.split('')
 var knownLetters = []
 var imperfectLetters = ['', '', '', '', '']
 var perfectLetters = ['', '', '', '', '']
+var submittedWords: string[] = []
 
 document
   .getElementById('wordForm')
@@ -19,7 +20,7 @@ function submitWord() {
 
   // if (words.indexOf(wordValue) !== -1) {
   if (wordValue.match(/^\w{5}$/)) {
-    console.log('valid word')
+    console.log('valid word', wordValue)
     addWord(wordValue)
   } else {
     alert('Invalid Word')
@@ -31,6 +32,7 @@ function resetWords() {
   knownLetters = []
   imperfectLetters = ['', '', '', '', '']
   perfectLetters = ['', '', '', '', '']
+  submittedWords = []
 
   d3.select('#attempts table tbody').selectAll('tr').remove()
   d3.text('/words.txt').then(function (data) {
@@ -48,7 +50,6 @@ function resetWords() {
   })
 }
 
-var submittedWords: string[] = []
 function addWord(word: string) {
   console.log('Adding word', word)
   submittedWords.push(word)
@@ -142,6 +143,9 @@ function calculateBestWords() {
       )
       .enter()
       .append('li')
+      .append('a')
+      .attr('href', '#')
+      .on('click', addWord)
       .text((d) => d)
   })
 }
