@@ -17,7 +17,8 @@ function submitWord() {
   var wordValue = word.value.trim()
   word.value = ''
 
-  if (words.indexOf(wordValue) !== -1) {
+  // if (words.indexOf(wordValue) !== -1) {
+  if (wordValue.match(/^\w{5}$/)) {
     console.log('valid word')
     addWord(wordValue)
   } else {
@@ -25,11 +26,12 @@ function submitWord() {
   }
 }
 
-
 var submittedWords: string[] = []
 function addWord(word: string) {
   console.log('Adding word', word)
   submittedWords.push(word)
+
+  bannedLetters = bannedLetters.concat(word.split(''))
 
   d3.select('table tbody')
     .selectAll('tr')
@@ -39,41 +41,75 @@ function addWord(word: string) {
         .selectAll('td')
         .data(word.split(''))
         .text((letter) => letter)
+        .attr('data-status', 0)
+        .on('click', function (val, index, stuff) {
+          var that = d3.select(stuff[index])
+          var status: number = (parseInt(that.attr('data-status')) + 1) % 3
+          that.attr('data-status', status)
+          if (status === 0) {
+            imperfectLetters[index] = imperfectLetters[index].replace(val, '')
+            perfectLetters[index] = perfectLetters[index].replace(val, '')
+            bannedLetters.push(val)
+          } else if (status === 1) {
+            bannedLetters = bannedLetters.filter((letter) => letter !== val)
+            perfectLetters[index] = perfectLetters[index].replace(val, '')
+            imperfectLetters[index] += val
+          } else if (status == 2) {
+            imperfectLetters[index] = imperfectLetters[index].replace(val, '')
+            bannedLetters = bannedLetters.filter((letter) => letter !== val)
+            perfectLetters[index] = val
+          }
+
+          calculateBestWords()
+        })
     })
     .enter()
     .append('tr')
     .text((d) => d)
+
+  calculateBestWords()
 }
 
-d3.text('/words.txt').then(function (data) {
-  words = data.split('\n')
-  var index = indexWords(words)
+function calculateBestWords() {
+  d3.text('/words.txt').then(function (data) {
+    words = data.split('\n')
+    var index = indexWords(words)
 
-  bannedLetters = ''.split('')
-  knownLetters = imperfectLetters.join('').split('').filter(onlyUnique)
+    console.log('words', words)
 
-  words = words.filter(removeWordsWithBannedLetters)
+    // bannedLetters = ''.split('')
+    knownLetters = imperfectLetters.join('').split('').filter(onlyUnique)
 
-  words = words.filter(removeWordsWithoutKnownLetters)
+    words = words.filter(removeWordsWithBannedLetters)
 
-  words = words.filter(removeWordsWithImperfectLetters)
+    words = words.filter(removeWordsWithoutKnownLetters)
 
-  words = words.filter(onlyWordsWithPerfectLetters)
+    words = words.filter(removeWordsWithImperfectLetters)
 
-  console.log(index)
+    words = words.filter(onlyWordsWithPerfectLetters)
 
-  var scoredWords = scoreWords(words, index).sort(function (a, b) {
-    return b[1] - a[1]
+    console.log(index)
+    console.log(words)
+
+    var scoredWords = scoreWords(words, index)
+      .sort(function (a, b) {
+        return b[1] - a[1]
+      })
+      .filter(onlyUnique)
+
+    d3.select('#bestWords').selectAll('li').remove()
+
+    console.log('scoredWords', scoredWords)
+    d3.select('#bestWords')
+      .selectAll('li')
+      .data(scoredWords.slice(0, 10))
+      .enter()
+      .append('li')
+      .text((d) => d[0])
   })
+}
 
-  console.log(scoredWords)
-  d3.select('#bestWords')
-    .selectAll('li')
-    .data(scoredWords.slice(0, 10))
-    .enter()
-    .append('li')
-    .text((d) => d[0])
-})
+calculateBestWords()
 
 // Score words
 function scoreWords(words, index) {
@@ -110,6 +146,7 @@ function indexWords(words: string[]) {
 }
 
 // https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
+// TODO: lowercase/uppercase
 function onlyUnique(value, index, self) {
   return self.indexOf(value) === index
 }
