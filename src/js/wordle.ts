@@ -6,7 +6,44 @@ var knownLetters = []
 var imperfectLetters = ['', '', '', '', '']
 var perfectLetters = ['', '', '', '', '']
 
+document
+  .getElementById('wordForm')
+  .addEventListener('submit', function (event) {
+    event.preventDefault()
+  })
 
+function submitWord() {
+  var word = document.getElementById('word') as HTMLInputElement
+  var wordValue = word.value.trim()
+  word.value = ''
+
+  if (words.indexOf(wordValue) !== -1) {
+    console.log('valid word')
+    addWord(wordValue)
+  } else {
+    alert('Invalid Word')
+  }
+}
+
+
+var submittedWords: string[] = []
+function addWord(word: string) {
+  console.log('Adding word', word)
+  submittedWords.push(word)
+
+  d3.select('table tbody')
+    .selectAll('tr')
+    .data(submittedWords)
+    .each((word, index, stuff) => {
+      d3.select(stuff[index])
+        .selectAll('td')
+        .data(word.split(''))
+        .text((letter) => letter)
+    })
+    .enter()
+    .append('tr')
+    .text((d) => d)
+}
 
 d3.text('/words.txt').then(function (data) {
   words = data.split('\n')
