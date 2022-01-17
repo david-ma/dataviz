@@ -26,6 +26,28 @@ function submitWord() {
   }
 }
 
+function resetWords() {
+  bannedLetters = ''.split('')
+  knownLetters = []
+  imperfectLetters = ['', '', '', '', '']
+  perfectLetters = ['', '', '', '', '']
+
+  d3.select('#attempts table tbody').selectAll('tr').remove()
+  d3.text('/words.txt').then(function (data) {
+    words = data.split('\n')
+    d3.select('#attempts table tbody')
+      .selectAll('tr')
+      .data(['', '', '', '', '', ''])
+      .enter()
+      .append('tr')
+      .selectAll('td')
+      .data(['', '', '', '', ''])
+      .enter()
+      .append('td')
+    calculateBestWords()
+  })
+}
+
 var submittedWords: string[] = []
 function addWord(word: string) {
   console.log('Adding word', word)

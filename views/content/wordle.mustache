@@ -3,6 +3,7 @@
 <form onsubmit="submitWord()" id="wordForm">
   <input id="word" onsubmit="submitWord()">
   <input type="button" value="submit" onclick="submitWord()">
+  <input type="button" value="reset" onclick="resetWords()">
 </form>
 
 <div id="attempts">
@@ -121,6 +122,7 @@
   #reverse {
     display: none;
   }
+
   #attempts table,
   #other table {
     margin: 5px;
