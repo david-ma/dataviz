@@ -1,7 +1,5 @@
 <br>
 
-
-
 <form onsubmit="submitWord()" id="wordForm">
   <input id="word" onsubmit="submitWord()">
   <input type="button" value="submit" onclick="submitWord()">
@@ -56,14 +54,75 @@
   </table>
 </div>
 
+<div id="reverse">
 
+  <form onsubmit="solution()" id="otherForm">
+    <input id="otherLength" onsubmit="solution()">
+    <input id="otherWord" onsubmit="solution()">
+    <input type="button" value="submit" onclick="solution()">
+  </form>
+
+  <div id="other">
+    <table>
+      <tbody>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
 <ul id="bestWords">
 
 </ul>
 
 
 <style>
-  #attempts table {
+  #reverse {
+    display: none;
+  }
+  #attempts table,
+  #other table {
     margin: 5px;
 
     td {

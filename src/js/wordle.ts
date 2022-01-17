@@ -1,7 +1,7 @@
 console.log('hello wordle')
 
 var words = []
-var bannedLetters = []
+var bannedLetters = ''.split('')
 var knownLetters = []
 var imperfectLetters = ['', '', '', '', '']
 var perfectLetters = ['', '', '', '', '']
@@ -33,7 +33,7 @@ function addWord(word: string) {
 
   bannedLetters = bannedLetters.concat(word.split(''))
 
-  d3.select('table tbody')
+  d3.select('#attempts table tbody')
     .selectAll('tr')
     .data(submittedWords)
     .each((word, index, stuff) => {
@@ -116,7 +116,7 @@ function calculateBestWords() {
           .slice(0, 50)
           .map((array) => array[0])
           .filter(onlyUnique)
-          .slice(0, 10)
+          .slice(0, 20)
       )
       .enter()
       .append('li')
@@ -208,3 +208,35 @@ function onlyWordsWithPerfectLetters(word, index, self) {
   })
   return validWord
 }
+
+d3.select('#other tbody')
+  .selectAll('tr')
+  .each((word, index, stuff) => {
+    var tds = d3
+      .select(stuff[index])
+      .selectAll('td')
+      .each((letter, index, stuff) => {
+        var td = d3.select(stuff[index])
+        td.attr('data-status', 0).on('click', function (val, index, stuff) {
+          var that = d3.select(stuff[index])
+          var status: number = (parseInt(that.attr('data-status')) + 1) % 3
+          that.attr('data-status', status)
+        })
+      })
+  })
+
+function solution(length = 5, otherWord = '') {
+  length = parseInt(<string>$('#otherLength').val()) || 4
+  otherWord = <string>$('#otherWord').val() || 'solar'
+
+  d3.select(`#other tbody tr:nth-child(${length})`)
+    .selectAll('td')
+    .data(otherWord.split(''))
+    .each((letter, index, stuff) => {
+      var td = d3.select(stuff[index])
+      td.text(letter)
+      td.attr('data-status', 2)
+    })
+}
+
+function reverseSolve() {}
