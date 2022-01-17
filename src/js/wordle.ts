@@ -41,7 +41,18 @@ function addWord(word: string) {
         .selectAll('td')
         .data(word.split(''))
         .text((letter) => letter)
-        .attr('data-status', 0)
+        .attr('data-status', function (val, index, stuff) {
+          console.log('ok???', val)
+          if (perfectLetters[index] === val) {
+            bannedLetters = bannedLetters.filter((letter) => letter !== val)
+            return 2
+          } else if (imperfectLetters[index].indexOf(val) !== -1) {
+            bannedLetters = bannedLetters.filter((letter) => letter !== val)
+            return 1
+          } else {
+            return 0
+          }
+        })
         .on('click', function (val, index, stuff) {
           var that = d3.select(stuff[index])
           var status: number = (parseInt(that.attr('data-status')) + 1) % 3
@@ -63,9 +74,6 @@ function addWord(word: string) {
           calculateBestWords()
         })
     })
-    .enter()
-    .append('tr')
-    .text((d) => d)
 
   calculateBestWords()
 }
@@ -91,21 +99,28 @@ function calculateBestWords() {
     console.log(index)
     console.log(words)
 
-    var scoredWords = scoreWords(words, index)
-      .sort(function (a, b) {
-        return b[1] - a[1]
-      })
-      .filter(onlyUnique)
+    var scoredWords: [string, number] = scoreWords(words, index).sort(function (
+      a,
+      b
+    ) {
+      return b[1] - a[1]
+    })
 
     d3.select('#bestWords').selectAll('li').remove()
 
     console.log('scoredWords', scoredWords)
     d3.select('#bestWords')
       .selectAll('li')
-      .data(scoredWords.slice(0, 10))
+      .data(
+        scoredWords
+          .slice(0, 50)
+          .map((array) => array[0])
+          .filter(onlyUnique)
+          .slice(0, 10)
+      )
       .enter()
       .append('li')
-      .text((d) => d[0])
+      .text((d) => d)
   })
 }
 
