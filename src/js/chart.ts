@@ -1,14 +1,25 @@
 // jshint esversion: 6
 
-import * as d3 from 'd3'
-import { selection, select } from 'd3-selection'
-d3[<any>'select'] = select // eslint-disable-line
-d3[<any>'selection'] = selection // eslint-disable-line
+// Language: typescript
+// Path: src/js/chart.ts
 
-import $ from 'jquery'
+const d3 = require('d3')
+
+import { Selection, selection, select, selectAll } from 'd3-selection'
+import 'd3-selection-multi'
+
+d3['select'] = select // eslint-disable-line
+d3['selectAll'] = selectAll // eslint-disable-line
+d3['selection'] = selection // eslint-disable-line
+
+d3['layout'] = {
+  cloud: require('d3-cloud'),
+}
+
+import $ = require('jquery')
 import 'datatables.net'
 
-import _ from 'lodash'
+import _ = require('lodash')
 
 interface chartOptions {
   element?: string
@@ -52,7 +63,7 @@ class Chart {
   innerWidth: number
   fullscreen: boolean
 
-  svg: d3.Selection<SVGSVGElement, any, HTMLElement, any>
+  svg: Selection<SVGSVGElement, any, HTMLElement, any>
   plot: any
   xScale: d3.ScaleLinear<number, number>
   yBand: d3.ScaleBand<string>
@@ -1386,4 +1397,4 @@ console.debug(`D3 version: ${d3.version}`)
 console.debug(`jQuery version: ${$.fn.jquery}`)
 console.debug(`lodash version: ${_.VERSION}`)
 
-export { Chart, decorateTable, _, $, d3 }
+export { Chart, Selection, decorateTable, _, $, d3 }

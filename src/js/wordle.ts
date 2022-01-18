@@ -1,3 +1,5 @@
+import { d3 } from 'chart'
+
 console.log('hello wordle')
 
 var words = []
@@ -76,8 +78,8 @@ function addWord(word: string) {
             return 0
           }
         })
-        .on('click', function (val, index, stuff) {
-          var that = d3.select(stuff[index])
+        .on('click', function (event, val) {
+          var that = d3.select(this)
           var status: number = (parseInt(that.attr('data-status')) + 1) % 3
           that.attr('data-status', status)
           if (status === 0) {
@@ -145,7 +147,9 @@ function calculateBestWords() {
       .append('li')
       .append('a')
       .attr('href', '#')
-      .on('click', addWord)
+      .on('click', function(event, data) {
+        addWord(data)
+      })
       .text((d) => d)
   })
 }
@@ -243,8 +247,8 @@ d3.select('#other tbody')
       .selectAll('td')
       .each((letter, index, stuff) => {
         var td = d3.select(stuff[index])
-        td.attr('data-status', 0).on('click', function (val, index, stuff) {
-          var that = d3.select(stuff[index])
+        td.attr('data-status', 0).on('click', function (event, data) {
+          var that = d3.select(this)
           var status: number = (parseInt(that.attr('data-status')) + 1) % 3
           that.attr('data-status', status)
         })

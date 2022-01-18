@@ -1,4 +1,4 @@
-import { Chart, _, d3 } from 'chart'
+import { Chart, Selection, _, d3 } from 'chart'
 
 const green = '#00c200',
   brightgreen = '#5ff967',
@@ -52,7 +52,7 @@ const quotes = [
   'Everyone falls the first time',
 ]
 
-type Board = d3.Selection<SVGGElement, any, HTMLElement, any>
+type Board = Selection<SVGGElement, any, HTMLElement, any>
 
 class Char {
   board: Board

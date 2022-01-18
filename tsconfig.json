@@ -7,7 +7,7 @@
     // "typeRoots": ["../../node_modules/@types/d3-selection-multi/index.d.ts"],
     "target": "ES2015",
     "module": "AMD",
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "paths": {
       "chart": ["js/chart.ts"]
     },

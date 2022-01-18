@@ -1,3 +1,6 @@
+/// <reference path="../../node_modules/@types/d3/index.d.ts" />
+/// <reference path="../../node_modules/@types/d3-selection/index.d.ts" />
+/// <reference path="../../node_modules/@types/d3-selection-multi/index.d.ts" />
 
 var md = new showdown.Converter({ openLinksInNewWindow: true })
 

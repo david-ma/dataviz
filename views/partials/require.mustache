@@ -1,17 +1,22 @@
 <script>
-var require = {
-  baseUrl: '/js/vendor',
-  urlArgs: 'v={{gitHash}}',
-  enforceDefine: false,
-  deps: ['chart', 'datatables.net', {{{ typescript }}}],
+  var require = {
+    baseUrl: '/js/vendor',
+    urlArgs: 'v={{gitHash}}',
+    enforceDefine: false,
+    deps: ['chart', 'datatables.net', {{{ typescript }}}],
   paths: {
     'chart': "/js/chart",
-    'datatables.net': "/js/datatables.min"
+      'datatables.net': "/js/datatables.min"
+  },
+  map: {
+    '*': {
+      'd3': '/js/vendor/d3.v7.3.0.min.js'
+    }
   },
   shim: {
     chart: {
       exports: "Chart",
-      deps: ['d3', 'd3-selection-multi', 'd3-scale', "datatables.net"]
+        deps: ['d3', 'd3-selection-multi', 'd3-cloud', 'd3-scale', "datatables.net"]
     },
     "datatables.net": {
       deps: ["jquery"]

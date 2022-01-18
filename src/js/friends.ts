@@ -1,8 +1,4 @@
-import { Chart } from 'chart'
-import * as d3 from 'd3'
-// import * as d3 from 'd3-selection-multi'
-import $ from 'jquery'
-import 'datatables.net'
+import { Chart, d3, $ } from 'chart'
 
 const margin = ({ top: 40, right: 40, bottom: 40, left: 40 })
 const height = 600

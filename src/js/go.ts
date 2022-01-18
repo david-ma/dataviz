@@ -1,8 +1,4 @@
-
-import { Chart, decorateTable } from 'chart'
-import * as d3 from 'd3'
-import $ from 'jquery'
-import 'datatables.net'
+import { Chart, d3, $ } from 'chart'
 
 console.log('Running go.ts')
 
@@ -65,7 +61,7 @@ $.when($.ready).then(function () {
       .classed("row", true)
       .each( (d,i, arr) => {
         d3.select(arr[i])
-          .selectAll<SVGRectElement, Square>(".square")
+          .selectAll(".square")
           .data(d)
           .enter()
           .append("rect")

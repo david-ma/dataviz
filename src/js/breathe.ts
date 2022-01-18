@@ -177,7 +177,8 @@ let currentTransition: d3.Selection<
 
 function callReverse(i: number) {
   d3.select('.chart-title').text('Breathe Out')
-  currentTransition = d3.select<SVGPolylineElement, DataPoint>(`#polyline-${i}`)
+  // currentTransition = d3.select<SVGPolylineElement, DataPoint>(`#polyline-${i}`)
+  currentTransition = d3.select(`#polyline-${i}`)
   currentTransition
     .transition()
     .ease(d3.easeLinear)
@@ -196,7 +197,8 @@ function callReverse(i: number) {
 
 function callDraw(i: number) {
   d3.select('.chart-title').text('Breathe In')
-  currentTransition = d3.select<SVGPolylineElement, DataPoint>(`#polyline-${i}`)
+  // currentTransition = d3.select<SVGPolylineElement, DataPoint>(`#polyline-${i}`)
+  currentTransition = d3.select(`#polyline-${i}`)
   currentTransition
     .style('display', 'inherit')
     .transition()
@@ -301,11 +303,8 @@ $('input[name="colors"]').on('change', () => {
     colors = monochrome
   }
 
-  d3.selectAll<SVGPolylineElement, DataPoint>('polyline').each(function (
-    d,
-    i,
-    k
-  ) {
+  // d3.selectAll<SVGPolylineElement, DataPoint>('polyline').each(function (
+  d3.selectAll('polyline').each(function (d, i, k) {
     d3.select(k[i]).attr('fill', colors[d.index % colors.length])
   })
 
@@ -376,7 +375,8 @@ function updatePolylines(d, i, arr) {
 }
 
 function updatePolygons(d, i, arr) {
-  d3.select<SVGPolygonElement, DataPoint>(arr[i]).attrs((d, i) => {
+  // d3.select<SVGPolygonElement, DataPoint>(arr[i]).attrs((d, i) => {
+  d3.select(arr[i]).attrs((d, i) => {
     return {
       id: `polygon-${i}`,
       class: 'polygon',
