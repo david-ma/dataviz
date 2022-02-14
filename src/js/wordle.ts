@@ -17,7 +17,7 @@ document
 
 function submitWord() {
   var word = document.getElementById('word') as HTMLInputElement
-  var wordValue = word.value.trim()
+  var wordValue = word.value.trim().toLowerCase()
   word.value = ''
 
   // if (words.indexOf(wordValue) !== -1) {
@@ -37,8 +37,8 @@ function resetWords() {
   submittedWords = []
 
   d3.select('#attempts table tbody').selectAll('tr').remove()
-  d3.text('/words.txt').then(function (data) {
-    words = data.split('\n')
+  d3.text('/words2.txt').then(function (data) {
+    words = data.split('\n').map((word) => word.toLowerCase())
     d3.select('#attempts table tbody')
       .selectAll('tr')
       .data(['', '', '', '', '', ''])
@@ -66,6 +66,7 @@ function addWord(word: string) {
         .selectAll('td')
         .data(word.split(''))
         .text((letter) => letter)
+        .attr('data-position', (letter, index) => index)
         .attr('data-status', function (val, index, stuff) {
           console.log('ok???', val)
           if (perfectLetters[index] === val) {
@@ -80,6 +81,7 @@ function addWord(word: string) {
         })
         .on('click', function (event, val) {
           var that = d3.select(this)
+          var index = that.attr('data-position')
           var status: number = (parseInt(that.attr('data-status')) + 1) % 3
           that.attr('data-status', status)
           if (status === 0) {
@@ -105,7 +107,7 @@ function addWord(word: string) {
 
 function calculateBestWords() {
   d3.text('/words.txt').then(function (data) {
-    words = data.split('\n')
+    words = data.split('\n').map((word) => word.toLowerCase())
     var index = indexWords(words)
 
     console.log('words', words)
@@ -141,13 +143,13 @@ function calculateBestWords() {
           .slice(0, 50)
           .map((array) => array[0])
           .filter(onlyUnique)
-          .slice(0, 20)
+        // .slice(0, 10)
       )
       .enter()
       .append('li')
       .append('a')
       .attr('href', '#')
-      .on('click', function(event, data) {
+      .on('click', function (event, data) {
         addWord(data)
       })
       .text((d) => d)
@@ -270,3 +272,6 @@ function solution(length = 5, otherWord = '') {
 }
 
 function reverseSolve() {}
+
+globalThis.submitWord = submitWord
+globalThis.resetWords = resetWords

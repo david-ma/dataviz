@@ -1,69 +1,13 @@
-<br>
-
-<form onsubmit="submitWord()" id="wordForm">
-  <input id="word" onsubmit="submitWord()">
-  <input type="button" value="submit" onclick="submitWord()">
-  <input type="button" value="reset" onclick="resetWords()">
-</form>
-
-<div id="attempts">
-  <table>
-    <tbody>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div id="reverse">
-
-  <form onsubmit="solution()" id="otherForm">
-    <input id="otherLength" onsubmit="solution()">
-    <input id="otherWord" onsubmit="solution()">
-    <input type="button" value="submit" onclick="solution()">
+<section>
+  <h1>Wordle solver</h1>
+  <p>This is a tool for helping you beat <a href="https://www.powerlanguage.co.uk/wordle/">Wordle</a>.</p>
+  <form onsubmit="submitWord()" id="wordForm">
+    <input id="word" onsubmit="submitWord()">
+    <input type="button" value="submit" onclick="submitWord()">
+    <input type="button" value="reset" onclick="resetWords()">
   </form>
 
-  <div id="other">
+  <div id="attempts">
     <table>
       <tbody>
         <tr>
@@ -112,39 +56,97 @@
     </table>
   </div>
 
-</div>
-<ul id="bestWords">
+  <div id="reverse">
 
-</ul>
+    <form onsubmit="solution()" id="otherForm">
+      <input id="otherLength" onsubmit="solution()">
+      <input id="otherWord" onsubmit="solution()">
+      <input type="button" value="submit" onclick="solution()">
+    </form>
+
+    <div id="other">
+      <table>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  <ul id="bestWords">
+
+  </ul>
 
 
-<style>
-  #reverse {
-    display: none;
-  }
+  <style>
+    #reverse {
+      display: none;
+    }
 
-  #attempts table,
-  #other table {
-    margin: 5px;
+    #attempts table,
+    #other table {
+      margin: 5px;
 
-    td {
-      height: 30px;
-      width: 30px;
-      border-collapse: collapse;
-      border: 1px solid black;
-      padding: 2px;
-      text-align: center;
-      text-transform: uppercase;
+      td {
+        height: 30px;
+        width: 30px;
+        border-collapse: collapse;
+        border: 1px solid black;
+        padding: 2px;
+        text-align: center;
+        text-transform: uppercase;
 
-      &[data-status="1"] {
-        background-color: yellow;
-      }
+        &[data-status="1"] {
+          background-color: yellow;
+        }
 
-      &[data-status="2"] {
-        background-color: green;
+        &[data-status="2"] {
+          background-color: green;
+        }
       }
     }
-  }
-</style>
+  </style>
 
-{{> require}}
+  {{> require}}
+</section>
