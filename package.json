@@ -8,6 +8,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "newBlogpost": "bash scripts/newBlogpost.sh",
     "start": "node server/thalia.js"
   },
   "dependencies": {

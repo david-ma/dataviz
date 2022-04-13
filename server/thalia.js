@@ -823,7 +823,10 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
         server = http.createServer(onRequest).listen(port);
         const io = socketIO.listen(server, {});
         socket_1.socketInit(io, handle);
-        return server.on('upgrade', function (request, socket, head) {
+        server.on('error', function (e) {
+            console.log("Server error", e);
+        });
+        server.on('upgrade', function (request, socket, head) {
             'use strict';
             let host = request.headers['x-host'] || request.headers.host;
             host = host.split(':')[0];
@@ -837,17 +840,29 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
                 else {
                     proxyConfig = proxies['*'];
                 }
-                httpProxy
+                const proxyServer = httpProxy
                     .createProxyServer({
                     ws: true,
                     target: {
                         host: proxyConfig.host || '127.0.0.1',
                         port: proxyConfig.port || 80,
                     },
-                })
-                    .ws(request, socket, head);
+                });
+                proxyServer.on('error', function (err, req, res) {
+                    'use strict';
+                    console.log(err);
+                    try {
+                        res.writeHead(500);
+                        res.end(proxyConfig.message);
+                    }
+                    catch (e) {
+                        console.log('Error doing upgraded proxy!', e);
+                    }
+                });
+                proxyServer.ws(request, socket, head);
             }
         });
+        return server;
     }
     exports.start = start;
     function getDateTime() {
