@@ -153,8 +153,6 @@ function drawPieChart() {
     // const dataReady = pie((<any>d3).entries(data).reverse())
 
     const dataReady = pie(Object.entries(data).reverse())
-    console.log('data', data)
-    console.log('dataReady', dataReady)
 
     // The arc generator
     const arc = d3
@@ -174,14 +172,14 @@ function drawPieChart() {
       .data(dataReady)
       .enter()
       .append('path')
-      .style('display', (d) => (d.index % 2 == 0 ? 'none' : ''))
+      // .style('display', (d) => (d.index % 2 == 1 ? 'none' : ''))
       .attr('d', arc)
       // .attr('fill', 'red')
       .attr('fill', 'black')
       .attr('stroke', 'white')
       .style('stroke-width', '2px')
       .style('opacity', (d) => {
-        data[d.data[0]].name.indexOf('peace') === 0
+        return data[d.data[0]].name.indexOf('peace') === 0
           ? 0.1
           : (d.value / longestWar) * 0.5 + 0.3
       })
@@ -228,7 +226,7 @@ function drawPieChart() {
         return midangle < Math.PI ? 'start' : 'end'
       })
 
-    const myPie = pie.value((d: any) => d.value)
+    const myPie = pie.value((d: any) => d[1])
     const innerData = myPie(Object.entries(totals as object).reverse())
 
     // The arc generator
@@ -271,11 +269,10 @@ function drawPieChart() {
       .append('text')
       .attr('x', 75)
       .attr('y', (d, i) => 35 + 30 * i)
-      .text(
-        (d: any) =>
-          `${d.value} years of ${
-            d.index % 2 === 1 ? 'peace' : 'war'
-          }: ${d3.format('.0%')(d.value / totalYears)}`
-      )
+      .text((d: any) => {
+        return `${d.value} years of ${
+          d.index % 2 === 1 ? 'peace' : 'war'
+        }: ${d3.format('.0%')(d.value / totalYears)}`
+      })
   })
 }
