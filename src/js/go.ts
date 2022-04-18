@@ -54,7 +54,9 @@ $.when($.ready).then(function () {
 
     console.log("square data", gameboard.squares)
 
-    box.selectAll<SVGGElement, Square[]>(".row")
+    // currentTransition = d3.select(`#polyline-${i}`)
+    // box.selectAll<SVGGElement, Square[]>(".row")
+    box.selectAll(".row")
       .data(gameboard.squares)
       .enter()
       .append("g")

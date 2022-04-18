@@ -1,5 +1,7 @@
 import { Chart, decorateTable, d3 } from 'chart'
 
+// alert("This dataviz is currently broken sorry")
+
 const currentYear = new Date().getFullYear()
 
 globalThis.celebrity = celebrity
@@ -143,10 +145,16 @@ function drawPieChart() {
     const pie = d3
       .pie()
       .sort(null) // Do not sort group by size
-      .value(function (d: any) {
-        return d.value.length
+      .value(function ([, d]) {
+        // console.log("A", a)
+        // console.log(d)
+        return d.length
       })
-    const dataReady = pie((<any>d3).entries(data).reverse())
+    // const dataReady = pie((<any>d3).entries(data).reverse())
+
+    const dataReady = pie(Object.entries(data).reverse())
+    console.log('data', data)
+    console.log('dataReady', dataReady)
 
     // The arc generator
     const arc = d3
@@ -166,17 +174,17 @@ function drawPieChart() {
       .data(dataReady)
       .enter()
       .append('path')
-      //                .style("display", (d) => d.index % 2 == 0 ? "none" : '')
+      .style('display', (d) => (d.index % 2 == 0 ? 'none' : ''))
       .attr('d', arc)
-      .attr('fill', 'red')
+      // .attr('fill', 'red')
       .attr('fill', 'black')
       .attr('stroke', 'white')
       .style('stroke-width', '2px')
-      .style('opacity', (d) =>
-        data[d.data.key].name.indexOf('peace') === 0
+      .style('opacity', (d) => {
+        data[d.data[0]].name.indexOf('peace') === 0
           ? 0.1
           : (d.value / longestWar) * 0.5 + 0.3
-      )
+      })
 
     // Add the polylines between chart and labels:
     svg
@@ -185,7 +193,7 @@ function drawPieChart() {
       .enter()
       .append('polyline')
       .style('display', (d) =>
-        data[d.data.key].name.indexOf('peace') === 0 ? 'none' : ''
+        data[d.data[0]].name.indexOf('peace') === 0 ? 'none' : ''
       )
       .attr('stroke', 'black')
       .style('fill', 'none')
@@ -206,9 +214,9 @@ function drawPieChart() {
       .enter()
       .append('text')
       .style('display', (d) =>
-        data[d.data.key].name.indexOf('peace') === 0 ? 'none' : ''
+        data[d.data[0]].name.indexOf('peace') === 0 ? 'none' : ''
       )
-      .text((d) => data[d.data.key].name)
+      .text((d) => data[d.data[0]].name)
       .attr('transform', function (d) {
         const pos = outerArc.centroid(d)
         const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
@@ -221,7 +229,7 @@ function drawPieChart() {
       })
 
     const myPie = pie.value((d: any) => d.value)
-    const innerData = myPie((<any>d3).entries(totals as object).reverse())
+    const innerData = myPie(Object.entries(totals as object).reverse())
 
     // The arc generator
     //            var arc = d3.arc()

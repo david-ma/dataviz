@@ -63,7 +63,8 @@ class Chart {
   innerWidth: number
   fullscreen: boolean
 
-  svg: Selection<SVGSVGElement, any, HTMLElement, any>
+  // svg: Selection<SVGSVGElement, any, HTMLElement, any>
+  svg: any
   plot: any
   xScale: d3.ScaleLinear<number, number>
   yBand: d3.ScaleBand<string>
@@ -1397,4 +1398,4 @@ console.debug(`D3 version: ${d3.version}`)
 console.debug(`jQuery version: ${$.fn.jquery}`)
 console.debug(`lodash version: ${_.VERSION}`)
 
-export { Chart, Selection, decorateTable, _, $, d3 }
+export { Chart, decorateTable, _, $, d3 }

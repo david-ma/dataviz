@@ -1,7 +1,12 @@
 import { Chart, decorateTable, $, d3 } from 'chart'
-import 'datatables.net'
+
+// import 'datatables.net'
 
 console.log('Running breathe.ts')
+
+/// <reference path="../../node_modules/@types/d3/index.d.ts" />
+/// <reference path="../../node_modules/@types/d3-selection/index.d.ts" />
+/// <reference path="../../node_modules/@types/d3-selection-multi/index.d.ts" />
 
 type Vertex = [number, number]
 
