@@ -77,7 +77,7 @@ function drawPieChart() {
   let totalYears = 0
 
   // Get a list of peacetime & wars for the person's life.
-  AmericanWars.forEach(function (war, i) {
+  AmericanWars.forEach(function (war, i, wars) {
     if (!war.end) war.end = currentYear
 
     // If you were born during peacetime.. and your birth is after the war starts.
@@ -126,6 +126,18 @@ function drawPieChart() {
       }
       if (thisWar.length > 0) {
         data[2 * i + 1] = thisWar
+      }
+
+      if (i === wars.length - 1 && death > thisWar.end) {
+        // Add the last peace time block
+        data[2 * i + 2] = {
+          name: `peace-${i + 1}`,
+          start: peaceStart,
+          end: death,
+          length: death - peaceStart,
+        }
+        totals.peace += death - peaceStart
+        totalYears += death - peaceStart
       }
     }
   })
