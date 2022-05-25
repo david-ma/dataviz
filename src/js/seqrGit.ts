@@ -1,8 +1,29 @@
-var allIssues = {}
-
 const sd = new showdown.Converter({
   openLinksInNewWindow: true,
 })
+
+type Issue = {
+  number: number
+  title: string
+  body: string
+  html_url: string
+  created_at: string
+  updated_at: string
+  closed_at: string
+  state: string
+}
+
+type Commit = {
+  author: string
+  date: string
+  description: string
+  hash: string
+  issue: string
+}
+
+var allIssues: {
+  [key: string]: Issue
+} = {}
 
 Promise.all([
   d3.tsv('/seqr/gitReport.txt', function (d: d3.DSVRowString<string>) {
@@ -29,7 +50,18 @@ Promise.all([
     git400,
     git500,
     git600,
-  ]: [any, any, any, any, any, any, any, any, any, any]) => {
+  ]: [
+    any,
+    Issue[],
+    Issue[],
+    Issue[],
+    Issue[],
+    Issue[],
+    Issue[],
+    Issue[],
+    Issue[],
+    Issue[]
+  ]) => {
     ;[
       github100,
       github200,
@@ -40,18 +72,22 @@ Promise.all([
       git400,
       git500,
       git600,
-    ].forEach((issueGroup: any) => {
-      issueGroup.forEach((issue: any) => {
+    ].forEach((issueGroup) => {
+      issueGroup.forEach((issue) => {
         allIssues[issue.number] = issue
       })
     })
 
+    var unknownIssues = {}
+
     var filteredIssues = newMcriIssues.filter((d) => {
       var issue = d.issue.slice(1)
       if (!allIssues[issue]) {
+        console.log(d)
         console.log(
           `Issue #${issue} by ${d.author} in ${d.hash} not found in allIssues`
         )
+        unknownIssues[issue] = d
         return false
       }
       return allIssues[issue].body !== null && allIssues[issue].title !== 'Dev'
@@ -63,7 +99,7 @@ Promise.all([
       .data(filteredIssues)
       .enter()
       .append('tr')
-      .html(function (d: any) {
+      .html(function (d: Commit) {
         const issue = d.issue.slice(1)
         return `<td><a href="https://github.com/broadinstitute/seqr/pull/${issue}">${d.issue}</a></td>
       <td class='date'>${d.date}</td>

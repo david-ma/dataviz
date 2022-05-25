@@ -24,7 +24,7 @@
     "noUnusedLocals": false,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "incremental": true,
-    "lib": [ "es6", "dom.iterable", "dom"]
+    "lib": [ "esnext", "dom.iterable", "dom"]
   },
   "include": [
     "src/**/*"
