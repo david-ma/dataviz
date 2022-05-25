@@ -1,8 +1,11 @@
 var allIssues = {}
 
+const sd = new showdown.Converter({
+  openLinksInNewWindow: true,
+})
+
 Promise.all([
   d3.tsv('/seqr/gitReport.txt', function (d: d3.DSVRowString<string>) {
-    console.log(d)
     return d
   }),
   d3.json('/seqr/100issues.json'),
@@ -45,6 +48,12 @@ Promise.all([
 
     var filteredIssues = newMcriIssues.filter((d) => {
       var issue = d.issue.slice(1)
+      if (!allIssues[issue]) {
+        console.log(
+          `Issue #${issue} by ${d.author} in ${d.hash} not found in allIssues`
+        )
+        return false
+      }
       return allIssues[issue].body !== null && allIssues[issue].title !== 'Dev'
     })
 
@@ -57,9 +66,14 @@ Promise.all([
       .html(function (d: any) {
         const issue = d.issue.slice(1)
         return `<td><a href="https://github.com/broadinstitute/seqr/pull/${issue}">${d.issue}</a></td>
-      <td>${d.date}</td>
+      <td class='date'>${d.date}</td>
       <td>${allIssues[issue].title}</td>
-      <td>${allIssues[issue].body}</td>`
+      <td class='body'>${allIssues[issue].body}</td>`
+      })
+      .select('.body')
+      .html(function (d: any) {
+        const issue = d.issue.slice(1)
+        return sd.makeHtml(allIssues[issue].body.replaceAll('<img', '\n<img'))
       })
   }
 )
