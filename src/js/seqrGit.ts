@@ -80,8 +80,15 @@ Promise.all([
 
     var unknownIssues = {}
 
+    var seenIssues = {}
+
     var filteredIssues = newMcriIssues.filter((d) => {
       var issue = d.issue.slice(1)
+      if (seenIssues[issue]) {
+        return false
+      }
+      seenIssues[issue] = true
+
       if (!allIssues[issue]) {
         console.log(d)
         console.log(
