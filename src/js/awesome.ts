@@ -79,18 +79,26 @@ d3.csv('/melbourne_export.csv', function (d) {
           id: `tabVotes-${d.id}`
         })
 
+      const projectId = "project-" + d.id
+
       const project = d3.select(this)
-      const header = project.append('div')
+      const header = project.append('div').attr("id", projectId)
       const left = project.append('div').classed('col-xs-6', true)
       const right = project.append('div').classed('col-xs-6', true)
 
       header.append('h1')
         .append('a')
-        .attr('href', d.url)
+        .attr('href', `#${projectId}`)
         .text(d.title)
 
-      header.append('span').text(d.name + ' - ')
-        .append('a').text(d.url)
+      header.append('span').text(`Submitted by: ${d.name}`)
+      if(d.url) {
+        header
+          .append('p')
+          .append('a')
+          .attr('href', d.url)
+          .text(d.url)
+      }
 
       left.append('h3').text("Here's my idea:")
       left.append('div').attr('id', 'description-' + d.id)
@@ -135,7 +143,7 @@ d3.csv('/melbourne_export.csv', function (d) {
         .attrs({
           id: `signatures-${d.id}`,
           name: `signatures-${d.id}`,
-          placeholder: 'Add comma seperated names to vote. E.g. "David Ma, Jon King, Lauren Gawne, Megan Flamer"'
+          placeholder: 'Add comma seperated names to vote. E.g. "David Ma, Jon King, Lauren Gawne"'
         }).on('keyup', function (d :any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
@@ -155,8 +163,10 @@ d3.csv('/melbourne_export.csv', function (d) {
       const categories = {
         'Social Justice': 'Description goes here',
         Art: 'Some sorta art piece??',
+        Education: 'Education',
+        Science: 'Citizen Science stuff',
         Healthcare: 'Has a healthcare aspect to it',
-        'Big Impact': "Our $1000 will make a real to the cause / it wouldn't happen without our help",
+        'Big Impact': "Our $1000 will make a real difference / it wouldn't happen without our help",
         Viable: 'Sounds like these peeps will get the job done'
       }
       right.append('ul').attrs({
@@ -209,6 +219,17 @@ d3.csv('/melbourne_export.csv', function (d) {
             return ''
           }
         })
+
+      d3.select('#title h1 a').text("Awesome Foundation Melbourne")
+
+      // print version
+      // right.remove()
+      // left.classed("col-xs-12", true)
+      // left.append("br").classed('page-break', true)
+      // d3.select("header").remove()
+      // d3.select("footer").remove()
+      // d3.select("#mobile_nav").remove()
+      d3.select("#tabs").remove()
     })
 })
 
