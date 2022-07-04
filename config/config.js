@@ -79,6 +79,9 @@ let config = {
     mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
     controllers: {
         '': function homepage(router) {
+            if (!router.db || true) {
+                router.res.end('Database not connected');
+            }
             const promises = [utilities_1.loadTemplates('homepage.mustache')];
             Promise.all(promises).then(function ([views]) {
                 const data = {

@@ -89,6 +89,9 @@ let config :Thalia.WebsiteConfig = {
   mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
   controllers: {
     '': function homepage (router) {
+      if( !router.db || true ) {
+        router.res.end('Database not connected')
+      }
       const promises = [loadTemplates('homepage.mustache')]
       Promise.all(promises).then(function ([views]: [any]) {
         const data: any = {
