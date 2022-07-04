@@ -112,7 +112,7 @@ let config :Thalia.WebsiteConfig = {
       }
     },
     blog: function blogpost (router) {
-      if( !router.db || true ) {
+      if( !router.db ) {
         router.res.end('Database not connected')
       } else {
         const promises = [loadTemplates('blog.mustache', router.path)]

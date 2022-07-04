@@ -102,7 +102,7 @@ let config = {
             }
         },
         blog: function blogpost(router) {
-            if (!router.db || true) {
+            if (!router.db) {
                 router.res.end('Database not connected');
             }
             else {
