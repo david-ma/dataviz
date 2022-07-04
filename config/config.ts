@@ -112,29 +112,33 @@ let config :Thalia.WebsiteConfig = {
       }
     },
     blog: function blogpost (router) {
-      const promises = [loadTemplates('blog.mustache', router.path)]
-      Promise.all(promises).then(function ([views]: [any]) {
-        const data: any = {
-          gitHash: gitHash
-        }
-        router.db.Blogpost.findAll({
-          where: {
-            published: true
-          },
-          order: [['publish_date', 'DESC']]
-        }).then((results) => {
-          data.blogposts = results.map(d => d.dataValues)
-          data.blogpost = data.blogposts.filter(d => d.shortname === router.path[0])
+      if( !router.db || true ) {
+        router.res.end('Database not connected')
+      } else {
+        const promises = [loadTemplates('blog.mustache', router.path)]
+        Promise.all(promises).then(function ([views]: [any]) {
+          const data: any = {
+            gitHash: gitHash
+          }
+          router.db.Blogpost.findAll({
+            where: {
+              published: true
+            },
+            order: [['publish_date', 'DESC']]
+          }).then((results) => {
+            data.blogposts = results.map(d => d.dataValues)
+            data.blogpost = data.blogposts.filter(d => d.shortname === router.path[0])
 
-          try {
-            const shortname = router.path[0]
-            data.typescript = `'/js/${shortname}.js'`
-          } catch (e) { }
+            try {
+              const shortname = router.path[0]
+              data.typescript = `'/js/${shortname}.js'`
+            } catch (e) { }
 
-          const output = mustache.render(views.template, data, views)
-          router.res.end(output)
+            const output = mustache.render(views.template, data, views)
+            router.res.end(output)
+          })
         })
-      })
+      }
     },
     experiment: function (router) {
       const promises = [loadTemplates('upload_experiment.mustache')]

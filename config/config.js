@@ -102,28 +102,33 @@ let config = {
             }
         },
         blog: function blogpost(router) {
-            const promises = [utilities_1.loadTemplates('blog.mustache', router.path)];
-            Promise.all(promises).then(function ([views]) {
-                const data = {
-                    gitHash: utilities_1.gitHash
-                };
-                router.db.Blogpost.findAll({
-                    where: {
-                        published: true
-                    },
-                    order: [['publish_date', 'DESC']]
-                }).then((results) => {
-                    data.blogposts = results.map(d => d.dataValues);
-                    data.blogpost = data.blogposts.filter(d => d.shortname === router.path[0]);
-                    try {
-                        const shortname = router.path[0];
-                        data.typescript = `'/js/${shortname}.js'`;
-                    }
-                    catch (e) { }
-                    const output = mustache_1.default.render(views.template, data, views);
-                    router.res.end(output);
+            if (!router.db || true) {
+                router.res.end('Database not connected');
+            }
+            else {
+                const promises = [utilities_1.loadTemplates('blog.mustache', router.path)];
+                Promise.all(promises).then(function ([views]) {
+                    const data = {
+                        gitHash: utilities_1.gitHash
+                    };
+                    router.db.Blogpost.findAll({
+                        where: {
+                            published: true
+                        },
+                        order: [['publish_date', 'DESC']]
+                    }).then((results) => {
+                        data.blogposts = results.map(d => d.dataValues);
+                        data.blogpost = data.blogposts.filter(d => d.shortname === router.path[0]);
+                        try {
+                            const shortname = router.path[0];
+                            data.typescript = `'/js/${shortname}.js'`;
+                        }
+                        catch (e) { }
+                        const output = mustache_1.default.render(views.template, data, views);
+                        router.res.end(output);
+                    });
                 });
-            });
+            }
         },
         experiment: function (router) {
             const promises = [utilities_1.loadTemplates('upload_experiment.mustache')];
