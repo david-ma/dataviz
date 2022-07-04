@@ -79,25 +79,27 @@ let config = {
     mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
     controllers: {
         '': function homepage(router) {
-            if (!router.db || true) {
+            if (!router.db) {
                 router.res.end('Database not connected');
             }
-            const promises = [utilities_1.loadTemplates('homepage.mustache')];
-            Promise.all(promises).then(function ([views]) {
-                const data = {
-                    gitHash: utilities_1.gitHash
-                };
-                router.db.Blogpost.findAll({
-                    where: {
-                        published: true
-                    },
-                    order: [['publish_date', 'DESC']]
-                }).then((results) => {
-                    data.blogposts = results.map(d => d.dataValues);
-                    const output = mustache_1.default.render(views.template, data, views);
-                    router.res.end(output);
+            else {
+                const promises = [utilities_1.loadTemplates('homepage.mustache')];
+                Promise.all(promises).then(function ([views]) {
+                    const data = {
+                        gitHash: utilities_1.gitHash
+                    };
+                    router.db.Blogpost.findAll({
+                        where: {
+                            published: true
+                        },
+                        order: [['publish_date', 'DESC']]
+                    }).then((results) => {
+                        data.blogposts = results.map(d => d.dataValues);
+                        const output = mustache_1.default.render(views.template, data, views);
+                        router.res.end(output);
+                    });
                 });
-            });
+            }
         },
         blog: function blogpost(router) {
             const promises = [utilities_1.loadTemplates('blog.mustache', router.path)];

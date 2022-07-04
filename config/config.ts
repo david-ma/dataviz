@@ -89,26 +89,27 @@ let config :Thalia.WebsiteConfig = {
   mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
   controllers: {
     '': function homepage (router) {
-      if( !router.db || true ) {
+      if( !router.db ) {
         router.res.end('Database not connected')
-      }
-      const promises = [loadTemplates('homepage.mustache')]
-      Promise.all(promises).then(function ([views]: [any]) {
-        const data: any = {
-          gitHash: gitHash
-        }
-        router.db.Blogpost.findAll({
-          where: {
-            published: true
-          },
-          order: [['publish_date', 'DESC']]
-        }).then((results) => {
-          data.blogposts = results.map(d => d.dataValues)
+      } else {
+        const promises = [loadTemplates('homepage.mustache')]
+        Promise.all(promises).then(function ([views]: [any]) {
+          const data: any = {
+            gitHash: gitHash
+          }
+          router.db.Blogpost.findAll({
+            where: {
+              published: true
+            },
+            order: [['publish_date', 'DESC']]
+          }).then((results) => {
+            data.blogposts = results.map(d => d.dataValues)
 
-          const output = mustache.render(views.template, data, views)
-          router.res.end(output)
+            const output = mustache.render(views.template, data, views)
+            router.res.end(output)
+          })
         })
-      })
+      }
     },
     blog: function blogpost (router) {
       const promises = [loadTemplates('blog.mustache', router.path)]
