@@ -1,0 +1,33 @@
+<div>
+  <h1>Atlassian Browser Interview</h1>
+  <div id="markdown_text_goes_here"></div>
+
+  <p>Hello atlassian</p>
+
+
+List:
+  <ul id="list">
+  </ul>
+
+</div>
+
+{{> require}}
+
+
+<script>
+
+  var md = new showdown.Converter({ openLinksInNewWindow: true });
+
+  const current_time = new Date()
+
+  $("#markdown_text_goes_here").html(md.makeHtml(`
+Hello Wellington the current time is: ${current_time}
+
+
+`))
+
+</script>
+
+
+
+
