@@ -6,10 +6,12 @@
   <h1>Atlassian Browser Interview</h1>
   <div id="markdown_text_goes_here"></div>
 
-  <p>Hello atlassian</p>
+  <p>hellooo test: ▼ ▶ •</p>
 
+  <p id="test">Test using content code "\2022" instead of the icon "•" </p>
+  <p id="test2">Does ASCII text work? </p>
 
-List:
+<h2>List</h2>
   <ul id="list">
   </ul>
 
@@ -17,6 +19,15 @@ List:
 
 {{> require}}
 
+<style>
+  #test::after {
+    {{!-- content: "▼ ▶ •"; --}}
+    content: "\2022"
+  }
+  #test2::after {
+    content: "test 2"
+  }
+</style>
 
 <script>
 
@@ -27,6 +38,8 @@ List:
   $("#markdown_text_goes_here").html(md.makeHtml(`
 Hello Wellington the current time is: ${current_time}
 
+
+testing: ▼ ▶ •
 `))
 
 </script>
