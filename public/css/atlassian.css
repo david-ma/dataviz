@@ -1,0 +1,25 @@
+
+  li {
+    list-style: "• ";
+  }
+
+  li.hasChildren {
+    list-style: '▼';
+  }
+  li {
+    padding-left: 5px;
+  }
+
+  ul {
+    padding-left: 10px;
+  }
+
+
+  li.collapsed {
+    list-style: '▶';
+
+  }
+  li.collapsed li {
+    display: none;
+  }
+
