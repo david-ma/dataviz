@@ -76,24 +76,30 @@ function fetchData() {
 
 
 
+function drawNode(list_element, node) {
+  list_element.text(node.name);
+  if (node.children) {
+
+    const next_level_list = list_element.append('ul')
+    node.children.forEach(child => {
+      drawNode(next_level_list.append('li'), child)
+    })
+
+  }
+}
+
+
 fetchData().then((d:any) => {
   console.log("data?", d);
   const list = d3.select("#list")
 
-  d.forEach(function(entry) {
-    const li = list.append("li").text(entry.name)
-
-    if(entry.children) {
-      const second_list = li.append('ul')
-
-      entry.children.forEach(child => {
-
-        second_list.append('li').text(child.name)
-      })
-    }
+  d.forEach(function(node) {
+    const li = list.append('li')
+    drawNode( li , node )
   })
 
 })
+
 
 
 
