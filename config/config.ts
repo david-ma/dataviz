@@ -3,7 +3,7 @@ import { config as smugmugConfig } from './smugmug'
 import { config as awesomeConfig } from './awesome'
 import { config as cameraConfig } from './camera'
 import { gitHash, loadTemplates } from './utilities'
-import { config as atlassianConfig } from './atlassian'
+import { config as atlassianConfig } from './atlassianBackend'
 
 import path from 'path'
 import http from 'http'

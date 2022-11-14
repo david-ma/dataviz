@@ -1,8 +1,6 @@
 import { Chart, _ } from 'chart'
 
-console.log('This message is coming from atlassian.ts')
-
-// Arrow characters to use: ▼ ▶ •
+console.log('This message is coming from the frontend atlassian.ts')
 
 function drawNode(list_element, node) {
   if (node.children) {
