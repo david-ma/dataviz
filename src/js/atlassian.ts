@@ -1,40 +1,48 @@
 import { Chart, _ } from 'chart'
 
-console.log('This message is coming from the frontend atlassian.ts')
+console.log('hello')
 
-function drawNode(list_element, node) {
-  if (node.children) {
-    list_element.classed('hasChildren', true)
+// this is a backend system abstaction that returns the state of *all* features for current user
+function fetchAllFeatures() {
+  // in reality, this would have been a `fetch` call:
+  // `fetch("/api/features/all")`
+  return new Promise((resolve) => {
+    const sampleFeatures = {
+      'extended-summary': true,
+      'feedback-dialog': false,
+    }
 
-    list_element
-      .append('a')
-      .text(node.name)
-      .attr('href', '#')
-      .on('click', (d) => {
-        console.log('clicked')
-        if (list_element.classed('collapsed')) {
-          list_element.classed('collapsed', false)
-        } else {
-          list_element.classed('collapsed', true)
-        }
-      })
-
-    const next_level_list = list_element.append('ul')
-    node.children.forEach((child) => {
-      drawNode(next_level_list.append('li'), child)
-    })
-  } else {
-    list_element.text(node.name)
-  }
+    setTimeout(resolve, 100, sampleFeatures)
+  })
 }
 
-fetch('/backendData')
-  .then((d) => d.json())
-  .then((d: any) => {
-    const list = d3.select('#list')
+function getFeatureState(featureName) {
+  // To be implemented by you
+  // this function would use fetchAllFeatures
 
-    d.forEach(function (node) {
-      const li = list.append('li')
-      drawNode(li, node)
+  return new Promise((resolve) => {
+    fetchAllFeatures().then(function (features) {
+      return resolve(features[featureName])
     })
   })
+}
+
+// // Function usage examples
+// // src/feature-x/summary.js
+getFeatureState('extended-summary').then(function (isEnabled) {
+  if (isEnabled) {
+    console.log("extended summary is enabled")
+    // showExtendedSummary();
+  } else {
+    console.log("showing brief summary")
+    // showBriefSummary();
+  }
+})
+
+// // src/feature-y/feedback-dialog.js
+getFeatureState("feedback-dialog")
+  .then(function(isEnabled) {
+    if (isEnabled) {
+      // makeFeedbackButtonVisible();
+    }
+  });
