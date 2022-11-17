@@ -224,8 +224,13 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path", "sass
                 handle.websites[site].readAllViews = function (cb) {
                     readAllViews(path.resolve(baseUrl, 'views')).then((d) => cb(d));
                 };
-                handle.websites[site].readTemplate = function (template, content, cb) {
-                    readTemplate(template, path.resolve(baseUrl, 'views'), content).then((d) => cb(d));
+                handle.websites[site].readTemplate = function (options) {
+                    readMustache(options.template, path.resolve(baseUrl, 'views'), options.content)
+                        .catch((e) => {
+                        console.error('error here?', e);
+                        options.callback(e);
+                    })
+                        .then((d) => options.callback(d));
                 };
                 readAllViews(path.resolve(baseUrl, 'views')).then((views) => {
                     handle.websites[site].views = views;
@@ -279,45 +284,28 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path", "sass
     };
     exports.handle = handle;
     handle.addWebsite('default', {});
-    async function readTemplate(template, folder, content = '') {
-        return new Promise((resolve) => {
+    async function readMustache(template, folder, content = '') {
+        return new Promise((resolve, reject) => {
             const promises = [];
             const filenames = ['template', 'content'];
-            promises.push(fsPromise.readFile(`${folder}/${template}`, {
-                encoding: 'utf8',
+            promises.push(new Promise((resolve) => {
+                fsPromise
+                    .readFile(`${folder}/${template}`, {
+                    encoding: 'utf8',
+                })
+                    .catch(() => {
+                    resolve(`404 - ${template} not found`);
+                })
+                    .then((data) => {
+                    resolve(data);
+                });
             }));
             promises.push(new Promise((resolve) => {
                 if (Array.isArray(content) && content[0])
                     content = content[0];
-                fsPromise
-                    .readFile(`${folder}/content/${content}.mustache`, {
-                    encoding: 'utf8',
-                })
-                    .then((result) => {
-                    const scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g;
-                    const styleEx = /<style\b.*>([^<]*(?:(?!<\/style>)<[^<]*)*)<\/style>/g;
-                    const scripts = [...result.matchAll(scriptEx)].map((d) => d[0]);
-                    const styles = [...result.matchAll(styleEx)].map((d) => d[0]);
-                    let styleData = styles.join('\n');
-                    sass.render({
-                        data: styleData,
-                        outputStyle: 'compressed',
-                    }, function (err, sassResult) {
-                        if (err) {
-                            console.error(`Error reading SCSS from file: ${folder}/content/${content}.mustache`);
-                            console.error(err);
-                        }
-                        else {
-                            styleData = sassResult.css.toString();
-                        }
-                        resolve({
-                            content: result.replace(scriptEx, '').replace(styleEx, ''),
-                            scripts: scripts.join('\n'),
-                            styles: `<style>${styleData}</style>`,
-                        });
-                    });
-                })
-                    .catch(() => {
+                loadMustacheTemplate(`${folder}/content/${content}.mustache`)
+                    .catch((e) => {
+                    console.error('Error loading mustache template.', e);
                     fsPromise
                         .readFile(`${folder}/404.mustache`, {
                         encoding: 'utf8',
@@ -325,7 +313,8 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path", "sass
                         .then((result) => {
                         resolve(result);
                     });
-                });
+                })
+                    .then((d) => resolve(d));
             }));
             fsPromise.readdir(`${folder}/partials/`).then(function (d) {
                 d.forEach(function (filename) {
@@ -386,6 +375,55 @@ define("requestHandlers", ["require", "exports", "fs", "mustache", "path", "sass
                 });
             })
                 .catch((e) => console.log(e));
+        });
+    }
+    function loadMustacheTemplate(file) {
+        return new Promise((resolve, reject) => {
+            fsPromise
+                .readFile(file, {
+                encoding: 'utf8',
+            })
+                .catch(() => {
+                console.error('Error reading file: ', file);
+                resolve(`Error reading file: ${file}`);
+            })
+                .then((fileText) => {
+                const scriptEx = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/g;
+                const styleEx = /<style\b.*>([^<]*(?:(?!<\/style>)<[^<]*)*)<\/style>/g;
+                const scripts = [...fileText.matchAll(scriptEx)].map((d) => d[0]);
+                const styles = [...fileText.matchAll(styleEx)].map((d) => d[0]);
+                let styleData = styles.join('\n').replace(/<\/?style>/g, '');
+                sass.render({
+                    data: styleData,
+                    outputStyle: 'compressed',
+                }, function (err, sassResult) {
+                    if (err) {
+                        console.error(`Error reading SCSS from file: ${file}`);
+                        console.error('Error', err);
+                        resolve({
+                            content: fileText,
+                            scripts: '',
+                            styles: '',
+                        });
+                    }
+                    else {
+                        styleData = sassResult.css.toString();
+                        resolve({
+                            content: fileText.replace(scriptEx, '').replace(styleEx, ''),
+                            scripts: scripts.join('\n'),
+                            styles: `<style>${styleData}</style>`,
+                        });
+                    }
+                });
+            })
+                .catch(() => {
+                console.error(`Error with SCSS or Script file: ${file}`);
+                resolve({
+                    content: '500',
+                    scripts: '',
+                    styles: '',
+                });
+            });
         });
     }
 });

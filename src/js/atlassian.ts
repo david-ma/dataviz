@@ -45,6 +45,15 @@ function getFeatureState(featureName, component = 'default') {
   // this function would use fetchAllFeatures
 
   return new Promise((resolve) => {
+    // if(globalFeaturesTimestamp)
+
+    // 1) if globalFeaturesTimestamp is null, fetch it
+    // 2) if globalFeaturesTimestamp is in progress, wait
+    // 3) if globalFeaturesTimestamp is fresh, use it
+    // 4) if globalFeaturesTimestamp is stale, fetch it
+
+    globalFeaturesTimestamp = "inProgress"
+
     // Check the timestamp of the cached features
     // Use the cached features if they are less than 5 minutes old
 
