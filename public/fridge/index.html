@@ -9,7 +9,6 @@
 
   <body>
     <div id="page" class="row">
-
       <div class="week"></div>
       <div class="middle">
         <div class="directions"></div>
@@ -17,7 +16,6 @@
         <div class="directions"></div>
       </div>
       <div class="week"></div>
-
     </div>
 
     <script src="https://d3js.org/d3.v6.min.js"></script>
@@ -26,39 +24,54 @@
     <style>
       body {
         margin: 0;
+        font-family: Helvetica, Arial, sans-serif;
       }
 
       div#page {
-        width: 297mm;
-        height: 420mm;
+        width: 420mm;
+        height: 297mm;
         background: lightskyblue;
       }
 
       div#box {
-        width: 217mm;
-        height: 340mm;
+        float: left;
+        width: 340mm;
+        height: 217mm;
         background: lightblue;
       }
 
       div.directions {
-        width: 217mm;
-        height: 40mm;
+        float: left;
+        width: 40mm;
+        height: 217mm;
         background: lightyellow;
       }
 
       div.middle {
         float: left;
-        width: 217mm;
-        height: 420mm;
+        width: 420mm;
+        height: 217mm;
         background: lightcoral;
         /* background: rgb(255, 166, 0, 0.5); */
       }
 
       div.week {
         float: left;
-        width: 40mm;
-        height: 420mm;
+        width: 420mm;
+        height: 40mm;
         background: lightgreen;
+      }
+
+      div.weekday {
+        float: left;
+        width: 59.11mm;
+        height: 40mm;
+        background: pink;
+        border-right: solid 1mm black;
+        text-align: center;
+      }
+      div.weekday:last-child {
+        border-right: none;
       }
 
       div.magnet {
@@ -106,6 +119,24 @@
             .html(d.split('.')[0].replace(/\d/, '').replace('_', '&nbsp;'))
         })
       })
+
+      const weekdays = [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ]
+      d3.select('.week')
+        .selectAll('.weekday')
+        .data(weekdays)
+        .enter()
+        .append('div')
+        .classed('weekday', true)
+        .append('p')
+        .text((d) => d)
     </script>
   </body>
 </html>
