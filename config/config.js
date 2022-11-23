@@ -19,7 +19,7 @@ const formidable_1 = __importDefault(require("formidable"));
 let config = {
     services: {
         fridge_images: function (res, req, db) {
-            const filter = [".DS_Store", ".gitignore", "david", "grace", "index.html", "printed"];
+            const filter = [".DS_Store", ".gitignore", "david.png", "grace.png", "index.html", "printed"];
             fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'public', 'fridge', 'images'))
                 .then(function (images) {
                 images = images.filter(d => filter.indexOf(d) === -1);

@@ -8,75 +8,28 @@
   </head>
 
   <body>
-    <div id="page" class="row">
-
-      <div class="week"></div>
-      <div class="middle">
-        <div class="directions"></div>
-        <div id="box"></div>
-        <div class="directions"></div>
-      </div>
-      <div class="week"></div>
-
-    </div>
+    <div id="box"></div>
 
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
 
     <style>
-      body {
-        margin: 0;
-      }
-
-      div#page {
-        width: 297mm;
-        height: 420mm;
-        background: lightskyblue;
-      }
-
-      div#box {
-        width: 217mm;
-        height: 340mm;
-        background: lightblue;
-      }
-
-      div.directions {
-        width: 217mm;
-        height: 40mm;
-        background: lightyellow;
-      }
-
-      div.middle {
-        float: left;
-        width: 217mm;
-        height: 420mm;
-        background: lightcoral;
-        /* background: rgb(255, 166, 0, 0.5); */
-      }
-
-      div.week {
-        float: left;
-        width: 40mm;
-        height: 420mm;
-        background: lightgreen;
-      }
-
       div.magnet {
-        width: 24mm;
-        height: 24mm;
+        width: 2.8cm;
+        height: 2.8cm;
         float: left;
-        border: solid 1px grey;
+        border: solid 2px lightgrey;
+        margin: 2px;
         padding: 5px;
         text-align: center;
         display: block;
       }
-
       div.magnet p {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: 0.8em;
         text-transform: capitalize;
         position: relative;
-        bottom: 4mm;
+        bottom: 5px;
       }
       img {
         max-width: 2cm;
