@@ -14,6 +14,7 @@
         <div class="directions" id="left">
           <div>
             <h1 style="margin-top: 15mm">Buy more</h1>
+            <img class="qr" src="qr.png" />
           </div>
           <div>
             <h1>Fresh</h1>
@@ -27,6 +28,7 @@
         <div class="directions" id="right">
           <div>
             <h1 style="margin-top: 15mm">Buy more</h1>
+            <img class="qr" src="qr.png" />
           </div>
           <div>
             <h1>Fresh</h1>
@@ -91,7 +93,7 @@
 
       div.directions div:last-child {
         position: absolute;
-        bottom: 0;
+        bottom: 40mm;
       }
 
       div.middle {
@@ -123,8 +125,8 @@
       }
 
       div.magnet {
-        width: 24mm;
-        height: 24mm;
+        width: 25.1mm;
+        height: 25.1mm;
         float: left;
         border: solid 1px grey;
         padding: 5px;
@@ -132,6 +134,7 @@
       }
 
       div.magnet p {
+        vertical-align: bottom;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: 0.75em;
         text-transform: capitalize;
@@ -139,13 +142,36 @@
         bottom: 4mm;
       }
       img {
-        max-width: 2cm;
-        max-height: 2cm;
+        max-width: 20mm;
+        max-height: 20mm;
+      }
+      img.qr {
+        max-width: 30mm;
+        max-height: 30mm;
       }
     </style>
     <script>
       d3.json('/fridge_images').then((images) => {
         var box = d3.select('#box').selectAll('div')
+
+        var boxes = box
+          .data(images)
+          .enter()
+          .append('div')
+          .classed('magnet', true)
+
+        boxes.each((d, i, all) => {
+          var magnet = d3.select(all[i])
+
+          magnet.append('img').attrs((image) => {
+            return {
+              src: `images/${image}`,
+            }
+          })
+          magnet
+            .append('p')
+            .html(d.split('.')[0].replace(/\d/, '').replace('_', '&nbsp;'))
+        })
 
         var boxes = box
           .data(images)
