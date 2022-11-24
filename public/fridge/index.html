@@ -53,29 +53,29 @@
       }
 
       div#page {
-        width: 420mm;
-        height: 297mm;
-        background: lightskyblue;
+        width: 426mm;
+        height: 303mm;
+        /* background: lightskyblue; */
       }
 
       div#box {
         float: left;
         width: 340mm;
         height: 217mm;
-        background: lightblue;
+        background: black;
       }
 
       div.directions {
         float: left;
-        width: 40mm;
+        width: 43mm;
         height: 217mm;
-        background: lightyellow;
+        /* background: lightyellow; */
       }
       div.directions h1 {
         font-size: 24px;
       }
       div.directions div {
-        width: 40mm;
+        width: 43mm;
       }
 
       div.directions div:nth-child(2) {
@@ -93,30 +93,30 @@
 
       div.directions div:last-child {
         position: absolute;
-        bottom: 40mm;
+        bottom: 43mm;
       }
 
       div.middle {
         float: left;
-        width: 420mm;
+        width: 426mm;
         height: 217mm;
-        background: lightcoral;
+        /* background: lightcoral; */
         /* background: rgb(255, 166, 0, 0.5); */
       }
 
       div.week {
         float: left;
-        width: 420mm;
-        height: 40mm;
-        background: lightgreen;
+        width: 426mm;
+        height: 43mm;
+        /* background: lightgreen; */
       }
 
       div.weekday {
         font-size: 30px;
         float: left;
-        width: 59.11mm;
-        height: 40mm;
-        background: pink;
+        width: 60mm;
+        height: 43mm;
+        /* background: pink; */
         border-right: solid 1mm black;
         text-align: center;
       }
@@ -125,12 +125,14 @@
       }
 
       div.magnet {
-        width: 25.1mm;
-        height: 25.1mm;
+        width: 25.689mm;
+        height: 25.689mm;
         float: left;
-        border: solid 1px grey;
+        /* border: solid 1mm white; */
+        border-radius: 5px;
         padding: 5px;
         display: block;
+        background-color: white;
       }
 
       div.magnet p {
@@ -191,6 +193,12 @@
             .append('p')
             .html(d.split('.')[0].replace(/\d/, '').replace('_', '&nbsp;'))
         })
+
+        d3.select('#box')
+          .append('div')
+          .classed('magnet', true)
+          .style('width', '337.3mm')
+          .style('height', '16.5mm')
       })
 
       const weekdays = [
