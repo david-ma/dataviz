@@ -7,7 +7,17 @@ type circleInfo = {
   color: string
 }
 
-
+// cubic bezier curve info
+type curveInfo = {
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+  x3: number
+  y3: number
+  x4: number
+  y4: number
+}
 
 type coords = {
   x: number
@@ -55,6 +65,29 @@ function calculateCircles(
   return circles
 }
 
+function calculateCurve(start: coords, end: coords) {
+  const x1 = start.x
+  const y1 = start.y
+  const x4 = end.x
+  const y4 = end.y
+
+  const x2 = x1 + 100
+  const y2 = y1
+  const x3 = x4 - 100
+  const y3 = y4
+
+  return {
+    x1,
+    y1,
+    x2,
+    y2,
+    x3,
+    y3,
+    x4,
+    y4,
+  }
+}
+
 function drawMandala() {
   const height = 1000,
     width = 1000,
@@ -84,32 +117,41 @@ function drawMandala() {
 
   // Draw petals from the first layer to the second layer
   // Calculate points on second layer
-  const secondCircles: circleInfo[] = calculateCircles(layerRadius + 150, 16, center)
+  const secondCircles: circleInfo[] = calculateCircles(
+    layerRadius + 150,
+    16,
+    center
+  )
 
   circles.forEach((circle, i) => {
-    // Draw a line from the first layer to the second layer
+    var curve = calculateCurve(circle, secondCircles[i * 2 + 1])
 
-    box.append('line')
-      .attr('x1', circle.x)
-      .attr('y1', circle.y)
-      .attr('x2', secondCircles[i * 2 + 1].x)
-      .attr('y2', secondCircles[i * 2 + 1].y)
+    box
+      .append('path')
+      .attr(
+        'd',
+        `M ${curve.x1} ${curve.y1} C ${curve.x2} ${curve.y2} ${curve.x3} ${curve.y3} ${curve.x4} ${curve.y4}`
+      )
       .attr('stroke', 'black')
       .attr('stroke-width', 2)
+      .attr('fill', 'none')
 
     // Magic number. Not great.
-    if(i === 0) { i = 8}
+    if (i === 0) {
+      i = 8
+    }
 
-    box.append('line')
-      .attr('x1', circle.x)
-      .attr('y1', circle.y)
-      .attr('x2', secondCircles[i * 2 - 1].x)
-      .attr('y2', secondCircles[i * 2 - 1].y)
+    var curve2 = calculateCurve(circle, secondCircles[i * 2 - 1])
+    box
+      .append('path')
+      .attr(
+        'd',
+        `M ${curve2.x1} ${curve2.y1} C ${curve2.x2} ${curve2.y2} ${curve2.x3} ${curve2.y3} ${curve2.x4} ${curve2.y4}`
+      )
       .attr('stroke', 'black')
       .attr('stroke-width', 2)
-
+      .attr('fill', 'none')
   })
-
 }
 
 drawMandala()
