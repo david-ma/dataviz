@@ -65,27 +65,61 @@ function calculateCircles(
   return circles
 }
 
-function calculateCurve(start: coords, end: coords) {
-  const x1 = start.x
-  const y1 = start.y
-  const x4 = end.x
-  const y4 = end.y
+function calculateCurves(
+  center: coords,
+  left: coords,
+  right: coords
+): curveInfo[] {
+  // Given the coordinates of the top left, top right and center of a petal
+  // Generate bezier curves for the petal
+  // The petal is a bezier curve with 4 control points
 
-  const x2 = x1 + 100
-  const y2 = y1
-  const x3 = x4 - 100
-  const y3 = y4
+  const topCenterX = (left.x + right.x) / 2
+  const topCenterY = (left.y + right.y) / 2
 
-  return {
-    x1,
-    y1,
-    x2,
-    y2,
-    x3,
-    y3,
-    x4,
-    y4,
-  }
+  // The mid control point is 60% between the topCenter and center
+  const midControlPointX = topCenterX * 0.6 + center.x * 0.4
+  const midControlPointY = topCenterY * 0.6 + center.y * 0.4
+
+  // Find the bottom left corner
+  const bottomLeftX = center.x - (topCenterX - left.x)
+  const bottomLeftY = center.y - (topCenterY - left.y)
+
+  const leftControlPointX = left.x * 0.6 + bottomLeftX * 0.4
+  const leftControlPointY = left.y * 0.6 + bottomLeftY * 0.4
+
+  // find bottom right corner
+  const bottomRightX = center.x - (topCenterX - right.x)
+  const bottomRightY = center.y - (topCenterY - right.y)
+
+  const rightControlPointX = right.x * 0.6 + bottomRightX * 0.4
+  const rightControlPointY = right.y * 0.6 + bottomRightY * 0.4
+
+  // return the curves
+  const curves: curveInfo[] = [
+    {
+      x1: left.x,
+      y1: left.y,
+      x2: leftControlPointX,
+      y2: leftControlPointY,
+      x3: midControlPointX,
+      y3: midControlPointY,
+      x4: center.x,
+      y4: center.y,
+    },
+    {
+      x1: center.x,
+      y1: center.y,
+      x2: midControlPointX,
+      y2: midControlPointY,
+      x3: rightControlPointX,
+      y3: rightControlPointY,
+      x4: right.x,
+      y4: right.y,
+    },
+  ]
+
+  return curves
 }
 
 function drawMandala() {
@@ -124,33 +158,51 @@ function drawMandala() {
   )
 
   circles.forEach((circle, i) => {
-    var curve = calculateCurve(circle, secondCircles[i * 2 + 1])
-
-    box
-      .append('path')
-      .attr(
-        'd',
-        `M ${curve.x1} ${curve.y1} C ${curve.x2} ${curve.y2} ${curve.x3} ${curve.y3} ${curve.x4} ${curve.y4}`
-      )
-      .attr('stroke', 'black')
-      .attr('stroke-width', 2)
-      .attr('fill', 'none')
+    var right = secondCircles[i * 2 + 1]
 
     // Magic number. Not great.
     if (i === 0) {
       i = 8
     }
+    var left = secondCircles[i * 2 - 1]
 
-    var curve2 = calculateCurve(circle, secondCircles[i * 2 - 1])
-    box
-      .append('path')
-      .attr(
-        'd',
-        `M ${curve2.x1} ${curve2.y1} C ${curve2.x2} ${curve2.y2} ${curve2.x3} ${curve2.y3} ${curve2.x4} ${curve2.y4}`
-      )
-      .attr('stroke', 'black')
-      .attr('stroke-width', 2)
-      .attr('fill', 'none')
+    var curves = calculateCurves(circle, left, right)
+
+    curves.forEach(function (curve) {
+      // drawCircle(box, {
+      //   x: curve.x1,
+      //   y: curve.y1,
+      //   r: 5,
+      //   color: 'red',
+      // })
+      // drawCircle(box, {
+      //   x: curve.x2,
+      //   y: curve.y2,
+      //   r: 5,
+      //   color: 'red',
+      // })
+      // drawCircle(box, {
+      //   x: curve.x3,
+      //   y: curve.y3,
+      //   r: 5,
+      //   color: 'red',
+      // })
+      // drawCircle(box, {
+      //   x: curve.x4,
+      //   y: curve.y4,
+      //   r: 5,
+      //   color: 'red',
+      // })
+
+      box
+        .append('path')
+        .attr(
+          'd',
+          `M ${curve.x1},${curve.y1} C ${curve.x2},${curve.y2} ${curve.x3},${curve.y3} ${curve.x4},${curve.y4}`
+        )
+        .attr('stroke', 'black')
+        .attr('fill', 'none')
+    })
   })
 }
 
