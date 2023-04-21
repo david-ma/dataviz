@@ -11,6 +11,8 @@ type coords = {
   y: number
 }
 
+const colors = ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3']
+
 // Takes a circleInfo and draws it on the svg
 function drawCircle(svg, circle: circleInfo) {
   svg
@@ -20,6 +22,7 @@ function drawCircle(svg, circle: circleInfo) {
     .attr('r', circle.r)
     .attr('fill', circle.color)
     .attr('stroke', 'black')
+  // .attr('opacity', 0.2)
 }
 
 // Calculates the circles for the mandala
@@ -35,8 +38,8 @@ function calculateCircles(
     const angle = (i / numCircles) * 2 * Math.PI
     const x = Math.cos(angle) * radius + center.x
     const y = Math.sin(angle) * radius + center.y
-    const r = 50
-    const color = 'red'
+    const r = 70
+    const color = colors[1]
 
     circles.push({
       x,
@@ -65,7 +68,8 @@ function drawMandala() {
     .attr('cx', centerX)
     .attr('cy', centerY)
     .attr('r', layerRadius)
-    .attr('fill', 'orange')
+    .attr('fill', colors[0])
+    // .attr('opacity', 0.2)
     .attr('stroke', 'black')
 
   const circles: circleInfo[] = calculateCircles(layerRadius, 8, {
