@@ -860,7 +860,7 @@ define("server", ["require", "exports", "socket", "http", "url", "http-proxy", "
         console.log('Server has started on port: ' + port);
         server = http.createServer(onRequest).listen(port);
         const io = socketIO.listen(server, {});
-        socket_1.socketInit(io, handle);
+        (0, socket_1.socketInit)(io, handle);
         server.on('error', function (e) {
             console.log("Server error", e);
         });

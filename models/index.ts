@@ -2,7 +2,7 @@ import * as sequelize from 'sequelize'
 // import { UserFactory } from "./user-model";
 // import { SkillsFactory } from "./skills-model";
 // import { WorksheetFactory } from './worksheet';
-import _ = require( 'lodash')
+import _ = require('lodash')
 // import _ from 'lodash'
 import { ScrapeFactory } from './scrape'
 import { FamilyFactory } from './family'
@@ -11,7 +11,7 @@ import { BlogpostFactory } from './blogpost'
 import path = require('path')
 
 // Default options
-let seqOptions :sequelize.Options = {
+let seqOptions: sequelize.Options = {
   database: process.env.DB_NAME || 'typescript_test',
   username: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
@@ -20,29 +20,39 @@ let seqOptions :sequelize.Options = {
   // timezone: 'Australia/Melbourne',
   dialectOptions: {
     timezone: 'Australia/Melbourne',
-    decimalNumbers: true
+    decimalNumbers: true,
   },
   logging: false,
   define: {
-    underscored: true
-  }
+    underscored: true,
+  },
 }
 
 // Load options from config.json if one is provided
 const env = process.env.NODE_ENV || 'development'
+console.log('env is:', env)
 try {
   // const configOptions = require(__dirname + '/../config/config.json')[env]
-  const configOptions = require(path.resolve(__dirname, '..', 'config', 'config.json'))[env]
+  const configOptions = require(path.resolve(
+    __dirname,
+    '..',
+    'config',
+    'config.json'
+  ))[env]
   seqOptions = _.merge(seqOptions, configOptions)
+
+  console.log("seqOptions are:", seqOptions)
 } catch (e) {
   console.error('No config.json provided for Sequelize', e)
 }
 
 // Do NOT log your password on production!!!
-if (env === 'development') { console.log('Initialising Sequelize with options:', seqOptions) }
+if (env === 'development') {
+  console.log('Initialising Sequelize with options:', seqOptions)
+}
 
 // Initialise Sequelize
-export const dbConfig :sequelize.Sequelize = new sequelize.Sequelize(seqOptions)
+export const dbConfig: sequelize.Sequelize = new sequelize.Sequelize(seqOptions)
 
 // Initialise models
 export const Scrape = ScrapeFactory(dbConfig)

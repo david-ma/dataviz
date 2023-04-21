@@ -84,7 +84,7 @@ let config = {
                 router.res.end('Database not connected');
             }
             else {
-                const promises = [utilities_1.loadTemplates('homepage.mustache')];
+                const promises = [(0, utilities_1.loadTemplates)('homepage.mustache')];
                 Promise.all(promises).then(function ([views]) {
                     const data = {
                         gitHash: utilities_1.gitHash
@@ -107,7 +107,7 @@ let config = {
                 router.res.end('Database not connected');
             }
             else {
-                const promises = [utilities_1.loadTemplates('blog.mustache', router.path)];
+                const promises = [(0, utilities_1.loadTemplates)('blog.mustache', router.path)];
                 Promise.all(promises).then(function ([views]) {
                     const data = {
                         gitHash: utilities_1.gitHash
@@ -132,7 +132,7 @@ let config = {
             }
         },
         experiment: function (router) {
-            const promises = [utilities_1.loadTemplates('upload_experiment.mustache')];
+            const promises = [(0, utilities_1.loadTemplates)('upload_experiment.mustache')];
             Promise.all(promises).then(function ([views]) {
                 const data = {
                     gitHash: utilities_1.gitHash
@@ -142,7 +142,7 @@ let config = {
             });
         },
         stickers: function (router) {
-            const promises = [utilities_1.loadTemplates('stickers.mustache')];
+            const promises = [(0, utilities_1.loadTemplates)('stickers.mustache')];
             Promise.all(promises).then(function ([views]) {
                 const data = {
                     gitHash: utilities_1.gitHash

@@ -28,7 +28,7 @@ let config = {
             }).then(function (d) {
                 const results = d.map((d) => d.dataValues);
                 if (results.length > 0) {
-                    utilities_1.asyncForEach(results, 20, function (d, i, array, done) {
+                    (0, utilities_1.asyncForEach)(results, 20, function (d, i, array, done) {
                         const target = d.link;
                         const brand = d.title.split(/(?<=^\S+)\s/)[0].trim();
                         const model = d.title.split(/(?<=^\S+)\s/)[1].trim();
@@ -53,7 +53,7 @@ let config = {
                                                 .replace(/<span class="no"><\/span>/g, 'No');
                                             const data = tabletojson.convert(`<table>${d}</table>`)[0];
                                             const camera = data.reduce((obj, detail) => {
-                                                obj[utilities_1.sanitise(detail[0])] = detail[1];
+                                                obj[(0, utilities_1.sanitise)(detail[0])] = detail[1];
                                                 return obj;
                                             }, {});
                                             db.Camera.create(camera);
@@ -99,7 +99,7 @@ let config = {
                 'sony',
                 'zeiss',
             ];
-            utilities_1.asyncForEach(brands, 1, function (brand, iterator, brands, done) {
+            (0, utilities_1.asyncForEach)(brands, 1, function (brand, iterator, brands, done) {
                 let lastPageReached = false;
                 let i = 0;
                 while (!lastPageReached && i < 20) {
@@ -145,7 +145,7 @@ let config = {
             const promises = [];
             const brand = type.indexOf('_') > 0 ? type.split('_')[0] : '';
             const model = type.indexOf('_') > 0 ? type.split('_')[1].replace(/-/g, ' ') : '';
-            promises.push(utilities_1.loadTemplates('camera.mustache'));
+            promises.push((0, utilities_1.loadTemplates)('camera.mustache'));
             promises.push(db.Camera.findAll({
                 attributes: ['brand', 'model', 'year'],
                 where: {
@@ -194,7 +194,7 @@ let config = {
             });
         },
         brand: function (res, req, db, type) {
-            const promises = [utilities_1.loadTemplates('brand.mustache')];
+            const promises = [(0, utilities_1.loadTemplates)('brand.mustache')];
             promises.push(db.Camera.findAll({
                 where: {
                     brand: type,
