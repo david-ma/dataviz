@@ -6,6 +6,9 @@ type circleInfo = {
   r: number
   color: string
 }
+
+
+
 type coords = {
   x: number
   y: number
@@ -57,7 +60,8 @@ function drawMandala() {
     width = 1000,
     centerY = height / 2,
     centerX = width / 2,
-    layerRadius = 200
+    layerRadius = 200,
+    center = { x: centerX, y: centerY }
 
   const box = d3.select('#svg-box').append('svg')
 
@@ -72,14 +76,40 @@ function drawMandala() {
     // .attr('opacity', 0.2)
     .attr('stroke', 'black')
 
-  const circles: circleInfo[] = calculateCircles(layerRadius, 8, {
-    x: centerX,
-    y: centerY,
-  })
+  const circles: circleInfo[] = calculateCircles(layerRadius, 8, center)
 
   circles.forEach((circle) => {
     drawCircle(box, circle)
   })
+
+  // Draw petals from the first layer to the second layer
+  // Calculate points on second layer
+  const secondCircles: circleInfo[] = calculateCircles(layerRadius + 150, 16, center)
+
+  circles.forEach((circle, i) => {
+    // Draw a line from the first layer to the second layer
+
+    box.append('line')
+      .attr('x1', circle.x)
+      .attr('y1', circle.y)
+      .attr('x2', secondCircles[i * 2 + 1].x)
+      .attr('y2', secondCircles[i * 2 + 1].y)
+      .attr('stroke', 'black')
+      .attr('stroke-width', 2)
+
+    // Magic number. Not great.
+    if(i === 0) { i = 8}
+
+    box.append('line')
+      .attr('x1', circle.x)
+      .attr('y1', circle.y)
+      .attr('x2', secondCircles[i * 2 - 1].x)
+      .attr('y2', secondCircles[i * 2 - 1].y)
+      .attr('stroke', 'black')
+      .attr('stroke-width', 2)
+
+  })
+
 }
 
 drawMandala()
