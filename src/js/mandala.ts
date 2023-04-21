@@ -74,26 +74,30 @@ function calculateCurves(
   // Generate bezier curves for the petal
   // The petal is a bezier curve with 4 control points
 
+  const harshness = 0.8
+
   const topCenterX = (left.x + right.x) / 2
   const topCenterY = (left.y + right.y) / 2
 
   // The mid control point is 60% between the topCenter and center
-  const midControlPointX = topCenterX * 0.6 + center.x * 0.4
-  const midControlPointY = topCenterY * 0.6 + center.y * 0.4
+  const midControlPointX = topCenterX * harshness + center.x * (1 - harshness)
+  const midControlPointY = topCenterY * harshness + center.y * (1 - harshness)
 
   // Find the bottom left corner
   const bottomLeftX = center.x - (topCenterX - left.x)
   const bottomLeftY = center.y - (topCenterY - left.y)
 
-  const leftControlPointX = left.x * 0.6 + bottomLeftX * 0.4
-  const leftControlPointY = left.y * 0.6 + bottomLeftY * 0.4
+  const leftControlPointX = left.x * harshness + bottomLeftX * (1 - harshness)
+  const leftControlPointY = left.y * harshness + bottomLeftY * (1 - harshness)
 
   // find bottom right corner
   const bottomRightX = center.x - (topCenterX - right.x)
   const bottomRightY = center.y - (topCenterY - right.y)
 
-  const rightControlPointX = right.x * 0.6 + bottomRightX * 0.4
-  const rightControlPointY = right.y * 0.6 + bottomRightY * 0.4
+  const rightControlPointX =
+    right.x * harshness + bottomRightX * (1 - harshness)
+  const rightControlPointY =
+    right.y * harshness + bottomRightY * (1 - harshness)
 
   // return the curves
   const curves: curveInfo[] = [
