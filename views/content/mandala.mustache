@@ -1,6 +1,63 @@
 <section id="madala" class="blogpost">
   <br>
   <div id="svg-box"></div>
+
+  <div>
+    {{!-- options --}}
+    {{!--       <div id='options'>
+        <div class="option">
+          <input type="radio" id="showOutlines" name="outlines" value="showOutlines" checked="true">
+          <label for="showOutlines">Show Outlines</label><br>
+
+          <input type="radio" id="hideOutlines" name="outlines" value="hideOutlines">
+          <label for="hideOutlines">Hide Outlines</label>
+        </div>
+
+        <div class="option">
+          <label for="hideOutlines">Speed:</label><br>
+
+          <input id="speedSlider" type="range" min="1" max="100" value="50">
+          <div>
+            <div pseudo="-webkit-slider-runnable-track" id="track">
+              <div id="thumb"></div>
+            </div>
+          </div>
+          </input>
+        </div>
+
+        <div class="option">
+          <input type="radio" id="pastels" name="colors" value="pastels" checked="true">
+          <label for="pastels">Pastel colors</label><br>
+
+          <input type="radio" id="monochrome" name="colors" value="monochrome">
+          <label for="monochrome">Monochrome</label>
+        </div>
+
+        <div class="option">
+          <label for="hideOutlines">Number of shapes:</label><br>
+
+          <input id="verticesSlider" type="range" min="4" max="25" value="14">
+          <div>
+            <div pseudo="-webkit-slider-runnable-track" id="track">
+              <div id="thumb"></div>
+            </div>
+          </div>
+          </input>
+        </div> --}}
+    {{!-- Add options to control the mandala. Specifically the number of circles --}}
+
+    <div class="option">
+      <label for="numberOfCircles">Number of circles:</label><br>
+
+      <input id="numberOfCircles" type="range" min="4" max="25" value="14">
+      <div>
+        <div pseudo="-webkit-slider-runnable-track" id="track">
+          <div id="thumb"></div>
+        </div>
+      </div>
+      </input>
+    </div>
+  </div>
 </section>
 
 <style>

@@ -74,7 +74,7 @@ function calculateCurves(
   // Generate bezier curves for the petal
   // The petal is a bezier curve with 4 control points
 
-  const harshness = 0.8
+  const harshness = 0.9
 
   const topCenterX = (left.x + right.x) / 2
   const topCenterY = (left.y + right.y) / 2
@@ -149,10 +149,6 @@ function drawMandala() {
 
   const circles: circleInfo[] = calculateCircles(layerRadius, 8, center)
 
-  circles.forEach((circle) => {
-    drawCircle(box, circle)
-  })
-
   // Draw petals from the first layer to the second layer
   // Calculate points on second layer
   const secondCircles: circleInfo[] = calculateCircles(
@@ -173,31 +169,6 @@ function drawMandala() {
     var curves = calculateCurves(circle, left, right)
 
     curves.forEach(function (curve) {
-      // drawCircle(box, {
-      //   x: curve.x1,
-      //   y: curve.y1,
-      //   r: 5,
-      //   color: 'red',
-      // })
-      // drawCircle(box, {
-      //   x: curve.x2,
-      //   y: curve.y2,
-      //   r: 5,
-      //   color: 'red',
-      // })
-      // drawCircle(box, {
-      //   x: curve.x3,
-      //   y: curve.y3,
-      //   r: 5,
-      //   color: 'red',
-      // })
-      // drawCircle(box, {
-      //   x: curve.x4,
-      //   y: curve.y4,
-      //   r: 5,
-      //   color: 'red',
-      // })
-
       box
         .append('path')
         .attr(
@@ -208,6 +179,11 @@ function drawMandala() {
         .attr('fill', 'none')
     })
   })
+
+  circles.forEach((circle) => {
+    drawCircle(box, circle)
+  })
+
 }
 
 drawMandala()
