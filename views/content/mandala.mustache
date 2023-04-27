@@ -1,63 +1,68 @@
 <section id="madala" class="blogpost">
   <br>
+
+  {{!-- DOM.download(() => rasterize(chart), undefined, "Save as PNG") --}}
+  <button onclick="download()">save</button>
+  {{!-- <button>save</button> --}}
+  <br>
   <div id="svg-box"></div>
 
   <div>
     {{!-- options --}}
-    {{!--       <div id='options'>
-        <div class="option">
-          <input type="radio" id="showOutlines" name="outlines" value="showOutlines" checked="true">
-          <label for="showOutlines">Show Outlines</label><br>
+    {{!-- <div id='options'>
+      <div class="option">
+        <input type="radio" id="showOutlines" name="outlines" value="showOutlines" checked="true">
+        <label for="showOutlines">Show Outlines</label><br>
 
-          <input type="radio" id="hideOutlines" name="outlines" value="hideOutlines">
-          <label for="hideOutlines">Hide Outlines</label>
-        </div>
-
-        <div class="option">
-          <label for="hideOutlines">Speed:</label><br>
-
-          <input id="speedSlider" type="range" min="1" max="100" value="50">
-          <div>
-            <div pseudo="-webkit-slider-runnable-track" id="track">
-              <div id="thumb"></div>
-            </div>
-          </div>
-          </input>
-        </div>
-
-        <div class="option">
-          <input type="radio" id="pastels" name="colors" value="pastels" checked="true">
-          <label for="pastels">Pastel colors</label><br>
-
-          <input type="radio" id="monochrome" name="colors" value="monochrome">
-          <label for="monochrome">Monochrome</label>
-        </div>
-
-        <div class="option">
-          <label for="hideOutlines">Number of shapes:</label><br>
-
-          <input id="verticesSlider" type="range" min="4" max="25" value="14">
-          <div>
-            <div pseudo="-webkit-slider-runnable-track" id="track">
-              <div id="thumb"></div>
-            </div>
-          </div>
-          </input>
-        </div> --}}
-    {{!-- Add options to control the mandala. Specifically the number of circles --}}
-
-    <div class="option">
-      <label for="numberOfCircles">Number of circles:</label><br>
-
-      <input id="numberOfCircles" type="range" min="4" max="25" value="14">
-      <div>
-        <div pseudo="-webkit-slider-runnable-track" id="track">
-          <div id="thumb"></div>
-        </div>
+        <input type="radio" id="hideOutlines" name="outlines" value="hideOutlines">
+        <label for="hideOutlines">Hide Outlines</label>
       </div>
-      </input>
+
+      <div class="option">
+        <label for="hideOutlines">Speed:</label><br>
+
+        <input id="speedSlider" type="range" min="1" max="100" value="50">
+        <div>
+          <div pseudo="-webkit-slider-runnable-track" id="track">
+            <div id="thumb"></div>
+          </div>
+        </div>
+        </input>
+      </div>
+
+      <div class="option">
+        <input type="radio" id="pastels" name="colors" value="pastels" checked="true">
+        <label for="pastels">Pastel colors</label><br>
+
+        <input type="radio" id="monochrome" name="colors" value="monochrome">
+        <label for="monochrome">Monochrome</label>
+      </div>
+
+      <div class="option">
+        <label for="hideOutlines">Number of shapes:</label><br>
+
+        <input id="verticesSlider" type="range" min="4" max="25" value="14">
+        <div>
+          <div pseudo="-webkit-slider-runnable-track" id="track">
+            <div id="thumb"></div>
+          </div>
+        </div>
+        </input>
+      </div> --}}
+      {{!-- Add options to control the mandala. Specifically the number of circles --}}
+
+      <div class="option">
+        <label for="numberOfCircles">Number of circles:</label><br>
+
+        <input id="numberOfCircles" type="range" min="0" max="12" value="8">
+        <div>
+          <div pseudo="-webkit-slider-runnable-track" id="track">
+            <div id="thumb"></div>
+          </div>
+        </div>
+        </input>
+      </div>
     </div>
-  </div>
 </section>
 
 <style>
@@ -68,5 +73,63 @@
     border: 5px solid black;
   }
 </style>
+
+<script>
+
+  const xmlns = "http://www.w3.org/2000/xmlns/";
+  const xlinkns = "http://www.w3.org/1999/xlink";
+  const svgns = "http://www.w3.org/2000/svg";
+
+  function serialize(svg) {
+    svg = svg.cloneNode(true);
+    const fragment = window.location.href + "#";
+    const walker = document.createTreeWalker(svg, NodeFilter.SHOW_ELEMENT);
+    while (walker.nextNode()) {
+      for (const attr of walker.currentNode.attributes) {
+        if (attr.value.includes(fragment)) {
+          attr.value = attr.value.replace(fragment, "#");
+        }
+      }
+    }
+    svg.setAttributeNS(xmlns, "xmlns", svgns);
+    svg.setAttributeNS(xmlns, "xmlns:xlink", xlinkns);
+    const serializer = new window.XMLSerializer;
+    const string = serializer.serializeToString(svg);
+    return new Blob([string], { type: "image/svg+xml" });
+  };
+
+  /*
+    function rasterize(svg) {
+      let resolve, reject;
+      const promise = new Promise((y, n) => (resolve = y, reject = n));
+      const image = new Image;
+      image.onerror = reject;
+      image.onload = () => {
+        const rect = svg.getBoundingClientRect();
+        const context = DOM.context2d(rect.width, rect.height);
+        context.drawImage(image, 0, 0, rect.width, rect.height);
+        context.canvas.toBlob(resolve);
+      };
+      image.src = URL.createObjectURL(serialize(svg));
+      return promise;
+    }
+  */
+
+  function download() {
+    var svg = document.querySelector('svg');
+    var serialized_svg = serialize(svg);
+    var file = new File([serialized_svg], "mandala.svg", { type: "image/svg+xml" });
+
+    const link = document.createElement("a");
+    link.style.display = "none";
+    link.href = URL.createObjectURL(file);
+    link.download = file.name;
+
+    document.body.appendChild(link);
+    link.click();
+
+  }
+
+</script>
 
 {{> require}}
