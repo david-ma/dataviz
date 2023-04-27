@@ -1,5 +1,13 @@
 import { Model, Sequelize } from 'sequelize'
-import { dbConfig, Blogpost, Scrape, Camera, Family, AwesomeProject } from '../models'
+import {
+  dbConfig,
+  Blogpost,
+  Scrape,
+  Camera,
+  Family,
+  AwesomeProject,
+  AwesomePhoto,
+} from '../models'
 
 export interface seqObject {
   [key: string]: Model | any | Sequelize
@@ -13,7 +21,8 @@ const seq: seqObject = {
   Scrape: Scrape,
   Camera: Camera,
   Family: Family,
-  AwesomeProject: AwesomeProject,
+  AwesomeProject,
+  AwesomePhoto,
 }
 
 // Family.get()
@@ -142,7 +151,8 @@ if (true) {
           shortname: 'winamp',
           title: 'Winamp Animation',
           category: 'animation',
-          summary: 'A simple animation, reminiscent of the old winamp visualisations',
+          summary:
+            'A simple animation, reminiscent of the old winamp visualisations',
           image: 'images/winamp.jpg',
           publish_date: '2021-09-15',
           published: true,
@@ -151,7 +161,8 @@ if (true) {
           shortname: 'earthquake',
           title: 'Melbourne Earthquake',
           category: 'animation',
-          summary: 'A visualisation of the twitter activity when Melbourne had an earthquake',
+          summary:
+            'A visualisation of the twitter activity when Melbourne had an earthquake',
           image: 'images/earthquake.jpg',
           publish_date: '2021-09-23',
           published: true,

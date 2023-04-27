@@ -1,5 +1,7 @@
-let request = require('request');
-let fs = require('fs');
+var request = require('request');
+var seq = require('../db_bootstrap').seq;
+var xray = require('x-ray')();
+var fs = require('fs');
 const base = 'https://www.awesomefoundation.org/en/chapters/melbourne/projects', target = '';
 const Cookie = require('../config.json').Cookie;
 const options = {
@@ -15,10 +17,8 @@ request(options, function callback(err, response, html) {
         response.end('error making request' + err);
     }
     console.log(html);
-    fs.writeFile('output/test.html', html, function (err) {
-        if (err) {
-            return console.log(err);
-        }
-        console.log('The file was saved!');
+    xray(html, 'article.project@html')
+        .then(d => {
+        console.log(d);
     });
 });

@@ -1,7 +1,8 @@
-let request = require('request')
+var request = require('request')
+var seq = require('../db_bootstrap').seq
+var xray = require('x-ray')()
 
-// @ts-ignore
-let fs = require('fs')
+var fs = require('fs')
 
 const base = 'https://www.awesomefoundation.org/en/chapters/melbourne/projects',
   target = ''
@@ -23,12 +24,18 @@ request(options, function callback(err, response, html) {
   }
   console.log(html)
 
-  fs.writeFile('output/test.html', html, function (err) {
-    if (err) {
-      return console.log(err)
-    }
-    console.log('The file was saved!')
+  xray(html, 'article.project@html')
+  .then(d => {
+    console.log(d)
   })
+
+
+  // fs.writeFile('output/test.html', html, function (err) {
+  //   if (err) {
+  //     return console.log(err)
+  //   }
+  //   console.log('The file was saved!')
+  // })
 })
 
 // const driver = makeDriver(options)		//Create driver

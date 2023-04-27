@@ -1,6 +1,6 @@
 var seq = require('../db_bootstrap').seq;
 var csv = require('csv/sync');
-let fs = require('fs');
+var fs = require('fs');
 var stuff = fs.readFileSync('data/melbourne_export_all.csv', {
     encoding: 'utf8',
 });

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import * as sequelize from 'sequelize'
 // import { UserFactory } from "./user-model";
 // import { SkillsFactory } from "./skills-model";
@@ -10,6 +12,7 @@ import { CameraFactory } from './camera'
 import { BlogpostFactory } from './blogpost'
 
 import { AwesomeProjectFactory } from './awesome'
+import { AwesomePhotoFactory } from './awesome'
 
 import path = require('path')
 
@@ -69,6 +72,8 @@ export const Blogpost = BlogpostFactory(dbConfig)
 // export const Worksheet = WorksheetFactory(dbConfig)
 
 export const AwesomeProject = AwesomeProjectFactory(dbConfig)
+export const AwesomePhoto = AwesomePhotoFactory(dbConfig)
+AwesomeProject.hasMany(AwesomePhoto)
 
 Camera.belongsTo(Family)
 Family.hasMany(Camera)

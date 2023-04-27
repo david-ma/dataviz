@@ -1,7 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AwesomeProjectFactory = void 0;
+exports.AwesomeProjectFactory = exports.AwesomePhotoFactory = void 0;
 const sequelize_1 = require("sequelize");
+function AwesomePhotoFactory(sequelize) {
+    return sequelize.define('AwesomePhoto', {
+        url: {
+            type: sequelize_1.DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+        },
+        awesome_project_id: {
+            type: sequelize_1.DataTypes.INTEGER,
+            allowNull: false,
+        },
+        caption: sequelize_1.DataTypes.STRING,
+    });
+}
+exports.AwesomePhotoFactory = AwesomePhotoFactory;
 function AwesomeProjectFactory(sequelize) {
     return sequelize.define('AwesomeProject', {
         name: sequelize_1.DataTypes.STRING,

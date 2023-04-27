@@ -1,5 +1,23 @@
 import { DataTypes, Sequelize } from 'sequelize'
 
+export function AwesomePhotoFactory(sequelize: Sequelize) {
+  return sequelize.define(
+    'AwesomePhoto',
+    {
+      url: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      awesome_project_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      caption: DataTypes.STRING,
+    }
+  )
+}
+
 export function AwesomeProjectFactory(sequelize: Sequelize) {
   return sequelize.define(
     'AwesomeProject',
