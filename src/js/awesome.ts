@@ -43,7 +43,7 @@ socket.on('overwriteText', (packet) => {
   } else {
     const properties = {
       selectionStart: element.prop('selectionStart'),
-      selectionEnd: element.prop('selectionEnd')
+      selectionEnd: element.prop('selectionEnd'),
     }
     element.val(packet.data)
     if (properties.selectionStart) element.prop(properties)
@@ -60,7 +60,8 @@ d3.csv('/melbourne_export.csv', function (d) {
   }
 }).then(function (d) {
   // console.log(d);
-  d3.select('#AwesomeStuff')
+  var project = d3
+    .select('#AwesomeStuff')
     .selectAll('div')
     .data(d)
     .enter()
@@ -70,63 +71,92 @@ d3.csv('/melbourne_export.csv', function (d) {
     .classed('row', true)
     .each(function (d) {
       const tab = d3.select('#tabs').append('li')
-      tab.append('input').attr('id', 'tab-' + d.id).attrs({
-        type: 'radio',
-        name: 'tabs'
-      })
-      tab.append('label').attr('for', 'tab-' + d.id).text(d.title)
-        .append('span').attrs({
-          id: `tabVotes-${d.id}`
+      tab
+        .append('input')
+        .attr('id', 'tab-' + d.id)
+        .attrs({
+          type: 'radio',
+          name: 'tabs',
+        })
+      tab
+        .append('label')
+        .attr('for', 'tab-' + d.id)
+        .text(d.title)
+        .append('span')
+        .attrs({
+          id: `tabVotes-${d.id}`,
         })
 
-      const projectId = "project-" + d.id
+      const projectId = 'project-' + d.id
 
       const project = d3.select(this)
-      const header = project.append('div').attr("id", projectId)
+      const header = project.append('div').attr('id', projectId)
       const left = project.append('div').classed('col-xs-6', true)
       const right = project.append('div').classed('col-xs-6', true)
 
-      header.append('h1')
+      var leftSide = header.append('div').classed('col-xs-6', true)
+
+      leftSide
+        .append('h1')
         .append('a')
         .attr('href', `#${projectId}`)
         .text(d.title)
 
-      header.append('span').text(`Submitted by: ${d.name}`)
-      if(d.url) {
-        header
-          .append('p')
-          .append('a')
-          .attr('href', d.url)
-          .text(d.url)
+      leftSide.append('span').text(`Submitted by: ${d.name}`)
+      if (d.url) {
+        leftSide.append('p').append('a').attr('href', d.url).text(d.url)
       }
 
+      var rightSide = header.append('div').classed('col-xs-6', true)
+      rightSide.html(
+        md.makeHtml(`Vote tally goes here:
+
+Does it do these things? Circle them if it does.
+
+Social Justice, Sports, Church, Queer, Refugee, Art, Education, Science, Collaboration, Environment, Health, Community, Technology, Feasibility with $1000,
+
+Other:`)
+      )
+
       left.append('h3').text("Here's my idea:")
-      left.append('div').attr('id', 'description-' + d.id)
+      left
+        .append('div')
+        .attr('id', 'description-' + d.id)
+        .classed('smaller', (d: any) => d.about_project.length > 1000)
       $('#description-' + d.id).html(md.makeHtml(d.about_project))
 
       left.append('h3').text('How I will use the money:')
 
-      left.append('div').attr('id', 'use-' + d.id)
+      left
+        .append('div')
+        .attr('id', 'use-' + d.id)
+        .classed('smaller', (d: any) => d.use_for_money.length > 600)
       $('#use-' + d.id).html(md.makeHtml(d.use_for_money))
 
       left.append('h3').text('A little about me:')
-      left.append('div').attr('id', 'me-' + d.id)
+      left
+        .append('div')
+        .attr('id', 'me-' + d.id)
+        .classed('smaller', (d: any) => d.about_me.length > 400)
       $('#me-' + d.id).html(md.makeHtml(d.about_me))
 
       right.append('h3').text('Awesome Trustee Comments:')
-      right.append('textarea')
+      right
+        .append('textarea')
         .classed('comments', true)
         .attrs({
           id: `comments-${d.id}`,
           name: `comments-${d.id}`,
-          placeholder: 'Write collaborative comments here'
-        }).on('keyup', function (d :any) {
+          placeholder: 'Write collaborative comments here',
+        })
+        .on('keyup', function (d: any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
             name: `comments-${d.id}`,
-            data: text
+            data: text,
           })
-        }).text(() => {
+        })
+        .text(() => {
           const data = initialData[`comments-${d.id}`]
           if (data) {
             return initialData[`comments-${d.id}`]
@@ -135,29 +165,38 @@ d3.csv('/melbourne_export.csv', function (d) {
           }
         })
 
-      right.append('h3').text('Votes:').append('span').attrs({
-        id: `voteCounts-${d.id}`
-      })
-      right.append('input')
+      right
+        .append('h3')
+        .text('Votes:')
+        .append('span')
+        .attrs({
+          id: `voteCounts-${d.id}`,
+        })
+      right
+        .append('input')
         .classed('signatures', true)
         .attrs({
           id: `signatures-${d.id}`,
           name: `signatures-${d.id}`,
-          placeholder: 'Add comma seperated names to vote. E.g. "David Ma, Jon King, Lauren Gawne"'
-        }).on('keyup', function (d :any) {
+          placeholder:
+            'Add comma seperated names to vote. E.g. "David Ma, Jon King, Lauren Gawne"',
+        })
+        .on('keyup', function (d: any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
             name: `signatures-${d.id}`,
-            data: text
+            data: text,
           })
-        }).text(() => {
+        })
+        .text(() => {
           const data = initialData[`signatures-${d.id}`]
           if (data) {
             return initialData[`signatures-${d.id}`]
           } else {
             return ''
           }
-        }).on('input', countVotes)
+        })
+        .on('input', countVotes)
 
       right.append('h3').text('Applicable Categories:')
       const categories = {
@@ -165,33 +204,49 @@ d3.csv('/melbourne_export.csv', function (d) {
         Art: 'Some sorta art piece??',
         Education: 'Education',
         Science: 'Citizen Science stuff',
+        Sports: 'Amateur sports',
+        Innovation: 'Innovation',
+        Sustainability: 'Sustainability',
+        Inclusivity: 'Inclusivity / Collaboration of community',
+        Scalability: 'Scalability',
         Healthcare: 'Has a healthcare aspect to it',
-        'Big Impact': "Our $1000 will make a real difference / it wouldn't happen without our help",
-        Viable: 'Sounds like these peeps will get the job done'
+        'Big Impact':
+          "Our $1000 will make a real difference / it wouldn't happen without our help",
+        Viable: 'Sounds like these peeps will get the job done',
       }
-      right.append('ul').attrs({
-        class: 'categoryList row'
-      }).selectAll('li').data(Object.keys(categories))
+      right
+        .append('ul')
+        .attrs({
+          class: 'categoryList row',
+        })
+        .selectAll('li')
+        .data(Object.keys(categories))
         .enter()
         .append('li')
-        .attr('id', category => `categoryLi-${d.id}-${cssSelectorSafe(category)}`)
-        .each(category => {
-          const li = d3.select(`#categoryLi-${d.id}-${cssSelectorSafe(category)}`)
+        .attr(
+          'id',
+          (category) => `categoryLi-${d.id}-${cssSelectorSafe(category)}`
+        )
+        .each((category) => {
+          const li = d3.select(
+            `#categoryLi-${d.id}-${cssSelectorSafe(category)}`
+          )
           const elementId = `category-${d.id}-${cssSelectorSafe(category)}`
 
-          li.append('input').attrs({
-            id: elementId,
-            type: 'checkbox'
-          })
+          li.append('input')
+            .attrs({
+              id: elementId,
+              type: 'checkbox',
+            })
             .on('input', function () {
               const value = $(`#${elementId}`).is(':checked')
               socket.emit('overwriteText', {
                 name: elementId,
-                data: value
+                data: value,
               })
             })
           li.append('label').text(category).attrs({
-            for: elementId
+            for: elementId,
           })
           li.append('p')
             .classed('categoryDesription', true)
@@ -199,19 +254,23 @@ d3.csv('/melbourne_export.csv', function (d) {
         })
 
       right.append('h3').text('Follow up items:')
-      right.append('textarea')
+      right
+        .append('textarea')
         .classed('debrief', true)
         .attrs({
           id: `debrief-${d.id}`,
           name: `debrief-${d.id}`,
-          placeholder: 'What other things could be done for this project, besides money? What advice can we give them?'
-        }).on('keyup', function (d :any) {
+          placeholder:
+            'What other things could be done for this project, besides money? What advice can we give them?',
+        })
+        .on('keyup', function (d: any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
             name: `debrief-${d.id}`,
-            data: text
+            data: text,
           })
-        }).text(() => {
+        })
+        .text(() => {
           const data = initialData[`debrief-${d.id}`]
           if (data) {
             return initialData[`debrief-${d.id}`]
@@ -220,20 +279,22 @@ d3.csv('/melbourne_export.csv', function (d) {
           }
         })
 
-      d3.select('#title h1 a').text("Awesome Foundation Melbourne")
+      d3.select('#title h1 a').text('Awesome Foundation Melbourne')
 
       // print version
-      // right.remove()
-      // left.classed("col-xs-12", true)
-      // left.append("br").classed('page-break', true)
-      // d3.select("header").remove()
-      // d3.select("footer").remove()
-      // d3.select("#mobile_nav").remove()
-      d3.select("#tabs").remove()
+      project.classed('printProject', true)
+      right.remove()
+      left.classed('col-xs-12', true)
+      left.append('br').classed('page-break', true)
+      d3.select('header').remove()
+      d3.select('footer').remove()
+      d3.select('#mobile_nav').remove()
+
+      d3.select('#tabs').remove()
     })
 })
 
-function countVotes (id) {
+function countVotes(id) {
   let text = ''
   if (typeof id === 'string') {
     text = $(`#${id}`).val() as string
@@ -249,6 +310,6 @@ function countVotes (id) {
   d3.select(`#tabVotes-${ideaID}`).text(` (${votes})`)
 }
 
-function cssSelectorSafe (string) {
+function cssSelectorSafe(string) {
   return string.toLowerCase().replace(/[ .!$#{}'"`\/\\\[\]]/, '-') // eslint-disable-line
 }
