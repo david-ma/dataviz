@@ -8,7 +8,6 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "loadcsv": "node config/scripts/csv_to_sqlite.js",
     "scrape": "node config/scripts/scrape_awesome.js",
     "newBlogpost": "bash scripts/newBlogpost.sh",
     "start": "node server/thalia.js"

@@ -39,7 +39,7 @@ export function xray(html) {
           }).then((d) => {
             if (d) {
               console.log('Found existing record', d.id)
-              d.update(photo)
+              // d.update(photo)
             } else {
               console.log('Creating new record', photo.url)
               seq.AwesomePhoto.create(photo).catch((error) => {

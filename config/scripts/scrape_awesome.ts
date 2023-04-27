@@ -21,3 +21,43 @@ request(options, function callback(err, response, html) {
   // console.log(html)
   xray(html)
 })
+
+var AwesomeProject = require('../db_bootstrap').seq.AwesomeProject
+var csv = require('csv/sync')
+request(
+  {
+    url: 'https://www.awesomefoundation.org/en/chapters/11/projects.csv',
+    headers: { Cookie },
+  },
+  function callback(err, response, body) {
+    if (err) {
+      console.log(err)
+      response.end('error making request' + err)
+    }
+
+    const records = csv.parse(body, {
+      delimiter: ',',
+      columns: true,
+      skip_empty_lines: true,
+    })
+
+    records.forEach((record) => {
+      AwesomeProject.findOne({
+        where: {
+          id: record.id,
+        },
+      }).then((d) => {
+        if (d) {
+          console.log('Found existing record', d.id)
+          // d.update(record)
+        } else {
+          console.log('Creating new record', record.id)
+
+          AwesomeProject.create(record).catch((error) => {
+            console.log('Error', error)
+          })
+        }
+      })
+    })
+  }
+)

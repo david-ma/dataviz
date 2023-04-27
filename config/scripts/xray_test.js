@@ -32,7 +32,6 @@ function xray(html) {
                     }).then((d) => {
                         if (d) {
                             console.log('Found existing record', d.id);
-                            d.update(photo);
                         }
                         else {
                             console.log('Creating new record', photo.url);
