@@ -1,11 +1,8 @@
 var request = require('request')
-var seq = require('../db_bootstrap').seq
-var xray = require('x-ray')()
+var xray = require('./xray_test').xray
 
-var fs = require('fs')
-
-const base = 'https://www.awesomefoundation.org/en/chapters/melbourne/projects',
-  target = ''
+const base = 'https://www.awesomefoundation.org/en/chapters/11/projects',
+  target = '?page=1'
 
 const Cookie = require('../config.json').Cookie
 
@@ -15,38 +12,12 @@ const options = {
     Cookie,
   },
 }
-console.log('cookie', Cookie)
 
 request(options, function callback(err, response, html) {
   if (err) {
     console.log(err)
     response.end('error making request' + err)
   }
-  console.log(html)
-
-  xray(html, 'article.project@html')
-  .then(d => {
-    console.log(d)
-  })
-
-
-  // fs.writeFile('output/test.html', html, function (err) {
-  //   if (err) {
-  //     return console.log(err)
-  //   }
-  //   console.log('The file was saved!')
-  // })
+  // console.log(html)
+  xray(html)
 })
-
-// const driver = makeDriver(options)		//Create driver
-// xray.driver(driver)						        //Set driver
-
-// xray('https://www.awesomefoundation.org/en/chapters/melbourne/projects', '.project', [
-//   {
-//     title: '.title',
-//     link: 'a@href',
-//     name: '.name',
-//     url: '.url',
-//     id: '@id',
-//   },
-// ]).write('output/awesome.json')
