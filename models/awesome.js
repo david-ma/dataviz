@@ -24,6 +24,8 @@ function AwesomeProjectFactory(sequelize) {
         rss_feed_url: sequelize_1.DataTypes.STRING,
         hidden_at: sequelize_1.DataTypes.DATE,
         hidden_reason: sequelize_1.DataTypes.STRING,
+    }, {
+        timestamps: false,
     });
 }
 exports.AwesomeProjectFactory = AwesomeProjectFactory;
