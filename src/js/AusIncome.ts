@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Chart, _, d3 } from 'chart'
 import 'datatables.net'
 

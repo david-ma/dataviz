@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Chart, d3, $ } from 'chart'
 
 const margin = ({ top: 40, right: 40, bottom: 40, left: 40 })

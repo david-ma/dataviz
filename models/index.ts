@@ -8,20 +8,26 @@ import { ScrapeFactory } from './scrape'
 import { FamilyFactory } from './family'
 import { CameraFactory } from './camera'
 import { BlogpostFactory } from './blogpost'
+
+import { AwesomeProjectFactory } from './awesome'
+
 import path = require('path')
 
 // Default options
 let seqOptions: sequelize.Options = {
-  database: process.env.DB_NAME || 'typescript_test',
-  username: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  port: 3306,
-  dialect: 'mariadb',
-  // timezone: 'Australia/Melbourne',
-  dialectOptions: {
-    timezone: 'Australia/Melbourne',
-    decimalNumbers: true,
-  },
+  // Old defaults, from when mariaDB was the default
+  // database: process.env.DB_NAME || 'typescript_test',
+  // username: process.env.DB_USER || 'root',
+  // password: process.env.DB_PASSWORD || '',
+  // port: 3306,
+  // dialect: 'mariadb',
+  // // timezone: 'Australia/Melbourne',
+  // dialectOptions: {
+  //   timezone: 'Australia/Melbourne',
+  //   decimalNumbers: true,
+  // },
+  "dialect": "sqlite",
+  "storage": path.resolve(__dirname, 'database.sqlite'),
   logging: false,
   define: {
     underscored: true,
@@ -61,6 +67,8 @@ export const Camera = CameraFactory(dbConfig)
 export const Blogpost = BlogpostFactory(dbConfig)
 // export const Family = FamilyFactory(dbConfig)
 // export const Worksheet = WorksheetFactory(dbConfig)
+
+export const AwesomeProject = AwesomeProjectFactory(dbConfig)
 
 Camera.belongsTo(Family)
 Family.hasMany(Camera)

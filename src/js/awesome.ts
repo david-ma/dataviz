@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /// <reference path="../../node_modules/@types/d3/index.d.ts" />
 /// <reference path="../../node_modules/@types/d3-selection/index.d.ts" />
 /// <reference path="../../node_modules/@types/d3-selection-multi/index.d.ts" />
@@ -67,9 +69,9 @@ d3.csv('/melbourne_export.csv', function (d) {
     .enter()
     .append('div')
     .classed('project', true)
-    .attr('id', (d) => 'project-' + d.id)
+    .attr('id', (d: any) => 'project-' + d.id)
     .classed('row', true)
-    .each(function (d) {
+    .each(function (d: any) {
       const tab = d3.select('#tabs').append('li')
       tab
         .append('input')

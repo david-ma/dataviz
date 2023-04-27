@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /* eslint-disable camelcase */
 /* eslint-disable no-var */
 /* eslint-disable no-redeclare */

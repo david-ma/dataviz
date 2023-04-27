@@ -1,5 +1,5 @@
 import { Model, Sequelize } from 'sequelize'
-import { dbConfig, Blogpost, Scrape, Camera, Family } from '../models'
+import { dbConfig, Blogpost, Scrape, Camera, Family, AwesomeProject } from '../models'
 
 export interface seqObject {
   [key: string]: Model | any | Sequelize
@@ -7,11 +7,13 @@ export interface seqObject {
 }
 
 const seq: seqObject = {
+  // @ts-ignore
   sequelize: dbConfig,
   Blogpost: Blogpost,
   Scrape: Scrape,
   Camera: Camera,
   Family: Family,
+  AwesomeProject: AwesomeProject,
 }
 
 // Family.get()

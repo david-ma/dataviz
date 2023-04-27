@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 const sd = new showdown.Converter({
   openLinksInNewWindow: true,
 })

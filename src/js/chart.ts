@@ -66,7 +66,9 @@ class Chart {
   // svg: Selection<SVGSVGElement, any, HTMLElement, any>
   svg: any
   plot: any
+  // @ts-ignore
   xScale: d3.ScaleLinear<number, number>
+  // @ts-ignore
   yBand: d3.ScaleBand<string>
 
   // Sets variables

@@ -7,6 +7,7 @@ const seq = {
     Scrape: models_1.Scrape,
     Camera: models_1.Camera,
     Family: models_1.Family,
+    AwesomeProject: models_1.AwesomeProject,
 };
 if (false) {
     models_1.Family.create({

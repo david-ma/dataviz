@@ -3,7 +3,7 @@
     "module": "CommonJS",
     // "allowSyntheticDefaultImports": true,
     // "esModuleInterop": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "skipLibCheck": false,
     "noImplicitAny": true,
     "noImplicitThis": true,

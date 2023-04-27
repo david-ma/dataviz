@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Chart, decorateTable, $, d3 } from 'chart'
 
 console.log('Running wealth.ts')

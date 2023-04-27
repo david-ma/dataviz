@@ -23,24 +23,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Blogpost = exports.Camera = exports.Family = exports.Scrape = exports.dbConfig = void 0;
+exports.AwesomeProject = exports.Blogpost = exports.Camera = exports.Family = exports.Scrape = exports.dbConfig = void 0;
 const sequelize = __importStar(require("sequelize"));
 const _ = require("lodash");
 const scrape_1 = require("./scrape");
 const family_1 = require("./family");
 const camera_1 = require("./camera");
 const blogpost_1 = require("./blogpost");
+const awesome_1 = require("./awesome");
 const path = require("path");
 let seqOptions = {
-    database: process.env.DB_NAME || 'typescript_test',
-    username: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    port: 3306,
-    dialect: 'mariadb',
-    dialectOptions: {
-        timezone: 'Australia/Melbourne',
-        decimalNumbers: true,
-    },
+    "dialect": "sqlite",
+    "storage": path.resolve(__dirname, 'database.sqlite'),
     logging: false,
     define: {
         underscored: true,
@@ -64,5 +58,6 @@ exports.Scrape = (0, scrape_1.ScrapeFactory)(exports.dbConfig);
 exports.Family = (0, family_1.FamilyFactory)(exports.dbConfig);
 exports.Camera = (0, camera_1.CameraFactory)(exports.dbConfig);
 exports.Blogpost = (0, blogpost_1.BlogpostFactory)(exports.dbConfig);
+exports.AwesomeProject = (0, awesome_1.AwesomeProjectFactory)(exports.dbConfig);
 exports.Camera.belongsTo(exports.Family);
 exports.Family.hasMany(exports.Camera);
