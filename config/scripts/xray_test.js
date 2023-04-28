@@ -8,7 +8,7 @@ function xray(html) {
         if (err) {
             console.log('ERROR', err);
         }
-        console.log('Projects:', projects);
+        console.log('Projects found in html:', projects);
         const tally = {
             total: projects.length,
             photos: 0,
@@ -20,6 +20,7 @@ function xray(html) {
                     project: project,
                     photos: x(`a[rel="project-${project}-images"]`, [
                         {
+                            awesome_project_id: project,
                             url: '@href',
                             caption: '@title',
                         },
@@ -31,7 +32,6 @@ function xray(html) {
                     }
                     Promise.all(blob.photos.map((photo) => {
                         new Promise((resolve, reject) => {
-                            photo.awesome_project_id = project;
                             tally.photos++;
                             AwesomePhoto.findOne({
                                 where: {

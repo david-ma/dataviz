@@ -20,7 +20,7 @@ export function xray(html) {
     if (err) {
       console.log('ERROR', err)
     }
-    console.log('Projects:', projects)
+    console.log('Projects found in html:', projects)
     const tally = {
       total: projects.length,
       photos: 0,

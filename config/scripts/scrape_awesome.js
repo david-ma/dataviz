@@ -30,6 +30,7 @@ request({
         columns: true,
         skip_empty_lines: true,
     });
+    console.log(`Found ${records.length} records in the CSV`);
     records.forEach((record) => {
         AwesomeProject.findOne({
             where: {
