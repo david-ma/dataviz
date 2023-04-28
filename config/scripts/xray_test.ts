@@ -5,6 +5,15 @@ var x = require('x-ray')()
 // var html = fs.readFileSync('output/test.html')
 // xray(html)
 
+type ProjectBlob = {
+  project: number
+  photos: Array<{
+    awesome_project_id: number
+    url: string
+    caption: string
+  }>
+}
+
 export function xray(html) {
   // Get the project IDs
   x(html, ['article.project@data-id'])(function (err, projects) {
@@ -26,11 +35,12 @@ export function xray(html) {
             project: project,
             photos: x(`a[rel="project-${project}-images"]`, [
               {
+                awesome_project_id: project,
                 url: '@href',
                 caption: '@title',
               },
             ]),
-          })(function (err, blob) {
+          })(function (err, blob: ProjectBlob) {
             if (err) {
               console.log('ERROR', err)
               reject(err)
@@ -41,7 +51,6 @@ export function xray(html) {
             Promise.all(
               blob.photos.map((photo) => {
                 new Promise((resolve, reject) => {
-                  photo.awesome_project_id = project
                   tally.photos++
 
                   AwesomePhoto.findOne({
@@ -72,7 +81,6 @@ export function xray(html) {
     ).then((d) => {
       console.log('Done!')
       console.log(`Total projects: ${tally.total}`)
-      // This tally doesn't work because the xray & sequelize calls are asynchronous
       console.log(`Total photos found: ${tally.photos}`)
       console.log(`New photos: ${tally.newPhotos}`)
     })
