@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.xray = void 0;
-var seq = require('../db_bootstrap').seq;
+var AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto;
 var x = require('x-ray')();
 function xray(html) {
     x(html, ['article.project@data-id'])(function (err, projects) {
@@ -9,6 +9,11 @@ function xray(html) {
             console.log('ERROR', err);
         }
         console.log('Projects:', projects);
+        const tally = {
+            total: projects.length,
+            photos: 0,
+            newPhotos: 0,
+        };
         projects.forEach((project) => {
             x(html, `article.project[data-id=${project}]`, {
                 project: project,
@@ -22,20 +27,19 @@ function xray(html) {
                 if (err) {
                     console.log('ERROR', err);
                 }
-                console.log(`Project ${project}:`, blob);
                 blob.photos.forEach((photo) => {
                     photo.awesome_project_id = project;
-                    seq.AwesomePhoto.findOne({
+                    tally.photos++;
+                    AwesomePhoto.findOne({
                         where: {
                             url: photo.url,
                         },
                     }).then((d) => {
                         if (d) {
-                            console.log('Found existing record', d.id);
                         }
                         else {
-                            console.log('Creating new record', photo.url);
-                            seq.AwesomePhoto.create(photo).catch((error) => {
+                            tally.newPhotos++;
+                            AwesomePhoto.create(photo).catch((error) => {
                                 console.log('Error', error);
                             });
                         }
@@ -43,6 +47,8 @@ function xray(html) {
                 });
             });
         });
+        console.log('Done!');
+        console.log(`Total projects: ${tally.total}`);
     });
 }
 exports.xray = xray;

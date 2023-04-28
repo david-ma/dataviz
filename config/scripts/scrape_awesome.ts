@@ -26,7 +26,7 @@ var AwesomeProject = require('../db_bootstrap').seq.AwesomeProject
 var csv = require('csv/sync')
 request(
   {
-    url: 'https://www.awesomefoundation.org/en/chapters/11/projects.csv',
+    url: 'https://www.awesomefoundation.org/en/chapters/11/projects.csv?end=&q=&start=2023-04-25',
     headers: { Cookie },
   },
   function callback(err, response, body) {

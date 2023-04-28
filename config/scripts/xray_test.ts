@@ -1,4 +1,4 @@
-var seq = require('../db_bootstrap').seq
+var AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto
 var x = require('x-ray')()
 
 // var fs = require('fs')
@@ -12,6 +12,11 @@ export function xray(html) {
       console.log('ERROR', err)
     }
     console.log('Projects:', projects)
+    const tally = {
+      total: projects.length,
+      photos: 0,
+      newPhotos: 0,
+    }
 
     // Get the photos for each project
     projects.forEach((project) => {
@@ -27,22 +32,24 @@ export function xray(html) {
         if (err) {
           console.log('ERROR', err)
         }
-        console.log(`Project ${project}:`, blob)
+        // console.log(`Project ${project}:`, blob)
         // Save the photos to the database
         blob.photos.forEach((photo) => {
           photo.awesome_project_id = project
+          tally.photos++
 
-          seq.AwesomePhoto.findOne({
+          AwesomePhoto.findOne({
             where: {
               url: photo.url,
             },
           }).then((d) => {
             if (d) {
-              console.log('Found existing record', d.id)
+              // console.log('Found existing record', d.id)
               // d.update(photo)
             } else {
-              console.log('Creating new record', photo.url)
-              seq.AwesomePhoto.create(photo).catch((error) => {
+              tally.newPhotos++
+              // console.log('Creating new record', photo.url)
+              AwesomePhoto.create(photo).catch((error) => {
                 console.log('Error', error)
               })
             }
@@ -50,5 +57,11 @@ export function xray(html) {
         })
       })
     })
+
+    console.log('Done!')
+    console.log(`Total projects: ${tally.total}`)
+    // This tally doesn't work because the xray & sequelize calls are asynchronous
+    // console.log(`Total photos found: ${tally.photos}`)
+    // console.log(`New photos: ${tally.newPhotos}`)
   })
 }
