@@ -233,6 +233,18 @@ class Matrix {
   }
 }
 
+if (window.location.hash === '#screensaver') {
+  console.log('ok we should do a screensaver mode')
+  d3.select('header').remove()
+  d3.select('footer').remove()
+  d3.select('#mobile_nav').remove()
+  d3.select('.sidebar').remove()
+  d3.selectAll('p').remove()
+  d3.select("div.col-xs-12.col-sm-9.col-md-10")
+    .style("width", "100%")
+    .style("padding", "0px")
+}
+
 new Chart({
   element: 'matrix',
   height: window.screen.height * 0.5,
