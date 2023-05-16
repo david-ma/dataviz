@@ -30,6 +30,8 @@ export function xray(html) {
     // Get the photos for each project
     Promise.all(
       projects.map((project) => {
+        // console.log("Processing project ", project)
+
         new Promise((resolve, reject) => {
           x(html, `article.project[data-id=${project}]`, {
             project: project,
@@ -46,10 +48,14 @@ export function xray(html) {
               reject(err)
             }
 
+            // console.log("Blob is", blob)
+
             // console.log(`Project ${project}:`, blob)
             // Save the photos to the database
             Promise.all(
               blob.photos.map((photo) => {
+                // console.log("Photo is", photo)
+                photo.awesome_project_id = project
                 new Promise((resolve, reject) => {
                   tally.photos++
 
@@ -64,8 +70,9 @@ export function xray(html) {
                     } else {
                       tally.newPhotos++
                       // console.log('Creating new record', photo.url)
+                      // console.log(photo)
                       AwesomePhoto.create(photo).catch((error) => {
-                        console.log('Error', error)
+                        console.log('Error creating new record', error)
                       })
                     }
                     resolve('done')

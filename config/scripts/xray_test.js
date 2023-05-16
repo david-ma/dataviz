@@ -31,6 +31,7 @@ function xray(html) {
                         reject(err);
                     }
                     Promise.all(blob.photos.map((photo) => {
+                        photo.awesome_project_id = project;
                         new Promise((resolve, reject) => {
                             tally.photos++;
                             AwesomePhoto.findOne({
@@ -43,7 +44,7 @@ function xray(html) {
                                 else {
                                     tally.newPhotos++;
                                     AwesomePhoto.create(photo).catch((error) => {
-                                        console.log('Error', error);
+                                        console.log('Error creating new record', error);
                                     });
                                 }
                                 resolve('done');
