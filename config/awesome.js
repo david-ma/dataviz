@@ -14,14 +14,16 @@ const config = {
                 callback: function (socket, packet, seq) {
                     socket.broadcast.emit('overwriteText', packet);
                     lodash_1.default.merge(datastore, {
-                        [packet.name]: packet.data
+                        [packet.name]: packet.data,
                     });
-                }
-            }
+                },
+            },
         ],
         emit: [
-            (socket, seq) => { socket.emit('allData', datastore); }
-        ]
-    }
+            (socket, seq) => {
+                socket.emit('allData', datastore);
+            },
+        ],
+    },
 };
 exports.config = config;
