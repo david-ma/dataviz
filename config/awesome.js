@@ -6,7 +6,44 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.config = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const datastore = {};
+const sequelize_1 = require("sequelize");
 const config = {
+    services: {
+        awesome: function (res, req, db) {
+            var blob = {
+                projects: [],
+                photos: [],
+            };
+            const params = new URLSearchParams(req.url.split('?')[1]);
+            var date = Date.parse(params.get('date'))
+                ? new Date(params.get('date'))
+                : new Date(new Date().setDate(new Date().getDate() - 30));
+            db.AwesomeProject.findAll({
+                where: {
+                    created_at: {
+                        [sequelize_1.Op.gte]: date,
+                    },
+                },
+            })
+                .catch(function (err) {
+                console.log('ERROR reading database', err);
+                res.end(JSON.stringify(err));
+            })
+                .then(function (projects) {
+                blob.projects = projects;
+                db.AwesomePhoto.findAll({
+                    where: {
+                        awesome_project_id: {
+                            [sequelize_1.Op.in]: projects.map((p) => p.id),
+                        },
+                    },
+                }).then(function (photos) {
+                    blob.photos = photos;
+                    res.end(JSON.stringify(blob));
+                });
+            });
+        },
+    },
     sockets: {
         on: [
             {
