@@ -48,7 +48,33 @@ const config = {
         on: [
             {
                 name: 'overwriteText',
-                callback: function (socket, packet, seq) {
+                callback: function (socket, packet, db) {
+                    console.log('packet', packet);
+                    db.AwesomeMetadata.findOne({
+                        where: {
+                            awesome_project_id: packet.id,
+                        },
+                    }).then((metadata) => {
+                        if (metadata) {
+                            const data = metadata.dataValues;
+                            lodash_1.default.merge(data.value, {
+                                [packet.name]: packet.data,
+                            });
+                            db.AwesomeMetadata.update(data, {
+                                where: {
+                                    awesome_project_id: packet.id,
+                                },
+                            });
+                        }
+                        else {
+                            db.AwesomeMetadata.create({
+                                awesome_project_id: packet.id,
+                                value: {
+                                    [packet.name]: packet.data,
+                                },
+                            });
+                        }
+                    });
                     socket.broadcast.emit('overwriteText', packet);
                     lodash_1.default.merge(datastore, {
                         [packet.name]: packet.data,

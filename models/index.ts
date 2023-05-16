@@ -13,6 +13,7 @@ import { BlogpostFactory } from './blogpost'
 
 import { AwesomeProjectFactory } from './awesome'
 import { AwesomePhotoFactory } from './awesome'
+import { AwesomeMetadataFactory } from './awesome'
 
 import path = require('path')
 
@@ -73,7 +74,9 @@ export const Blogpost = BlogpostFactory(dbConfig)
 
 export const AwesomeProject = AwesomeProjectFactory(dbConfig)
 export const AwesomePhoto = AwesomePhotoFactory(dbConfig)
+export const AwesomeMetadata = AwesomeMetadataFactory(dbConfig)
 AwesomeProject.hasMany(AwesomePhoto)
+AwesomeProject.hasOne(AwesomeMetadata)
 
 Camera.belongsTo(Family)
 Family.hasMany(Camera)

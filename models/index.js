@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AwesomePhoto = exports.AwesomeProject = exports.Blogpost = exports.Camera = exports.Family = exports.Scrape = exports.dbConfig = void 0;
+exports.AwesomeMetadata = exports.AwesomePhoto = exports.AwesomeProject = exports.Blogpost = exports.Camera = exports.Family = exports.Scrape = exports.dbConfig = void 0;
 const sequelize = __importStar(require("sequelize"));
 const _ = require("lodash");
 const scrape_1 = require("./scrape");
@@ -32,6 +32,7 @@ const camera_1 = require("./camera");
 const blogpost_1 = require("./blogpost");
 const awesome_1 = require("./awesome");
 const awesome_2 = require("./awesome");
+const awesome_3 = require("./awesome");
 const path = require("path");
 let seqOptions = {
     "dialect": "sqlite",
@@ -61,6 +62,8 @@ exports.Camera = (0, camera_1.CameraFactory)(exports.dbConfig);
 exports.Blogpost = (0, blogpost_1.BlogpostFactory)(exports.dbConfig);
 exports.AwesomeProject = (0, awesome_1.AwesomeProjectFactory)(exports.dbConfig);
 exports.AwesomePhoto = (0, awesome_2.AwesomePhotoFactory)(exports.dbConfig);
+exports.AwesomeMetadata = (0, awesome_3.AwesomeMetadataFactory)(exports.dbConfig);
 exports.AwesomeProject.hasMany(exports.AwesomePhoto);
+exports.AwesomeProject.hasOne(exports.AwesomeMetadata);
 exports.Camera.belongsTo(exports.Family);
 exports.Family.hasMany(exports.Camera);

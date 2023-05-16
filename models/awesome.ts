@@ -1,21 +1,29 @@
 import { DataTypes, Sequelize } from 'sequelize'
 
+// store metadata about a project
+export function AwesomeMetadataFactory(sequelize: Sequelize) {
+  return sequelize.define('AwesomeMetadata', {
+    awesome_project_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    value: DataTypes.JSON,
+  })
+}
+
 export function AwesomePhotoFactory(sequelize: Sequelize) {
-  return sequelize.define(
-    'AwesomePhoto',
-    {
-      url: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      awesome_project_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      caption: DataTypes.STRING,
-    }
-  )
+  return sequelize.define('AwesomePhoto', {
+    url: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    awesome_project_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    caption: DataTypes.STRING,
+  })
 }
 
 export function AwesomeProjectFactory(sequelize: Sequelize) {

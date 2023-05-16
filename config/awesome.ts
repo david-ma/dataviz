@@ -2,6 +2,8 @@
 
 import _ from 'lodash'
 import { Thalia } from '../../../server/thalia'
+
+// TODO: Restore datastore from database
 const datastore = {}
 
 import { Op } from 'sequelize'
@@ -51,7 +53,36 @@ const config: Thalia.WebsiteConfig = {
     on: [
       {
         name: 'overwriteText',
-        callback: function (socket, packet, seq) {
+        callback: function (socket, packet, db) {
+          console.log('packet', packet)
+
+          db.AwesomeMetadata.findOne({
+            where: {
+              awesome_project_id: packet.id,
+            },
+          }).then((metadata) => {
+            if (metadata) {
+              const data = metadata.dataValues
+
+              _.merge(data.value, {
+                [packet.name]: packet.data,
+              })
+
+              db.AwesomeMetadata.update(data, {
+                where: {
+                  awesome_project_id: packet.id,
+                },
+              })
+            } else {
+              db.AwesomeMetadata.create({
+                awesome_project_id: packet.id,
+                value: {
+                  [packet.name]: packet.data,
+                },
+              })
+            }
+          })
+
           // eslint-disable-line
           socket.broadcast.emit('overwriteText', packet)
           _.merge(datastore, {

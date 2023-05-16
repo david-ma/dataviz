@@ -7,6 +7,7 @@ import {
   Family,
   AwesomeProject,
   AwesomePhoto,
+  AwesomeMetadata,
 } from '../models'
 
 export interface seqObject {
@@ -23,6 +24,7 @@ const seq: seqObject = {
   Family: Family,
   AwesomeProject,
   AwesomePhoto,
+  AwesomeMetadata,
 }
 
 // Family.get()
