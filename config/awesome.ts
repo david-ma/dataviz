@@ -3,8 +3,14 @@
 import _ from 'lodash'
 import { Thalia } from '../../../server/thalia'
 
-// TODO: Restore datastore from database
 const datastore = {}
+var AwesomeMetadata = require('../config/db_bootstrap').seq.AwesomeMetadata
+AwesomeMetadata.findAll({}).then((data) => {
+  data.reduce((acc, d) => {
+    _.merge(acc, d.dataValues.value)
+    return acc
+  }, datastore)
+})
 
 import { Op } from 'sequelize'
 
