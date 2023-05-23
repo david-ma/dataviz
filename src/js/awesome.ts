@@ -1,8 +1,4 @@
-// @ts-nocheck
-
-/// <reference path="../../node_modules/@types/d3/index.d.ts" />
-/// <reference path="../../node_modules/@types/d3-selection/index.d.ts" />
-/// <reference path="../../node_modules/@types/d3-selection-multi/index.d.ts" />
+// @ts-nocheck 2551
 
 var md = new showdown.Converter({ openLinksInNewWindow: true })
 
@@ -53,19 +49,11 @@ socket.on('overwriteText', (packet) => {
   if (type === 'signatures') countVotes(packet.name)
 })
 
-d3.csv('/melbourne_export.csv', function (d) {
-  if (d.hidden_at === '') {
-    // console.log(d);
-    return d
-  } else {
-    return null
-  }
-}).then(function (d) {
-  // console.log(d);
+d3.json('/awesome').then(function (data: any) {
   var project = d3
     .select('#AwesomeStuff')
     .selectAll('div')
-    .data(d)
+    .data(data.projects)
     .enter()
     .append('div')
     .classed('project', true)
@@ -73,6 +61,7 @@ d3.csv('/melbourne_export.csv', function (d) {
     .classed('row', true)
     .each(function (d: any) {
       const tab = d3.select('#tabs').append('li')
+
       tab
         .append('input')
         .attr('id', 'tab-' + d.id)
@@ -80,6 +69,10 @@ d3.csv('/melbourne_export.csv', function (d) {
           type: 'radio',
           name: 'tabs',
         })
+        .on('click', () => {
+          window.location.hash = `#project-${d.id}`
+        })
+
       tab
         .append('label')
         .attr('for', 'tab-' + d.id)
@@ -120,6 +113,22 @@ Social Justice, Sports, Church, Queer, Refugee, Art, Education, Science, Collabo
 Other:`)
       )
 
+      left
+        .append('div')
+        .classed('photos', true)
+        .selectAll('img')
+        .data(
+          data.photos.filter((photo: any) => photo.awesome_project_id === d.id)
+        )
+        .enter()
+        .append('img')
+        .attr('src', (d: any) => d.url)
+        .styles({
+          width: '150px',
+          height: '150px',
+          'object-fit': 'contain',
+        })
+
       left.append('h3').text("Here's my idea:")
       left
         .append('div')
@@ -154,6 +163,7 @@ Other:`)
         .on('keyup', function (d: any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
+            id: d.id,
             name: `comments-${d.id}`,
             data: text,
           })
@@ -186,6 +196,7 @@ Other:`)
         .on('keyup', function (d: any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
+            id: d.id,
             name: `signatures-${d.id}`,
             data: text,
           })
@@ -243,6 +254,7 @@ Other:`)
             .on('input', function () {
               const value = $(`#${elementId}`).is(':checked')
               socket.emit('overwriteText', {
+                id: d.id,
                 name: elementId,
                 data: value,
               })
@@ -268,6 +280,7 @@ Other:`)
         .on('keyup', function (d: any) {
           const text = $(this).val()
           socket.emit('overwriteText', {
+            id: d.id,
             name: `debrief-${d.id}`,
             data: text,
           })
@@ -284,15 +297,15 @@ Other:`)
       d3.select('#title h1 a').text('Awesome Foundation Melbourne')
 
       // print version
-      project.classed('printProject', true)
-      right.remove()
-      left.classed('col-xs-12', true)
-      left.append('br').classed('page-break', true)
-      d3.select('header').remove()
-      d3.select('footer').remove()
-      d3.select('#mobile_nav').remove()
+      // project.classed('printProject', true)
+      // right.remove()
+      // left.classed('col-xs-12', true)
+      // left.append('br').classed('page-break', true)
+      // d3.select('header').remove()
+      // d3.select('footer').remove()
+      // d3.select('#mobile_nav').remove()
 
-      d3.select('#tabs').remove()
+      // d3.select('#tabs').remove()
     })
 })
 
