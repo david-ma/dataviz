@@ -89,7 +89,7 @@ d3.json('/awesome').then(function (data: any) {
       const left = project.append('div').classed('col-xs-6', true)
       const right = project.append('div').classed('col-xs-6', true)
 
-      var leftSide = header.append('div').classed('col-xs-6', true)
+      var leftSide = header.append('div').classed('col-xs-7', true)
 
       leftSide
         .append('h1')
@@ -102,16 +102,15 @@ d3.json('/awesome').then(function (data: any) {
         leftSide.append('p').append('a').attr('href', d.url).text(d.url)
       }
 
-      var rightSide = header.append('div').classed('col-xs-6', true)
-      rightSide.html(
-        md.makeHtml(`Vote tally goes here:
-
-Does it do these things? Circle them if it does.
-
-Social Justice, Sports, Church, Queer, Refugee, Art, Education, Science, Collaboration, Environment, Health, Community, Technology, Feasibility with $1000,
-
-Other:`)
-      )
+      var rightSide = header.append('div').classed('col-xs-5', true)
+      rightSide
+        .html(
+          md.makeHtml(
+            `Dinosaur, Social Justice, Sports, Art, Church, Queer, Refugee, Education, Science, Collaboration, Environment, Health, Community, Technology, Feasibility with $1000, Other:`
+          )
+        )
+        .classed('categories', true)
+        .style('display', 'none')
 
       left
         .append('div')
@@ -121,11 +120,14 @@ Other:`)
           data.photos.filter((photo: any) => photo.awesome_project_id === d.id)
         )
         .enter()
+        .append('a')
+        .attr('href', (d: any) => d.url)
+        .attr('target', '_blank')
         .append('img')
         .attr('src', (d: any) => d.url)
         .styles({
-          width: '150px',
-          height: '150px',
+          width: '135px',
+          height: '135px',
           'object-fit': 'contain',
         })
 
@@ -141,7 +143,7 @@ Other:`)
       left
         .append('div')
         .attr('id', 'use-' + d.id)
-        .classed('smaller', (d: any) => d.use_for_money.length > 600)
+        .classed('smaller', (d: any) => d.use_for_money.length > 400)
       $('#use-' + d.id).html(md.makeHtml(d.use_for_money))
 
       left.append('h3').text('A little about me:')
@@ -213,6 +215,7 @@ Other:`)
 
       right.append('h3').text('Applicable Categories:')
       const categories = {
+        Dinosaur: 'Dinosaur',
         'Social Justice': 'Description goes here',
         Art: 'Some sorta art piece??',
         Education: 'Education',
@@ -297,15 +300,19 @@ Other:`)
       d3.select('#title h1 a').text('Awesome Foundation Melbourne')
 
       // print version
-      // project.classed('printProject', true)
-      // right.remove()
-      // left.classed('col-xs-12', true)
-      // left.append('br').classed('page-break', true)
-      // d3.select('header').remove()
-      // d3.select('footer').remove()
-      // d3.select('#mobile_nav').remove()
+      // check querystring for "print"
+      if (window.location.search.includes('print')) {
+        project.classed('printProject', true)
+        d3.select('body').classed('print', true)
+        right.remove()
+        left.classed('col-xs-12', true)
+        left.append('br').classed('page-break', true)
+        d3.select('header').remove()
+        d3.select('footer').remove()
+        d3.select('#mobile_nav').remove()
 
-      // d3.select('#tabs').remove()
+        d3.select('#tabs').remove()
+      }
     })
 })
 

@@ -16,11 +16,33 @@
         text-align: center;
     }
     body.print {
+        div.categories {
+            display: inline-block !important;
+        }
         font-size: 14px;
+
+        h1 {
+            font-size: 24px;
+        }
+        h2 {
+            font-size: 21px;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .smaller p {
+            font-size: 13px;
+            margin: 0 0 0 3px;
+        }
     }
 
     div.project {
         page-break-after: always;
+    }
+    div.project.printProject {
+        height: 270mm;
+        width: 200mm;
     }
 </style>
 
