@@ -1,6 +1,8 @@
 var request = require('request')
 var xray = require('./xray_test').xray
 
+console.log("Scraping stuff from awesome foundation")
+
 const base = 'https://www.awesomefoundation.org/en/chapters/11/projects',
   target = '?page=1'
 

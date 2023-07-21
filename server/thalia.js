@@ -963,6 +963,7 @@ if (typeof define !== 'function') {
 }
 define(function (require) {
     require(['server', 'router', 'requestHandlers', 'fs'], function (server, router, requestHandlers, fs) {
+        var argv = require('minimist')(process.argv.slice(2));
         let port = '1337';
         const pattern = /^\d{0,5}$/;
         let workspace = 'default';
@@ -981,6 +982,18 @@ define(function (require) {
             process.argv[3] !== undefined &&
             !pattern.exec(process.argv[3])) {
             workspace = process.argv[3];
+        }
+        if (argv.s !== undefined) {
+            workspace = argv.w;
+        }
+        if (argv.site !== undefined) {
+            workspace = argv.site;
+        }
+        if (argv.p !== undefined && pattern.exec(argv.port)) {
+            port = argv.p;
+        }
+        if (argv.port !== undefined && pattern.exec(argv.port)) {
+            port = argv.port;
         }
         if (fs.existsSync(`websites/${workspace}`)) {
             console.log(`Setting workspace to websites/${workspace}`);

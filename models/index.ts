@@ -30,8 +30,8 @@ let seqOptions: sequelize.Options = {
   //   timezone: 'Australia/Melbourne',
   //   decimalNumbers: true,
   // },
-  "dialect": "sqlite",
-  "storage": path.resolve(__dirname, 'database.sqlite'),
+  dialect: 'sqlite',
+  storage: path.resolve(__dirname, 'database.sqlite'),
   logging: false,
   define: {
     underscored: true,
@@ -51,7 +51,7 @@ try {
   ))[env]
   seqOptions = _.merge(seqOptions, configOptions)
 
-  console.log("seqOptions are:", seqOptions)
+  console.log('seqOptions are:', seqOptions)
 } catch (e) {
   console.error('No config.json provided for Sequelize', e)
 }

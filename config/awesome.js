@@ -26,10 +26,27 @@ const config = {
                 ? new Date(params.get('date'))
                 : new Date(new Date().setDate(new Date().getDate() - 30));
             db.AwesomeProject.findAll({
+                limit: 100,
                 where: {
-                    created_at: {
-                        [sequelize_1.Op.gte]: date,
-                    },
+                    [sequelize_1.Op.or]: [
+                        {
+                            created_at: {
+                                [sequelize_1.Op.gte]: date,
+                            },
+                        },
+                        {
+                            id: {
+                                [sequelize_1.Op.in]: [225920, 224022],
+                            },
+                        },
+                    ],
+                    [sequelize_1.Op.and]: [
+                        {
+                            id: {
+                                [sequelize_1.Op.notIn]: [226178, 226108, 226170],
+                            }
+                        }
+                    ]
                 },
             })
                 .catch(function (err) {

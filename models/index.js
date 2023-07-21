@@ -35,8 +35,8 @@ const awesome_2 = require("./awesome");
 const awesome_3 = require("./awesome");
 const path = require("path");
 let seqOptions = {
-    "dialect": "sqlite",
-    "storage": path.resolve(__dirname, 'database.sqlite'),
+    dialect: 'sqlite',
+    storage: path.resolve(__dirname, 'database.sqlite'),
     logging: false,
     define: {
         underscored: true,
@@ -47,7 +47,7 @@ console.log('env is:', env);
 try {
     const configOptions = require(path.resolve(__dirname, '..', 'config', 'config.json'))[env];
     seqOptions = _.merge(seqOptions, configOptions);
-    console.log("seqOptions are:", seqOptions);
+    console.log('seqOptions are:', seqOptions);
 }
 catch (e) {
     console.error('No config.json provided for Sequelize', e);

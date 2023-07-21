@@ -29,10 +29,27 @@ const config: Thalia.WebsiteConfig = {
         : new Date(new Date().setDate(new Date().getDate() - 30))
 
       db.AwesomeProject.findAll({
+        limit: 100,
         where: {
-          created_at: {
-            [Op.gte]: date,
-          },
+          [Op.or]: [
+            {
+              created_at: {
+                [Op.gte]: date,
+              },
+            },
+            {
+              id: {
+                [Op.in]: [225920, 224022],
+              },
+            },
+          ],
+          [Op.and]: [
+            {
+              id: {
+                [Op.notIn]: [226178, 226108, 226170],
+              }
+            }
+          ]
         },
       })
         .catch(function (err) {
