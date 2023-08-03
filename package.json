@@ -24,7 +24,7 @@
     "mysql2": "^2.3.3",
     "prettier": "^2.4.1",
     "sass": "^1.42.1",
-    "sequelize": "^6.6.5",
+    "sequelize": "^6.29.0",
     "socket.io": "^4.2.0"
   },
   "resolutions": {
