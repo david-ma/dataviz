@@ -21,11 +21,11 @@
     "lodash": "^4.17.21",
     "mime": "^2.5.2",
     "mustache": "^4.2.0",
-    "mysql2": "^2.3.3",
-    "prettier": "^2.4.1",
-    "sass": "^1.42.1",
-    "sequelize": "^6.6.5",
-    "socket.io": "^4.2.0",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "sass": "^1.65.1",
+    "sequelize": "^6.32.1",
+    "socket.io": "^4.7.2",
     "sqlite3": "^5.1.6"
   },
   "resolutions": {
