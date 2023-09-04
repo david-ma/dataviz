@@ -63,7 +63,6 @@ exports.Blogpost = (0, blogpost_1.BlogpostFactory)(exports.dbConfig);
 exports.AwesomeProject = (0, awesome_1.AwesomeProjectFactory)(exports.dbConfig);
 exports.AwesomePhoto = (0, awesome_2.AwesomePhotoFactory)(exports.dbConfig);
 exports.AwesomeMetadata = (0, awesome_3.AwesomeMetadataFactory)(exports.dbConfig);
-exports.AwesomeProject.hasMany(exports.AwesomePhoto);
 exports.AwesomeProject.hasOne(exports.AwesomeMetadata);
 exports.Camera.belongsTo(exports.Family);
 exports.Family.hasMany(exports.Camera);

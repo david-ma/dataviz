@@ -28,6 +28,9 @@ const config: Thalia.WebsiteConfig = {
         ? new Date(params.get('date'))
         : new Date(new Date().setDate(new Date().getDate() - 30))
 
+      const whitelist = []
+      const blacklist = [229432]
+
       db.AwesomeProject.findAll({
         limit: 100,
         where: {
@@ -39,14 +42,14 @@ const config: Thalia.WebsiteConfig = {
             },
             {
               id: {
-                [Op.in]: [225920, 224022],
+                [Op.in]: whitelist,
               },
             },
           ],
           [Op.and]: [
             {
               id: {
-                [Op.notIn]: [226178, 226108, 226170],
+                [Op.notIn]: blacklist,
               }
             }
           ]

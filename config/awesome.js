@@ -25,6 +25,8 @@ const config = {
             var date = Date.parse(params.get('date'))
                 ? new Date(params.get('date'))
                 : new Date(new Date().setDate(new Date().getDate() - 30));
+            const whitelist = [];
+            const blacklist = [229432];
             db.AwesomeProject.findAll({
                 limit: 100,
                 where: {
@@ -36,14 +38,14 @@ const config = {
                         },
                         {
                             id: {
-                                [sequelize_1.Op.in]: [225920, 224022],
+                                [sequelize_1.Op.in]: whitelist,
                             },
                         },
                     ],
                     [sequelize_1.Op.and]: [
                         {
                             id: {
-                                [sequelize_1.Op.notIn]: [226178, 226108, 226170],
+                                [sequelize_1.Op.notIn]: blacklist,
                             }
                         }
                     ]

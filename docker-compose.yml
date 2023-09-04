@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - dataviz_db:/var/lib/postgresql/data
+    ports:
+      - '5433:5432'
+    environment:
+      PGUSER: 'postgres'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'mysecretpassword'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-d', 'postgres']
+    restart: always
+
+  web:
+    build: .
+    ports:
+      - '1334:1337'
+    environment:
+      - NODE_ENV=docker
+    depends_on:
+      db:
+        condition: service_healthy
+    # restart: always
+    entrypoint: ["/usr/app/Thalia/start.sh", "dataviz"]
+
+volumes:
+  dataviz_db:

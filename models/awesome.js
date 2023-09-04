@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AwesomeProjectFactory = exports.AwesomePhotoFactory = exports.AwesomeMetadataFactory = void 0;
 const sequelize_1 = require("sequelize");
-// store metadata about a project
+const _1 = require(".");
 function AwesomeMetadataFactory(sequelize) {
     return sequelize.define('AwesomeMetadata', {
         awesome_project_id: {
@@ -22,9 +22,15 @@ function AwesomePhotoFactory(sequelize) {
         },
         awesome_project_id: {
             type: sequelize_1.DataTypes.INTEGER,
-            allowNull: false,
+            references: {
+                model: _1.AwesomeProject,
+                key: 'id',
+            }
         },
         caption: sequelize_1.DataTypes.STRING,
+        smugmug_album: sequelize_1.DataTypes.STRING,
+        smugmug_key: sequelize_1.DataTypes.STRING,
+        smugmug_url: sequelize_1.DataTypes.STRING,
     });
 }
 exports.AwesomePhotoFactory = AwesomePhotoFactory;

@@ -1,4 +1,5 @@
 import { DataTypes, Sequelize } from 'sequelize'
+import { AwesomeProject } from '.'
 
 // store metadata about a project
 export function AwesomeMetadataFactory(sequelize: Sequelize) {
@@ -20,9 +21,15 @@ export function AwesomePhotoFactory(sequelize: Sequelize) {
     },
     awesome_project_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      references: {
+        model: AwesomeProject,
+        key: 'id',
+      }
     },
     caption: DataTypes.STRING,
+    smugmug_album: DataTypes.STRING,
+    smugmug_key: DataTypes.STRING,
+    smugmug_url: DataTypes.STRING,
   })
 }
 
