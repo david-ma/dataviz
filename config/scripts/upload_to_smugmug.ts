@@ -7,36 +7,54 @@ AwesomePhoto.findAll({
   where: {
     smugmug_key: null,
   },
-  limit: 1,
+  limit: 30,
+  order: [['id', 'DESC']],
 }).then((photos) => {
-  photos.forEach((photo) => {
-    console.log(`Found photo ${photo.id} with url ${photo.url}`)
+  checkPhotosAndUpdate()
+  checkPhotosAndUpdate()
+  checkPhotosAndUpdate()
+  checkPhotosAndUpdate()
 
-    https.get(
-      'http://upload.david-ma.net/uploadByUrl',
-      {
-        headers: {
-          target: photo.url,
-        },
-      },
-      (res) => {
-        let rawData = ''
-
-        res.on('data', (d) => {
-          rawData += d
-        })
-        res.on('end', () => {
-          const data = JSON.parse(rawData)
-          console.log('Data', data)
-          photo
-            .update({
-              smugmug_url: data.smugmug_url,
-              smugmug_key: data.smugmug_key,
-              smugmug_album: data.smugmug_album,
-            })
-            .then(() => {})
-        })
-      }
-    )
-  })
+  function checkPhotosAndUpdate() {
+    if (photos.length > 0) {
+      const photo = photos.pop()
+      updatePhoto(photo, function () {
+        checkPhotosAndUpdate()
+      })
+    }
+  }
 })
+
+//  We should check the photo URL is a valid URL before trying to upload it
+function updatePhoto(photo, callback) {
+  console.log(`Updating photo ${photo.id} ${photo.url}`)
+  https.get(
+    'https://upload.david-ma.net/uploadByUrl',
+    {
+      headers: {
+        target: photo.url,
+        caption: photo.caption,
+      },
+    },
+    (res) => {
+      let rawData = ''
+
+      res.on('data', (d) => {
+        rawData += d
+      })
+      res.on('end', () => {
+        const data = JSON.parse(rawData)
+        photo
+          .update({
+            smugmug_url: data.smugmug_url,
+            smugmug_key: data.smugmug_key,
+            smugmug_album: data.smugmug_album,
+          })
+          .then((data) => {
+            console.log(`Updated photo ${photo.id} ${data.smugmug_url}`)
+            callback()
+          })
+      })
+    }
+  )
+}
