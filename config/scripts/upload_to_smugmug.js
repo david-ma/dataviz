@@ -5,13 +5,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto;
 const https_1 = __importDefault(require("https"));
+const blacklist = [
+    626, 628, 629, 630, 631, 632, 640, 645, 649, 662, 664, 663, 665, 666, 637, 8,
+    4, 9, 10, 29, 25, 22, 13,
+];
+const bannedFiletypes = ['.avif', '.webp'];
 AwesomePhoto.findAll({
     where: {
         smugmug_key: null,
     },
-    limit: 30,
     order: [['id', 'DESC']],
 }).then((photos) => {
+    checkPhotosAndUpdate();
+    checkPhotosAndUpdate();
     checkPhotosAndUpdate();
     checkPhotosAndUpdate();
     checkPhotosAndUpdate();
@@ -25,30 +31,54 @@ AwesomePhoto.findAll({
         }
     }
 });
-function updatePhoto(photo, callback) {
-    console.log(`Updating photo ${photo.id} ${photo.url}`);
-    https_1.default.get('https://upload.david-ma.net/uploadByUrl', {
-        headers: {
-            target: photo.url,
-            caption: photo.caption,
-        },
-    }, (res) => {
-        let rawData = '';
-        res.on('data', (d) => {
-            rawData += d;
-        });
-        res.on('end', () => {
-            const data = JSON.parse(rawData);
-            photo
-                .update({
-                smugmug_url: data.smugmug_url,
-                smugmug_key: data.smugmug_key,
-                smugmug_album: data.smugmug_album,
-            })
-                .then((data) => {
-                console.log(`Updated photo ${photo.id} ${data.smugmug_url}`);
-                callback();
+function updatePhoto(photo, next) {
+    console.log(`Photo ${photo.id} ${photo.url}`);
+    if (blacklist.indexOf(photo.id) > -1) {
+        console.log(`Blacklisted Photo ${photo.id} ${photo.url}`);
+        next();
+    }
+    else if (photo.url.indexOf('https') !== 0 ||
+        bannedFiletypes.some((filetype) => photo.url.indexOf(filetype) > -1)) {
+        console.log(`Rejecting this photo ${photo.id} ${photo.url}`);
+        next();
+    }
+    else {
+        https_1.default.get('https://upload.david-ma.net/uploadByUrl', {
+            headers: {
+                target: photo.url,
+                caption: photo.caption,
+            },
+            timeout: 120000,
+        }, (res) => {
+            let rawData = '';
+            res.on('data', (d) => {
+                rawData += d;
+            });
+            res.on('error', (e) => {
+                console.log(`Error in photo upload ${photo.id} ${photo.url}`);
+                console.error(e);
+            });
+            res.on('end', () => {
+                try {
+                    const data = JSON.parse(rawData);
+                    photo
+                        .update({
+                        smugmug_url: data.smugmug_url,
+                        smugmug_key: data.smugmug_key,
+                        smugmug_album: data.smugmug_album,
+                    })
+                        .then((data) => {
+                        console.log(`Updated photo ${photo.id} ${data.smugmug_url}`);
+                        next();
+                    });
+                }
+                catch (e) {
+                    console.log(`Error parsing JSON ${photo.id} ${photo.url}`);
+                    console.log(rawData);
+                    console.error(e.message);
+                    next();
+                }
             });
         });
-    });
+    }
 }

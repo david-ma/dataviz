@@ -50,7 +50,7 @@ socket.on('overwriteText', (packet) => {
 })
 
 d3.json('/awesome').then(function (data: any) {
-  console.log("List of projects recieved", data)
+  console.log('List of projects recieved', data)
 
   var project = d3
     .select('#AwesomeStuff')
@@ -119,16 +119,22 @@ d3.json('/awesome').then(function (data: any) {
         .classed('photos', true)
         .selectAll('img')
         .data(
-          data.photos.filter((photo: any) => photo.awesome_project_id === d.id)
+          data.photos.filter((photo: any) => photo.awesome_project_id === d.id && photo.smugmug_key)
         )
         .enter()
         // .append('b')
         .append('a')
-        .attr('href', (d: any) => d.url)
+        .attr('href', (d: any) => d.smugmug_url)
         .attr('target', '_blank')
         // .text(`Image-Link `)
         .append('img')
-        .attr('src', (d: any) => d.url)
+        .attr('src', (d: any) => {
+          // smugmug_url: 'https://photos.smugmug.com/photos/i-9D27hvg/0/175fb517/L/i-9D27hvg.png'
+
+          return `https://photos.smugmug.com/photos/i-${d.smugmug_key}/0/${d.smugmug_album}/L/i-${d.smugmug_key}.jpg`
+
+          // return `https://photos.smugmug.com/photos/i-${d.smugmug_key}/0/${d.smugmug_album}/O/i-${d.smugmug_key}.jpg`
+        })
         .styles({
           width: '135px',
           height: '135px',
@@ -219,20 +225,20 @@ d3.json('/awesome').then(function (data: any) {
 
       right.append('h3').text('Applicable Categories:')
       const categories = {
-          Dino: "Includes the codeword",
-          "Social Justice": "Promotes equality and justice.",
-          Art: "Expresses creative endeavors.",
-          Education: "Provides learning opportunities.",
-          Science: "Involves citizen science or research.",
-          Sports: "Engages in amateur sports.",
-          Innovation: "Showcases innovative ideas.",
-          Sustainability: "Helps the environment.",
-          Inclusivity: "Promotes community collaboration.",
-          Healthcare: "Focuses on health improvement.",
-          Scalability: "This project could start something really big.",
-          Viable: "Feasible and achievable.",
-          "Big Impact": "Our $1000 will have a big impact.",
-        };
+        Dino: 'Includes the codeword',
+        'Social Justice': 'Promotes equality and justice.',
+        Art: 'Expresses creative endeavors.',
+        Education: 'Provides learning opportunities.',
+        Science: 'Involves citizen science or research.',
+        Sports: 'Engages in amateur sports.',
+        Innovation: 'Showcases innovative ideas.',
+        Sustainability: 'Helps the environment.',
+        Inclusivity: 'Promotes community collaboration.',
+        Healthcare: 'Focuses on health improvement.',
+        Scalability: 'This project could start something really big.',
+        Viable: 'Feasible and achievable.',
+        'Big Impact': 'Our $1000 will have a big impact.',
+      }
 
       right
         .append('ul')
