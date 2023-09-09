@@ -163,6 +163,15 @@ d3.json('/awesome').then(function (data: any) {
         .classed('smaller', (d: any) => d.about_me.length > 400)
       $('#me-' + d.id).html(md.makeHtml(d.about_me))
 
+      left.append('h3').text((d) => d.extra_question_1)
+      left.append('p').text((d) => d.extra_answer_1)
+
+      left.append('h3').text((d) => d.extra_question_2)
+      left.append('p').text((d) => d.extra_answer_2)
+
+      left.append('h3').text((d) => d.extra_question_3)
+      left.append('p').text((d) => d.extra_answer_3)
+
       right.append('h3').text('Awesome Trustee Comments:')
       right
         .append('textarea')

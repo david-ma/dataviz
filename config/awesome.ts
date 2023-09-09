@@ -28,8 +28,10 @@ const config: Thalia.WebsiteConfig = {
         ? new Date(params.get('date'))
         : new Date(new Date().setDate(new Date().getDate() - 30))
 
-      const whitelist = []
+      const whitelist = [227558, 227756]
       const blacklist = [229432]
+
+      // blacklist name Diana Hallare
 
       db.AwesomeProject.findAll({
         limit: 100,

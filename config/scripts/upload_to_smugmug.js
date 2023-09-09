@@ -7,13 +7,14 @@ const AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto;
 const https_1 = __importDefault(require("https"));
 const blacklist = [
     626, 628, 629, 630, 631, 632, 640, 645, 649, 662, 664, 663, 665, 666, 637, 8,
-    4, 9, 10, 29, 25, 22, 13,
+    4, 9, 10, 29, 25, 22, 13, 240, 239, 238, 235
 ];
 const bannedFiletypes = ['.avif', '.webp'];
 AwesomePhoto.findAll({
     where: {
         smugmug_key: null,
     },
+    limit: 30,
     order: [['id', 'DESC']],
 }).then((photos) => {
     checkPhotosAndUpdate();

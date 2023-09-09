@@ -25,7 +25,7 @@ const config = {
             var date = Date.parse(params.get('date'))
                 ? new Date(params.get('date'))
                 : new Date(new Date().setDate(new Date().getDate() - 30));
-            const whitelist = [];
+            const whitelist = [227558, 227756];
             const blacklist = [229432];
             db.AwesomeProject.findAll({
                 limit: 100,
