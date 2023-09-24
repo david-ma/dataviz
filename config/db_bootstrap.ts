@@ -68,6 +68,7 @@ if (true) {
   // eslint-disable-line
   seq.sequelize
     .sync({
+      // alter: true,
       // force: true
     })
     .then(function (d) {

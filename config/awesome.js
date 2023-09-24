@@ -24,17 +24,36 @@ const config = {
             const params = new URLSearchParams(req.url.split('?')[1]);
             var date = Date.parse(params.get('date'))
                 ? new Date(params.get('date'))
-                : new Date(new Date().setDate(new Date().getDate() - 30));
-            const whitelist = [227558, 227756];
-            const blacklist = [229432];
+                : new Date(new Date().setDate(new Date().getDate() - 25));
+            const whitelist = [], blacklist = [229432, 231426, 233994, 233860];
+            const start = 231394, end = 234099;
             db.AwesomeProject.findAll({
                 limit: 100,
                 where: {
                     [sequelize_1.Op.or]: [
                         {
-                            created_at: {
-                                [sequelize_1.Op.gte]: date,
-                            },
+                            [sequelize_1.Op.and]: [
+                                {
+                                    id: {
+                                        [sequelize_1.Op.gte]: start,
+                                    },
+                                },
+                                {
+                                    id: {
+                                        [sequelize_1.Op.lte]: end,
+                                    },
+                                },
+                                {
+                                    id: {
+                                        [sequelize_1.Op.notIn]: blacklist,
+                                    },
+                                },
+                                {
+                                    name: {
+                                        [sequelize_1.Op.notLike]: '%Diana Hallare%',
+                                    },
+                                },
+                            ],
                         },
                         {
                             id: {
@@ -42,13 +61,6 @@ const config = {
                             },
                         },
                     ],
-                    [sequelize_1.Op.and]: [
-                        {
-                            id: {
-                                [sequelize_1.Op.notIn]: blacklist,
-                            }
-                        }
-                    ]
                 },
             })
                 .catch(function (err) {

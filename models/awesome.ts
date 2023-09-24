@@ -30,6 +30,7 @@ export function AwesomePhotoFactory(sequelize: Sequelize) {
     smugmug_album: DataTypes.STRING,
     smugmug_key: DataTypes.STRING,
     smugmug_url: DataTypes.STRING,
+    // error: DataTypes.TEXT,
   })
 }
 

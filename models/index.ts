@@ -77,7 +77,12 @@ export const AwesomePhoto = AwesomePhotoFactory(dbConfig)
 export const AwesomeMetadata = AwesomeMetadataFactory(dbConfig)
 // AwesomeProject.hasMany(AwesomePhoto)
 // AwesomePhoto.hasOne(AwesomeProject)
-AwesomeProject.hasOne(AwesomeMetadata)
+AwesomeProject.hasOne(AwesomeMetadata, { foreignKey: 'awesome_project_id', sourceKey: 'id' })
+AwesomeMetadata.belongsTo(AwesomeProject, { foreignKey: 'awesome_project_id', targetKey: 'id' })
+
+AwesomePhoto.belongsTo(AwesomeProject, { foreignKey: 'awesome_project_id', targetKey: 'id' })
+AwesomeProject.hasMany(AwesomePhoto, { foreignKey: 'awesome_project_id', sourceKey: 'id' })
+
 
 Camera.belongsTo(Family)
 Family.hasMany(Camera)

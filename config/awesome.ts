@@ -26,21 +26,49 @@ const config: Thalia.WebsiteConfig = {
       // Try to get the provided date, otherwise give today's date minus 30 days
       var date = Date.parse(params.get('date'))
         ? new Date(params.get('date'))
-        : new Date(new Date().setDate(new Date().getDate() - 30))
+        : new Date(new Date().setDate(new Date().getDate() - 25))
 
-      const whitelist = [227558, 227756]
-      const blacklist = [229432]
+      const whitelist = [],
+        blacklist = [229432, 231426, 233994, 233860]
+
+      const start = 231394,
+        end = 234099
+
+      // start 231394
+      // end 234099
 
       // blacklist name Diana Hallare
 
       db.AwesomeProject.findAll({
         limit: 100,
         where: {
+          // ID is between start and end
+          // And it isn't in the blacklist
+          // And it isn't Diana Hallare
           [Op.or]: [
             {
-              created_at: {
-                [Op.gte]: date,
-              },
+              [Op.and]: [
+                {
+                  id: {
+                    [Op.gte]: start,
+                  },
+                },
+                {
+                  id: {
+                    [Op.lte]: end,
+                  },
+                },
+                {
+                  id: {
+                    [Op.notIn]: blacklist,
+                  },
+                },
+                {
+                  name: {
+                    [Op.notLike]: '%Diana Hallare%',
+                  },
+                },
+              ],
             },
             {
               id: {
@@ -48,13 +76,6 @@ const config: Thalia.WebsiteConfig = {
               },
             },
           ],
-          [Op.and]: [
-            {
-              id: {
-                [Op.notIn]: blacklist,
-              }
-            }
-          ]
         },
       })
         .catch(function (err) {
