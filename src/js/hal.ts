@@ -5,12 +5,11 @@ console.log('Hello World')
 const height = 600,
   width = 960
 
-const svg = d3
-  .select('#screen')
-  .append('svg')
-  .attrs({
-    viewBox: `0 0 ${width} ${height}`,
-  })
+const screens = d3.select('#screens')
+
+const svg = screens.append('svg').attrs({
+  viewBox: `0 0 ${width} ${height}`,
+})
 
 svg.append('rect').attrs({
   x: 0,
