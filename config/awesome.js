@@ -25,8 +25,8 @@ const config = {
             var date = Date.parse(params.get('date'))
                 ? new Date(params.get('date'))
                 : new Date(new Date().setDate(new Date().getDate() - 25));
-            const whitelist = [], blacklist = [229432, 231426, 233994, 233860];
-            const start = 231394, end = 234099;
+            const whitelist = [], blacklist = [];
+            const start = 234100, end = 239548;
             db.AwesomeProject.findAll({
                 limit: 100,
                 where: {

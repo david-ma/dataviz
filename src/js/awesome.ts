@@ -165,14 +165,16 @@ d3.json('/awesome').then(function (data: any) {
         .classed('smaller', (d: any) => d.about_me.length > 400)
       $('#me-' + d.id).html(md.makeHtml(d.about_me))
 
-      left.append('h3').text((d) => d.extra_question_1)
-      left.append('p').text((d) => d.extra_answer_1)
+      var extra_questions = left.append("div").classed("extra_questions", true)
 
-      left.append('h3').text((d) => d.extra_question_2)
-      left.append('p').text((d) => d.extra_answer_2)
+      extra_questions.append('h3').text((d) => d.extra_question_1)
+      extra_questions.append('p').text((d) => d.extra_answer_1)
 
-      left.append('h3').text((d) => d.extra_question_3).classed("q3", true)
-      left.append('p').text((d) => d.extra_answer_3).classed("q3", true)
+      extra_questions.append('h3').text((d) => d.extra_question_2)
+      extra_questions.append('p').text((d) => d.extra_answer_2)
+
+      extra_questions.append('h3').text((d) => d.extra_question_3).classed("q3", true)
+      extra_questions.append('p').text((d) => d.extra_answer_3).classed("q3", true)
 
       right.append('h3').text('Awesome Trustee Comments:')
       right

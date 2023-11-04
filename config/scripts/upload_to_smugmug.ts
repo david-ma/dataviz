@@ -7,13 +7,16 @@ const blacklist = [
   626, 628, 629, 630, 631, 632, 640, 645, 649, 662, 664, 663, 665, 666, 637, 8,
   4, 9, 10, 29, 25, 22, 13, 240, 239, 238, 235, 711, 684, 677, 580, 573, 561, 295
 ]
-const bannedFiletypes = ['.avif', '.webp']
+
+// 472, 474, 489, 478
+
+const bannedFiletypes = ['.avif', '.webp', '.tiff', '.tif', '.heic', '.heif']
 
 AwesomePhoto.findAll({
   where: {
     smugmug_key: null,
   },
-  limit: 300,
+  limit: 100,
   order: [['id', 'ASC']],
 }).then((photos) => {
   checkPhotosAndUpdate()

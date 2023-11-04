@@ -29,10 +29,14 @@ const config: Thalia.WebsiteConfig = {
         : new Date(new Date().setDate(new Date().getDate() - 25))
 
       const whitelist = [],
-        blacklist = [229432, 231426, 233994, 233860]
+            blacklist = []
+        // blacklist = [229432, 231426, 233994, 233860, 234555, 234659, 235745, 236850, 238783]
 
-      const start = 231394,
-        end = 234099
+      // const start = 231394,
+      //   end = 234099
+
+      const start = 234100,
+            end = 239548;
 
       // start 231394
       // end 234099
