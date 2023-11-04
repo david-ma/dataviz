@@ -66,32 +66,90 @@ screen2.append('rect').attrs({
 })
 
 var lines = []
-for (var i = 0; i < 10; i++) {
-  var top = height / 4
-  var bottom = 2 * height / 4
+for (var i = 0; i < 11; i++) {
+  var y1 = height / 4
+  var y2 = height / 4 + height / 3
+  var x = (width / 3) + (i * (20 - i))
 
   lines.push({
-    x1: width / 3,
-    x2: width / 3,
-    y1: top,
-    y2: bottom,
+    x1: x,
+    x2: x,
+    y1: y1,
+    y2: y2,
+  })
+}
+for (var i = 0; i < 11; i++) {
+  var y1 = height / 4
+  var y2 = height / 4 + height / 3
+  var x = (width / 3) + (i * (20 - i)) + 100
+
+  lines.push({
+    x1: x,
+    x2: x,
+    y1: y1,
+    y2: y2,
+  })
+}
+for (var i = 0; i < 11; i++) {
+  var y1 = height / 4
+  var y2 = height / 4 + height / 3
+  var x = (width / 3) + (i * (20 - i)) + 200
+
+  lines.push({
+    x1: x,
+    x2: x,
+    y1: y1,
+    y2: y2,
   })
 }
 
 lines.forEach((line) => {
-  screen2
-    .append('line')
-    .attrs({
-      x1: line.x1,
-      y1: line.y1,
-      x2: line.x2,
-      y2: line.y2,
-      stroke: 'white',
-      'stroke-width': 0.5,
-    })
+  screen2.append('line').attrs({
+    x1: line.x1,
+    y1: line.y1,
+    x2: line.x2,
+    y2: line.y2,
+    stroke: 'white',
+    'stroke-width': 0.5,
+  })
 })
 
+// horizontal lines
+var horizontalLines = []
+for (var i = 0; i < 11; i++) {
+  var x1 = width / 3
+  var x2 = width / 3 * 2
+  var y = (height / 4) + (i * (20 - i))
 
+  horizontalLines.push({
+    x1: x1,
+    x2: x2,
+    y1: y,
+    y2: y,
+  })
+}
+for (var i = 0; i < 11; i++) {
+  var x1 = width / 3
+  var x2 = width / 3 * 2
+  var y = (height / 4) + (i * (20 - i)) + 100
+
+  horizontalLines.push({
+    x1: x1,
+    x2: x2,
+    y1: y,
+    y2: y,
+  })
+}
+horizontalLines.forEach((line) => {
+  screen2.append('line').attrs({
+    x1: line.x1,
+    y1: line.y1,
+    x2: line.x2,
+    y2: line.y2,
+    stroke: 'white',
+    'stroke-width': 0.5,
+  })
+})
 
 // 4x4 block of text
 var text = []
@@ -106,21 +164,21 @@ for (var i = 0; i < 4; i++) {
 
 var textY = (height / 10) * 7
 text.forEach((row, i) => {
-  console.log("Row", row)
+  console.log('Row', row)
   row.forEach((number, j) => {
     screen2
-    .append('text')
-    .text(number)
-    .attrs({
-      x: width / 3 + j * 100,
-      y: textY + i * 15,
-      fill: 'white',
-      'font-size': '10px',
-      'text-anchor': 'start',
-      // Lucida Console???
-      'font-family': 'Lucida Grande, monospace',
-      // 'font-family': 'monospace',
-    })
+      .append('text')
+      .text(number)
+      .attrs({
+        x: width / 3 + j * 100,
+        y: textY + i * 15,
+        fill: 'white',
+        'font-size': '10px',
+        'text-anchor': 'start',
+        // Lucida Console???
+        'font-family': 'Lucida Grande, monospace',
+        // 'font-family': 'monospace',
+      })
   })
 })
 
