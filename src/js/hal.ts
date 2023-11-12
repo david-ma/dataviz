@@ -2,6 +2,82 @@
 
 console.log('Hello World')
 
+let midi = null // global MIDIAccess object
+
+globalThis.midiButton = function () {
+  console.log('hey we pushed a midi button')
+  navigator.permissions.query({ name: 'midi', sysex: true }).then((result) => {
+    if (result.state === 'granted') {
+      // Access granted.
+      console.log('Acceds granted')
+    } else if (result.state === 'prompt') {
+      // Using API will prompt for permission
+      console.log('we should prompt?')
+      function onMIDISuccess(midiAccess) {
+        console.log('MIDI ready!')
+        midi = midiAccess // store in the global (in real usage, would probably keep in an object instance)
+        listInputsAndOutputs(midi)
+        startLoggingMIDIInput(midi, 0)
+      }
+
+      function onMIDIFailure(msg) {
+        console.error(`Failed to get MIDI access - ${msg}`)
+      }
+
+      navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure)
+    }
+    // Permission was denied by user prompt or permission policy
+  })
+}
+
+
+function listInputsAndOutputs(midiAccess) {
+  for (const entry of midiAccess.inputs) {
+    const input = entry[1];
+    console.log(
+      `Input port [type:'${input.type}']` +
+        ` id:'${input.id}'` +
+        ` manufacturer:'${input.manufacturer}'` +
+        ` name:'${input.name}'` +
+        ` version:'${input.version}'`,
+    );
+  }
+
+  for (const entry of midiAccess.outputs) {
+    const output = entry[1];
+    console.log(
+      `Output port [type:'${output.type}'] id:'${output.id}' manufacturer:'${output.manufacturer}' name:'${output.name}' version:'${output.version}'`,
+    );
+  }
+}
+
+
+function onMIDIMessage(event) {
+  let str = `MIDI message received at timestamp ${event.timeStamp}[${event.data.length} bytes]: `;
+  let signal = ''
+  for (const character of event.data) {
+    str += `0x${character.toString(16)} `;
+    signal = `0x${character.toString(16)}`
+  }
+  if(signal != '0xf8') { // ignore the clock signal 0xf8
+    console.log(str);
+  }
+}
+
+
+function startLoggingMIDIInput(midiAccess, indexOfPort) {
+  midiAccess.inputs.forEach((entry) => {
+    entry.onmidimessage = onMIDIMessage;
+  });
+}
+
+
+
+
+
+
+
+
 const height = 600,
   width = 960
 
@@ -69,7 +145,7 @@ var lines = []
 for (var i = 0; i < 11; i++) {
   var y1 = height / 4
   var y2 = height / 4 + height / 3
-  var x = (width / 3) + (i * (20 - i))
+  var x = width / 3 + i * (20 - i)
 
   lines.push({
     x1: x,
@@ -81,7 +157,7 @@ for (var i = 0; i < 11; i++) {
 for (var i = 0; i < 11; i++) {
   var y1 = height / 4
   var y2 = height / 4 + height / 3
-  var x = (width / 3) + (i * (20 - i)) + 100
+  var x = width / 3 + i * (20 - i) + 100
 
   lines.push({
     x1: x,
@@ -93,7 +169,7 @@ for (var i = 0; i < 11; i++) {
 for (var i = 0; i < 11; i++) {
   var y1 = height / 4
   var y2 = height / 4 + height / 3
-  var x = (width / 3) + (i * (20 - i)) + 200
+  var x = width / 3 + i * (20 - i) + 200
 
   lines.push({
     x1: x,
@@ -118,8 +194,8 @@ lines.forEach((line) => {
 var horizontalLines = []
 for (var i = 0; i < 11; i++) {
   var x1 = width / 3
-  var x2 = width / 3 * 2
-  var y = (height / 4) + (i * (20 - i))
+  var x2 = (width / 3) * 2
+  var y = height / 4 + i * (20 - i)
 
   horizontalLines.push({
     x1: x1,
@@ -130,8 +206,8 @@ for (var i = 0; i < 11; i++) {
 }
 for (var i = 0; i < 11; i++) {
   var x1 = width / 3
-  var x2 = width / 3 * 2
-  var y = (height / 4) + (i * (20 - i)) + 100
+  var x2 = (width / 3) * 2
+  var y = height / 4 + i * (20 - i) + 100
 
   horizontalLines.push({
     x1: x1,
