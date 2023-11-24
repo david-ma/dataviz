@@ -1,7 +1,6 @@
 var box = d3.select('#cards')
 
 
-
 d3.csv('/cards.csv')
   .then(function (data) {
     box
@@ -15,7 +14,7 @@ d3.csv('/cards.csv')
           <div class="card ${d.Category}">
               <div class="category">${d.Category}</div>
           </div>
-          <div class="card ${d.Category}">
+          <div class="card">
             <div class="prompt">${d.Prompt}</div>
           </div>
         `
