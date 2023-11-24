@@ -13,6 +13,7 @@ header, .sidebar, footer {
 }
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background-color: white;
 }
 div.a4 {
   height: 29.7cm;
@@ -31,6 +32,7 @@ div.card {
   height: 88mm;
   width: 64mm;
   box-sizing: border-box;
+  position: relative;
 
 }
 div.card .category {
@@ -40,9 +42,15 @@ div.card .category {
   text-align: center;
 }
 div.card .prompt {
-  margin-top: 30%;
+  margin-top: 50%;
   font-size: 1.5em;
   text-align: center;
+}
+div.card .sideprompt {
+  transform: rotate(-90deg) translate(0%, -64mm);
+  transform-origin: top right;
+  text-align: right;
+  padding: 0.2rem 0.5em;
 }
 </style>
 
