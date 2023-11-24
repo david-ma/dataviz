@@ -1,0 +1,54 @@
+
+
+<style>
+#dataviz_blog, div.col-xs-12.col-sm-9.col-md-10 {
+  margin-left: 0;
+  padding-left: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+header, .sidebar {
+  display: none;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  {{!-- font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; --}}
+  {{!-- font-family: Gilroy, courier; --}}
+  {{!-- font-family --}}
+  {{!-- font-family: san-serif; --}}
+  {{!-- font-family: Lexend, courier; --}}
+}
+div.a4 {
+  height: 29.7cm;
+  width: 21cm;
+}
+div.card {
+  border: solid 1px red;
+  height: 60mm;
+  width: 50mm;
+}
+div.card .category {
+  margin-top: 30%;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+}
+div.card .prompt {
+  margin-top: 30%;
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+}
+div.side {
+  {{!-- border: solid 1px green; --}}
+}
+div.card.Physicality {
+  border: solid 1px green;
+}
+</style>
+
+<div id="cards"></div>
+
+{{> require}}
+
