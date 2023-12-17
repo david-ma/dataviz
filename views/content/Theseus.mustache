@@ -1,0 +1,24 @@
+<section id="example" class="blogpost">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-md-6">
+      <br>
+      <div id="exampleDiv"></div>
+    </div>
+  </div>
+</section>
+
+{{> require}}
+
+
+
+<script>
+  console.log("hey?")
+
+  var md = new showdown.Converter({openLinksInNewWindow: true});
+
+  $("#exampleDiv").html(md.makeHtml(
+`#Blogpost
+Write a blog post here`
+  ));
+
+</script>

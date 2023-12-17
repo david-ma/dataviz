@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "scrape": "node config/scripts/scrape_awesome.js",
-    "newBlogpost": "bash scripts/newBlogpost.sh",
+    "blog": "bash scripts/newBlogpost.sh",
     "start": "node server/thalia.js"
   },
   "dependencies": {

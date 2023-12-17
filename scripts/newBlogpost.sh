@@ -6,7 +6,8 @@ echo "Please enter the name of the new blog post"
 
 read BLOGPOST
 
-echo "So, you wanna create '${BLOGPOST}?'"
+echo "Creating '/blog/${BLOGPOST}'"
+
 # TODO:
 # - check if the file already exists
 # - ask if you want to overwrite it
@@ -19,5 +20,6 @@ code src/js/${BLOGPOST}.ts
 code views/content/${BLOGPOST}.mustache
 
 # Check if server is running first?
+# Check which port it's on...
 open http://localhost:3000/blog/${BLOGPOST}
 
