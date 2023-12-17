@@ -35,8 +35,9 @@ const config: Thalia.WebsiteConfig = {
       // const start = 231394,
       //   end = 234099
 
-      const start = 234100,
-            end = 239548;
+      const start = 239549,
+            end = 242711;
+            // 234101
 
       // start 231394
       // end 234099
