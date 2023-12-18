@@ -115,6 +115,22 @@ ${caption}
     },
     // TODO: find a way to match the citation numbers?
 
+    // {{Quote|The ship wherein [[Theseus]] and the youth of Athens returned from Crete had thirty oars, and was preserved by the Athenians down even to the time of [[Demetrius of Phalerum|Demetrius Phalereus]], for they took away the old planks as they decayed, putting in new and stronger timber in their places, insomuch that this ship became a standing example among the philosophers, for the logical question of things that grow; one side holding that the ship remained the same, and the other contending that it was not the same.|Plutarch|''Life of Theseus'' 23.1}}
+    // <blockquote class="templatequote"><p>The ship wherein <a href="/wiki/Theseus" title="Theseus">Theseus</a> and the youth of Athens returned from Crete had thirty oars, and was preserved by the Athenians down even to the time of <a href="/wiki/Demetrius_of_Phalerum" title="Demetrius of Phalerum">Demetrius Phalereus</a>, for they took away the old planks as they decayed, putting in new and stronger timber in their places, insomuch that this ship became a standing example among the philosophers, for the logical question of things that grow; one side holding that the ship remained the same, and the other contending that it was not the same.</p><div class="templatequotecite">— <cite>Plutarch, <i>Life of Theseus</i> 23.1</cite></div></blockquote>
+
+    // {{Quote|For if that Ship of Theseus (concerning the Difference whereof, made by continual reparation, in taking out the old Planks, and putting in new, the [[sophist]]ers of Athens were wont to dispute) were, after all the Planks were changed, the same Numerical Ship it was at the beginning; and if some Man had kept the Old Planks as they were taken out, and by putting them afterward together in the same order, had again made a Ship of them, this, without doubt, had also been the same Numerical Ship with that which was at the beginnings and so there would have been two Ships Numerically the same, which is absurd… But we must consider by what name anything is called when we inquire concerning the Identity of it… so that a Ship, which signifies Matter so figured, will be the same, as long as the Matter remains the same; but if no part of the Matter is the same, then it is Numerically another Ship; and if part of the Matter remains, and part is changed, then the Ship will be partly the same, and partly not the same.|Hobbes|"Of Identity and Difference"{{sfn|Hobbes|1656}}}}
+    // <blockquote class="templatequote"><p>For if that Ship of Theseus (concerning the Difference whereof, made by continual reparation, in taking out the old Planks, and putting in new, the <a href="/wiki/Sophist" title="Sophist">sophisters</a> of Athens were wont to dispute) were, after all the Planks were changed, the same Numerical Ship it was at the beginning; and if some Man had kept the Old Planks as they were taken out, and by putting them afterward together in the same order, had again made a Ship of them, this, without doubt, had also been the same Numerical Ship with that which was at the beginnings and so there would have been two Ships Numerically the same, which is absurd... But we must consider by what name anything is called when we inquire concerning the Identity of it... so that a Ship, which signifies Matter so figured, will be the same, as long as the Matter remains the same; but if no part of the Matter is the same, then it is Numerically another Ship; and if part of the Matter remains, and part is changed, then the Ship will be partly the same, and partly not the same.</p><div class="templatequotecite">— <cite>Hobbes, "Of  Identity  and  Difference"<sup id="cite_ref-FOOTNOTEHobbes1656_3-0" class="reference"><a href="#cite_note-FOOTNOTEHobbes1656-3">[3]</a></sup></cite></div></blockquote>
+
+
+    {
+      type: 'lang',
+      regex: /{{Quote\|([^|]+)\|([^|]+)\|([^|]+)}}/g,
+      replace: function (match, content, author, source) {
+        return `<blockquote class="templatequote"><p>${content}</p><div class="templatequotecite">— <cite>${author}, <i>${source}</i></cite></div></blockquote>`
+      },
+    },
+
+
 
     // {{Cite web|title = The Three Basic Facts of Existence: I. Impermanence (Anicca)|url = http://www.accesstoinsight.org/lib/authors/various/wheel186.html|website = accesstoinsight.org|access-date = 1 November 2015|archive-url = https://web.archive.org/web/20190709094922/https://www.accesstoinsight.org/lib/authors/various/wheel186.html|archive-date = 9 July 2019|url-status = dead}}
     // <div role="note" class="hatnote navigation-not-searchable">This article is about the thought experiment. For the film, see <a href="/wiki/Ship_of_Theseus_(film)" title="Ship of Theseus (film)"><i>Ship of Theseus</i> (film)</a>.</div>
@@ -122,9 +138,9 @@ ${caption}
     // {{cite web|title = Rebuilt, Preserved, Restored – USS Constitution Across the Centuries| date=13 April 2018 |url = https://ussconstitutionmuseum.org/2018/04/13/rebuilt-preserved-restored-uss-constitution-across-the-centuries/|publisher = USS Constitution Museum|access-date = 8 October 2023}}
     {
       type: 'lang',
-      regex: /{{Cite web.+?}}/g,
+      regex: /{{Cite (web|journal|book).+?}}/gi,
       replace: function (match, content) {
-        return `<div role="note" class="hatnote navigation-not-searchable">${content}</div>`
+        return `<sup role="note" class="hatnote navigation-not-searchable">[${content}]</sup>`
       },
     },
 
