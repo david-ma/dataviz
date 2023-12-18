@@ -93,6 +93,7 @@ ${caption}
         return `<h2><span class="mw-headline" id="${content}">${content}</span></h2>`
       },
     },
+
     {
       type: 'lang',
       regex: /{{Quote\|([^|]+)\|([^|]+)\|([^|]+)}}/g,
@@ -107,13 +108,25 @@ ${caption}
     // <sup id="cite_ref-FOOTNOTEHobbes1656_3-0" class="reference"><a href="#cite_note-FOOTNOTEHobbes1656-3">[3]</a></sup>
     {
       type: 'lang',
-      regex: /{{sfn(\|[^|]+)+?(\|\d+)?(\|(?=p=|loc=).+?)?}}/g,
+      regex: /{{sfn(\|[^|]+?)+?(\|\d+)?(\|(?=p=|loc=).+?)?}}/g,
       replace: function (match, content) {
         return `<sup id="cite_ref-FOOTNOTE${content}_1-3" class="reference"><a href="#cite_note-FOOTNOTE${content}-1">[1]</a></sup>`
       },
     },
     // TODO: find a way to match the citation numbers?
 
+
+    // {{Cite web|title = The Three Basic Facts of Existence: I. Impermanence (Anicca)|url = http://www.accesstoinsight.org/lib/authors/various/wheel186.html|website = accesstoinsight.org|access-date = 1 November 2015|archive-url = https://web.archive.org/web/20190709094922/https://www.accesstoinsight.org/lib/authors/various/wheel186.html|archive-date = 9 July 2019|url-status = dead}}
+    // <div role="note" class="hatnote navigation-not-searchable">This article is about the thought experiment. For the film, see <a href="/wiki/Ship_of_Theseus_(film)" title="Ship of Theseus (film)"><i>Ship of Theseus</i> (film)</a>.</div>
+
+    // {{cite web|title = Rebuilt, Preserved, Restored – USS Constitution Across the Centuries| date=13 April 2018 |url = https://ussconstitutionmuseum.org/2018/04/13/rebuilt-preserved-restored-uss-constitution-across-the-centuries/|publisher = USS Constitution Museum|access-date = 8 October 2023}}
+    {
+      type: 'lang',
+      regex: /{{Cite web.+?}}/g,
+      replace: function (match, content) {
+        return `<div role="note" class="hatnote navigation-not-searchable">${content}</div>`
+      },
+    },
 
 
     // {{main|Temporal parts}}
