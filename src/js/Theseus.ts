@@ -495,7 +495,9 @@ var raw = new showdown.Converter({
 d3.json('/ship_of_theseus_revisions_2.json').then(function (data) {
   console.log('data', data)
   const first = data[0]
-  d3.select('#raw').html(raw.makeHtml(first.content))
+
+  d3.select("#raw").html(firstParagraph(first.content))
+
   d3.select('#edited').html(md.makeHtml(first.content))
 })
 
@@ -512,3 +514,14 @@ function getFieldValue(fields, fieldName) {
   const field = fields.find((f) => f.startsWith(fieldName))
   return field ? field.split('=')[1] : ''
 }
+
+function firstParagraph(text) {
+  const paragraphs = text.split('\n')
+
+  // return the first paragraph doesn't start with {{ and isn't null
+  const result = paragraphs.find((p) => p && !p.startsWith('{{'))
+  // const result = paragraphs.find((p) => !p.startsWith('{{'))
+  console.log("Result", result)
+  return result
+}
+
