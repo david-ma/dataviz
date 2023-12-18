@@ -492,13 +492,20 @@ var raw = new showdown.Converter({
   // extensions: ['wiki'],
 })
 
-d3.json('/ship_of_theseus_revisions_2.json').then(function (data) {
+d3.json('/ship_of_theseus_revisions_2.json').then(function (data : [{content: string}]) {
   console.log('data', data)
   const first = data[0]
 
   d3.select("#raw").html(firstParagraph(first.content))
 
-  d3.select('#edited').html(md.makeHtml(first.content))
+  // d3.select('#edited').html(md.makeHtml(first.content))
+
+  d3.select("#edited").selectAll("div.words")
+    .data(data)
+    .enter()
+    .append("div")
+    .classed("words", true)
+    .html((d) => md.makeHtml(firstParagraph(d.content)))
 })
 
 // We need the 1st then 1st & 2nd parts of an md5 hash of filename
@@ -518,10 +525,9 @@ function getFieldValue(fields, fieldName) {
 function firstParagraph(text) {
   const paragraphs = text.split('\n')
 
-  // return the first paragraph doesn't start with {{ and isn't null
-  const result = paragraphs.find((p) => p && !p.startsWith('{{'))
-  // const result = paragraphs.find((p) => !p.startsWith('{{'))
-  console.log("Result", result)
-  return result
+  // return the first two paragraphs that don't start with {{ and aren't null
+  const result = paragraphs.filter((p) => p && !p.startsWith('{{'))
+  return result.slice(0, 2).join('\n\n')
+  // return result
 }
 
