@@ -38,21 +38,28 @@ showdown.extension('wiki', function () {
 // https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/400px-Teseo_e_Arianna%2C_Pompei.jpg
     {
       type: 'lang',
-      regex: /\[\[File:([^|]+)\|thumb\|((?:[^\]]|\[\[|]])+)\]\]/g,
-      replace: function (match, filename, caption) {
+      regex: /\[\[File:([^|]+)\|thumb\|(\d+)px\|((?:.)+)\]\]/g,
+      replace: function (match, filename, width, caption) {
         const parts = filename.split('|')
 
         console.log("Figure found, parts", parts)
+        console.log("width", width)
+        console.log("caption", caption)
         // const link = parts[0]
         // encode the link, turn spaces into underscores
         const link = parts[0].replace(/\s/g, '_')
-        const width = parts[1]
-        const height = parts[2]
-        const description = parts[3]
         // https://en.wikipedia.org/wiki/File:Teseo_e_Arianna,_Pompei.jpg
         const url = `https://en.wikipedia.org/wiki/File:${link}`
+        const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/${link}/${width}px-${link}`
 
-        return url
+        return `<figure>
+<a href="${url}">
+<img src=${img}>
+</a>
+<figcaption>
+${caption}
+</figcaption>
+</figure>`
 
         // return `\`\`\`${url}\`\`\``
       },
