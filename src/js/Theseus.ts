@@ -76,15 +76,14 @@ ${caption}
       },
     },
 
-
     {
       type: 'lang',
       regex: /{{Div col\|colwidth=20em}}([\s\S]+?){{Div col end}}/g,
       replace: function (match, content) {
         // Process the content within the {{Div col...}} template
-        const processedContent = md.makeHtml(content.trim());
-    
-        return `<div style="column-width: 20em;">${processedContent}</div>`;
+        const processedContent = md.makeHtml(content.trim())
+
+        return `<div style="column-width: 20em;">${processedContent}</div>`
       },
     },
 
@@ -93,7 +92,7 @@ ${caption}
       regex: /{{Reflist}}/gi,
       replace: function (match) {
         // Process the Reflist template as needed
-        return '<div class="reflist">References will go here.</div>';
+        return '<div class="reflist">References will go here.</div>'
       },
     },
 
@@ -217,7 +216,7 @@ ${caption}
     // {{cite web|title = Rebuilt, Preserved, Restored – USS Constitution Across the Centuries| date=13 April 2018 |url = https://ussconstitutionmuseum.org/2018/04/13/rebuilt-preserved-restored-uss-constitution-across-the-centuries/|publisher = USS Constitution Museum|access-date = 8 October 2023}}
     {
       type: 'lang',
-      regex: /{{Cite (web|journal|book).+?}}/gi,
+      regex: /{{Cite web.+?}}/gi,
       replace: function (match, content) {
         return `<sup role="note" class="hatnote navigation-not-searchable">[${content}]</sup>`
       },
@@ -225,41 +224,197 @@ ${caption}
 
     {
       type: 'lang',
-      regex: /{{cite encyclopedia\|([^}]+)}}/gi,
+      regex: /\{\{cite encyclopedia\s*\|([^}]+)}}/gi,
       replace: function (match, content) {
-        const fields = content.split('|').map(field => field.trim());
-    
+        const fields = content.split('|').map((field) => field.trim())
+
         // Extract values for different fields
-        const editorLastName = getFieldValue(fields, 'editor-last1');
-        const editorFirstName = getFieldValue(fields, 'editor-first1');
-        const editorLink = getFieldValue(fields, 'editor-link');
-        const title = getFieldValue(fields, 'title');
-        const encyclopedia = getFieldValue(fields, 'encyclopedia');
-        const year = getFieldValue(fields, 'year');
-        const publisher = getFieldValue(fields, 'publisher');
-        const isbn = getFieldValue(fields, 'isbn');
-        const url = getFieldValue(fields, 'url');
-        const accessDate = getFieldValue(fields, 'access-date');
-        const language = getFieldValue(fields, 'language');
-    
-        // Generate the HTML representation
+        const editorLastName = getFieldValue(fields, 'editor-last1')
+        const editorFirstName = getFieldValue(fields, 'editor-first1')
+        const editorLink = getFieldValue(fields, 'editor-link')
+        const title = getFieldValue(fields, 'title')
+        const encyclopedia = getFieldValue(fields, 'encyclopedia')
+        const year = getFieldValue(fields, 'year')
+        const publisher = getFieldValue(fields, 'publisher')
+        const isbn = getFieldValue(fields, 'isbn')
+        const url = getFieldValue(fields, 'url')
+        const accessDate = getFieldValue(fields, 'access-date')
+        const language = getFieldValue(fields, 'language')
+
+        // Generate the HTML representation without <li> tags
         const htmlRepresentation = `
-          <li>
-            <link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631">
-            <cite id="CITEREF${editorLastName}${year}" class="citation encyclopaedia cs1">
-              <a href="${editorLink}" title="${editorFirstName} ${editorLastName}">${editorLastName}, ${editorFirstName}</a>, ed. (${year}). 
-              <a rel="nofollow" class="external text" href="${url}">"${title}"</a> <span class="cs1-format">(Encyclopedia)</span>. 
-              <i>${encyclopedia}</i>. ${publisher}; ${year}. 
-              <a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>&nbsp;
-              <a href="/wiki/Special:BookSources/${isbn}" title="Special:BookSources/${isbn}"><bdi>${isbn}</bdi></a>. 
-              <span class="language">${language}</span>. 
-              <span class="access-date">Accessed ${accessDate}</span>.
-            </cite>
-            <span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=bookitem&amp;rft.atitle=${title}&amp;rft.btitle=${encyclopedia}&amp;rft.pub=${publisher}&amp;rft.date=${year}&amp;rft.isbn=${isbn}&amp;rft_id=${url}&amp;rft.accessDate=${accessDate}&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3A${title}" class="Z3988"></span>
-          </li>
-        `;
-    
-        return htmlRepresentation;
+          <link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631">
+          <cite id="CITEREF${editorLastName}${year}" class="citation encyclopaedia cs1">
+            <a href="${editorLink}" title="${editorFirstName} ${editorLastName}">${editorLastName}, ${editorFirstName}</a>, ed. (${year}). 
+            <a rel="nofollow" class="external text" href="${url}">"${title}"</a> <span class="cs1-format">(Encyclopedia)</span>. 
+            <i>${encyclopedia}</i>. ${publisher}; ${year}. 
+            <a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>&nbsp;
+            <a href="/wiki/Special:BookSources/${isbn}" title="Special:BookSources/${isbn}"><bdi>${isbn}</bdi></a>. 
+            <span class="language">${language}</span>. 
+            <span class="access-date">Accessed ${accessDate}</span>.
+          </cite>
+          <span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=bookitem&amp;rft.atitle=${title}&amp;rft.btitle=${encyclopedia}&amp;rft.pub=${publisher}&amp;rft.date=${year}&amp;rft.isbn=${isbn}&amp;rft_id=${url}&amp;rft.accessDate=${accessDate}&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3A${title}" class="Z3988"></span>
+        `
+
+        return htmlRepresentation
+      },
+    },
+
+    {
+      type: 'lang',
+      regex: /\{\{cite book(?:\s*\|\s*[^\s=]+=[^|}]+)*\}\}/gi,
+      replace: function (match) {
+        const fields = match
+          .replace(/\{\{/g, '')
+          .replace(/\}\}/g, '')
+          .split('|')
+          .map((field) => field.trim())
+
+        // Extract values for different fields
+        const parameters = fields.map((field) => {
+          const [name, value] = field.split('=')
+          return { name: name.trim(), value: value ? value.trim() : '' }
+        })
+
+        // Generate HTML representation for a book citation
+        const authors = parameters
+          .filter((param) => param.name.startsWith('author'))
+          .map(
+            (author) =>
+              `<a href="/wiki/${author.value}" title="${author.value}">${author.value}</a>`
+          )
+          .join('; ')
+
+        const editors = parameters
+          .filter((param) => param.name.startsWith('editor'))
+          .map(
+            (editor) =>
+              `<a href="/wiki/${editor.value}" title="${editor.value}">${editor.value}</a>`
+          )
+          .join('; ')
+
+        const htmlRepresentation = `
+          <link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631">
+          <cite id="CITEREF${
+            parameters.find((param) => param.name === 'author1-last')?.value
+          }${
+          parameters.find((param) => param.name === 'date')?.value
+        }" class="citation book cs1">
+            ${authors} (${
+          parameters.find((param) => param.name === 'date')?.value
+        }). ${
+          editors ? `${editors} (eds.). ` : ''
+        }<a rel="nofollow" class="external text" href="${
+          parameters.find((param) => param.name === 'url')?.value
+        }"><i>${
+          parameters.find((param) => param.name === 'title')?.value
+        }</i></a>. ${
+          parameters.find((param) => param.name === 'publisher')?.value
+        }. p.&nbsp;${
+          parameters.find((param) => param.name === 'pages')?.value
+        }. <a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>&nbsp;<a href="/wiki/Special:BookSources/${
+          parameters.find((param) => param.name === 'isbn')?.value
+        }" title="Special:BookSources/${
+          parameters.find((param) => param.name === 'isbn')?.value
+        }"><bdi>${
+          parameters.find((param) => param.name === 'isbn')?.value
+        }</bdi></a>.
+          </cite>
+          <span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=book&amp;rft.btitle=${
+            parameters.find((param) => param.name === 'title')?.value
+          }&amp;rft.pages=${
+          parameters.find((param) => param.name === 'pages')?.value
+        }&amp;rft.pub=${
+          parameters.find((param) => param.name === 'publisher')?.value
+        }&amp;rft.date=${
+          parameters.find((param) => param.name === 'date')?.value
+        }&amp;rft.isbn=${
+          parameters.find((param) => param.name === 'isbn')?.value
+        }&amp;rft.aulast=${
+          parameters.find((param) => param.name === 'author1-last')?.value
+        }&amp;rft.aufirst=${
+          parameters.find((param) => param.name === 'author1-first')?.value
+        }&amp;rft_id=${
+          parameters.find((param) => param.name === 'url')?.value
+        }&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AShip+of+Theseus" class="Z3988"></span>
+        `
+
+        return htmlRepresentation
+      },
+    },
+
+    {
+      type: 'lang',
+      regex: /\{\{cite journal(?:\s*\|\s*[^\s=]+=[^|}]+)*\}\}/gi,
+      replace: function (match) {
+        const fields = match
+          .replace(/\{\{/g, '')
+          .replace(/\}\}/g, '')
+          .split('|')
+          .map((field) => field.trim())
+
+        // Extract values for different fields
+        const parameters = fields.map((field) => {
+          const [name, value] = field.split('=')
+          return { name: name.trim(), value: value ? value.trim() : '' }
+        })
+
+        // Generate HTML representation for a journal citation
+        const authors = parameters
+          .filter((param) => param.name.startsWith('author'))
+          .map(
+            (author) =>
+              `<a href="/wiki/${author.value}" title="${author.value}">${author.value}</a>`
+          )
+          .join('; ')
+
+        const htmlRepresentation = `
+          <link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631">
+          <cite id="CITEREF${
+            parameters.find((param) => param.name === 'last1')?.value
+          }${
+          parameters.find((param) => param.name === 'year')?.value
+        }" class="citation journal cs1">
+            ${authors} (${
+          parameters.find((param) => param.name === 'year')?.value
+        }). <i>${
+          parameters.find((param) => param.name === 'title')?.value
+        }</i>. ${parameters.find((param) => param.name === 'journal')?.value} ${
+          parameters.find((param) => param.name === 'volume')?.value
+            ? `${parameters.find((param) => param.name === 'volume')?.value}`
+            : ''
+        }${
+          parameters.find((param) => param.name === 'issue')?.value
+            ? `(${parameters.find((param) => param.name === 'issue')?.value})`
+            : ''
+        }: ${
+          parameters.find((param) => param.name === 'pages')?.value
+        }. <a href="${
+          parameters.find((param) => param.name === 'url')?.value
+        }" class="external text">doi:${
+          parameters.find((param) => param.name === 'doi')?.value
+        }</a>.
+          </cite>
+          <span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.genre=article&amp;rft.atitle=${
+            parameters.find((param) => param.name === 'title')?.value
+          }&amp;rft.jtitle=${
+          parameters.find((param) => param.name === 'journal')?.value
+        }&amp;rft.date=${
+          parameters.find((param) => param.name === 'year')?.value
+        }&amp;rft.volume=${
+          parameters.find((param) => param.name === 'volume')?.value
+        }&amp;rft.issue=${
+          parameters.find((param) => param.name === 'issue')?.value
+        }&amp;rft.pages=${
+          parameters.find((param) => param.name === 'pages')?.value
+        }&amp;rft.aulast=${
+          parameters.find((param) => param.name === 'last1')?.value
+        }&amp;rft.aufirst=${
+          parameters.find((param) => param.name === 'first1')?.value
+        }&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AShip+of+Theseus" class="Z3988"></span>
+        `
+
+        return htmlRepresentation
       },
     },
 
@@ -268,7 +423,7 @@ ${caption}
       regex: /{{refbegin\|(\d+)em}}([\s\S]*?){{refend}}/gi,
       replace: function (match, colWidth, content) {
         // Process the refbegin template and generate HTML
-        return `<div style="column-width: ${colWidth}">${content}</div>`;
+        return `<div style="column-width: ${colWidth}">${content}</div>`
       },
     },
 
@@ -354,6 +509,6 @@ function md5(str) {
 }
 
 function getFieldValue(fields, fieldName) {
-  const field = fields.find(f => f.startsWith(fieldName));
-  return field ? field.split('=')[1] : '';
+  const field = fields.find((f) => f.startsWith(fieldName))
+  return field ? field.split('=')[1] : ''
 }
