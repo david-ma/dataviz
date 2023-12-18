@@ -492,21 +492,41 @@ var raw = new showdown.Converter({
   // extensions: ['wiki'],
 })
 
-d3.json('/ship_of_theseus_revisions_2.json').then(function (data : [{content: string}]) {
-  console.log('data', data)
-  const first = data[0]
+d3.json('/ship_of_theseus_revisions_2.json')
+  .then(function (data: [{ content: string }]) {
+    // Get just the first 2 paragraphs
+    // Check if there are any differences
+    // Ignore if none
 
-  d3.select("#raw").html(firstParagraph(first.content))
+    var rows = []
+    var previous = ""
 
-  // d3.select('#edited').html(md.makeHtml(first.content))
+    data.forEach(function(row) {
+      var text = getIntro(row.content)
+      if (text !== previous) {
+        rows.push(row)
+        previous = text
+      }
+    })
 
-  d3.select("#edited").selectAll("div.words")
-    .data(data)
-    .enter()
-    .append("div")
-    .classed("words", true)
-    .html((d) => md.makeHtml(firstParagraph(d.content)))
-})
+    return rows
+  })
+  .then(function (data: [{ content: string }]) {
+    console.log('data', data)
+    const first = data[0]
+
+    d3.select('#raw').html(getIntro(first.content))
+
+    // d3.select('#edited').html(md.makeHtml(first.content))
+
+    d3.select('#edited')
+      .selectAll('div.words')
+      .data(data)
+      .enter()
+      .append('div')
+      .classed('words', true)
+      .html((d) => md.makeHtml(getIntro(d.content)))
+  })
 
 // We need the 1st then 1st & 2nd parts of an md5 hash of filename
 // Hardcode it for now.
@@ -522,12 +542,25 @@ function getFieldValue(fields, fieldName) {
   return field ? field.split('=')[1] : ''
 }
 
-function firstParagraph(text) {
+function getIntro(text) {
   const paragraphs = text.split('\n')
+  var result = []
 
   // return the first two paragraphs that don't start with {{ and aren't null
-  const result = paragraphs.filter((p) => p && !p.startsWith('{{'))
-  return result.slice(0, 2).join('\n\n')
+  var looping = true
+  paragraphs.forEach((p) => {
+    if(p && p.startsWith('==')) {
+      looping = false
+    }
+
+    if(looping && p && !p.startsWith('{{')) {
+      result.push(p)
+    }
+  })
+
+  return result.join('\n\n')
   // return result
 }
+
+
 
