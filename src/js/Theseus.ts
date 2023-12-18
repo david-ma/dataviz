@@ -117,25 +117,58 @@ ${caption}
     //     return `<blockquote class="templatequote"><p>${text}</p><div class="templatequotecite">— <cite>${sign}, <i>${source}</i></cite></div></blockquote>`
     //   },
     // }
+    // {
+    //   type: 'lang',
+    //   regex: /{{Quote\|(.+?}?}?)}}/gi,
+    //   replace: function (match, content) {
+    //     // Find inside the content, the 3 parts
+    //     console.log("Quote Content", content)
+
+    //     const text = content.match(/(.+)\|(?:.+)\|(?:.+)/)
+    //     const sign = content.match(/(?<=\|)(.+)(?=\|)/)
+    //     const source = content.match(/(?:.+)\|(.+)$/)
+    //     // return content
+    //     console.log("Quote Parts", {
+    //       text: text,
+    //       sign: sign,
+    //       source: source,
+    //     })
+
+    //     return `<blockquote class="templatequote"><p>${text[1]}</p><div class="templatequotecite">— <cite>${sign[1]}, <i>${source[1]}</i></cite></div></blockquote>`
+    //   },
+    // },
+
     {
       type: 'lang',
-      regex: /{{Quote\|(.+?}?}?)}}/gi,
+      regex:
+        /{{Quote\|((?:[^{}|]+|\{\{(?:[^{}]|{{.*?}})*?\}\}|\[\[(?:[^[\]]|\[\[.*?]])*?\]\]|(?:\|[^{}|]+|\{\{(?:[^{}]|{{.*?}})*?\}\}|\[\[(?:[^[\]]|\[\[.*?]])*?\]\])*)*)}}/gi,
       replace: function (match, content) {
-        // Find inside the content, the 3 parts
-        console.log("Quote Content", content)
+        console.log('Quote Content', content)
 
-        const text = content.match(/(.+)\|(?:.+)\|(?:.+)/)
-        const sign = content.match(/(?<=\|)(.+)(?=\|)/)
-        const source = content.match(/(?:.+)\|(.+)$/)
-        // return content
-        console.log("Quote Parts", {
-          text: text,
-          sign: sign,
-          source: source,
-        })
+        // Use a simpler regex pattern to extract text, sign, and source
+        const parts = content.match(/(.+?)\|(.+?)\|(.+)/)
 
-        return `<blockquote class="templatequote"><p>${text[1]}</p><div class="templatequotecite">— <cite>${sign[1]}, <i>${source[1]}</i></cite></div></blockquote>`
-      },  
+        if (parts) {
+          const [_, text, sign, source] = parts
+
+          // Optionally, you can trim the extracted parts
+          const trimmedText = text.trim()
+          const trimmedSign = sign.trim()
+          const trimmedSource = source.trim()
+
+          console.log('Quote Parts', {
+            text: trimmedText,
+            sign: trimmedSign,
+            source: trimmedSource,
+          })
+
+          return `<blockquote class="templatequote"><p>${trimmedText}</p><div class="templatequotecite">— <cite>${trimmedSign}, <i>${trimmedSource}</i></cite></div></blockquote>`
+        } else {
+          // Handle the case where the regex doesn't match as expected
+          console.error('Failed to match parts in Quote template')
+          return match // Return the original match as fallback
+        }
+      },
     },
 
     // {{sfn|Wasserman}}
@@ -157,9 +190,6 @@ ${caption}
     // {{Quote|For if that Ship of Theseus (concerning the Difference whereof, made by continual reparation, in taking out the old Planks, and putting in new, the [[sophist]]ers of Athens were wont to dispute) were, after all the Planks were changed, the same Numerical Ship it was at the beginning; and if some Man had kept the Old Planks as they were taken out, and by putting them afterward together in the same order, had again made a Ship of them, this, without doubt, had also been the same Numerical Ship with that which was at the beginnings and so there would have been two Ships Numerically the same, which is absurd… But we must consider by what name anything is called when we inquire concerning the Identity of it… so that a Ship, which signifies Matter so figured, will be the same, as long as the Matter remains the same; but if no part of the Matter is the same, then it is Numerically another Ship; and if part of the Matter remains, and part is changed, then the Ship will be partly the same, and partly not the same.|Hobbes|"Of Identity and Difference"{{sfn|Hobbes|1656}}}}
     // <blockquote class="templatequote"><p>For if that Ship of Theseus (concerning the Difference whereof, made by continual reparation, in taking out the old Planks, and putting in new, the <a href="/wiki/Sophist" title="Sophist">sophisters</a> of Athens were wont to dispute) were, after all the Planks were changed, the same Numerical Ship it was at the beginning; and if some Man had kept the Old Planks as they were taken out, and by putting them afterward together in the same order, had again made a Ship of them, this, without doubt, had also been the same Numerical Ship with that which was at the beginnings and so there would have been two Ships Numerically the same, which is absurd... But we must consider by what name anything is called when we inquire concerning the Identity of it... so that a Ship, which signifies Matter so figured, will be the same, as long as the Matter remains the same; but if no part of the Matter is the same, then it is Numerically another Ship; and if part of the Matter remains, and part is changed, then the Ship will be partly the same, and partly not the same.</p><div class="templatequotecite">— <cite>Hobbes, "Of  Identity  and  Difference"<sup id="cite_ref-FOOTNOTEHobbes1656_3-0" class="reference"><a href="#cite_note-FOOTNOTEHobbes1656-3">[3]</a></sup></cite></div></blockquote>
 
-
-
-
     // {{Cite web|title = The Three Basic Facts of Existence: I. Impermanence (Anicca)|url = http://www.accesstoinsight.org/lib/authors/various/wheel186.html|website = accesstoinsight.org|access-date = 1 November 2015|archive-url = https://web.archive.org/web/20190709094922/https://www.accesstoinsight.org/lib/authors/various/wheel186.html|archive-date = 9 July 2019|url-status = dead}}
     // <div role="note" class="hatnote navigation-not-searchable">This article is about the thought experiment. For the film, see <a href="/wiki/Ship_of_Theseus_(film)" title="Ship of Theseus (film)"><i>Ship of Theseus</i> (film)</a>.</div>
 
@@ -171,7 +201,6 @@ ${caption}
         return `<sup role="note" class="hatnote navigation-not-searchable">[${content}]</sup>`
       },
     },
-
 
     // {{main|Temporal parts}}
     // <div role="note" class="hatnote navigation-not-searchable">Main article: <a href="/wiki/Temporal_parts" title="Temporal parts">Temporal parts</a></div>
