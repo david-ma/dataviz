@@ -7,6 +7,21 @@
     border: solid 1px black;
     padding: 2px;
   }
+  span.diff {
+    background-color: #FFD700;
+  }
+  span.add, span.diff-added {
+    background-color: #90EE90;
+  }
+  span.del, span.diff-removed {
+    background-color: #FF6347;
+  }
+  span.none {
+    background-color: #FFFFFF;
+  }
+  span.replace {
+    background-color: #87CEFA;
+  }
 </style>
 
 <section id="example" class="blogpost">
@@ -21,6 +36,7 @@
     </div>
   </div>
 </section>
+<script src="/js/diff_match_patch.js"></script>
 
 {{> require}}
 

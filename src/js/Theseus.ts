@@ -492,18 +492,22 @@ var raw = new showdown.Converter({
   // extensions: ['wiki'],
 })
 
-d3.json('/ship_of_theseus_revisions_6.json')
-  .then(function (data: [{ content: string }]) {
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/diff-match-patch/20121119/diff_match_patch.js"></script>
+
+d3.json('/ship_of_theseus_revisions.json')
+  .then(function (data: [any]) {
     // Get just the first 2 paragraphs
     // Check if there are any differences
     // Ignore if none
 
     var rows = []
-    var previous = ""
+    var previous = ''
 
-    data.forEach(function(row) {
+    data.forEach(function (row) {
       var text = getIntro(row.content)
       if (text !== previous) {
+        row.previous = previous
+        row.content = text
         rows.push(row)
         previous = text
       }
@@ -511,7 +515,7 @@ d3.json('/ship_of_theseus_revisions_6.json')
 
     return rows
   })
-  .then(function (data: [{ content: string }]) {
+  .then(function (data: [{ content: string; previous: string }]) {
     console.log('data', data)
     const first = data[0]
 
@@ -519,14 +523,74 @@ d3.json('/ship_of_theseus_revisions_6.json')
 
     // d3.select('#edited').html(md.makeHtml(first.content))
 
+    // Create a diff_match_patch object
+    // const dmp = new diff_match_patch();
+
+    // // Get the differences
+    // const diffs = dmp.diff_main(data.content, data.string);
+
     d3.select('#edited')
       .selectAll('div.words')
       .data(data)
       .enter()
       .append('div')
       .classed('words', true)
-      .html((d) => md.makeHtml(getIntro(d.content)))
+      .html((d) => {
+        // get differences between data.content and data.string
+        // wrap them with <span class="diff">...</span>
+        // var string = d.content
+        // var string = getIntro(d.content)
+        var dmp = new diff_match_patch()
+
+        var diffs = dmp.diff_main(d.previous, d.content)
+
+        // dmp.diff_cleanupSemantic(diffs)
+
+        var content = parseDiffs(diffs)
+        console.log(content)
+
+        // .map(([type, text]) => {
+        // return "lol"
+        // const className =
+        //   type === 0 ? '' : type === 1 ? 'diff-added' : 'diff-removed'
+        // return `<span class="diff ${className}">${text}</span>`
+        // })
+
+        // const htmlContent = [].concat(diffs).map(([type, text]) => {
+        //   const className = type === 0 ? '' : type === 1 ? 'diff-added' : 'diff-removed';
+        //   return `<span class="diff ${className}">${text}</span>`;
+        // }).join('');
+
+        // console.log(htmlContent)
+
+        return md.makeHtml(content)
+      })
   })
+
+function parseDiffs(diffs) {
+  // .map(([type, text]) => {
+  // return "lol"
+  // const className =
+  //   type === 0 ? '' : type === 1 ? 'diff-added' : 'diff-removed'
+  // return `<span class="diff ${className}">${text}</span>`
+  // })
+  console.log(diffs)
+
+  var result = ''
+  for (var i = 0; i < diffs.length; i++) {
+    // var [type, text] = diffs[i]
+    var type = diffs[i][0]
+    var text = diffs[i][1]
+
+    const className =
+      type === 0 ? '' : type === 1 ? 'diff-added' : 'diff-removed'
+    result += `<span class="diff ${className}">${text}</span>`
+  }
+
+  console.log(result)
+
+  return result
+}
 
 // We need the 1st then 1st & 2nd parts of an md5 hash of filename
 // Hardcode it for now.
@@ -549,18 +613,15 @@ function getIntro(text) {
   // return the first two paragraphs that don't start with {{ and aren't null
   var looping = true
   paragraphs.forEach((p) => {
-    if(p && p.startsWith('==')) {
+    if (p && p.startsWith('==')) {
       looping = false
     }
 
-    if(looping && p && !p.startsWith('{{')) {
+    if (looping && p && !p.startsWith('{{')) {
       result.push(p)
     }
   })
 
-  return result.join('\n\n')
+  return result.join('')
   // return result
 }
-
-
-

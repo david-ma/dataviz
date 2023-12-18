@@ -9,11 +9,13 @@
   "private": true,
   "scripts": {
     "scrape": "node config/scripts/scrape_awesome.js",
+    "wiki": "node scripts/wiki.js",
     "blog": "bash scripts/newBlogpost.sh",
     "start": "node server/thalia.js"
   },
   "dependencies": {
     "amdefine": "^1.0.1",
+    "axios": "^1.6.2",
     "d3": "^7.3.0",
     "d3-cloud": "^1.2.5",
     "formidable": "^1.2.2",
