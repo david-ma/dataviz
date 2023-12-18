@@ -529,42 +529,23 @@ d3.json('/ship_of_theseus_revisions.json')
     // // Get the differences
     // const diffs = dmp.diff_main(data.content, data.string);
 
-    d3.select('#edited')
+    var box = d3.select('#edited')
       .selectAll('div.words')
       .data(data)
       .enter()
       .append('div')
       .classed('words', true)
-      .html((d) => {
-        // get differences between data.content and data.string
-        // wrap them with <span class="diff">...</span>
-        // var string = d.content
-        // var string = getIntro(d.content)
+    box.append('div').html((d) => {
         var dmp = new diff_match_patch()
-
         var diffs = dmp.diff_main(d.previous, d.content)
-
-        // dmp.diff_cleanupSemantic(diffs)
+        dmp.diff_cleanupSemantic(diffs)
 
         var content = parseDiffs(diffs)
-        console.log(content)
-
-        // .map(([type, text]) => {
-        // return "lol"
-        // const className =
-        //   type === 0 ? '' : type === 1 ? 'diff-added' : 'diff-removed'
-        // return `<span class="diff ${className}">${text}</span>`
-        // })
-
-        // const htmlContent = [].concat(diffs).map(([type, text]) => {
-        //   const className = type === 0 ? '' : type === 1 ? 'diff-added' : 'diff-removed';
-        //   return `<span class="diff ${className}">${text}</span>`;
-        // }).join('');
-
-        // console.log(htmlContent)
-
         return md.makeHtml(content)
       })
+    box.append('div').html((d) => {
+      return `${d.timestamp} by ${d.user}`
+    })
   })
 
 function parseDiffs(diffs) {
@@ -586,8 +567,6 @@ function parseDiffs(diffs) {
       type === 0 ? '' : type === 1 ? 'diff-added' : 'diff-removed'
     result += `<span class="diff ${className}">${text}</span>`
   }
-
-  console.log(result)
 
   return result
 }
