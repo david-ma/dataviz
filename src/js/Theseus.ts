@@ -492,7 +492,7 @@ var raw = new showdown.Converter({
   // extensions: ['wiki'],
 })
 
-d3.json('/ship_of_theseus_revisions_2.json')
+d3.json('/ship_of_theseus_revisions_6.json')
   .then(function (data: [{ content: string }]) {
     // Get just the first 2 paragraphs
     // Check if there are any differences
