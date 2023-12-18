@@ -32,19 +32,19 @@ console.log('Hello World')
 
 showdown.extension('wiki', function () {
   return [
-// [[File:Teseo e Arianna, Pompei.jpg|thumb|200px|A [[Fresco]] from [[Pompeii]] depicting Theseus and Ariadne escaping from Crete. According to Plutarch, the Athenians preserved the ship that Theseus used to escape, by replacing the parts one by one as they decayed.]]
-// Should become this:
-// <figure typeof="mw:File/Thumb"><a href=https://en.wikipedia.org/wiki/File:Teseo_e_Arianna,_Pompei.jpg" class="mw-file-description"><img src="//upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/200px-Teseo_e_Arianna%2C_Pompei.jpg" decoding="async" width="200" height="231" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/300px-Teseo_e_Arianna%2C_Pompei.jpg 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/400px-Teseo_e_Arianna%2C_Pompei.jpg 2x" data-file-width="1902" data-file-height="2200"></a><figcaption>A <a href="/wiki/Fresco" title="Fresco">Fresco</a> from <a href="/wiki/Pompeii" title="Pompeii">Pompeii</a> depicting Theseus and Ariadne escaping from Crete. According to Plutarch, the Athenians preserved the ship that Theseus used to escape, by replacing the parts one by one as they decayed.</figcaption></figure>
-// https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/400px-Teseo_e_Arianna%2C_Pompei.jpg
+    // [[File:Teseo e Arianna, Pompei.jpg|thumb|200px|A [[Fresco]] from [[Pompeii]] depicting Theseus and Ariadne escaping from Crete. According to Plutarch, the Athenians preserved the ship that Theseus used to escape, by replacing the parts one by one as they decayed.]]
+    // Should become this:
+    // <figure typeof="mw:File/Thumb"><a href=https://en.wikipedia.org/wiki/File:Teseo_e_Arianna,_Pompei.jpg" class="mw-file-description"><img src="//upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/200px-Teseo_e_Arianna%2C_Pompei.jpg" decoding="async" width="200" height="231" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/300px-Teseo_e_Arianna%2C_Pompei.jpg 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/400px-Teseo_e_Arianna%2C_Pompei.jpg 2x" data-file-width="1902" data-file-height="2200"></a><figcaption>A <a href="/wiki/Fresco" title="Fresco">Fresco</a> from <a href="/wiki/Pompeii" title="Pompeii">Pompeii</a> depicting Theseus and Ariadne escaping from Crete. According to Plutarch, the Athenians preserved the ship that Theseus used to escape, by replacing the parts one by one as they decayed.</figcaption></figure>
+    // https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/400px-Teseo_e_Arianna%2C_Pompei.jpg
     {
       type: 'lang',
       regex: /\[\[File:([^|]+)\|thumb\|(\d+)px\|((?:.)+)\]\]/g,
       replace: function (match, filename, width, caption) {
         const parts = filename.split('|')
 
-        console.log("Figure found, parts", parts)
-        console.log("width", width)
-        console.log("caption", caption)
+        console.log('Figure found, parts', parts)
+        console.log('width', width)
+        console.log('caption', caption)
         // const link = parts[0]
         // encode the link, turn spaces into underscores
         const link = parts[0].replace(/\s/g, '_')
@@ -65,7 +65,6 @@ ${caption}
       },
     },
 
-
     {
       type: 'lang',
       regex: /\[\[([^\]]+)\]\]/g,
@@ -74,6 +73,16 @@ ${caption}
         const link = parts[0]
         const text = parts[1] || link
         return `<a href="https://en.wikipedia.org/wiki/${link}">${text}</a>`
+      },
+    },
+
+    // ===Constitution is not identity===
+    // <h3><span class="mw-headline" id="Constitution_is_not_identity">Constitution is not identity</span></h3>
+    {
+      type: 'lang',
+      regex: /===([^=]+)===/g,
+      replace: function (match, content) {
+        return `<h3><span class="mw-headline" id="${content}">${content}</span></h3>`
       },
     },
 
@@ -92,6 +101,30 @@ ${caption}
       },
     },
 
+    // {{sfn|Wasserman}}
+    // <sup id="cite_ref-FOOTNOTEWasserman_1-3" class="reference"><a href="#cite_note-FOOTNOTEWasserman-1">[1]</a></sup>
+    // {{sfn|Hobbes|1656}}}}
+    // <sup id="cite_ref-FOOTNOTEHobbes1656_3-0" class="reference"><a href="#cite_note-FOOTNOTEHobbes1656-3">[3]</a></sup>
+    {
+      type: 'lang',
+      regex: /{{sfn(\|[^|]+)+?(\|\d+)?(\|(?=p=|loc=).+?)?}}/g,
+      replace: function (match, content) {
+        return `<sup id="cite_ref-FOOTNOTE${content}_1-3" class="reference"><a href="#cite_note-FOOTNOTE${content}-1">[1]</a></sup>`
+      },
+    },
+    // TODO: find a way to match the citation numbers?
+
+
+
+    // {{main|Temporal parts}}
+    // <div role="note" class="hatnote navigation-not-searchable">Main article: <a href="/wiki/Temporal_parts" title="Temporal parts">Temporal parts</a></div>
+    {
+      type: 'lang',
+      regex: /{{main\|([^|]+)}}/g,
+      replace: function (match, content) {
+        return `<div role="note" class="hatnote navigation-not-searchable">Main article: <a href="/wiki/${content}" title="${content}">${content}</a></div>`
+      },
+    },
 
     // {{Short description|Thought experiment about identity over time}}
     // <div class="shortdescription nomobile noexcerpt noprint searchaux" style="display:none">Thought experiment about identity over time</div>
@@ -135,8 +168,6 @@ ${caption}
         return `<b>${content}</b>`
       },
     },
-
-
   ]
 })
 
@@ -157,12 +188,11 @@ d3.json('/ship_of_theseus_revisions_2.json').then(function (data) {
   d3.select('#edited').html(md.makeHtml(first.content))
 })
 
-
 // We need the 1st then 1st & 2nd parts of an md5 hash of filename
 // Hardcode it for now.
-function md5 (str) {
-  if( str === "USS_Constitution_fires_a_17-gun_salute.jpg") {
-    return "e/ed"
+function md5(str) {
+  if (str === 'USS_Constitution_fires_a_17-gun_salute.jpg') {
+    return 'e/ed'
   }
-  return "1/1c"
+  return '1/1c'
 }
