@@ -76,6 +76,27 @@ ${caption}
       },
     },
 
+
+    {
+      type: 'lang',
+      regex: /{{Div col\|colwidth=20em}}([\s\S]+?){{Div col end}}/g,
+      replace: function (match, content) {
+        // Process the content within the {{Div col...}} template
+        const processedContent = md.makeHtml(content.trim());
+    
+        return `<div style="column-width: 20em;">${processedContent}</div>`;
+      },
+    },
+
+    {
+      type: 'lang',
+      regex: /{{Reflist}}/gi,
+      replace: function (match) {
+        // Process the Reflist template as needed
+        return '<div class="reflist">References will go here.</div>';
+      },
+    },
+
     // ===Constitution is not identity===
     // <h3><span class="mw-headline" id="Constitution_is_not_identity">Constitution is not identity</span></h3>
     {
@@ -202,6 +223,56 @@ ${caption}
       },
     },
 
+    {
+      type: 'lang',
+      regex: /{{cite encyclopedia\|([^}]+)}}/gi,
+      replace: function (match, content) {
+        const fields = content.split('|').map(field => field.trim());
+        
+        // Extract values for different fields
+        const editorLastName = getFieldValue(fields, 'editor-last1');
+        const editorFirstName = getFieldValue(fields, 'editor-first1');
+        const editorLink = getFieldValue(fields, 'editor-link');
+        const title = getFieldValue(fields, 'title');
+        const encyclopedia = getFieldValue(fields, 'encyclopedia');
+        const url = getFieldValue(fields, 'url');
+        const edition = getFieldValue(fields, 'edition');
+        const format = getFieldValue(fields, 'format');
+        const year = getFieldValue(fields, 'year');
+        const location = getFieldValue(fields, 'location');
+        const publisher = getFieldValue(fields, 'publisher');
+        const isbn = getFieldValue(fields, 'isbn');
+        const oclc = getFieldValue(fields, 'oclc');
+    
+        // Process the citation data as needed
+        const htmlRepresentation = `
+        <link rel="mw-deduplicated-inline-style" href="mw-data:TemplateStyles:r1133582631">
+        <cite id="CITEREF${editorLastName}${year}" class="citation encyclopaedia cs1">
+          <a href="${editorLink}" title="${editorFirstName} ${editorLastName}">${editorLastName}, ${editorFirstName}</a>, ed. (${year}). 
+          <a rel="nofollow" class="external text" href="${url}">"${title}"</a> <span class="cs1-format">(${format})</span>. 
+          <i>${encyclopedia}</i> (${edition} ed.). ${location}: ${publisher}. 
+          <a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>&nbsp;
+          <a href="/wiki/Special:BookSources/${isbn}" title="Special:BookSources/${isbn}"><bdi>${isbn}</bdi></a>. 
+          <a href="/wiki/OCLC_(identifier)" class="mw-redirect" title="OCLC (identifier)">OCLC</a>&nbsp;
+          <a rel="nofollow" class="external text" href="https://www.worldcat.org/oclc/${oclc}">${oclc}</a>.
+        </cite>
+        <span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=bookitem&amp;rft.atitle=${title}&amp;rft.btitle=${encyclopedia}&amp;rft.place=${location}&amp;rft.edition=${edition}&amp;rft.pub=${publisher}&amp;rft.date=${year}&amp;rft_id=info%3Aoclcnum%2F${oclc}&amp;rft.isbn=${isbn}&amp;rft_id=${url}&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3A${title}" class="Z3988"></span>
+    `;
+
+    return htmlRepresentation;
+  
+      },
+    },
+
+    {
+      type: 'lang',
+      regex: /{{refbegin\|(\d+)em}}([\s\S]*?){{refend}}/gi,
+      replace: function (match, colWidth, content) {
+        // Process the refbegin template and generate HTML
+        return `<div style="column-width: ${colWidth}">${content}</div>`;
+      },
+    },
+
     // {{main|Temporal parts}}
     // <div role="note" class="hatnote navigation-not-searchable">Main article: <a href="/wiki/Temporal_parts" title="Temporal parts">Temporal parts</a></div>
     {
@@ -281,4 +352,9 @@ function md5(str) {
     return 'e/ed'
   }
   return '1/1c'
+}
+
+function getFieldValue(fields, fieldName) {
+  const field = fields.find(f => f.startsWith(fieldName));
+  return field ? field.split('=')[1] : '';
 }
