@@ -50,8 +50,8 @@ showdown.extension('wiki', function () {
         const link = parts[0].replace(/\s/g, '_')
         // https://en.wikipedia.org/wiki/File:Teseo_e_Arianna,_Pompei.jpg
         const url = `https://en.wikipedia.org/wiki/File:${link}`
-        const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/${link}/${width}px-${link}`
-
+        const hash = md5(link)
+        const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${link}/${width}px-${link}`
         return `<figure>
 <a href="${url}">
 <img src=${img}>
@@ -156,3 +156,13 @@ d3.json('/ship_of_theseus_revisions_2.json').then(function (data) {
   d3.select('#raw').html(raw.makeHtml(first.content))
   d3.select('#edited').html(md.makeHtml(first.content))
 })
+
+
+// We need the 1st then 1st & 2nd parts of an md5 hash of filename
+// Hardcode it for now.
+function md5 (str) {
+  if( str === "USS_Constitution_fires_a_17-gun_salute.jpg") {
+    return "e/ed"
+  }
+  return "1/1c"
+}
