@@ -507,31 +507,77 @@ var raw = new showdown.Converter({
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/diff-match-patch/20121119/diff_match_patch.js"></script>
 
 d3.json('/ship_of_theseus_revisions.json')
+  // .then(function (data: Revision[]) {
+  //   // Get just the first 2 paragraphs
+  //   // Check if there are any differences
+  //   // Ignore if none
+
+  //   var rows: Revision[] = []
+  //   var previous = ''
+
+  //   data.forEach(function (row) {
+  //     var text = getIntro(row.content)
+  //     if (text !== previous) {
+  //       row.previous = previous
+  //       row.content = text
+  //       rows.push(row)
+  //       previous = text
+  //     }
+  //   })
+
+  //   return rows
+  // })
   .then(function (data: Revision[]) {
-    // Get just the first 2 paragraphs
-    // Check if there are any differences
-    // Ignore if none
-
-    var rows: Revision[] = []
-    var previous = ''
-
-    data.forEach(function (row) {
-      var text = getIntro(row.content)
-      if (text !== previous) {
-        row.previous = previous
-        row.content = text
-        rows.push(row)
-        previous = text
-      }
-    })
-
-    return rows
-  })
-  .then(function (data) {
     console.log('data', data)
     const first = data[0]
 
-    d3.select('#raw').html(getIntro(first.content))
+    d3.select("#main").html(md.makeHtml(first.content))
+
+    var slider = d3.select("#slider")
+      .append("svg")
+      .attr("width", 1000)
+      .attr("height", 120)
+      .attr("viewBox", [0, 0, 1000, 120])
+    slider
+      .append("rect")
+      .attr("width", 1000)
+      .attr("height", 80)
+      .attr("fill", "red")
+      
+
+    slider.selectAll("rect")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("width", 10)
+      .attr("height", 80)
+      .attr("fill", (d, i) => {
+        return i % 2 === 0 ? "blue" : "green"
+      })
+      .attr("x", (d, i) => i)
+      .attr("y", 0)
+      .on("mouseover", (d, i) => {
+        console.log('hey')
+        d3.select("#main").html(md.makeHtml(d.content))
+      })
+      .on("mouseout", (d, i) => {
+        // d3.select("#main").html(md.makeHtml(first.content))
+      })
+
+
+      // Add an x axis
+      var x = d3.scaleLinear()
+        .domain([0, data.length])
+        .range([0, 1000]);
+        
+      slider.append("g")
+        .attr("transform", "translate(0, 100)")
+        .call(d3.axisBottom(x));
+
+
+
+
+    // d3.select('#raw').html(getIntro(first.content))
 
     // d3.select('#edited').html(md.makeHtml(first.content))
 
@@ -541,25 +587,26 @@ d3.json('/ship_of_theseus_revisions.json')
     // // Get the differences
     // const diffs = dmp.diff_main(data.content, data.string);
 
-    var box = d3
-      .select('#edited')
-      .selectAll('div.words')
-      .data(data)
-      .enter()
-      .append('div')
-      .classed('words', true)
+    // var box = d3
+    //   .select('#edited')
+    //   .selectAll('div.words')
+    //   .data(data)
+    //   .enter()
+    //   .append('div')
+    //   .classed('words', true)
 
-    box.append('div').html((d) => {
-      var dmp = new diff_match_patch()
-      var diffs = dmp.diff_main(d.previous, d.content)
-      dmp.diff_cleanupSemantic(diffs)
+    // box.append('div').html((d) => {
+    //   var dmp = new diff_match_patch()
+    //   var diffs = dmp.diff_main(d.previous, d.content)
+    //   dmp.diff_cleanupSemantic(diffs)
 
-      var content = parseDiffs(diffs)
-      return md.makeHtml(content)
-    })
-    box.append('div').html((d) => {
-      return `${d.timestamp} by ${d.user}`
-    })
+    //   var content = parseDiffs(diffs)
+    //   return md.makeHtml(content)
+    // })
+
+    // box.append('div').html((d) => {
+    //   return `${d.timestamp} by ${d.user}`
+    // })
   })
 
 function parseDiffs(diffs) {

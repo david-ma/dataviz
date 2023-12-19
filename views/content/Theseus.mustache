@@ -40,6 +40,28 @@
   #contentBox {
     background: #ffffff;
   }
+
+  html,
+  #dataviz_blog {
+    font-family: sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Linux Libertine', 'Georgia', 'Times', 'Source Serif Pro', serif;
+  }
+
+  div#header, div#slider {
+    padding-bottom: 2px;
+    border-bottom: solid 1px #a2a9b1;
+  }
+  div#slider svg {
+    width: 100%;
+  }
 </style>
 
 <section id="example" class="blogpost">
@@ -54,12 +76,17 @@
           src="/static/images/mobile/copyright/wikipedia-tagline-en.svg" width="117" height="13"
           style="width: 7.3125em; height: 0.8125em;">
       </span>
-      
+
 
     </div>
     <div class="col-xs-8">
-      <br>
-      <div id="edited"></div>
+      <div id="header">
+        <h1>Ship of Theseus</h1>
+      </div>
+      <div id="slider"></div>
+
+      <div id="main">
+      </div>
     </div>
   </div>
 </section>
