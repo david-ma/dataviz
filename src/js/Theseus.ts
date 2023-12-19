@@ -3,6 +3,18 @@ import { Chart, decorateTable } from 'chart'
 import $ from 'jquery'
 import 'datatables.net'
 
+declare var diff_match_patch: any
+
+type Revision = {
+  id: number
+  timestamp: string
+  user: string
+  comment: string
+  text?: string
+  content: string
+  previous?: string
+}
+
 console.log('Running example.ts')
 console.log('Hello World')
 
@@ -495,12 +507,12 @@ var raw = new showdown.Converter({
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/diff-match-patch/20121119/diff_match_patch.js"></script>
 
 d3.json('/ship_of_theseus_revisions.json')
-  .then(function (data: [any]) {
+  .then(function (data: Revision[]) {
     // Get just the first 2 paragraphs
     // Check if there are any differences
     // Ignore if none
 
-    var rows = []
+    var rows: Revision[] = []
     var previous = ''
 
     data.forEach(function (row) {
@@ -515,7 +527,7 @@ d3.json('/ship_of_theseus_revisions.json')
 
     return rows
   })
-  .then(function (data: [{ content: string; previous: string }]) {
+  .then(function (data) {
     console.log('data', data)
     const first = data[0]
 
@@ -529,20 +541,22 @@ d3.json('/ship_of_theseus_revisions.json')
     // // Get the differences
     // const diffs = dmp.diff_main(data.content, data.string);
 
-    var box = d3.select('#edited')
+    var box = d3
+      .select('#edited')
       .selectAll('div.words')
       .data(data)
       .enter()
       .append('div')
       .classed('words', true)
-    box.append('div').html((d) => {
-        var dmp = new diff_match_patch()
-        var diffs = dmp.diff_main(d.previous, d.content)
-        dmp.diff_cleanupSemantic(diffs)
 
-        var content = parseDiffs(diffs)
-        return md.makeHtml(content)
-      })
+    box.append('div').html((d) => {
+      var dmp = new diff_match_patch()
+      var diffs = dmp.diff_main(d.previous, d.content)
+      dmp.diff_cleanupSemantic(diffs)
+
+      var content = parseDiffs(diffs)
+      return md.makeHtml(content)
+    })
     box.append('div').html((d) => {
       return `${d.timestamp} by ${d.user}`
     })
