@@ -1,5 +1,7 @@
 <style>
-  .sidebar {
+  .sidebar,
+  header,
+  footer {
     display: none;
   }
 
@@ -7,30 +9,55 @@
     border: solid 1px black;
     padding: 2px;
   }
+
   span.diff {
-//    background-color: #FFD700;
+    //    background-color: #FFD700;
   }
-  span.add, span.diff-added {
+
+  span.add,
+  span.diff-added {
     background-color: #90EE90;
   }
-  span.del, span.diff-removed {
+
+  span.del,
+  span.diff-removed {
     background-color: #FF6347;
   }
+
   span.none {
     background-color: #FFFFFF;
   }
+
   span.replace {
     background-color: #87CEFA;
+  }
+
+  body,
+  #dataviz_blog {
+    background: #f8f9fa;
+  }
+
+  #contentBox {
+    background: #ffffff;
   }
 </style>
 
 <section id="example" class="blogpost">
   <div class="row" id="contentBox">
-    <div class="col-xs-6 col-md-6">
-      <br>
-      <div id="raw"></div>
+    <div class="col-xs-2">
+      <img class="mw-logo-icon" src="https://en.wikipedia.org/static/images/icons/wikipedia.png" alt=""
+        aria-hidden="true" height="50" width="50">
+      <span class="mw-logo-container">
+        <img class="mw-logo-wordmark" alt="Wikipedia" src="/static/images/mobile/copyright/wikipedia-wordmark-en.svg"
+          style="width: 7.5em; height: 1.125em;">
+        <img class="mw-logo-tagline" alt="The Free Encyclopedia"
+          src="/static/images/mobile/copyright/wikipedia-tagline-en.svg" width="117" height="13"
+          style="width: 7.3125em; height: 0.8125em;">
+      </span>
+      
+
     </div>
-    <div class="col-xs-6 col-md-6">
+    <div class="col-xs-8">
       <br>
       <div id="edited"></div>
     </div>
@@ -45,10 +72,10 @@
 <script>
   console.log("hey?")
 
-  var md = new showdown.Converter({openLinksInNewWindow: true});
+  var md = new showdown.Converter({ openLinksInNewWindow: true });
 
   $("#exampleDiv").html(md.makeHtml(
-`#Blogpost
+    `#Blogpost
 Write a blog post here`
   ));
 
