@@ -535,9 +535,9 @@ d3.json('/ship_of_theseus_revisions.json')
 
     var slider = d3.select("#slider")
       .append("svg")
-      .attr("width", 1000)
+      .attr("width", 1800)
       .attr("height", 120)
-      .attr("viewBox", [0, 0, 1000, 120])
+      .attr("viewBox", [0, 0, 1800, 120])
     slider
       .append("rect")
       .attr("width", 1000)
@@ -568,7 +568,7 @@ d3.json('/ship_of_theseus_revisions.json')
       // Add an x axis
       var x = d3.scaleLinear()
         .domain([0, data.length])
-        .range([0, 1000]);
+        .range([0, 1800]);
         
       slider.append("g")
         .attr("transform", "translate(0, 100)")
