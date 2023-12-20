@@ -70,20 +70,60 @@
     position: sticky;
     top: 0;
   }
+
+  div#logo-replacement {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin-top: 15px;
+
+    a {
+      color: black;
+
+
+      img {
+        padding: 5px;
+        margin: 2px;
+      }
+
+      span.mw-logo-container {
+        margin-top: 5px;
+        font-size: 15px;
+        float: right;
+
+        h1 {
+          font-size: 1.48em;
+          margin: 0;
+        }
+
+        h2 {
+          font-size: 1em;
+          margin: 0;
+        }
+      }
+    }
+
+  }
 </style>
 
 <section id="example" class="blogpost">
   <div class="row" id="contentBox">
     <div class="col-xs-2">
-      <img class="mw-logo-icon" src="https://en.wikipedia.org/static/images/icons/wikipedia.png" alt=""
-        aria-hidden="true" height="50" width="50">
-      <span class="mw-logo-container">
-        <img class="mw-logo-wordmark" alt="Wikipedia" src="/static/images/mobile/copyright/wikipedia-wordmark-en.svg"
-          style="width: 7.5em; height: 1.125em;">
-        <img class="mw-logo-tagline" alt="The Free Encyclopedia"
-          src="/static/images/mobile/copyright/wikipedia-tagline-en.svg" width="117" height="13"
-          style="width: 7.3125em; height: 0.8125em;">
-      </span>
+      <div id="logo-replacement">
+        <a href="/">
+          <img class="mw-logo-icon" src="https://en.wikipedia.org/static/images/icons/wikipedia.png" alt=""
+            aria-hidden="true" height="50" width="50">
+          <span class="mw-logo-container">
+            <h1>David's Dataviz</h1>
+            <h2>Not actually Wikipedia</h2>
+          </span>
+        </a>
+
+      </div>
+
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vitae dolorum aliquam tempore quasi aperiam magni
+        soluta. Voluptates rem voluptate culpa repellendus voluptas unde, dignissimos veritatis, doloremque porro rerum,
+        suscipit nihil.</p>
 
 
     </div>

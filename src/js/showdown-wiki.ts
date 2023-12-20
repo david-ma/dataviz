@@ -1,4 +1,13 @@
-// This is a showdown extension for wiki syntax
+// This is a ShowdownJS extension for Wiki Markup
+// By David Ma, for the Ship of Theseus project
+// See:
+// - https://www.mediawiki.org/wiki/Parsoid
+// - https://www.mediawiki.org/wiki/Markup_spec
+// - https://www.mediawiki.org/wiki/Help:Wikitext_examples
+// - https://www.mediawiki.org/wiki/Help:Formatting
+// - https://www.mediawiki.org/wiki/Help:Links
+// - https://www.mediawiki.org/wiki/Help:Templates
+// - https://github.com/showdownjs/showdown
 
 window.globalThis.wiki = function () {
   return [
