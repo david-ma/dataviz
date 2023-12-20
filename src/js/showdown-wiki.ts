@@ -31,7 +31,7 @@ window.globalThis.wiki = function () {
         const url = `https://en.wikipedia.org/wiki/File:${link}`
         const hash = md5(link)
         const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${link}/${width}px-${link}`
-        return `<figure>
+        return `<figure style="width: ${width}px;">
   <a href="${url}">
   <img src=${img}>
   </a>
@@ -197,6 +197,10 @@ window.globalThis.wiki = function () {
       type: 'lang',
       regex: /{{Cite web.+?}}/gi,
       replace: function (match, content) {
+        console.log("Citing web", content)
+
+
+        // return "LOL WEB"
         return `<sup role="note" class="hatnote navigation-not-searchable">[${content}]</sup>`
       },
     },
