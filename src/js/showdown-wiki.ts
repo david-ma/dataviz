@@ -9,25 +9,66 @@
 // - https://www.mediawiki.org/wiki/Help:Templates
 // - https://github.com/showdownjs/showdown
 
+const citations = []
+
+const cite = [
+
+// {{cite web|title = Rebuilt, Preserved, Restored – USS Constitution Across the Centuries| date=13 April 2018 |url = https://ussconstitutionmuseum.org/2018/04/13/rebuilt-preserved-restored-uss-constitution-across-the-centuries/|publisher = USS Constitution Museum|access-date = 8 October 2023}}
+// {{cite web|title = Heroes and Villains|url = http://www.bbc.co.uk/comedy/onlyfools/quotes/quote11.shtml|publisher = BBC|access-date = 16 January 2014}}
+// {{cite web|url=https://www.dir.co.jp/report/column/20160406010798.html|archive-url=https://web.archive.org/web/20210507162638/https://www.dir.co.jp/report/column/20160406010798.html|script-title=ja:常若（とこわか）＝伊勢神宮・式年遷宮にみる和のサステナビリティ|language=ja|publisher=Daiwa Institute of Research Ltd.|date=6 April 2016|archive-date=7 May 2021|access-date=5 November 2022}}Shinnyo Kawai (2013) ''常若の思想 伊勢神宮と日本人''. [[Shodensha]]. {{ISBN|978-4396614669}}
+// {{cite web|title = Rebuilt, Preserved, Restored – USS Constitution Across the Centuries| date=13 April 2018 |url = https://ussconstitutionmuseum.org/2018/04/13/rebuilt-preserved-restored-uss-constitution-across-the-centuries/|publisher = USS Constitution Museum|access-date = 8 October 2023}}
+// {{cite web |author1=Antique and Classic Boat Society |title=Preserved and Restored Boats |date=24 July 2016 |url=https://acbs.org/acbs-boat-classifications-judging-classes/ |access-date=2023-11-01}}
+// {{Cite web|title = The Three Basic Facts of Existence: I. Impermanence (Anicca)|url = http://www.accesstoinsight.org/lib/authors/various/wheel186.html|website = accesstoinsight.org|access-date = 1 November 2015|archive-url = https://web.archive.org/web/20190709094922/https://www.accesstoinsight.org/lib/authors/various/wheel186.html|archive-date = 9 July 2019|url-status = dead}}
+
+  {
+    type: 'lang',
+    regex: /{{cite web\s*\|(.*?)}}/gi,
+    replace: function (match, content) {
+      // const citations = window.globalThis.citations
+
+      console.log("citations", citations)
+
+      const parts = content.split('|').map((field) => field.trim())
+      const fields = parts.map((field) => {
+        const [name, value] = field.split('=')
+        return { name: name.trim(), value: value ? value.trim() : '' }
+      })
+      // Check if we already have this citation
+      const existing = citations.find((c) => c.fields[0].value === fields[0].value)
+      if (existing) {
+        return `<sup id="cite_ref-${existing.id}_1-0" class="reference"><a href="#cite_note-${existing.id}-0">[0]</a></sup>`
+      } else {
+        const id = citations.length + 1
+        console.log("ID is:", id)
+        citations.push({
+          type: 'web',
+          id,
+          fields,
+        })
+        return `<sup id="cite_ref-${id}_1-0" class="reference"><a href="#cite_note-${id}-0">[${id}]</a></sup>`
+      }
+
+    }
+  }
+]
+
+
+
+
+
 window.globalThis.wiki = function () {
   return [
-    // [[File:Teseo e Arianna, Pompei.jpg|thumb|200px|A [[Fresco]] from [[Pompeii]] depicting Theseus and Ariadne escaping from Crete. According to Plutarch, the Athenians preserved the ship that Theseus used to escape, by replacing the parts one by one as they decayed.]]
-    // Should become this:
-    // <figure typeof="mw:File/Thumb"><a href=https://en.wikipedia.org/wiki/File:Teseo_e_Arianna,_Pompei.jpg" class="mw-file-description"><img src="//upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/200px-Teseo_e_Arianna%2C_Pompei.jpg" decoding="async" width="200" height="231" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/300px-Teseo_e_Arianna%2C_Pompei.jpg 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/400px-Teseo_e_Arianna%2C_Pompei.jpg 2x" data-file-width="1902" data-file-height="2200"></a><figcaption>A <a href="/wiki/Fresco" title="Fresco">Fresco</a> from <a href="/wiki/Pompeii" title="Pompeii">Pompeii</a> depicting Theseus and Ariadne escaping from Crete. According to Plutarch, the Athenians preserved the ship that Theseus used to escape, by replacing the parts one by one as they decayed.</figcaption></figure>
-    // https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Teseo_e_Arianna%2C_Pompei.jpg/400px-Teseo_e_Arianna%2C_Pompei.jpg
+    ...cite,
+
+// [[File: ]]
+// Display an image
     {
       type: 'lang',
       regex: /\[\[File:([^|]+)\|thumb\|(\d+)px\|((?:.)+)\]\]/g,
-      replace: function (match, filename, width, caption) {
+      replace: function (match, filename, width = 100, caption) {
         const parts = filename.split('|')
 
-        // console.log('Figure found, parts', parts)
-        // console.log('width', width)
-        // console.log('caption', caption)
-        // const link = parts[0]
-        // encode the link, turn spaces into underscores
         const link = parts[0].replace(/\s/g, '_')
-        // https://en.wikipedia.org/wiki/File:Teseo_e_Arianna,_Pompei.jpg
         const url = `https://en.wikipedia.org/wiki/File:${link}`
         const hash = md5(link)
         const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${link}/${width}px-${link}`
@@ -39,11 +80,11 @@ window.globalThis.wiki = function () {
   ${caption}
   </figcaption>
   </figure>`
-
-        // return `\`\`\`${url}\`\`\``
       },
     },
 
+// [[ link ]]
+// Used for linking to another wikipedia page
     {
       type: 'lang',
       regex: /\[\[([^\]]+)\]\]/g,
@@ -93,56 +134,12 @@ window.globalThis.wiki = function () {
       },
     },
 
-    // {
-    //   type: 'lang',
-    //   regex: /{{Quote\|([^|]+)\|([^|]+)\|([^|]+)}}/g,
-    //   replace: function (match, content, author, source) {
-    //     return `<blockquote class="templatequote"><p>${content}</p><div class="templatequotecite">— <cite>${author}, <i>${source}</i></cite></div></blockquote>`
-    //   },
-    // },
-
-    // {
-    //   type: 'lang',
-    //   // regex: /{{Quote\|([^|]+)\|([^|]+)\|([^|]+)}}/gi,
-    //   regex: /{{Quote(\|.+?)+?}}/gi,
-    //   // regex: /{{Quote\|([(?:.+)(?:{{(?:.|\|)+?}})(?:\[\[(?:.|\|)+?]])])+}}/gi,
-    //   replace: function (match, text, sign, source) {
-    //     console.log("Found a quote", {
-    //       text: text,
-    //       sign: sign,
-    //       source: source,
-    //     })
-
-    //     return `<blockquote class="templatequote"><p>${text}</p><div class="templatequotecite">— <cite>${sign}, <i>${source}</i></cite></div></blockquote>`
-    //   },
-    // }
-    // {
-    //   type: 'lang',
-    //   regex: /{{Quote\|(.+?}?}?)}}/gi,
-    //   replace: function (match, content) {
-    //     // Find inside the content, the 3 parts
-    //     console.log("Quote Content", content)
-
-    //     const text = content.match(/(.+)\|(?:.+)\|(?:.+)/)
-    //     const sign = content.match(/(?<=\|)(.+)(?=\|)/)
-    //     const source = content.match(/(?:.+)\|(.+)$/)
-    //     // return content
-    //     console.log("Quote Parts", {
-    //       text: text,
-    //       sign: sign,
-    //       source: source,
-    //     })
-
-    //     return `<blockquote class="templatequote"><p>${text[1]}</p><div class="templatequotecite">— <cite>${sign[1]}, <i>${source[1]}</i></cite></div></blockquote>`
-    //   },
-    // },
-
     {
       type: 'lang',
       regex:
         /{{Quote\|((?:[^{}|]+|\{\{(?:[^{}]|{{.*?}})*?\}\}|\[\[(?:[^[\]]|\[\[.*?]])*?\]\]|(?:\|[^{}|]+|\{\{(?:[^{}]|{{.*?}})*?\}\}|\[\[(?:[^[\]]|\[\[.*?]])*?\]\])*)*)}}/gi,
       replace: function (match, content) {
-        console.log('Quote Content', content)
+        // console.log('Quote Content', content)
 
         // Use a simpler regex pattern to extract text, sign, and source
         const parts = content.match(/(.+?)\|(.+?)\|(.+)/)
@@ -170,38 +167,11 @@ window.globalThis.wiki = function () {
       },
     },
 
-    // {{sfn|Wasserman}}
-    // <sup id="cite_ref-FOOTNOTEWasserman_1-3" class="reference"><a href="#cite_note-FOOTNOTEWasserman-1">[1]</a></sup>
-    // {{sfn|Hobbes|1656}}}}
-    // <sup id="cite_ref-FOOTNOTEHobbes1656_3-0" class="reference"><a href="#cite_note-FOOTNOTEHobbes1656-3">[3]</a></sup>
     {
       type: 'lang',
       regex: /{{sfn(\|[^|]+?)+?(\|\d+)?(\|(?=p=|loc=).+?)?}}/g,
       replace: function (match, content) {
         return `<sup id="cite_ref-FOOTNOTE${content}_1-3" class="reference"><a href="#cite_note-FOOTNOTE${content}-1">[1]</a></sup>`
-      },
-    },
-    // TODO: find a way to match the citation numbers?
-
-    // {{Quote|The ship wherein [[Theseus]] and the youth of Athens returned from Crete had thirty oars, and was preserved by the Athenians down even to the time of [[Demetrius of Phalerum|Demetrius Phalereus]], for they took away the old planks as they decayed, putting in new and stronger timber in their places, insomuch that this ship became a standing example among the philosophers, for the logical question of things that grow; one side holding that the ship remained the same, and the other contending that it was not the same.|Plutarch|''Life of Theseus'' 23.1}}
-    // <blockquote class="templatequote"><p>The ship wherein <a href="/wiki/Theseus" title="Theseus">Theseus</a> and the youth of Athens returned from Crete had thirty oars, and was preserved by the Athenians down even to the time of <a href="/wiki/Demetrius_of_Phalerum" title="Demetrius of Phalerum">Demetrius Phalereus</a>, for they took away the old planks as they decayed, putting in new and stronger timber in their places, insomuch that this ship became a standing example among the philosophers, for the logical question of things that grow; one side holding that the ship remained the same, and the other contending that it was not the same.</p><div class="templatequotecite">— <cite>Plutarch, <i>Life of Theseus</i> 23.1</cite></div></blockquote>
-
-    // {{Quote|For if that Ship of Theseus (concerning the Difference whereof, made by continual reparation, in taking out the old Planks, and putting in new, the [[sophist]]ers of Athens were wont to dispute) were, after all the Planks were changed, the same Numerical Ship it was at the beginning; and if some Man had kept the Old Planks as they were taken out, and by putting them afterward together in the same order, had again made a Ship of them, this, without doubt, had also been the same Numerical Ship with that which was at the beginnings and so there would have been two Ships Numerically the same, which is absurd… But we must consider by what name anything is called when we inquire concerning the Identity of it… so that a Ship, which signifies Matter so figured, will be the same, as long as the Matter remains the same; but if no part of the Matter is the same, then it is Numerically another Ship; and if part of the Matter remains, and part is changed, then the Ship will be partly the same, and partly not the same.|Hobbes|"Of Identity and Difference"{{sfn|Hobbes|1656}}}}
-    // <blockquote class="templatequote"><p>For if that Ship of Theseus (concerning the Difference whereof, made by continual reparation, in taking out the old Planks, and putting in new, the <a href="/wiki/Sophist" title="Sophist">sophisters</a> of Athens were wont to dispute) were, after all the Planks were changed, the same Numerical Ship it was at the beginning; and if some Man had kept the Old Planks as they were taken out, and by putting them afterward together in the same order, had again made a Ship of them, this, without doubt, had also been the same Numerical Ship with that which was at the beginnings and so there would have been two Ships Numerically the same, which is absurd... But we must consider by what name anything is called when we inquire concerning the Identity of it... so that a Ship, which signifies Matter so figured, will be the same, as long as the Matter remains the same; but if no part of the Matter is the same, then it is Numerically another Ship; and if part of the Matter remains, and part is changed, then the Ship will be partly the same, and partly not the same.</p><div class="templatequotecite">— <cite>Hobbes, "Of  Identity  and  Difference"<sup id="cite_ref-FOOTNOTEHobbes1656_3-0" class="reference"><a href="#cite_note-FOOTNOTEHobbes1656-3">[3]</a></sup></cite></div></blockquote>
-
-    // {{Cite web|title = The Three Basic Facts of Existence: I. Impermanence (Anicca)|url = http://www.accesstoinsight.org/lib/authors/various/wheel186.html|website = accesstoinsight.org|access-date = 1 November 2015|archive-url = https://web.archive.org/web/20190709094922/https://www.accesstoinsight.org/lib/authors/various/wheel186.html|archive-date = 9 July 2019|url-status = dead}}
-    // <div role="note" class="hatnote navigation-not-searchable">This article is about the thought experiment. For the film, see <a href="/wiki/Ship_of_Theseus_(film)" title="Ship of Theseus (film)"><i>Ship of Theseus</i> (film)</a>.</div>
-
-    // {{cite web|title = Rebuilt, Preserved, Restored – USS Constitution Across the Centuries| date=13 April 2018 |url = https://ussconstitutionmuseum.org/2018/04/13/rebuilt-preserved-restored-uss-constitution-across-the-centuries/|publisher = USS Constitution Museum|access-date = 8 October 2023}}
-    {
-      type: 'lang',
-      regex: /{{Cite web.+?}}/gi,
-      replace: function (match, content) {
-        console.log("Citing web", content)
-
-
-        // return "LOL WEB"
-        return `<sup role="note" class="hatnote navigation-not-searchable">[${content}]</sup>`
       },
     },
 
