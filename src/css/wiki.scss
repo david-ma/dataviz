@@ -1,0 +1,110 @@
+.sidebar,
+header,
+footer {
+  display: none;
+}
+
+div.words {
+  border: solid 1px black;
+  padding: 2px;
+}
+
+span.add,
+span.diff-added {
+  background-color: #90EE90;
+}
+
+span.del,
+span.diff-removed {
+  background-color: #FF6347;
+}
+
+span.none {
+  background-color: #FFFFFF;
+}
+
+span.replace {
+  background-color: #87CEFA;
+}
+
+body,
+#dataviz_blog {
+  background: #f8f9fa;
+}
+
+#contentBox {
+  background: #ffffff;
+}
+
+html,
+#dataviz_blog {
+  font-family: sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Linux Libertine', 'Georgia', 'Times', 'Source Serif Pro', serif;
+}
+
+div#header,
+div#slider {
+  padding-bottom: 2px;
+  border-bottom: solid 1px #a2a9b1;
+}
+
+div#slider svg {
+  width: 100%;
+}
+
+div#header {
+  background: white;
+  position: sticky;
+  top: 0;
+}
+
+div#logo-replacement {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin-top: 15px;
+
+  a {
+    color: black;
+
+
+    img {
+      padding: 5px;
+      margin: 2px;
+    }
+
+    span.mw-logo-container {
+      margin-top: 5px;
+      font-size: 15px;
+      float: right;
+
+      h1 {
+        font-size: 1.48em;
+        margin: 0;
+      }
+
+      h2 {
+        font-size: 1em;
+        margin: 0;
+      }
+    }
+  }
+
+}
+
+figure {
+  float: right;
+  display: table;
+  background-color: #f8f9fa;
+  border: 1px solid #c8ccd1;
+  margin: 0.5em 0 1.3em 1.4em;
+  padding: 0.25em;
+}

@@ -22,16 +22,22 @@
       <div id="sideinfo"></div>
 
     </div>
-    <div class="col-xs-8">
+    <div class="col-xs-5">
       <div id="header">
         <h1>Ship of Theseus</h1>
-        <div id="slider"></div>
       </div>
 
       <div id="main">
       </div>
     </div>
-  </div>
+    <div class="col-xs-5">
+      <div id="header">
+        <h1>Ship of Theseus</h1>
+      </div>
+
+      <div id="raw">
+      </div>
+    </div>
 </section>
 <script src="/js/diff_match_patch.js"></script>
 <script src="/js/showdown-wiki.js"></script>
@@ -46,7 +52,7 @@
   var md = new showdown.Converter({ openLinksInNewWindow: true });
 
   $("#sideinfo").html(md.makeHtml(
-`##Todo:
+    `##Todo:
 - Mobile friendly version
 - Add better axis to the scrubber
 - Add info on hover when scrubbing
