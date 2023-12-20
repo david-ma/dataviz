@@ -125,6 +125,7 @@
         soluta. Voluptates rem voluptate culpa repellendus voluptas unde, dignissimos veritatis, doloremque porro rerum,
         suscipit nihil.</p>
 
+      <div id="sideinfo"></div>
 
     </div>
     <div class="col-xs-8">
@@ -150,9 +151,21 @@
 
   var md = new showdown.Converter({ openLinksInNewWindow: true });
 
-  $("#exampleDiv").html(md.makeHtml(
-    `#Blogpost
-Write a blog post here`
+  $("#sideinfo").html(md.makeHtml(
+`##Todo:
+- Mobile friendly version
+- Add better axis to the scrubber
+- Add info on hover when scrubbing
+- Fix all the wiki markup
+- Publish ShowdownJS wiki plugin?
+- Add a link to the original article
+- Add a link to the source code
+- Add a link to the data (or how to download data)
+- Fix the references in wiki markdown?
+- Put a table of contents here?
+- Highlight differences when changing versions?
+- Smoother transition, animations?
+`
   ));
 
 </script>
