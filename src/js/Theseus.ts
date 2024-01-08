@@ -47,7 +47,6 @@ declare var wiki: any
 
 showdown.extension('wiki', wiki)
 
-
 var md = new showdown.Converter({
   openLinksInNewWindow: true,
   extensions: ['wiki'],
@@ -85,51 +84,64 @@ d3.json('/ship_of_theseus_revisions.json')
     console.log('data', data)
     const first = data[0]
 
-    d3.select("#main").html(md.makeHtml(first.content))
+    d3.select('#main').html(md.makeHtml(first.content))
 
-    var slider = d3.select("#slider")
-      .append("svg")
-      .attr("width", 1800)
-      .attr("height", 120)
-      .attr("viewBox", [0, 0, 1800, 120])
+    var slider = d3
+      .select('#slider')
+      .append('svg')
+      .attr('width', 1800)
+      .attr('height', 120)
+      .attr('viewBox', [0, 0, 1800, 120])
     slider
-      .append("rect")
-      .attr("width", 1000)
-      .attr("height", 80)
-      .attr("fill", "red")
-      
+      .append('rect')
+      .attr('width', 1000)
+      .attr('height', 80)
+      .attr('fill', 'red')
 
-    slider.selectAll("rect")
+    slider
+      .selectAll('rect')
       .data(data)
       .enter()
-      .append("rect")
-      .attr("width", 10)
-      .attr("height", 80)
-      .attr("fill", (d, i) => {
-        return i % 2 === 0 ? "blue" : "green"
+      .append('rect')
+      .attr('width', 10)
+      .attr('height', 80)
+      .attr('fill', (d, i) => {
+        return i % 2 === 0 ? 'blue' : 'green'
       })
-      .attr("x", (d, i) => i)
-      .attr("y", 0)
-      .on("mouseover", (d, i) => {
-        console.log('hey')
-        d3.select("#main").html(md.makeHtml(d.content))
+      .attr('x', (d, i) => i)
+      .attr('y', 0)
+      .on('mouseover', (d: any, i: any) => {
+        // console.log('hey', i)
+        // console.log(d)
+
+        //   var diffs = dmp.diff_main(d.previous, d.content)
+        //   dmp.diff_cleanupSemantic(diffs)
+
+        //   var content = parseDiffs(diffs)
+        //   return md.makeHtml(content)
+
+        var pos = parseInt(i)
+        const dmp = new diff_match_patch()
+        var diffs = dmp.diff_main(data[pos - 1].content, d.content)
+        dmp.diff_cleanupSemantic(diffs)
+
+        var result = parseDiffs(diffs)
+
+        d3.select('#main').html(md.makeHtml(result))
+
+        // d3.select('#main').html(md.makeHtml(d.content))
       })
-      .on("mouseout", (d, i) => {
+      .on('mouseout', (d, i) => {
         // d3.select("#main").html(md.makeHtml(first.content))
       })
 
+    // Add an x axis
+    var x = d3.scaleLinear().domain([0, data.length]).range([0, 1800])
 
-      // Add an x axis
-      var x = d3.scaleLinear()
-        .domain([0, data.length])
-        .range([0, 1800]);
-        
-      slider.append("g")
-        .attr("transform", "translate(0, 100)")
-        .call(d3.axisBottom(x));
-
-
-
+    slider
+      .append('g')
+      .attr('transform', 'translate(0, 100)')
+      .call(d3.axisBottom(x))
 
     // d3.select('#raw').html(getIntro(first.content))
 
@@ -185,7 +197,6 @@ function parseDiffs(diffs) {
 
   return result
 }
-
 
 function getIntro(text) {
   const paragraphs = text.split('\n')
