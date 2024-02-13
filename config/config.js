@@ -20,9 +20,14 @@ let config = {
     services: {
         fridge_images: function (res, req, db) {
             const filter = [".DS_Store", ".gitignore", "david.png", "grace.png", "index.html", "printed"];
-            fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'public', 'fridge', 'images'))
-                .then(function (images) {
-                images = images.filter(d => filter.indexOf(d) === -1);
+            Promise.all([
+                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'public', 'fridge', 'az_images')),
+                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'public', 'fridge', 'ruby_images'))
+            ]).then(function ([az, ruby]) {
+                var images = az.filter(d => filter.indexOf(d) === -1)
+                    .map(d => 'az_images/' + d)
+                    .concat(ruby.filter(d => filter.indexOf(d) === -1)
+                    .map(d => 'ruby_images/' + d));
                 res.end(JSON.stringify(images));
             });
         },

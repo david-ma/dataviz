@@ -24,7 +24,8 @@
             <h1>Eat ASAP</h1>
           </div>
         </div>
-        <div id="box"></div>
+        <div id="az_box"></div>
+        <div id="ruby_box"></div>
         <div class="directions" id="right">
           <div>
             <h1 style="margin-top: 15mm">Buy more</h1>
@@ -46,9 +47,15 @@
     <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
 
     <style>
+      @font-face {
+        font-family: 'Gum Chew';
+        src: url('/fonts/gum-chew-gum-chew-svg-400.otf') format('truetype');
+      }
+
       body {
         margin: 0;
-        font-family: Helvetica, Arial, sans-serif;
+/*        font-family: Helvetica, Arial, sans-serif;*/
+        font-family: 'Gum Chew', cursive;
         text-align: center;
       }
 
@@ -56,6 +63,17 @@
         width: 426mm;
         height: 303mm;
         /* background: lightskyblue; */
+      }
+
+      div#az_box,
+      div#ruby_box {
+        float: left;
+        width: 170mm;
+        height: 217mm;
+        background: black;
+      }
+      div#az_box {
+        background: black;
       }
 
       div#box {
@@ -66,13 +84,16 @@
       }
 
       div.directions {
+/*        display: none; */
         float: left;
         width: 43mm;
         height: 217mm;
         /* background: lightyellow; */
       }
       div.directions h1 {
-        font-size: 24px;
+        font-size: 20px;
+        font-weight: 100;
+        font-kerning: auto;
       }
       div.directions div {
         width: 43mm;
@@ -105,6 +126,7 @@
       }
 
       div.week {
+        display: none;
         float: left;
         width: 426mm;
         height: 43mm;
@@ -125,14 +147,21 @@
       }
 
       div.magnet {
-        width: 25.689mm;
-        height: 25.689mm;
+        width: 21.63mm;
+        height: 21.63mm;
         float: left;
         /* border: solid 1mm white; */
         border-radius: 5px;
         padding: 5px;
         display: block;
-        background-color: white;
+/*        background-color: #F0F8FF; 
+        background-color: #EFF6FA;
+        background-color: #FEFEFA; */
+        background-color: #FEF3ED;
+      }
+
+      #az_box div.magnet {
+        background-color: #F0F8FF;
       }
 
       div.magnet p {
@@ -144,20 +173,24 @@
         bottom: 4mm;
       }
       img {
-        max-width: 20mm;
-        max-height: 20mm;
+        max-width: 18mm;
+        max-height: 18mm;
       }
       img.qr {
+        display: none;
         max-width: 30mm;
         max-height: 30mm;
       }
     </style>
     <script>
       d3.json('/fridge_images').then((images) => {
-        var box = d3.select('#box').selectAll('div')
+        const az_images = images.filter((image) => image.includes('az'))
+        const ruby_images = images.filter((image) => image.includes('ruby'))
 
-        var boxes = box
-          .data(images)
+        var az_box = d3.select('#az_box').selectAll('div')
+
+        var boxes = az_box
+          .data(az_images)
           .enter()
           .append('div')
           .classed('magnet', true)
@@ -167,16 +200,19 @@
 
           magnet.append('img').attrs((image) => {
             return {
-              src: `images/${image}`,
+              src: `${image}`,
             }
           })
           magnet
             .append('p')
-            .html(d.split('.')[0].replace(/\d/, '').replace('_', '&nbsp;'))
+            .html(d.split('.')[0].split('/')[1].replace(/\d/, '').replace('_', '&nbsp;'))
         })
 
-        var boxes = box
-          .data(images)
+        
+        var ruby_box = d3.select('#ruby_box').selectAll('div')
+
+        var boxes = ruby_box
+          .data(ruby_images)
           .enter()
           .append('div')
           .classed('magnet', true)
@@ -186,19 +222,13 @@
 
           magnet.append('img').attrs((image) => {
             return {
-              src: `images/${image}`,
+              src: `${image}`,
             }
           })
           magnet
             .append('p')
-            .html(d.split('.')[0].replace(/\d/, '').replace('_', '&nbsp;'))
+            .html(d.split('.')[0].split('/')[1].replace(/\d/, '').replace('_', '&nbsp;'))
         })
-
-        d3.select('#box')
-          .append('div')
-          .classed('magnet', true)
-          .style('width', '337.3mm')
-          .style('height', '16.5mm')
       })
 
       const weekdays = [

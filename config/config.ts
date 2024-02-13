@@ -19,10 +19,16 @@ let config :Thalia.WebsiteConfig = {
   services: {
     fridge_images: function(res, req, db) {
       const filter = [".DS_Store", ".gitignore", "david.png", "grace.png", "index.html", "printed"]
+      
+      Promise.all([
+        fsPromise.readdir(path.resolve(__dirname, '..', 'public', 'fridge', 'az_images')),
+        fsPromise.readdir(path.resolve(__dirname, '..', 'public', 'fridge', 'ruby_images'))
+      ]).then(function([az, ruby]){
+          var images = az.filter(d => filter.indexOf(d) === -1)
+              .map(d => 'az_images/' + d)
+                .concat(ruby.filter(d => filter.indexOf(d) === -1)
+                .map(d => 'ruby_images/' + d))
 
-      fsPromise.readdir(path.resolve(__dirname, '..', 'public', 'fridge', 'images'))
-        .then(function(images){
-          images = images.filter(d => filter.indexOf(d) === -1)
           res.end(JSON.stringify(images))
         })
     },
@@ -37,7 +43,8 @@ let config :Thalia.WebsiteConfig = {
           res.end(err)
         } else {
           Object.keys(files).forEach((inputfield) => {
-            const file = files[inputfield] as Formidable.File
+            // const file = files[inputfield] as Formidable.File
+            const file :any = files[inputfield]
             const newLocation = uploadFolder + file.name
 
             fs.rename(file.path, newLocation, function (err) {
