@@ -9,38 +9,18 @@
 
   <body>
     <div id="page" class="row">
-      <div class="week" id="top"></div>
-      <div class="middle">
-        <div class="directions" id="left">
-          <div>
-            <h1 style="margin-top: 15mm">Buy more</h1>
-            <img class="qr" src="qr.png" />
-          </div>
-          <div>
-            <h1>Fresh</h1>
-            <h2>←</h2>
-          </div>
-          <div style="position: absolute">
-            <h1>Eat ASAP</h1>
-          </div>
-        </div>
-        <div id="az_box"></div>
-        <div id="ruby_box"></div>
-        <div class="directions" id="right">
-          <div>
-            <h1 style="margin-top: 15mm">Buy more</h1>
-            <img class="qr" src="qr.png" />
-          </div>
-          <div>
-            <h1>Fresh</h1>
-            <h2>←</h2>
-          </div>
-          <div style="position: absolute">
-            <h1>Eat ASAP</h1>
-          </div>
-        </div>
+      <div id="az" class="set">
+        <div class="legends"></div>
+        <div class="magnets"></div>
       </div>
-      <div class="week" id="bottom"></div>
+      <div id="ruby" class="set">
+        <div class="legends"></div>
+        <div class="magnets"></div>
+      </div>
+      <div id="renee" class="set">
+        <div class="legends"></div>
+        <div class="magnets"></div>
+      </div>
     </div>
 
     <script src="https://d3js.org/d3.v6.min.js"></script>
@@ -49,81 +29,59 @@
     <link rel="stylesheet" href="/fridge/fridge.css" />
 
     <script>
+      // Draw legend
+      drawLegends(d3.select('#az .legends'))
+      drawLegends(d3.select('#ruby .legends'))
+      drawLegends(d3.select('#renee .legends'))
+
+      function drawLegends(div) {
+        div.append('div').classed('legend', true).append('p').text('Buy more')
+        div.append('div').classed('legend', true).append('p').text('Fresh')
+        div.append('div').classed('legend', true).append('p').text('Eat Soon')
+        div.append('div').classed('legend', true).append('p').text('→')
+      }
+
+      function drawMagnets(div, images) {
+        var boxes = div
+          .data(images)
+          .enter()
+          .append('div')
+          .classed('magnet', true)
+
+        boxes.each((d, i, all) => {
+          var magnet = d3.select(all[i])
+
+          magnet.append('img').attrs((image) => {
+            return {
+              src: `${image}`,
+            }
+          })
+          magnet
+            .append('p')
+            .html(
+              d
+                .split('.')[0]
+                .split('/')[1]
+                .replace(/\d/, '')
+                .replace('_', '&nbsp;')
+            )
+        })
+      }
+
       d3.json('/fridge_images').then((images) => {
         const az_images = images.filter((image) => image.includes('az'))
         const ruby_images = images.filter((image) => image.includes('ruby'))
+        const renee_images = images.filter((image) => image.includes('renee'))
 
-        var az_box = d3.select('#az_box').selectAll('div')
+        var az_box = d3.select('div#az div.magnets').selectAll('div')
+        drawMagnets(az_box, az_images)
 
-        var boxes = az_box
-          .data(az_images)
-          .enter()
-          .append('div')
-          .classed('magnet', true)
+        var ruby_box = d3.select('div#ruby div.magnets').selectAll('div')
+        drawMagnets(ruby_box, ruby_images)
 
-        boxes.each((d, i, all) => {
-          var magnet = d3.select(all[i])
-
-          magnet.append('img').attrs((image) => {
-            return {
-              src: `${image}`,
-            }
-          })
-          magnet
-            .append('p')
-            .html(d.split('.')[0].split('/')[1].replace(/\d/, '').replace('_', '&nbsp;'))
-        })
-
-        
-        var ruby_box = d3.select('#ruby_box').selectAll('div')
-
-        var boxes = ruby_box
-          .data(ruby_images)
-          .enter()
-          .append('div')
-          .classed('magnet', true)
-
-        boxes.each((d, i, all) => {
-          var magnet = d3.select(all[i])
-
-          magnet.append('img').attrs((image) => {
-            return {
-              src: `${image}`,
-            }
-          })
-          magnet
-            .append('p')
-            .html(d.split('.')[0].split('/')[1].replace(/\d/, '').replace('_', '&nbsp;'))
-        })
+        var renee_box = d3.select('div#renee div.magnets').selectAll('div')
+        drawMagnets(renee_box, renee_images)
       })
-
-      const weekdays = [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday',
-      ]
-
-      d3.select('#top.week')
-        .selectAll('.weekday')
-        .data(weekdays)
-        .enter()
-        .append('div')
-        .classed('weekday', true)
-        .append('p')
-        .text((d) => d)
-
-      d3.select('#bottom.week')
-        .selectAll('.weekday')
-        .data(weekdays)
-        .enter()
-        .append('div')
-        .classed('weekday', true)
-        .append('p')
-        .text((d) => d)
     </script>
   </body>
 </html>
