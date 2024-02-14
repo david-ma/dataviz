@@ -19,15 +19,24 @@ const formidable_1 = __importDefault(require("formidable"));
 let config = {
     services: {
         fridge_images: function (res, req, db) {
+            if (!fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'az_images'))
+                || !fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images'))
+                || !fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'renee_images'))) {
+                res.end('No images');
+                return;
+            }
             const filter = [".DS_Store", ".gitignore", "david.png", "grace.png", "index.html", "printed"];
             Promise.all([
-                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'public', 'fridge', 'az_images')),
-                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'public', 'fridge', 'ruby_images'))
-            ]).then(function ([az, ruby]) {
+                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'az_images')),
+                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')),
+                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'renee_images'))
+            ]).then(function ([az, ruby, renee]) {
                 var images = az.filter(d => filter.indexOf(d) === -1)
                     .map(d => 'az_images/' + d)
                     .concat(ruby.filter(d => filter.indexOf(d) === -1)
-                    .map(d => 'ruby_images/' + d));
+                    .map(d => 'ruby_images/' + d))
+                    .concat(renee.filter(d => filter.indexOf(d) === -1)
+                    .map(d => 'renee_images/' + d));
                 res.end(JSON.stringify(images));
             });
         },
