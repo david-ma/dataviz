@@ -19,9 +19,10 @@ const formidable_1 = __importDefault(require("formidable"));
 let config = {
     services: {
         fridge_images: function (res, req, db) {
-            if (!fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'az_images')) ||
-                !fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')) ||
-                !fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'renee_images'))) {
+            const basePath = path_1.default.resolve(__dirname, '..', 'data', 'fridge');
+            if (!fs_1.default.existsSync(path_1.default.resolve(basePath, 'az_images')) ||
+                !fs_1.default.existsSync(path_1.default.resolve(basePath, 'ruby_images')) ||
+                !fs_1.default.existsSync(path_1.default.resolve(basePath, 'renee_images'))) {
                 res.end('No images');
                 return;
             }
@@ -34,9 +35,9 @@ let config = {
                 'printed',
             ];
             Promise.all([
-                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'az_images')),
-                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')),
-                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'renee_images')),
+                fsPromise.readdir(path_1.default.resolve(basePath, 'az_images')),
+                fsPromise.readdir(path_1.default.resolve(basePath, 'ruby_images')),
+                fsPromise.readdir(path_1.default.resolve(basePath, 'renee_images')),
             ]).then(function ([az, ruby, renee]) {
                 var images = az
                     .filter((d) => filter.indexOf(d) === -1)

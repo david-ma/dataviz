@@ -17,17 +17,13 @@ import Formidable from 'formidable'
 let config: Thalia.WebsiteConfig = {
   services: {
     fridge_images: function (res, req, db) {
+      const basePath = path.resolve(__dirname, '..', 'data', 'fridge')
+
       // check if az_images, ruby_images and renee_images exist
       if (
-        !fs.existsSync(
-          path.resolve(__dirname, '..', 'data', 'fridge', 'az_images')
-        ) ||
-        !fs.existsSync(
-          path.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')
-        ) ||
-        !fs.existsSync(
-          path.resolve(__dirname, '..', 'data', 'fridge', 'renee_images')
-        )
+        !fs.existsSync(path.resolve(basePath, 'az_images')) ||
+        !fs.existsSync(path.resolve(basePath, 'ruby_images')) ||
+        !fs.existsSync(path.resolve(basePath, 'renee_images'))
       ) {
         res.end('No images')
         return
@@ -43,15 +39,9 @@ let config: Thalia.WebsiteConfig = {
       ]
 
       Promise.all([
-        fsPromise.readdir(
-          path.resolve(__dirname, '..', 'data', 'fridge', 'az_images')
-        ),
-        fsPromise.readdir(
-          path.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')
-        ),
-        fsPromise.readdir(
-          path.resolve(__dirname, '..', 'data', 'fridge', 'renee_images')
-        ),
+        fsPromise.readdir(path.resolve(basePath, 'az_images')),
+        fsPromise.readdir(path.resolve(basePath, 'ruby_images')),
+        fsPromise.readdir(path.resolve(basePath, 'renee_images')),
       ]).then(function ([az, ruby, renee]) {
         var images = az
           .filter((d) => filter.indexOf(d) === -1)
