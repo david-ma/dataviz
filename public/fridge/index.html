@@ -31,10 +31,17 @@
                 />
                 <span id="borderValue">5</span><span>px</span>
               </td>
-            </tr>
-            <tr>
               <td>Magnet padding</td>
-              <td>5px</td>
+              <td>
+                <input
+                  type="range"
+                  min="0"
+                  max="50"
+                  value="5"
+                  id="paddingRange"
+                />
+                <span id="paddingValue">5</span><span>px</span>
+              </td>
             </tr>
             <tr>
               <td>Magnet width</td>
@@ -90,6 +97,22 @@
                   value="#f0f8ff"
                 />
               </td>
+            </tr>
+            <tr>
+              <td>Font size</td>
+              <td>
+                <input
+                  type="range"
+                  min="10"
+                  max="50"
+                  value="21"
+                  id="fontSizeRange"
+                />
+                <span id="fontSizeValue">21</span><span>px</span>
+              </td>
+
+              <td></td>
+              <td></td>
             </tr>
           </table>
         </div>
@@ -213,6 +236,22 @@
       var reneeColor = document.getElementById('reneeColor')
       reneeColor.oninput = function () {
         d3.selectAll('div#renee .magnet').style('background-color', this.value)
+      }
+
+      var paddingSlider = document.getElementById('paddingRange')
+      var paddingOutput = document.getElementById('paddingValue')
+      paddingOutput.innerHTML = paddingSlider.value // Display the default slider value
+      paddingSlider.oninput = function () {
+        paddingOutput.innerHTML = this.value
+        d3.selectAll('.magnet').style('padding', this.value + 'px')
+      }
+
+      var fontSizeSlider = document.getElementById('fontSizeRange')
+      var fontSizeOutput = document.getElementById('fontSizeValue')
+      fontSizeOutput.innerHTML = fontSizeSlider.value // Display the default slider value
+      fontSizeSlider.oninput = function () {
+        fontSizeOutput.innerHTML = this.value
+        d3.selectAll('.magnet p').style('font-size', this.value + 'px')
       }
     </script>
   </body>
