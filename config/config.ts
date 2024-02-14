@@ -14,40 +14,66 @@ import _ from 'lodash'
 const fsPromise = fs.promises
 import Formidable from 'formidable'
 
-
-let config :Thalia.WebsiteConfig = {
+let config: Thalia.WebsiteConfig = {
   services: {
-    fridge_images: function(res, req, db) {
+    fridge_images: function (res, req, db) {
       // check if az_images, ruby_images and renee_images exist
-      if( !fs.existsSync(path.resolve(__dirname, '..', 'data', 'fridge', 'az_images'))
-        || !fs.existsSync(path.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images'))
-        || !fs.existsSync(path.resolve(__dirname, '..', 'data', 'fridge', 'renee_images'))
-       ) {
+      if (
+        !fs.existsSync(
+          path.resolve(__dirname, '..', 'data', 'fridge', 'az_images')
+        ) ||
+        !fs.existsSync(
+          path.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')
+        ) ||
+        !fs.existsSync(
+          path.resolve(__dirname, '..', 'data', 'fridge', 'renee_images')
+        )
+      ) {
         res.end('No images')
         return
       }
 
-      const filter = [".DS_Store", ".gitignore", "david.png", "grace.png", "index.html", "printed"]
-      
-      Promise.all([
-        fsPromise.readdir(path.resolve(__dirname, '..', 'data', 'fridge', 'az_images')),
-        fsPromise.readdir(path.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')),
-        fsPromise.readdir(path.resolve(__dirname, '..', 'data', 'fridge', 'renee_images'))
-      ]).then(function([az, ruby, renee]){
-          var images = az.filter(d => filter.indexOf(d) === -1)
-              .map(d => 'az_images/' + d)
-                .concat(ruby.filter(d => filter.indexOf(d) === -1)
-                .map(d => 'ruby_images/' + d))
-                .concat(renee.filter(d => filter.indexOf(d) === -1)
-                .map(d => 'renee_images/' + d))
+      const filter = [
+        '.DS_Store',
+        '.gitignore',
+        'david.png',
+        'grace.png',
+        'index.html',
+        'printed',
+      ]
 
-          res.end(JSON.stringify(images))
-        })
+      Promise.all([
+        fsPromise.readdir(
+          path.resolve(__dirname, '..', 'data', 'fridge', 'az_images')
+        ),
+        fsPromise.readdir(
+          path.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')
+        ),
+        fsPromise.readdir(
+          path.resolve(__dirname, '..', 'data', 'fridge', 'renee_images')
+        ),
+      ]).then(function ([az, ruby, renee]) {
+        var images = az
+          .filter((d) => filter.indexOf(d) === -1)
+          .map((d) => 'az_images/' + d)
+          .concat(
+            ruby
+              .filter((d) => filter.indexOf(d) === -1)
+              .map((d) => 'ruby_images/' + d)
+          )
+          .concat(
+            renee
+              .filter((d) => filter.indexOf(d) === -1)
+              .map((d) => 'renee_images/' + d)
+          )
+
+        res.end(JSON.stringify(images))
+      })
     },
 
     upload: function (res, req) {
       const uploadFolder = 'websites/dataviz/data/campjs/'
-      const form = new Formidable.IncomingForm();
+      const form = new Formidable.IncomingForm()
       form.parse(req, (err, fields, files) => {
         if (err) {
           console.log('Error uploading!')
@@ -56,7 +82,7 @@ let config :Thalia.WebsiteConfig = {
         } else {
           Object.keys(files).forEach((inputfield) => {
             // const file = files[inputfield] as Formidable.File
-            const file :any = files[inputfield]
+            const file: any = files[inputfield]
             const newLocation = uploadFolder + file.name
 
             fs.rename(file.path, newLocation, function (err) {
@@ -72,7 +98,8 @@ let config :Thalia.WebsiteConfig = {
         }
       })
     },
-    curl: function (incomingResponse, incomingRequest, db, type) { // eslint-disable-line
+    curl: function (incomingResponse, incomingRequest, db, type) {
+      // eslint-disable-line
       // This is just to experimenting with http.request
       // It isn't needed for anything
 
@@ -80,7 +107,7 @@ let config :Thalia.WebsiteConfig = {
         host: 'www.github.com',
         port: 80,
         path: '/',
-        method: 'GET'
+        method: 'GET',
       }
 
       const req = http.request(options, function (res) {
@@ -104,26 +131,26 @@ let config :Thalia.WebsiteConfig = {
       //    req.write('data\n');
       //    req.write('data\n');
       req.end()
-    }
+    },
   },
   mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
   controllers: {
-    '': function homepage (router) {
-      if( !router.db ) {
+    '': function homepage(router) {
+      if (!router.db) {
         router.res.end('Database not connected')
       } else {
         const promises = [loadTemplates('homepage.mustache')]
         Promise.all(promises).then(function ([views]: [any]) {
           const data: any = {
-            gitHash: gitHash
+            gitHash: gitHash,
           }
           router.db.Blogpost.findAll({
             where: {
-              published: true
+              published: true,
             },
-            order: [['publish_date', 'DESC']]
+            order: [['publish_date', 'DESC']],
           }).then((results) => {
-            data.blogposts = results.map(d => d.dataValues)
+            data.blogposts = results.map((d) => d.dataValues)
 
             const output = mustache.render(views.template, data, views)
             router.res.end(output)
@@ -131,28 +158,30 @@ let config :Thalia.WebsiteConfig = {
         })
       }
     },
-    blog: function blogpost (router) {
-      if( !router.db ) {
+    blog: function blogpost(router) {
+      if (!router.db) {
         router.res.end('Database not connected')
       } else {
         const promises = [loadTemplates('blog.mustache', router.path)]
         Promise.all(promises).then(function ([views]: [any]) {
           const data: any = {
-            gitHash: gitHash
+            gitHash: gitHash,
           }
           router.db.Blogpost.findAll({
             where: {
-              published: true
+              published: true,
             },
-            order: [['publish_date', 'DESC']]
+            order: [['publish_date', 'DESC']],
           }).then((results) => {
-            data.blogposts = results.map(d => d.dataValues)
-            data.blogpost = data.blogposts.filter(d => d.shortname === router.path[0])
+            data.blogposts = results.map((d) => d.dataValues)
+            data.blogpost = data.blogposts.filter(
+              (d) => d.shortname === router.path[0]
+            )
 
             try {
               const shortname = router.path[0]
               data.typescript = `'/js/${shortname}.js'`
-            } catch (e) { }
+            } catch (e) {}
 
             const output = mustache.render(views.template, data, views)
             router.res.end(output)
@@ -162,9 +191,9 @@ let config :Thalia.WebsiteConfig = {
     },
     experiment: function (router) {
       const promises = [loadTemplates('upload_experiment.mustache')]
-      Promise.all(promises).then(function ([views] :[any]) {
+      Promise.all(promises).then(function ([views]: [any]) {
         const data = {
-          gitHash: gitHash
+          gitHash: gitHash,
         }
 
         const output = mustache.render(views.template, data, views)
@@ -174,22 +203,22 @@ let config :Thalia.WebsiteConfig = {
     stickers: function (router) {
       const promises = [loadTemplates('stickers.mustache')]
 
-      Promise.all(promises).then(function ([views] :[any]) {
+      Promise.all(promises).then(function ([views]: [any]) {
         const data = {
-          gitHash: gitHash
+          gitHash: gitHash,
         }
 
         const output = mustache.render(views.template, data, views)
         router.res.end(output)
       })
-    }
-  }
+    },
+  },
 }
 
-if(fs.existsSync(path.resolve(__dirname, 'config.json'))) {
+if (fs.existsSync(path.resolve(__dirname, 'config.json'))) {
   config = _.merge(config, smugmugConfig)
 } else {
-  console.warn("config.json not provided, skipping smugmug stuff")
+  console.warn('config.json not provided, skipping smugmug stuff')
 }
 
 config = _.merge(config, awesomeConfig)

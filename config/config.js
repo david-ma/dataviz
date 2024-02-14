@@ -19,24 +19,34 @@ const formidable_1 = __importDefault(require("formidable"));
 let config = {
     services: {
         fridge_images: function (res, req, db) {
-            if (!fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'az_images'))
-                || !fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images'))
-                || !fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'renee_images'))) {
+            if (!fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'az_images')) ||
+                !fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')) ||
+                !fs_1.default.existsSync(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'renee_images'))) {
                 res.end('No images');
                 return;
             }
-            const filter = [".DS_Store", ".gitignore", "david.png", "grace.png", "index.html", "printed"];
+            const filter = [
+                '.DS_Store',
+                '.gitignore',
+                'david.png',
+                'grace.png',
+                'index.html',
+                'printed',
+            ];
             Promise.all([
                 fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'az_images')),
                 fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'ruby_images')),
-                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'renee_images'))
+                fsPromise.readdir(path_1.default.resolve(__dirname, '..', 'data', 'fridge', 'renee_images')),
             ]).then(function ([az, ruby, renee]) {
-                var images = az.filter(d => filter.indexOf(d) === -1)
-                    .map(d => 'az_images/' + d)
-                    .concat(ruby.filter(d => filter.indexOf(d) === -1)
-                    .map(d => 'ruby_images/' + d))
-                    .concat(renee.filter(d => filter.indexOf(d) === -1)
-                    .map(d => 'renee_images/' + d));
+                var images = az
+                    .filter((d) => filter.indexOf(d) === -1)
+                    .map((d) => 'az_images/' + d)
+                    .concat(ruby
+                    .filter((d) => filter.indexOf(d) === -1)
+                    .map((d) => 'ruby_images/' + d))
+                    .concat(renee
+                    .filter((d) => filter.indexOf(d) === -1)
+                    .map((d) => 'renee_images/' + d));
                 res.end(JSON.stringify(images));
             });
         },
@@ -72,7 +82,7 @@ let config = {
                 host: 'www.github.com',
                 port: 80,
                 path: '/',
-                method: 'GET'
+                method: 'GET',
             };
             const req = http_1.default.request(options, function (res) {
                 console.log('STATUS: ' + res.statusCode);
@@ -89,7 +99,7 @@ let config = {
                 incomingResponse.end('Uhhh we did a thing');
             });
             req.end();
-        }
+        },
     },
     mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
     controllers: {
@@ -101,15 +111,15 @@ let config = {
                 const promises = [(0, utilities_1.loadTemplates)('homepage.mustache')];
                 Promise.all(promises).then(function ([views]) {
                     const data = {
-                        gitHash: utilities_1.gitHash
+                        gitHash: utilities_1.gitHash,
                     };
                     router.db.Blogpost.findAll({
                         where: {
-                            published: true
+                            published: true,
                         },
-                        order: [['publish_date', 'DESC']]
+                        order: [['publish_date', 'DESC']],
                     }).then((results) => {
-                        data.blogposts = results.map(d => d.dataValues);
+                        data.blogposts = results.map((d) => d.dataValues);
                         const output = mustache_1.default.render(views.template, data, views);
                         router.res.end(output);
                     });
@@ -124,16 +134,16 @@ let config = {
                 const promises = [(0, utilities_1.loadTemplates)('blog.mustache', router.path)];
                 Promise.all(promises).then(function ([views]) {
                     const data = {
-                        gitHash: utilities_1.gitHash
+                        gitHash: utilities_1.gitHash,
                     };
                     router.db.Blogpost.findAll({
                         where: {
-                            published: true
+                            published: true,
                         },
-                        order: [['publish_date', 'DESC']]
+                        order: [['publish_date', 'DESC']],
                     }).then((results) => {
-                        data.blogposts = results.map(d => d.dataValues);
-                        data.blogpost = data.blogposts.filter(d => d.shortname === router.path[0]);
+                        data.blogposts = results.map((d) => d.dataValues);
+                        data.blogpost = data.blogposts.filter((d) => d.shortname === router.path[0]);
                         try {
                             const shortname = router.path[0];
                             data.typescript = `'/js/${shortname}.js'`;
@@ -149,7 +159,7 @@ let config = {
             const promises = [(0, utilities_1.loadTemplates)('upload_experiment.mustache')];
             Promise.all(promises).then(function ([views]) {
                 const data = {
-                    gitHash: utilities_1.gitHash
+                    gitHash: utilities_1.gitHash,
                 };
                 const output = mustache_1.default.render(views.template, data, views);
                 router.res.end(output);
@@ -159,20 +169,20 @@ let config = {
             const promises = [(0, utilities_1.loadTemplates)('stickers.mustache')];
             Promise.all(promises).then(function ([views]) {
                 const data = {
-                    gitHash: utilities_1.gitHash
+                    gitHash: utilities_1.gitHash,
                 };
                 const output = mustache_1.default.render(views.template, data, views);
                 router.res.end(output);
             });
-        }
-    }
+        },
+    },
 };
 exports.config = config;
 if (fs_1.default.existsSync(path_1.default.resolve(__dirname, 'config.json'))) {
     exports.config = config = lodash_1.default.merge(config, smugmug_1.config);
 }
 else {
-    console.warn("config.json not provided, skipping smugmug stuff");
+    console.warn('config.json not provided, skipping smugmug stuff');
 }
 exports.config = config = lodash_1.default.merge(config, awesome_1.config);
 exports.config = config = lodash_1.default.merge(config, camera_1.config);
