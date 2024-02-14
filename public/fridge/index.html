@@ -8,6 +8,44 @@
   </head>
 
   <body>
+    <div class="container">
+      <div class="row">
+        <div id="info" class="col-xs-12">
+          <h1>Fridge Magnets</h1>
+          <p>
+            This is a fridge magnet simulation. The images are from the fridge
+            camera. The images are classified and sorted into three categories:
+            "az", "ruby", and "renee". The images are then displayed as fridge
+            magnets.
+          </p>
+          <table>
+            <tr>
+              <td>Magnet border-radius</td>
+              <td>5px</td>
+            </tr>
+            <tr>
+              <td>Magnet padding</td>
+              <td>5px</td>
+            </tr>
+            <tr>
+              <td>Magnet width</td>
+              <td>
+                <!-- put an interactive slider here -->
+                <input
+                  type="range"
+                  min="10"
+                  max="200"
+                  value="21"
+                  id="widthRange"
+                />
+                <span id="widthValue">21</span><span>mm</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <div id="page" class="row">
       <div id="az" class="set">
         <div class="legends"></div>
@@ -82,6 +120,16 @@
         var renee_box = d3.select('div#renee div.magnets').selectAll('div')
         drawMagnets(renee_box, renee_images)
       })
+
+      // Add event listener to the slider
+      var slider = document.getElementById('widthRange')
+      var output = document.getElementById('widthValue')
+      output.innerHTML = slider.value // Display the default slider value
+      slider.oninput = function () {
+        output.innerHTML = this.value
+        d3.selectAll('.magnet').style('width', this.value + 'mm')
+        d3.selectAll('.magnet').style('height', this.value + 'mm')
+      }
     </script>
   </body>
 </html>

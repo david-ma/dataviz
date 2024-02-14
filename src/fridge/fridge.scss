@@ -5,13 +5,30 @@
 
 body {
   margin: 0;
-  font-family: 'Gum Chew', cursive;
   text-align: center;
+  font-family: Roboto, sans-serif;
+}
+
+table {
+  width: 500px;
+  margin: 15px;
+
+
+  border-collapse: collapse;
+  padding: 0;
+  tr {
+    border: 1px solid black;
+    td {
+      border: 1px solid black;
+      padding: 5px;
+    }
+  }
 }
 
 div#page {
   width: 426mm;
   height: 303mm;
+  font-family: 'Gum Chew', cursive;
 
   div.set {
     float: left;
@@ -108,6 +125,7 @@ div.weekday:last-child {
 }
 
 div.magnet {
+  margin: 1px;
   width: 21.63mm;
   height: 21.63mm;
   float: left;
