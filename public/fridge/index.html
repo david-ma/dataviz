@@ -21,7 +21,16 @@
           <table>
             <tr>
               <td>Magnet border-radius</td>
-              <td>5px</td>
+              <td>
+                <input
+                  type="range"
+                  min="0"
+                  max="50"
+                  value="5"
+                  id="borderRange"
+                />
+                <span id="borderValue">5</span><span>px</span>
+              </td>
             </tr>
             <tr>
               <td>Magnet padding</td>
@@ -39,6 +48,47 @@
                   id="widthRange"
                 />
                 <span id="widthValue">21</span><span>mm</span>
+              </td>
+              <td>Icon size</td>
+              <td>
+                <input
+                  type="range"
+                  min="10"
+                  max="200"
+                  value="21"
+                  id="iconRange"
+                />
+                <span id="iconValue">21</span><span>mm</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Background Colour</td>
+              <td>
+                <span>Az</span>
+                <input
+                  type="color"
+                  id="azColor"
+                  name="favcolor"
+                  value="#f0f8ff"
+                />
+              </td>
+              <td>
+                <span>Ruby</span>
+                <input
+                  type="color"
+                  id="rubyColor"
+                  name="favcolor"
+                  value="#fef3ed"
+                />
+              </td>
+              <td>
+                <span>Renee</span>
+                <input
+                  type="color"
+                  id="reneeColor"
+                  name="favcolor"
+                  value="#f0f8ff"
+                />
               </td>
             </tr>
           </table>
@@ -121,6 +171,14 @@
         drawMagnets(renee_box, renee_images)
       })
 
+      var borderSlider = document.getElementById('borderRange')
+      var borderOutput = document.getElementById('borderValue')
+      borderOutput.innerHTML = borderSlider.value // Display the default slider value
+      borderSlider.oninput = function () {
+        borderOutput.innerHTML = this.value
+        d3.selectAll('.magnet').style('border-radius', this.value + 'px')
+      }
+
       // Add event listener to the slider
       var slider = document.getElementById('widthRange')
       var output = document.getElementById('widthValue')
@@ -129,6 +187,32 @@
         output.innerHTML = this.value
         d3.selectAll('.magnet').style('width', this.value + 'mm')
         d3.selectAll('.magnet').style('height', this.value + 'mm')
+      }
+
+      var iconSlider = document.getElementById('iconRange')
+      var iconOutput = document.getElementById('iconValue')
+      iconOutput.innerHTML = iconSlider.value // Display the default slider value
+      iconSlider.oninput = function () {
+        iconOutput.innerHTML = this.value
+        d3.selectAll('.magnet img').style('width', this.value + 'mm')
+        d3.selectAll('.magnet img').style('height', this.value + 'mm')
+        d3.selectAll('.magnet img').style('max-width', this.value + 'mm')
+        d3.selectAll('.magnet img').style('max-height', this.value + 'mm')
+      }
+
+      var azColor = document.getElementById('azColor')
+      azColor.oninput = function () {
+        d3.selectAll('div#az .magnet').style('background-color', this.value)
+      }
+
+      var rubyColor = document.getElementById('rubyColor')
+      rubyColor.oninput = function () {
+        d3.selectAll('div#ruby .magnet').style('background-color', this.value)
+      }
+
+      var reneeColor = document.getElementById('reneeColor')
+      reneeColor.oninput = function () {
+        d3.selectAll('div#renee .magnet').style('background-color', this.value)
       }
     </script>
   </body>

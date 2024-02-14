@@ -13,7 +13,6 @@ table {
   width: 500px;
   margin: 15px;
 
-
   border-collapse: collapse;
   padding: 0;
   tr {
@@ -133,13 +132,15 @@ div.magnet {
   border-radius: 5px;
   padding: 5px;
   display: block;
-  /*        background-color: #F0F8FF; 
-  background-color: #EFF6FA;
-  background-color: #FEFEFA; */
-  background-color: #fef3ed;
 }
 
-#az_box div.magnet {
+div#az div.magnet {
+  background-color: #f0f8ff;
+}
+div#ruby div.magnet {
+  background-color: #fef3ed;
+}
+div#renee div.magnet {
   background-color: #f0f8ff;
 }
 
