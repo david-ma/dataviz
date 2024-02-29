@@ -10,6 +10,7 @@ const blacklist = [
     4, 9, 10, 29, 25, 22, 13, 240, 239, 238, 235, 711, 684, 677, 580, 573, 561, 295, 732,
     735, 765, 763, 715, 769
 ];
+console.log("Running upload_to_smugmug.ts");
 const bannedFiletypes = ['.avif', '.webp', '.tiff', '.tif', '.heic', '.heif'];
 AwesomePhoto.findAll({
     where: {
@@ -62,8 +63,8 @@ function updatePhoto(photo, next) {
             });
             res.on('end', () => {
                 try {
-                    const data = JSON.parse(rawData);
                     console.log(`Got data for photo ${photo.id} ${photo.url}`);
+                    const data = JSON.parse(rawData);
                     console.log(data);
                     photo
                         .update({
@@ -72,12 +73,14 @@ function updatePhoto(photo, next) {
                         smugmug_album: data.albumId,
                     })
                         .then((newPhoto) => {
-                        console.log(`Updated photo ${photo.id} ${newPhoto.dataValues.image_url}`);
+                        console.log(`Updated photo ${photo.id} ${newPhoto.smugmug_url}`);
                         next();
                     });
                 }
                 catch (e) {
                     console.log(`Error parsing JSON ${photo.id} ${photo.url}`);
+                    console.log("Status", res.statusCode);
+                    console.log("Headers", res.headers);
                     console.log(rawData);
                     console.error(e.message);
                     setTimeout(next, 5000);

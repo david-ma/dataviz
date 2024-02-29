@@ -2,6 +2,7 @@
 
 const AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto
 import https from 'https'
+import http from 'http'
 
 const blacklist = [
   626, 628, 629, 630, 631, 632, 640, 645, 649, 662, 664, 663, 665, 666, 637, 8,
@@ -9,6 +10,7 @@ const blacklist = [
    735, 765, 763, 715, 769
 ]
 
+console.log("Running upload_to_smugmug.ts")
 // 472, 474, 489, 478
 
 const bannedFiletypes = ['.avif', '.webp', '.tiff', '.tif', '.heic', '.heif']
@@ -51,6 +53,8 @@ function updatePhoto(photo, next) {
     console.log(`Rejecting this photo ${photo.id} ${photo.url}`)
     next()
   } else {
+    // http.get(
+    //   'http://127.0.0.1:1335/uploadByUrl',
     https.get(
       'https://upload.david-ma.net/uploadByUrl',
       {
@@ -84,8 +88,8 @@ function updatePhoto(photo, next) {
 
         res.on('end', () => {
           try {
-            const data = JSON.parse(rawData)
             console.log(`Got data for photo ${photo.id} ${photo.url}`)
+            const data = JSON.parse(rawData)
             console.log(data)
             photo
               .update({
@@ -94,11 +98,13 @@ function updatePhoto(photo, next) {
                 smugmug_album: data.albumId,
               })
               .then((newPhoto) => {
-                console.log(`Updated photo ${photo.id} ${newPhoto.dataValues.image_url}`)
+                console.log(`Updated photo ${photo.id} ${newPhoto.smugmug_url}`)
                 next()
               })
           } catch (e) {
             console.log(`Error parsing JSON ${photo.id} ${photo.url}`)
+            console.log("Status", res.statusCode)
+            console.log("Headers", res.headers)
             console.log(rawData)
             console.error(e.message)
             setTimeout(next, 5000)
