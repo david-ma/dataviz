@@ -44,6 +44,9 @@ function updatePhoto(photo, next) {
   console.log(`Photo ${photo.id} ${photo.url}`)
   if (blacklist.indexOf(photo.id) > -1) {
     console.log(`Blacklisted Photo ${photo.id} ${photo.url}`)
+    photo.update({
+      smugmug_key: 'blacklisted',
+    })
     next()
   } else if (
     photo.url.indexOf('https') !== 0 ||
@@ -51,8 +54,12 @@ function updatePhoto(photo, next) {
     bannedFiletypes.some((filetype) => photo.url.indexOf(filetype) > -1)
   ) {
     console.log(`Rejecting this photo ${photo.id} ${photo.url}`)
+    photo.update({
+      smugmug_key: 'rejected',
+    })
     next()
   } else {
+    console.log(`Photo ${photo.id} caption: ${photo.caption}`)
     // http.get(
     //   'http://127.0.0.1:1335/uploadByUrl',
     https.get(
@@ -60,7 +67,9 @@ function updatePhoto(photo, next) {
       {
         headers: {
           target: photo.url,
-          caption: photo.caption,
+// encode the caption to be safe to send in a header
+          caption: photo.caption ? encodeURIComponent(photo.caption) : '',
+          keywords: 'Awesome Foundation Melbourne, Batch Upload Script'
         },
         timeout: 120000, // 2 minutes. This isn't the problem
       },
@@ -91,6 +100,11 @@ function updatePhoto(photo, next) {
             console.log(`Got data for photo ${photo.id} ${photo.url}`)
             const data = JSON.parse(rawData)
             console.log(data)
+
+            if(data.Code === 400) {
+              throw new Error(`(400) ${data.Message}`)
+            }
+
             photo
               .update({
                 smugmug_url: data.image_url,
@@ -99,7 +113,7 @@ function updatePhoto(photo, next) {
               })
               .then((newPhoto) => {
                 console.log(`Updated photo ${photo.id} ${newPhoto.smugmug_url}`)
-                next()
+                setTimeout(next, 2000)
               })
           } catch (e) {
             console.log(`Error parsing JSON ${photo.id} ${photo.url}`)
@@ -107,6 +121,10 @@ function updatePhoto(photo, next) {
             console.log("Headers", res.headers)
             console.log(rawData)
             console.error(e.message)
+            photo.update({
+              smugmug_key: `error`,
+              smugmug_url: `Error: ${res.statusCode} ${e.message}`,
+            })
             setTimeout(next, 5000)
           }
         })
