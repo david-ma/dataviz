@@ -272,3 +272,50 @@ globalThis.aniamteButton = function () {
       width: width - offset * 2,
     })
 }
+
+function randomNumbers(length: number = 10): string {
+  return Math.floor(Math.random() * Math.pow(10, length + 5))
+    .toString()
+    .slice(1, length)
+}
+
+
+// Paperclips per 
+
+const paperclips = screens.append('svg').attrs({
+  viewBox: `0 0 ${width} ${height}`,
+})
+
+paperclips.append('rect').attrs({
+  x: 0,
+  y: 0,
+  height: height,
+  width: width,
+  fill: '#8357a4',
+})
+
+// Show current paperclips per minute.
+// With average paperclips per minute?
+// Draw X and Y axes
+
+paperclips.append("line")
+  .attrs({
+    x1: 100,
+    y1: 100,
+    x2: 100,
+    y2: 500,
+    stroke: 'white',
+    'stroke-width': 0.5
+  })
+
+paperclips.append("line")
+  .attrs({
+    x1: 100,
+    y1: 500,
+    x2: 850,
+    y2: 500,
+    stroke: 'white',
+    'stroke-width': 0.5
+  })
+
+  d3.axisLeft()

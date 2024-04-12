@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const models_1 = require("../models");
 const seq = {
-    // @ts-ignore
     sequelize: models_1.dbConfig,
     Blogpost: models_1.Blogpost,
     Scrape: models_1.Scrape,
@@ -12,51 +11,17 @@ const seq = {
     AwesomePhoto: models_1.AwesomePhoto,
     AwesomeMetadata: models_1.AwesomeMetadata,
 };
-// Family.get()
-// if (false) {
-//   // eslint-disable-line
-//   Camera.findAll({
-//     where: {
-//       model: {
-//         [Op.like]: '%Coolpix%',
-//       },
-//     },
-//   }).then(function (cameras) {
-//     Family.findOne({
-//       where: {
-//         name: 'Coolpix',
-//       },
-//     }).then((family) => {
-//       cameras.forEach((camera) => {
-//         // camera.setFamily(family);
-//         // camera.addFamily(family);
-//         // console.log(camera);
-//         // camera.update({
-//         //   family: family,
-//         // })
-//       })
-//     })
-//   })
-// }
 if (false) {
-    // eslint-disable-line
     models_1.Family.create({
         brand: 'Nikon',
         name: 'Coolpix',
         description: 'None',
     });
 }
-// rebuild entire database & reload data..?
 if (true) {
-    // eslint-disable-line
     seq.sequelize
-        .sync({
-    // alter: true,
-    // force: true
-    })
+        .sync({})
         .then(function (d) {
-        // eslint-disable-line
-        // Add blog posts
         const blogposts = [
             {
                 shortname: 'war',
@@ -150,7 +115,6 @@ if (true) {
             },
         ];
         blogposts.forEach(function (blogpost) {
-            // console.log(`Adding ${blogpost.shortname}`)
             models_1.Blogpost.findOne({
                 where: {
                     shortname: blogpost.shortname,

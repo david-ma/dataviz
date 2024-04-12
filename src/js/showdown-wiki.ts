@@ -235,7 +235,7 @@ const cite = [
     replace: function (match, type, content) {
       // const citations = window.globalThis.citations
 
-      console.log('citations', citations)
+      // console.log('citations', citations)
 
       const parts = content.split('|').map((field) => field.trim())
       const fields = parts.map((field) => {
@@ -250,7 +250,7 @@ const cite = [
         return `<sup id="cite_ref-${existing.id}_1-0" class="reference"><a href="#cite_note-${existing.id}-0">[0]</a></sup>`
       } else {
         const id = citations.length + 1
-        console.log('ID is:', id)
+        // console.log('ID is:', id)
         citations.push({
           id,
           type,
@@ -358,11 +358,11 @@ window.globalThis.wiki = function () {
           const trimmedSign = sign.trim()
           const trimmedSource = source.trim()
 
-          console.log('Quote Parts', {
-            text: trimmedText,
-            sign: trimmedSign,
-            source: trimmedSource,
-          })
+          // console.log('Quote Parts', {
+          //   text: trimmedText,
+          //   sign: trimmedSign,
+          //   source: trimmedSource,
+          // })
 
           return `<blockquote class="templatequote"><p>${trimmedText}</p><div class="templatequotecite">— <cite>${trimmedSign}, <i>${trimmedSource}</i></cite></div></blockquote>`
         } else {

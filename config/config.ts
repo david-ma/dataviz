@@ -1,4 +1,4 @@
-import { Thalia } from '../../../server/thalia'
+import { Thalia } from 'thalia'
 import { config as smugmugConfig } from './smugmug'
 import { config as awesomeConfig } from './awesome'
 import { config as cameraConfig } from './camera'

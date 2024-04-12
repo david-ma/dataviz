@@ -16,7 +16,7 @@ AwesomePhoto.findAll({
     where: {
         smugmug_key: null,
     },
-    limit: 20,
+    limit: 1,
     order: [['id', 'DESC']],
 }).then((photos) => {
     checkPhotosAndUpdate();
