@@ -54,6 +54,7 @@ try {
   console.log('seqOptions are:', seqOptions)
 } catch (e) {
   console.error('No config.json provided for Sequelize', e)
+  process.exit(1)
 }
 
 // Do NOT log your password on production!!!

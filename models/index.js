@@ -51,6 +51,7 @@ try {
 }
 catch (e) {
     console.error('No config.json provided for Sequelize', e);
+    process.exit(1);
 }
 if (env === 'development') {
     console.log('Initialising Sequelize with options:', seqOptions);
