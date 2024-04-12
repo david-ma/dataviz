@@ -1,12 +1,8 @@
-import { Chart, decorateTable, $, d3 } from 'chart'
+import { Chart, decorateTable, $, d3 } from './chart'
 
 // import 'datatables.net'
 
 console.log('Running breathe.ts')
-
-/// <reference path="../../node_modules/@types/d3/index.d.ts" />
-/// <reference path="../../node_modules/@types/d3-selection/index.d.ts" />
-/// <reference path="../../node_modules/@types/d3-selection-multi/index.d.ts" />
 
 type Vertex = [number, number]
 
@@ -309,7 +305,7 @@ $('input[name="colors"]').on('change', () => {
   }
 
   // d3.selectAll<SVGPolylineElement, DataPoint>('polyline').each(function (
-  d3.selectAll('polyline').each(function (d, i, k) {
+  d3.selectAll('polyline').each(function (d: any, i, k) {
     d3.select(k[i]).attr('fill', colors[d.index % colors.length])
   })
 
@@ -381,17 +377,27 @@ function updatePolylines(d, i, arr) {
 
 function updatePolygons(d, i, arr) {
   // d3.select<SVGPolygonElement, DataPoint>(arr[i]).attrs((d, i) => {
-  d3.select(arr[i]).attrs((d, i) => {
-    return {
-      id: `polygon-${i}`,
-      class: 'polygon',
-      points: d.end.vertices.map((d) => d.join(',')).join(' '),
-      transform: d.end.transform,
-      stroke: 'lightgrey',
-      'stroke-width': 1,
-      fill: 'rgba(0,0,0,0)',
-    }
-  })
+  d3.select(arr[i])
+    .attr('id', `polygon-${i}`)
+    .classed('polygon', true)
+    .attr('points', (d: any) =>
+      d.end.vertices.map((d) => d.join(',')).join(' ')
+    )
+    .attr('transform', (d: any) => d.end.transform)
+    .attr('stroke', 'lightgrey')
+    .attr('stroke-width', 1)
+    .attr('fill', 'rgba(0,0,0,0)')
+  // .attrs((d, i) => {
+  //   return {
+  //     id: `polygon-${i}`,
+  //     class: 'polygon',
+  //     points: d.end.vertices.map((d) => d.join(',')).join(' '),
+  //     transform: d.end.transform,
+  //     stroke: 'lightgrey',
+  //     'stroke-width': 1,
+  //     fill: 'rgba(0,0,0,0)',
+  //   }
+  // })
 }
 
 function calculateDataPoints(n: number): DataPoint[] {

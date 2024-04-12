@@ -1,4 +1,4 @@
-import { Chart, d3 } from 'chart'
+import { Chart, d3 } from './chart'
 
 const earthquakeDay = new Date('2021-09-21T23:13:40.000Z')
 
@@ -76,17 +76,13 @@ new Chart({
 
     tweet
       .append('img')
-      .attrs({
-        x: 0,
-        y: 0,
-        height: 50,
-        width: 50,
-        src: user.profile_image_url_https,
-      })
-      .styles({
-        'border-radius': '50%',
-        border: 'solid 1px lightgrey',
-      })
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('height', 50)
+      .attr('width', 50)
+      .attr('src', user.profile_image_url_https)
+      .style('border-radius', '50%')
+      .style('border', 'solid 1px lightgrey')
 
     var name = tweet.append('p')
     name
@@ -109,14 +105,18 @@ new Chart({
 
     const bottom = tweet.append('div').append('p')
 
-    bottom.append('span').append('i').attrs({
-      class: 'fa fa-retweet',
-    })
+    bottom
+      .append('span')
+      .append('i')
+      .classed('fa', true)
+      .classed('fa-retweet', true)
     bottom.append('span').text(data.retweet_count)
 
-    bottom.append('span').append('i').attrs({
-      class: 'fa fa-heart',
-    })
+    bottom
+      .append('span')
+      .append('i')
+      .classed('fa', true)
+      .classed('fa-heart', true)
     bottom.append('span').text(data.favorite_count)
 
     setTimeout(() => {
@@ -131,13 +131,11 @@ new Chart({
         lat: lat,
         long: long,
       })
-      .attrs({
-        cx: 0,
-        cy: 0,
-        r: 0,
-        fill: '#FF0000',
-        'fill-opacity': 1,
-      })
+      .attr('cx', 0)
+      .attr('cy', 0)
+      .attr('r', 0)
+      .attr('fill', '#FF0000')
+      .attr('fill-opacity', 1)
       .attr('transform', (d: any) => {
         return `translate(${projection([long, lat])})`
       })
@@ -205,3 +203,5 @@ function geocodesCenter(geocodes: string[]) {
 
   return [totalLat / weight, totalLong / weight]
 }
+
+// exports = {}

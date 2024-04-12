@@ -1,4 +1,5 @@
 import { Chart, _ } from 'chart'
+import * as d3 from 'd3'
 
 const green = '#00c200',
   brightgreen = '#5ff967',

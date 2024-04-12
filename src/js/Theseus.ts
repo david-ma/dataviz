@@ -1,9 +1,6 @@
-import { Chart, decorateTable } from 'chart'
-// import * as d3 from 'd3'
-import $ from 'jquery'
-import 'datatables.net'
-
-declare var diff_match_patch: any
+import * as d3 from 'd3'
+import showdown from 'showdown'
+import { diff_match_patch } from './diff_match_patch'
 
 type Revision = {
   id: number
@@ -13,6 +10,7 @@ type Revision = {
   text?: string
   content: string
   previous?: string
+  pos?: number,
 }
 
 console.log('Running example.ts')
@@ -106,11 +104,12 @@ d3.json('/ship_of_theseus_revisions.json')
       .attr('width', 10)
       .attr('height', 80)
       .attr('fill', (d, i) => {
+        d.pos = i
         return i % 2 === 0 ? 'blue' : 'green'
       })
       .attr('x', (d, i) => i)
       .attr('y', 0)
-      .on('mouseover', (d: any, i: any) => {
+      .on('mouseover', (event, d: any) => {
         // console.log('hey', i)
         // console.log(d)
 
@@ -120,9 +119,8 @@ d3.json('/ship_of_theseus_revisions.json')
         //   var content = parseDiffs(diffs)
         //   return md.makeHtml(content)
 
-        var pos = parseInt(i)
         const dmp = new diff_match_patch()
-        var diffs = dmp.diff_main(data[pos - 1].content, d.content)
+        var diffs = dmp.diff_main(data[d.pos - 1].content, d.content)
         dmp.diff_cleanupSemantic(diffs)
 
         var result = parseDiffs(diffs)

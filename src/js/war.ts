@@ -1,4 +1,4 @@
-import { Chart, decorateTable, d3 } from 'chart'
+import { Chart, decorateTable, d3 } from './chart'
 
 // alert("This dataviz is currently broken sorry")
 
@@ -157,14 +157,13 @@ function drawPieChart() {
     const pie = d3
       .pie()
       .sort(null) // Do not sort group by size
-      .value(function ([, d]) {
-        // console.log("A", a)
-        // console.log(d)
-        return d.length
-      })
+      .value((d: any) => d.length)
+
     // const dataReady = pie((<any>d3).entries(data).reverse())
 
-    const dataReady = pie(Object.entries(data).reverse())
+    const reverseData: any = Object.entries(data).reverse()
+
+    const dataReady = pie(reverseData)
 
     // The arc generator
     const arc = d3
@@ -239,7 +238,9 @@ function drawPieChart() {
       })
 
     const myPie = pie.value((d: any) => d[1])
-    const innerData = myPie(Object.entries(totals as object).reverse())
+
+    const moreReverseData: any = Object.entries(totals as object).reverse()
+    const innerData = myPie(moreReverseData)
 
     // The arc generator
     //            var arc = d3.arc()

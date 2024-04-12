@@ -1,7 +1,8 @@
 import { Chart, decorateTable } from 'chart'
-// import * as d3 from 'd3'
+import * as d3 from 'd3'
 import $ from 'jquery'
 import 'datatables.net'
+import showdown from 'showdown'
 
 declare var diff_match_patch: any
 

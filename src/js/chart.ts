@@ -1,27 +1,16 @@
-// jshint esversion: 6
-
 // Language: typescript
 // Path: src/js/chart.ts
+console.log("Running chart.ts")
 
-const d3 = require('d3')
+import * as d3 from 'd3'
 
-import { Selection, selection, select, selectAll } from 'd3-selection'
-import 'd3-selection-multi'
-
-d3['select'] = select // eslint-disable-line
-d3['selectAll'] = selectAll // eslint-disable-line
-d3['selection'] = selection // eslint-disable-line
-
-d3['layout'] = {
-  cloud: require('d3-cloud'),
-}
-
-import $ = require('jquery')
+import $ from 'jquery'
 import 'datatables.net'
 
-import _ = require('lodash')
+import _ from 'lodash'
 
-interface chartOptions {
+// interface or type?
+type chartOptions = {
   element?: string
   data?: any[] | {}
   title?: string
@@ -372,12 +361,8 @@ class Chart {
         .datum(typeData.pop())
         .text(type.label)
         .attr('fill', type.color)
-        .attrs((d) => {
-          return {
-            x: x(d[options.xField]) + 10,
-            y: y(d[options.yField]) + 5,
-          }
-        })
+        .attr('x', (d) => x(d[options.xField]) + 10)
+        .attr('y', (d) => y(d[options.yField]) + 5)
     })
 
     chart.plot
@@ -1396,7 +1381,8 @@ function decorateTable(
   return $(element).DataTable(options)
 }
 
-console.debug(`D3 version: ${d3.version}`)
+// D3 version is no longer exposed in v7 and above
+// console.debug(`D3 version: ${d3.version}`)
 console.debug(`jQuery version: ${$.fn.jquery}`)
 console.debug(`lodash version: ${_.VERSION}`)
 
