@@ -1,4 +1,4 @@
-import { Chart, d3 } from 'chart'
+import { Chart, d3 } from './chart'
 
 const speed = 3000
 
@@ -14,14 +14,10 @@ new Chart({
     .data(new Array(50))
     .enter()
     .append('line')
-    .attrs((d, i) => {
-      return {
-        x1: i * 5,
-        y1: 0,
-        x2: i * 15,
-        y2: chart.height,
-      }
-    })
+    .attr('x1', (d, i) => i * 5)
+    .attr('y1', 0)
+    .attr('x2', (d, i) => i * 15)
+    .attr('y2', chart.height)
 
   function animate() {
     const top = (Math.random() - 0.5) * 50,
@@ -33,12 +29,8 @@ new Chart({
       .transition()
       .ease(d3.easeQuad)
       .duration(speed)
-      .attrs((d, i) => {
-        return {
-          x1: i * top + offset_top + i * i * 0.1,
-          x2: i * bottom + offset_bottom + i * i * 0.1,
-        }
-      })
+      .attr('x1', (d, i) => i * top + offset_top + i * i * 0.1)
+      .attr('x2', (d, i) => i * bottom + offset_bottom + i * i * 0.1)
   }
 
   animate()

@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { Chart, decorateTable, $, d3 } from 'chart'
+import { Chart, decorateTable, $, d3 } from './chart'
 
 console.log('Running wealth.ts')
 
@@ -217,10 +217,9 @@ function drawTreemap(data, datatable: DataTables.Api) {
 
         const regionGroupTranslate = `translate(${d.x0},${d.y0})`
 
-        const regionGroup = svg.append('g').attrs({
-          id: `${classifyName(d.data.name)}`,
-          transform: regionGroupTranslate,
-        })
+        const regionGroup = svg.append('g')
+          .attr('id', `${classifyName(d.data.name)}`)
+          .attr('transform', regionGroupTranslate)
 
         regionGroup
           .selectAll('rect.country')
@@ -272,9 +271,8 @@ function drawTreemap(data, datatable: DataTables.Api) {
             const speed = 1000
             let done = false
 
-            regionGroup.transition().duration(speed).attrs({
-              transform: 'translate(0,0)',
-            })
+            regionGroup.transition().duration(speed)
+              .attr('transform', 'translate(0,0)')
             regionGroup
               .selectAll('rect.country')
               .data(zoomedRegionTree.leaves())
@@ -352,14 +350,12 @@ function drawTreemap(data, datatable: DataTables.Api) {
 
                   svg
                     .append('rect')
-                    .attrs({
-                      id: 'blocker',
-                      x: 0,
-                      y: 0,
-                      width: width,
-                      height: height,
-                      fill: 'rgba(0,0,0,0)',
-                    })
+                    .attr('id', 'blocker')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', width)
+                    .attr('height', height)
+                    .attr('fill', 'rgba(0,0,0,0)')
                     .on('click', function () {
                       console.log('Reverse time!!!')
                       d3.selectAll('.tempText').remove()
@@ -371,9 +367,8 @@ function drawTreemap(data, datatable: DataTables.Api) {
                         .padding(2)
                       const regionTree = myTreemap(regionRoot)
 
-                      regionGroup.transition().duration(speed).attrs({
-                        transform: regionGroupTranslate,
-                      })
+                      regionGroup.transition().duration(speed)
+                        .attr('transform', regionGroupTranslate)
                       regionGroup
                         .selectAll('rect.country')
                         .data(regionTree.leaves())

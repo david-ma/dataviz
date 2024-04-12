@@ -1,4 +1,4 @@
-import { Chart, _ } from 'chart'
+import { Chart, _ } from './chart'
 import * as d3 from 'd3'
 
 const green = '#00c200',
@@ -66,12 +66,12 @@ class Char {
   constructor(opts: { board: Board; col: number; line: number }) {
     this.board = opts.board
 
-    this.self = this.board.append('text').attrs({
-      class: 'char',
-      x: 2 + opts.col * 6,
-      y: 10 * (opts.line + 1),
-      fill: green,
-    })
+    this.self = this.board
+      .append('text')
+      .classed('char', true)
+      .attr('x', 2 + opts.col * 6)
+      .attr('y', 10 * (opts.line + 1))
+      .attr('fill', green)
   }
 
   setChar(char: string) {
@@ -87,25 +87,17 @@ class Char {
       this.self.text(_.sample(charset))
     }
     this.self
-      .attrs({
-        'font-weight': 900,
-        fill: 'white',
-      })
+      .attr('font-weight', 900)
+      .attr('fill', 'white')
       .classed('fadeout', false)
     return this
   }
 
   lowlight() {
     if (Math.random() < boldChance) {
-      this.self.attrs({
-        'font-weight': 900,
-        fill: brightgreen,
-      })
+      this.self.attr('font-weight', 900).attr('fill', brightgreen)
     } else {
-      this.self.attrs({
-        'font-weight': 300,
-        fill: green,
-      })
+      this.self.attr('font-weight', 300).attr('fill', green)
     }
     return this
   }
@@ -241,9 +233,9 @@ if (window.location.hash === '#screensaver') {
   d3.select('#mobile_nav').remove()
   d3.select('.sidebar').remove()
   d3.selectAll('p').remove()
-  d3.select("div.col-xs-12.col-sm-9.col-md-10")
-    .style("width", "100%")
-    .style("padding", "0px")
+  d3.select('div.col-xs-12.col-sm-9.col-md-10')
+    .style('width', '100%')
+    .style('padding', '0px')
 }
 
 new Chart({
@@ -254,13 +246,13 @@ new Chart({
   nav: false,
 }).scratchpad((chart) => {
   // set background
-  chart.svg.append('rect').attrs({
-    x: 0,
-    y: 0,
-    height: chart.innerHeight,
-    width: chart.innerWidth,
-    fill: 'black',
-  })
+  chart.svg
+    .append('rect')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('height', chart.innerHeight)
+    .attr('width', chart.innerWidth)
+    .attr('fill', 'black')
 
   const lines = Math.floor(chart.innerHeight / 10), // 60
     cols = Math.floor(chart.innerWidth / 6), // 160

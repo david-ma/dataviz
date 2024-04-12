@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { Chart, _, d3 } from 'chart'
+import { Chart, _, d3 } from './chart'
 import 'datatables.net'
 
 console.log('Australian Income stuff')
@@ -284,12 +284,8 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
           .datum(data.pop())
           .text(type.label)
           .attr('fill', type.color)
-          .attrs((d) => {
-            return {
-              x: x(d[options.xField]) + 10,
-              y: y(d[options.yField]) + 5,
-            }
-          })
+          .attr('x', (d) => x(d[options.xField]) + 10)
+          .attr('y', (d) => y(d[options.yField]) + 5)
       })
 
       chart.plot
@@ -375,44 +371,38 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
       chart.plot
         .append('text')
         .text('Legend')
-        .attrs({
-          x: 30,
-          y: 30,
-        })
+        .attr('x', 30)
+        .attr('y', 30)
         .style('font-size', '24px')
 
-      chart.plot.append('rect').attrs({
-        x: 30,
-        y: 50,
-        width: 50,
-        height: 50,
-        fill: colors.Male,
-      })
+      chart.plot
+        .append('rect')
+        .attr('x', 30)
+        .attr('y', 50)
+        .attr('width', 50)
+        .attr('height', 50)
+        .attr('fill', colors.Male)
 
       chart.plot
         .append('text')
         .text('Male')
-        .attrs({
-          x: 90,
-          y: 80,
-        })
+        .attr('x', 90)
+        .attr('y', 80)
         .style('font-size', '24px')
 
-      chart.plot.append('rect').attrs({
-        x: 30,
-        y: 110,
-        width: 50,
-        height: 50,
-        fill: colors.Female,
-      })
+      chart.plot
+        .append('rect')
+        .attr('x', 30)
+        .attr('y', 110)
+        .attr('width', 50)
+        .attr('height', 50)
+        .attr('fill', colors.Female)
 
       chart.plot
         .append('text')
         .text('Female')
-        .attrs({
-          x: 90,
-          y: 140,
-        })
+        .attr('x', 90)
+        .attr('y', 140)
         .style('font-size', '24px')
     })
   })
