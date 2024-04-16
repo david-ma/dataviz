@@ -19,7 +19,7 @@ type chartOptions = {
     colours?: string[];
     nav?: boolean;
 };
-type Coordinates = {
+export type Coordinates = {
     label?: string;
     latitude: number;
     longitude: number;
@@ -103,6 +103,7 @@ declare class Chart {
         center?: Coordinates;
         json?: string;
         zoom?: number;
+        markers?: Coordinates[];
     }): void;
     venn(options: any): void;
 }

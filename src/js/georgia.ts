@@ -1,7 +1,6 @@
-import { Chart, decorateTable, d3, Geoip } from './chart.js'
+import { Chart, decorateTable, d3, Geoip, Coordinates } from './chart.js'
 
 console.log('hey')
-
 
 Promise.all([
   d3.json('https://monetiseyourwebsite.com/geoip'),
@@ -17,6 +16,17 @@ Promise.all([
   console.log('geoip', geoip)
   console.log(JSON.stringify(geoip))
 
+  const georgiaCountry: Coordinates = {
+    latitude: 42.3154,
+    longitude: 43.3569,
+    label: 'Georgia',
+  }
+
+  const georgiaState: Coordinates = {
+    latitude: 32.1656,
+    longitude: -82.9001,
+    label: 'Georgia',
+  }
 
   chart.map({
     // lat: geoip.location.latitude,
@@ -25,6 +35,7 @@ Promise.all([
     // center: geoip.location,
     json: '/world.geo.json',
     zoom: 100,
+    markers: [georgiaCountry, georgiaState, geoip.location],
   })
 })
 

@@ -34,8 +34,8 @@ type commit = {
   x: Date
 }
 
-type Coordinates = {
-  label?: string;
+export type Coordinates = {
+  label?: string
   latitude: number
   longitude: number
 }
@@ -1165,6 +1165,7 @@ class Chart {
     json?: string
     // place?: string
     zoom?: number
+    markers?: Coordinates[]
   }) {
     let lat = options.center ? options.center.latitude : 0
     let long = options.center ? options.center.longitude : 0
@@ -1245,27 +1246,53 @@ class Chart {
           return d.properties.STATE_NAME
         })
 
-      // Append the name
-      // svg
-      //   .append('text')
-      //   .attr('x', w / 2)
-      //   .attr('y', h / 2 - 15)
-      //   .attr('font-size', 16)
-      //   .attr('font-weight', 'bold')
-      //   .attr('font-family', 'FontAwesome')
-      //   .attr('text-anchor', 'middle')
-      //   .classed('fa fa-map-marker', true)
-      //   .text('\uf041')
+      // var marks = [{long: -75, lat: 43},{long: -78, lat: 41},{long: -70, lat: 53}];
 
-      // svg
-      //   .append('text')
-      //   .attr('x', w / 2)
-      //   .attr('y', h / 2)
-      //   .attr('font-size', 16)
-      //   .attr('font-weight', 'bold')
-      //   .attr('font-family', 'Roboto')
-      //   .attr('text-anchor', 'middle')
-      //   .text(place)
+      // svg.selectAll(".mark")
+      //     .data(marks)
+      //     .enter()
+      //     .append("image")
+      //     .attr('class','mark')
+      //     .attr('width', 20)
+      //     .attr('height', 20)
+      //     .attr("xlink:href",'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png')
+      //     .attr("transform", d => `translate(${projection([d.long,d.lat])}`);
+
+      if (options.markers)
+        svg
+          .selectAll('.mark')
+          .data(options.markers)
+          .enter()
+          .append('g')
+          .classed('mark', true)
+          .attr('transform', (d: Coordinates) => {
+            console.log('Data is', d)
+            console.log(
+              'Translate',
+              `translate(${projection([d.longitude, d.latitude])}`
+            )
+            return `translate(${projection([d.longitude, d.latitude])})`
+          })
+          .append('image')
+          .attr('width', 20)
+          .attr('height', 20)
+          // push it up 20 pixels
+          .attr('y', -20)
+          .attr(
+            'xlink:href',
+            'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png'
+          )
+
+      svg
+        .selectAll('.mark')
+        .append('text')
+        .attr('x', 10)
+        .attr('y', -30)
+        .attr('font-size', 16)
+        .attr('font-weight', 'bold')
+        .attr('font-family', 'Roboto')
+        .attr('text-anchor', 'middle')
+        .text((d) => d.label || '')
     })
   }
 
