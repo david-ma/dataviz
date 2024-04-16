@@ -1,1 +1,1 @@
-"use strict";(self.webpackChunkdataviz=self.webpackChunkdataviz||[]).push([[325],{403:(e,o,t)=>{var s=t(839),n=t(569);console.log("Chart is:",s.t),console.log(Object.entries(s.t)),n.when(n.ready).then((function(){console.log("heyyyy"),console.log("Chart",s.t)}))}},e=>{e(e.s=403)}]);
+"use strict";(self.webpackChunkdataviz=self.webpackChunkdataviz||[]).push([[325],{403:(e,o,n)=>{n(839).d3.json("/world-50m.json").then((e=>{console.log(e)})),console.log("new change., do we see it?"),console.log("another new change")}},e=>{e(e.s=403)}]);

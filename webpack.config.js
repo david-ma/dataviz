@@ -11,8 +11,9 @@ const files = fs
     return acc
   }, {})
 
-module.exports = {
+var config = {
   mode: 'development',
+  devtool: 'source-map',
   entry: {
     ...files,
     chart: './src/js/chart.ts',
@@ -53,4 +54,15 @@ module.exports = {
     maxEntrypointSize: 1024000,
     maxAssetSize: 1024000,
   }
+}
+
+module.exports = (env, argv) => {
+  // development by default
+  if (argv.mode === 'production') {
+    config.mode = 'production'
+    delete config.devtool
+    config.output.path = __dirname + '/public/js'
+  }
+
+  return config
 }
