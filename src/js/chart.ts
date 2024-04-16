@@ -1130,11 +1130,20 @@ class Chart {
     callback(this)
   }
 
-  map(options: { json?: string; lat?: number; long?: number; place?: string }) {
+  // Todo, draw markers?
+  // Add more geoip helper stuff?
+  map(options: {
+    json?: string
+    lat?: number
+    long?: number
+    place?: string
+    zoom?: number
+  }) {
     let lat = options.lat || 1
     let long = options.long || 1
     let place = options.place || 'Somewhere'
     let json = options.json || '/data/aust.json'
+    let zoom = options.zoom || 100
 
     console.log('Drawing map', {
       lat: lat,
@@ -1143,15 +1152,15 @@ class Chart {
     })
 
     // Width and height
-    const w = 600
-    const h = 600
+    const w = this.width  
+    const h = this.height
 
     // Define map projection
     const projection = d3
       .geoMercator()
       .center([Math.floor(long), Math.floor(lat)])
       .translate([w / 2, h / 2])
-      .scale(1000)
+      .scale(zoom)
 
     // Define path generator
     const path = d3.geoPath().projection(projection)
