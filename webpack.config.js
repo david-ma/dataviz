@@ -1,40 +1,6 @@
-// // path
-// module.exports = {
-//   mode: 'development',
-//   entry: './src/js/index.ts',
-//   output: {
-//     path: __dirname + '/public/js',
-//     filename: 'index.js',
-//   },
-//   resolve: {
-//     // mainFields: ['browser', 'module'],
-//     mainFields: ['module', 'browser', 'main'],
-//   },
-//   module: {
-//     rules: [
-//       {
-//         test: /\.ts$/,
-//         use: 'ts-loader',
-//       },
-//       {
-//         test: /\.(?:js|mjs|cjs)$/,
-//         exclude: /node_modules/,
-//         use: {
-//           loader: 'babel-loader',
-//           options: {
-//             presets: [['@babel/preset-env', { targets: 'defaults' }]],
-//           },
-//         },
-//       },
-//     ],
-//   },
-// }
-
-var webpack = require('webpack')
-
+const webpack = require('webpack')
 const fs = require('fs')
-
-var files = fs
+const files = fs
   .readdirSync('./src/js')
   .filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts'))
   .reduce((acc, file) => {
@@ -47,47 +13,20 @@ var files = fs
 
 module.exports = {
   mode: 'development',
-  // devtool: 'inline-source-map',
-  // entry: './src/js/index.ts',
-  // externals: {
-  //   jquery: 'jQuery',
-  //   d3: 'd3',
-  //   datatables: 'datatables.net',
-  //   showdown: 'showdown',
-  // },
   entry: {
     ...files,
     chart: './src/js/chart.ts',
-    // georgia: {
-    //   import: './src/js/georgia.ts',
-    //   dependOn: 'chart',
-    // },
-    // index: './src/js/index.ts',
-    // earthquake: './src/js/earthquake.ts',
-    // war: './src/js/war.ts',
-    // Theseus: './src/js/Theseus.ts',
-    // go: './src/js/go.ts',
-    // breathe: './src/js/breathe.ts',
-    // matrix: './src/js/matrix.ts',
-    // winamp: './src/js/winamp.ts',
-    // AusIncome: './src/js/AusIncome.ts',
-    // wealth: './src/js/wealth.ts',
   },
   output: {
-    path: __dirname + '/public/js',
-    // filename: 'chart.js',
+    path: __dirname + '/dist/js',
     filename: '[name].js',
-    // sourceMapFilename: 'build/js/[name].js.map',
-    // filename: 'index.js',
   },
   plugins: [
     // https://stackoverflow.com/questions/28969861/managing-jquery-plugin-dependency-in-webpack
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      // datatables: 'datatables.net',
       'datatables.net': 'datatables.net',
-      // 'dataTables.net': 'datatables.net',
       d3: 'd3',
       showdown: 'showdown',
     }),
@@ -110,4 +49,8 @@ module.exports = {
       { test: /\.([cm]?ts|tsx)$/, loader: 'ts-loader' },
     ],
   },
+  performance: {
+    maxEntrypointSize: 1024000,
+    maxAssetSize: 1024000,
+  }
 }

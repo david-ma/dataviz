@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build:webpack": "webpack --mode production",
+    "build": "webpack --mode production",
     "develop:webpack": "webpack --watch --mode development",
     "scrape": "node config/scripts/scrape_awesome.js",
     "wiki": "node scripts/wiki.js",
