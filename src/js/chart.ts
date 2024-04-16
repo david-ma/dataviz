@@ -34,6 +34,34 @@ type commit = {
   x: Date
 }
 
+type Coordinates = {
+  label?: string;
+  latitude: number
+  longitude: number
+}
+type GeoipNames = {
+  [key: string]: string
+}
+export type Geoip = {
+  city: {
+    names: GeoipNames
+  }
+  continent: {
+    code: string
+    geoname_id: number
+    names: GeoipNames
+  }
+  country: {
+    geoname_id: number
+    is_in_european_union: boolean
+    iso_code: string
+    names: GeoipNames
+  }
+  location: Coordinates
+  subdivisions: {
+    names: GeoipNames
+  }
+}
 /*
  * David Ma - March 2018
  */
@@ -1133,30 +1161,34 @@ class Chart {
   // Todo, draw markers?
   // Add more geoip helper stuff?
   map(options: {
+    center?: Coordinates
     json?: string
-    lat?: number
-    long?: number
-    place?: string
+    // place?: string
     zoom?: number
   }) {
-    let lat = options.lat || 1
-    let long = options.long || 1
-    let place = options.place || 'Somewhere'
+    let lat = options.center ? options.center.latitude : 0
+    let long = options.center ? options.center.longitude : 0
+    // let place = options.place || 'Somewhere'
     let json = options.json || '/data/aust.json'
     let zoom = options.zoom || 100
 
     console.log('Drawing map', {
       lat: lat,
       long: long,
-      place: place,
     })
 
     // Width and height
-    const w = this.width  
+    const w = this.width
     const h = this.height
 
     // Define map projection
     const projection = d3
+      // .geoConicConformal()
+      // .geoAlbersUsa()
+      // .geoAzimuthalEqualArea()
+      // .geoProjection()
+      // .geoOrthographic()
+      // .geoGnomonic()
       .geoMercator()
       .center([Math.floor(long), Math.floor(lat)])
       .translate([w / 2, h / 2])
@@ -1214,26 +1246,26 @@ class Chart {
         })
 
       // Append the name
-      svg
-        .append('text')
-        .attr('x', w / 2)
-        .attr('y', h / 2 - 15)
-        .attr('font-size', 16)
-        .attr('font-weight', 'bold')
-        .attr('font-family', 'FontAwesome')
-        .attr('text-anchor', 'middle')
-        .classed('fa fa-map-marker', true)
-        .text('\uf041')
+      // svg
+      //   .append('text')
+      //   .attr('x', w / 2)
+      //   .attr('y', h / 2 - 15)
+      //   .attr('font-size', 16)
+      //   .attr('font-weight', 'bold')
+      //   .attr('font-family', 'FontAwesome')
+      //   .attr('text-anchor', 'middle')
+      //   .classed('fa fa-map-marker', true)
+      //   .text('\uf041')
 
-      svg
-        .append('text')
-        .attr('x', w / 2)
-        .attr('y', h / 2)
-        .attr('font-size', 16)
-        .attr('font-weight', 'bold')
-        .attr('font-family', 'Roboto')
-        .attr('text-anchor', 'middle')
-        .text(place)
+      // svg
+      //   .append('text')
+      //   .attr('x', w / 2)
+      //   .attr('y', h / 2)
+      //   .attr('font-size', 16)
+      //   .attr('font-weight', 'bold')
+      //   .attr('font-family', 'Roboto')
+      //   .attr('text-anchor', 'middle')
+      //   .text(place)
     })
   }
 

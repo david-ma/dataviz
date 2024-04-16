@@ -1,33 +1,7 @@
-import { Chart, decorateTable, d3 } from './chart.js'
+import { Chart, decorateTable, d3, Geoip } from './chart.js'
 
 console.log('hey')
 
-type GeoipNames = {
-  [key: string]: string
-}
-type Geoip = {
-  city: {
-    names: GeoipNames
-  }
-  continent: {
-    code: string
-    geoname_id: number
-    names: GeoipNames
-  }
-  country: {
-    geoname_id: number
-    is_in_european_union: boolean
-    iso_code: string
-    names: GeoipNames
-  }
-  location: {
-    latitude: number
-    longitude: number
-  }
-  subdivisions: {
-    names: GeoipNames
-  }
-}
 
 Promise.all([
   d3.json('https://monetiseyourwebsite.com/geoip'),
@@ -42,10 +16,13 @@ Promise.all([
 ]).then(([geoip, chart]: [Geoip, Chart]) => {
   console.log('geoip', geoip)
   console.log(JSON.stringify(geoip))
+
+
   chart.map({
-    lat: geoip.location.latitude,
-    long: geoip.location.longitude,
-    place: geoip.country.names.en,
+    // lat: geoip.location.latitude,
+    // long: geoip.location.longitude,
+    // place: geoip.country.names.en,
+    // center: geoip.location,
     json: '/world.geo.json',
     zoom: 100,
   })

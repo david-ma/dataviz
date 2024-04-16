@@ -47,13 +47,19 @@ var config = {
   module: {
     rules: [
       // all files with a `.ts`, `.cts`, `.mts` or `.tsx` extension will be handled by `ts-loader`
-      { test: /\.([cm]?ts|tsx)$/, loader: 'ts-loader' },
+      {
+        test: /\.([cm]?ts|tsx)$/,
+        loader: 'ts-loader',
+        options: {
+          configFile: 'tsconfig.json',
+        },
+      },
     ],
   },
   performance: {
     maxEntrypointSize: 1024000,
     maxAssetSize: 1024000,
-  }
+  },
 }
 
 module.exports = (env, argv) => {

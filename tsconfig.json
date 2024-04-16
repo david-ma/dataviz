@@ -2,8 +2,8 @@
   "compilerOptions": {
     "rootDir": "src",
     "baseUrl": "src",
-    "outDir": "public",
-    // "declaration": true,
+    // "outDir": "public",
+    "declaration": true,
     // "types": ["node"],
     // "typeRoots": ["../../node_modules/@types/d3-selection-multi/index.d.ts"],
     // "target": "ES2015",
