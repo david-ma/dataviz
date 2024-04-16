@@ -1,4 +1,4 @@
-import { Chart, decorateTable, d3, Geoip, Coordinates } from './chart.js'
+import { Chart, mapDistance, d3, Geoip, Coordinates } from './chart.js'
 
 console.log('hey')
 
@@ -33,6 +33,17 @@ Promise.all([
     label: 'You are here',
   }
 
+  const countryDistance = Math.floor(mapDistance(georgiaCountry, you))
+  const stateDistance = Math.floor(mapDistance(georgiaState, you))
+
+  console.log(`You are ${countryDistance}km from Georgia (country)`)
+  console.log(`You are ${stateDistance}km from Georgia (state)`)
+  const statement = d3.select("#statement")
+  if (countryDistance < stateDistance) {
+    statement.text(`You are ${countryDistance} km from Georgia (country). This is closer than Georgia (state), which is ${stateDistance} km away from you.`)
+  } else {
+    statement.text(`You are ${stateDistance} km from Georgia (state). This is closer than Georgia (country), which is ${countryDistance} km away from you.`)
+  }
   // calculate which Georgia is closer
   const distanceToCountry = Math.sqrt(
     Math.pow(georgiaCountry.latitude - you.latitude, 2) +
@@ -45,9 +56,9 @@ Promise.all([
   )
 
   if (distanceToCountry < distanceToState) {
-    you.label = 'You are closer to Georgia (country)'
+    you.label = 'You are closer to Georgia (the country)'
   } else {
-    you.label = 'You are closer to Georgia (state)'
+    you.label = 'You are closer to Georgia (the state)'
   }
 
   chart.map({

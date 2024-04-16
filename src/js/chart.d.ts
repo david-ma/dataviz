@@ -113,4 +113,5 @@ type chartDataTableSettings = any & {
     render?: any;
 };
 declare function decorateTable(dataset: any, newOptions?: chartDataTableSettings): any;
+export declare function mapDistance(a: Coordinates, b: Coordinates): number;
 export { Chart, decorateTable, _, $, d3 };

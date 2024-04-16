@@ -3,6 +3,7 @@
     <div class="col-xs-12">
       <br>
       <div id="exampleDiv"></div>
+      <p id="statement"></p>
     </div>
   </div>
 </section>
@@ -13,10 +14,10 @@
 
 
 <script>
-  var md = new showdown.Converter({openLinksInNewWindow: true});
+  var md = new showdown.Converter({ openLinksInNewWindow: true });
 
   $("#exampleDiv").html(md.makeHtml(
-`Which Georgia are you closest to?
+    `Which Georgia are you closest to?
 This helpful world map will show you which Georgia you are closest to.
 
 Georgia the US State (32.1656° N, 82.9001° W) or Georgia the Country (42.3154° N, 43.3569° E)
