@@ -1,5 +1,5 @@
 
-import { Chart, decorateTable } from './chart'
+import { Chart, decorateTable, d3 } from './chart'
 // import * as d3 from 'd3'
 // import $ from 'jquery'
 // import 'datatables.net'
@@ -20,11 +20,10 @@ $.when($.ready).then(function () {
   })
 })
 
+d3.json("/world-50m.json")
+  .then((data) => {
+      console.log(data)
+  })
 
-// d3.json("js/world-50m.json", function(error, world) {")
-
-
-
-
-
-
+console.log(" hello ")
+console.log("World 2")

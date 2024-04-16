@@ -47,9 +47,9 @@ module.exports = {
   devtool: 'inline-source-map',
   // entry: './src/js/index.ts',
   entry: {
-    ...files,
+    // ...files,
     chart: './src/js/chart.ts',
-    index: './src/js/index.ts',
+    // index: './src/js/index.ts',
     earthquake: './src/js/earthquake.ts',
     war: './src/js/war.ts',
     Theseus: './src/js/Theseus.ts',
@@ -79,7 +79,7 @@ module.exports = {
   ],
   resolve: {
     // mainFields: ['module'],
-    mainFields: ['module', 'browser', 'main'],
+    // mainFields: ['module', 'browser', 'main'],
     // Add `.ts` and `.tsx` as a resolvable extension.
     extensions: ['.ts', '.tsx', '.js'],
     // Add support for TypeScripts fully qualified ESM imports.
