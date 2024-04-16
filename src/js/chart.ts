@@ -80,6 +80,7 @@ class Chart {
   innerHeight: number
   innerWidth: number
   fullscreen: boolean
+  projection?: any
 
   // svg: Selection<SVGSVGElement, any, HTMLElement, any>
   svg: any
@@ -1161,10 +1162,9 @@ class Chart {
 
   // Todo, draw markers?
   // Add more geoip helper stuff?
-  map(options: {
+  drawmap(options: {
     center?: Coordinates
     json?: string
-    // place?: string
     zoom?: number
     markers?: Coordinates[]
   }) {
@@ -1177,6 +1177,9 @@ class Chart {
     console.log('Drawing map', {
       lat: lat,
       long: long,
+      json: json,
+      zoom: zoom,
+      markers: options.markers,
     })
 
     // Width and height
@@ -1185,6 +1188,7 @@ class Chart {
 
     // Define map projection
     const projection = d3
+      // .geoEqualEarth()
       // .geoConicConformal()
       // .geoAlbersUsa()
       // .geoAzimuthalEqualArea()
@@ -1197,8 +1201,10 @@ class Chart {
       .scale(zoom)
 
     // Define path generator
-    const path = d3.geoPath().projection(projection)
 
+    this.projection = projection
+
+    const path = d3.geoPath().projection(projection)
     const color = d3
       .scaleOrdinal()
       .range([
@@ -1220,10 +1226,11 @@ class Chart {
     d3.json(json).then((json: any) => {
       // Bind data and create one path per GeoJSON feature
       svg
-        .selectAll('path')
+        .selectAll('path.map-outlines')
         .data(json.features)
         .enter()
         .append('path')
+        .classed('map-outlines', true)
         .attr('d', path)
         .attr('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
         .attr('fill', function (d, i) {
@@ -1232,10 +1239,11 @@ class Chart {
 
       // States
       svg
-        .selectAll('text')
+        .selectAll('text.map-labels')
         .data(json.features)
         .enter()
         .append('text')
+        .classed('map-labels', true)
         .attr('fill', 'darkslategray')
         .attr('transform', function (d: any) {
           return 'translate(' + path.centroid(d) + ')'
@@ -1262,46 +1270,74 @@ class Chart {
       if (options.markers)
         svg
           .selectAll('.mark')
-          .data(options.markers)
-          .enter()
-          .each((d: any, i, nodes) => {
-            const node = d3
-              .select(nodes[i])
-              .append('g')
-              .classed('mark', true)
-              .attr('transform', (d: Coordinates) => {
-                console.log('Data is', d)
-                console.log(
-                  'Translate',
-                  `translate(${projection([d.longitude, d.latitude])}`
-                )
-                return `translate(${projection([d.longitude, d.latitude])})`
+          .data(options.markers, (d: any, i) => i)
+          .join(
+            function (enter) {
+              console.log('Enter', enter)
+              enter.each((d: any, i, nodes) => {
+                const node = d3
+                  .select(nodes[i])
+                  .append('g')
+                  .classed('mark', true)
+                  .attr(
+                    'transform',
+                    (d: Coordinates) =>
+                      `translate(${projection([d.longitude, d.latitude])})`
+                  )
+
+                node
+                  .append('image')
+                  .attr('width', 20)
+                  .attr('height', 20)
+                  // push it up 20 pixels
+                  .attr('y', -20)
+                  .attr(
+                    'xlink:href',
+                    'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png'
+                  )
+
+                if (d.label)
+                  node
+                    .append('text')
+                    .attr('x', 10)
+                    .attr('y', -30)
+                    .attr('font-size', 16)
+                    .attr('font-weight', 'bold')
+                    .attr('font-family', 'Roboto')
+                    .attr('text-anchor', 'middle')
+                    .text(d.label)
+
+                if (d.drag) node.call(d.drag)
               })
+              return d3.selectAll('.mark')
+            },
+            function (update) {
+              update.each((d: any, i, nodes) => {
+                const node = d3
+                  .select(nodes[i])
+                  .attr(
+                    'transform',
+                    (d: Coordinates) =>
+                      `translate(${projection([d.longitude, d.latitude])})`
+                  )
+              })
+              return d3.selectAll('.mark')
+            },
+            function (exit) {
+              exit.each((d: any, i, nodes) => {
+                console.log('removing node', i)
+                d3.select(nodes[i]).remove()
+              })
+              return d3.selectAll('.mark')
+            }
+          )
 
-            node
-              .append('image')
-              .attr('width', 20)
-              .attr('height', 20)
-              // push it up 20 pixels
-              .attr('y', -20)
-              .attr(
-                'xlink:href',
-                'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png'
-              )
-
-            if (d.label)
-              node
-                .append('text')
-                .attr('x', 10)
-                .attr('y', -30)
-                .attr('font-size', 16)
-                .attr('font-weight', 'bold')
-                .attr('font-family', 'Roboto')
-                .attr('text-anchor', 'middle')
-                .text(d.label)
-
-            if (d.drag) node.call(d.drag)
-          })
+      // .enter()
+      // .each((d: any, i, nodes) => )
+      // .update()
+      // .each((d: any, i, nodes) => {
+      //   console.log("Updating node", i)
+      // })
     })
   }
 

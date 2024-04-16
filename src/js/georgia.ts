@@ -13,8 +13,8 @@ Promise.all([
     nav: false,
   }),
 ]).then(([geoip, chart]: [Geoip, Chart]) => {
-  console.log('geoip', geoip)
-  console.log(JSON.stringify(geoip))
+  // console.log('geoip', geoip)
+  // console.log(JSON.stringify(geoip))
 
   const georgiaCountry: Coordinates = {
     latitude: 42.3154,
@@ -33,15 +33,36 @@ Promise.all([
     label: 'You are here',
     drag: d3
       .drag()
-      .on('start', function () {
-        console.log('starting a drag')
+      .on('start', function (d: DragEvent) {
+        // console.log('starting a drag', d)
+        // console.log(`Coordinates: ${chart.projection.invert([d.x, d.y])}`)
         // d3.select(this).raise().classed('active', true)
       })
-      .on('drag', function () {
-        console.log('dragging')
+      .on('drag', function (d: DragEvent) {
+        // console.log('dragging', d)
+        // console.log(`Coordinates: ${chart.projection.invert([d.x, d.y])}`)
       })
-      .on('end', function () {
-        console.log('drag ended')
+      .on('end', function (d: DragEvent, data) {
+        // console.log(d)
+        // console.log('drag ended')
+        // console.log(`Coordinates: ${chart.projection.invert([d.x, d.y])}`)
+
+        you.latitude = chart.projection.invert([d.x, d.y])[1]
+        you.longitude = chart.projection.invert([d.x, d.y])[0]
+
+        chart.drawmap({
+          json: '/world.geo.json',
+          zoom: 100,
+          markers: [
+            georgiaCountry,
+            georgiaState,
+            {
+              ...you,
+              latitude: chart.projection.invert([d.x, d.y])[1],
+              longitude: chart.projection.invert([d.x, d.y])[0],
+            },
+          ],
+        })
       }),
   }
 
@@ -77,11 +98,8 @@ Promise.all([
     you.label = 'You are closer to Georgia (the state)'
   }
 
-  chart.map({
-    // lat: geoip.location.latitude,
-    // long: geoip.location.longitude,
-    // place: geoip.country.names.en,
-    // center: geoip.location,
+  chart.drawmap({
+    // center: you,
     json: '/world.geo.json',
     zoom: 100,
     markers: [georgiaCountry, georgiaState, you],

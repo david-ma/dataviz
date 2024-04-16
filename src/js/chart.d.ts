@@ -67,6 +67,7 @@ declare class Chart {
     innerHeight: number;
     innerWidth: number;
     fullscreen: boolean;
+    projection?: any;
     svg: any;
     plot: any;
     xScale: d3.ScaleLinear<number, number>;
@@ -100,7 +101,7 @@ declare class Chart {
     squares(): this;
     treemap(): void;
     scratchpad(callback: (chart: Chart) => void): void;
-    map(options: {
+    drawmap(options: {
         center?: Coordinates;
         json?: string;
         zoom?: number;
