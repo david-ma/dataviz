@@ -28,6 +28,28 @@ Promise.all([
     label: 'Georgia',
   }
 
+  const you: Coordinates = {
+    ...geoip.location,
+    label: 'You are here',
+  }
+
+  // calculate which Georgia is closer
+  const distanceToCountry = Math.sqrt(
+    Math.pow(georgiaCountry.latitude - you.latitude, 2) +
+      Math.pow(georgiaCountry.longitude - you.longitude, 2)
+  )
+
+  const distanceToState = Math.sqrt(
+    Math.pow(georgiaState.latitude - you.latitude, 2) +
+      Math.pow(georgiaState.longitude - you.longitude, 2)
+  )
+
+  if (distanceToCountry < distanceToState) {
+    you.label = 'You are closer to Georgia (country)'
+  } else {
+    you.label = 'You are closer to Georgia (state)'
+  }
+
   chart.map({
     // lat: geoip.location.latitude,
     // long: geoip.location.longitude,
@@ -35,7 +57,7 @@ Promise.all([
     // center: geoip.location,
     json: '/world.geo.json',
     zoom: 100,
-    markers: [georgiaCountry, georgiaState, geoip.location],
+    markers: [georgiaCountry, georgiaState, you],
   })
 })
 
