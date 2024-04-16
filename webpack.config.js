@@ -38,31 +38,46 @@ var files = fs
   .readdirSync('./src/js')
   .filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts'))
   .reduce((acc, file) => {
-    acc[file.replace('.ts', '')] = `./src/js/${file}`
+    acc[file.replace('.ts', '')] = {
+      import: `./src/js/${file}`,
+      dependOn: 'chart',
+    }
     return acc
   }, {})
 
 module.exports = {
   mode: 'development',
-  devtool: 'inline-source-map',
+  // devtool: 'inline-source-map',
   // entry: './src/js/index.ts',
+  // externals: {
+  //   jquery: 'jQuery',
+  //   d3: 'd3',
+  //   datatables: 'datatables.net',
+  //   showdown: 'showdown',
+  // },
   entry: {
-    // ...files,
+    ...files,
     chart: './src/js/chart.ts',
+    // georgia: {
+    //   import: './src/js/georgia.ts',
+    //   dependOn: 'chart',
+    // },
     // index: './src/js/index.ts',
-    earthquake: './src/js/earthquake.ts',
-    war: './src/js/war.ts',
-    Theseus: './src/js/Theseus.ts',
-    go: './src/js/go.ts',
-    breathe: './src/js/breathe.ts',
-    matrix: './src/js/matrix.ts',
-    winamp: './src/js/winamp.ts',
-    AusIncome: './src/js/AusIncome.ts',
-    wealth: './src/js/wealth.ts',
+    // earthquake: './src/js/earthquake.ts',
+    // war: './src/js/war.ts',
+    // Theseus: './src/js/Theseus.ts',
+    // go: './src/js/go.ts',
+    // breathe: './src/js/breathe.ts',
+    // matrix: './src/js/matrix.ts',
+    // winamp: './src/js/winamp.ts',
+    // AusIncome: './src/js/AusIncome.ts',
+    // wealth: './src/js/wealth.ts',
   },
   output: {
     path: __dirname + '/public/js',
+    // filename: 'chart.js',
     filename: '[name].js',
+    // sourceMapFilename: 'build/js/[name].js.map',
     // filename: 'index.js',
   },
   plugins: [
@@ -70,9 +85,9 @@ module.exports = {
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      datatables: 'datatables.net',
+      // datatables: 'datatables.net',
       'datatables.net': 'datatables.net',
-      'dataTables.net': 'datatables.net',
+      // 'dataTables.net': 'datatables.net',
       d3: 'd3',
       showdown: 'showdown',
     }),

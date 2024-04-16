@@ -1326,7 +1326,7 @@ function log(message: string) {
   console.info(`${formatTime(date)}${message}`)
 }
 
-type chartDataTableSettings = DataTables.Settings & {
+type chartDataTableSettings = any & {
   element?: string
   titles?: any
   render?: any
@@ -1335,7 +1335,7 @@ type chartDataTableSettings = DataTables.Settings & {
 function decorateTable(
   dataset: any,
   newOptions?: chartDataTableSettings
-): DataTables.Api {
+): any {
   const element = newOptions ? newOptions.element : '#dataset table'
 
   const columns = dataset.columns
@@ -1352,7 +1352,7 @@ function decorateTable(
         }
       })
 
-  const options: DataTables.Settings = {
+  const options: any = {
     info: false,
     paging: false,
     search: false,
@@ -1387,3 +1387,5 @@ console.debug(`jQuery version: ${$.fn.jquery}`)
 console.debug(`lodash version: ${_.VERSION}`)
 
 export { Chart, decorateTable, _, $, d3 }
+
+// export default Chart

@@ -147,7 +147,7 @@ let config = {
                         data.blogpost = data.blogposts.filter((d) => d.shortname === router.path[0]);
                         try {
                             const shortname = router.path[0];
-                            data.typescript = `'/js/${shortname}.js'`;
+                            data.typescript = `"/js/${shortname}.js"`;
                         }
                         catch (e) { }
                         const output = mustache_1.default.render(views.template, data, views);

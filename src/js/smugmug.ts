@@ -4,10 +4,6 @@
 /* eslint-disable no-var */
 /* eslint-disable no-redeclare */
 
-/// <reference path="../../node_modules/@types/d3/index.d.ts" />
-/// <reference path="../../node_modules/@types/d3-selection/index.d.ts" />
-/// <reference path="../../node_modules/@types/d3-selection-multi/index.d.ts" />
-
 
 const OAUTH_ORIGIN = 'https://api.smugmug.com'
 const REQUEST_TOKEN_URL = OAUTH_ORIGIN + '/services/oauth/1.0a/getRequestToken'

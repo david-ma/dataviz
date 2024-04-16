@@ -170,7 +170,7 @@ let config: Thalia.WebsiteConfig = {
 
             try {
               const shortname = router.path[0]
-              data.typescript = `'/js/${shortname}.js'`
+              data.typescript = `"/js/${shortname}.js"`
             } catch (e) {}
 
             const output = mustache.render(views.template, data, views)

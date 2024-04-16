@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdataviz=self.webpackChunkdataviz||[]).push([[11],{749:(e,a,n)=>{var t=n(839),h=n(569);console.log("Running example.ts"),h.when(h.ready).then((function(){new t.t({element:"exampleDiv",margin:20,width:800,height:600,nav:!1}).scratchpad((e=>{}))}))}},e=>{e(e.s=749)}]);

@@ -1,7 +1,5 @@
 import { Chart, decorateTable, $, d3 } from './chart'
 
-// import 'datatables.net'
-
 console.log('Running breathe.ts')
 
 type Vertex = [number, number]
@@ -18,7 +16,7 @@ type DataPoint = {
   }
 }
 
-let dataTable: DataTables.Api = null
+let dataTable: any = null
 
 const Tau = 2 * Math.PI
 
