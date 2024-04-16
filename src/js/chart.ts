@@ -1,6 +1,6 @@
 // Language: typescript
 // Path: src/js/chart.ts
-console.log("Running chart.ts")
+console.log('Running chart.ts')
 
 import * as d3 from 'd3'
 
@@ -1130,6 +1130,104 @@ class Chart {
     callback(this)
   }
 
+  map(options: { json?: string; lat?: number; long?: number; place?: string }) {
+    let lat = options.lat || 1
+    let long = options.long || 1
+    let place = options.place || 'Somewhere'
+    let json = options.json || '/data/aust.json'
+
+    console.log('Drawing map', {
+      lat: lat,
+      long: long,
+      place: place,
+    })
+
+    // Width and height
+    const w = 600
+    const h = 600
+
+    // Define map projection
+    const projection = d3
+      .geoMercator()
+      .center([Math.floor(long), Math.floor(lat)])
+      .translate([w / 2, h / 2])
+      .scale(1000)
+
+    // Define path generator
+    const path = d3.geoPath().projection(projection)
+
+    const color = d3
+      .scaleOrdinal()
+      .range([
+        '#8dd3c7',
+        '#ffffb3',
+        '#bebada',
+        '#fb8072',
+        '#80b1d3',
+        '#fdb462',
+        '#b3de69',
+        '#fccde5',
+        '#d9d9d9',
+      ])
+
+    // Create SVG
+    const svg = this.svg
+
+    // Load in GeoJSON data
+    d3.json(json).then((json: any) => {
+      // Bind data and create one path per GeoJSON feature
+      svg
+        .selectAll('path')
+        .data(json.features)
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
+        .attr('fill', function (d, i) {
+          return color(i.toString())
+        })
+
+      // States
+      svg
+        .selectAll('text')
+        .data(json.features)
+        .enter()
+        .append('text')
+        .attr('fill', 'darkslategray')
+        .attr('transform', function (d: any) {
+          return 'translate(' + path.centroid(d) + ')'
+        })
+        .attr('text-anchor', 'middle')
+        .attr('dy', '.35em')
+        .style('opacity', 0.5)
+        .text(function (d: any) {
+          return d.properties.STATE_NAME
+        })
+
+      // Append the name
+      svg
+        .append('text')
+        .attr('x', w / 2)
+        .attr('y', h / 2 - 15)
+        .attr('font-size', 16)
+        .attr('font-weight', 'bold')
+        .attr('font-family', 'FontAwesome')
+        .attr('text-anchor', 'middle')
+        .classed('fa fa-map-marker', true)
+        .text('\uf041')
+
+      svg
+        .append('text')
+        .attr('x', w / 2)
+        .attr('y', h / 2)
+        .attr('font-size', 16)
+        .attr('font-weight', 'bold')
+        .attr('font-family', 'Roboto')
+        .attr('text-anchor', 'middle')
+        .text(place)
+    })
+  }
+
   venn(options: any) {
     const svg = this.plot
     const data = this.data
@@ -1332,10 +1430,7 @@ type chartDataTableSettings = any & {
   render?: any
 }
 
-function decorateTable(
-  dataset: any,
-  newOptions?: chartDataTableSettings
-): any {
+function decorateTable(dataset: any, newOptions?: chartDataTableSettings): any {
   const element = newOptions ? newOptions.element : '#dataset table'
 
   const columns = dataset.columns
