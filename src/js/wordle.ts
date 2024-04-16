@@ -1,4 +1,4 @@
-import { d3 } from 'chart'
+import { d3 } from './chart'
 
 console.log('hello wordle')
 

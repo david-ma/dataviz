@@ -30,13 +30,24 @@
 //   },
 // }
 
-var webpack = require('webpack');
+var webpack = require('webpack')
+
+const fs = require('fs')
+
+var files = fs
+  .readdirSync('./src/js')
+  .filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts'))
+  .reduce((acc, file) => {
+    acc[file.replace('.ts', '')] = `./src/js/${file}`
+    return acc
+  }, {})
 
 module.exports = {
-  mode: "development",
-  devtool: "inline-source-map",
+  mode: 'development',
+  devtool: 'inline-source-map',
   // entry: './src/js/index.ts',
   entry: {
+    ...files,
     chart: './src/js/chart.ts',
     index: './src/js/index.ts',
     earthquake: './src/js/earthquake.ts',
@@ -51,7 +62,7 @@ module.exports = {
   },
   output: {
     path: __dirname + '/public/js',
-    filename: '[name].js'
+    filename: '[name].js',
     // filename: 'index.js',
   },
   plugins: [
@@ -70,18 +81,18 @@ module.exports = {
     // mainFields: ['module'],
     mainFields: ['module', 'browser', 'main'],
     // Add `.ts` and `.tsx` as a resolvable extension.
-    extensions: [".ts", ".tsx", ".js"],
+    extensions: ['.ts', '.tsx', '.js'],
     // Add support for TypeScripts fully qualified ESM imports.
     extensionAlias: {
-     ".js": [".js", ".ts"],
-     ".cjs": [".cjs", ".cts"],
-     ".mjs": [".mjs", ".mts"]
-    }
+      '.js': ['.js', '.ts'],
+      '.cjs': ['.cjs', '.cts'],
+      '.mjs': ['.mjs', '.mts'],
+    },
   },
   module: {
     rules: [
       // all files with a `.ts`, `.cts`, `.mts` or `.tsx` extension will be handled by `ts-loader`
-      { test: /\.([cm]?ts|tsx)$/, loader: "ts-loader" }
-    ]
-  }
-};
+      { test: /\.([cm]?ts|tsx)$/, loader: 'ts-loader' },
+    ],
+  },
+}

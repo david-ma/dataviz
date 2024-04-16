@@ -1,4 +1,4 @@
-import { Chart, d3 } from 'chart'
+import { Chart, d3 } from './chart'
 console.log('running fridge.ts')
 
 // https://codepen.io/hainersavimaa/pen/oLAGBq

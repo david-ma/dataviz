@@ -1,8 +1,8 @@
 
-import { Chart, decorateTable } from 'chart'
-import * as d3 from 'd3'
-import $ from 'jquery'
-import 'datatables.net'
+import { Chart, decorateTable } from './chart'
+// import * as d3 from 'd3'
+// import $ from 'jquery'
+// import 'datatables.net'
 
 console.log('Running example.ts')
 
