@@ -31,6 +31,18 @@ Promise.all([
   const you: Coordinates = {
     ...geoip.location,
     label: 'You are here',
+    drag: d3
+      .drag()
+      .on('start', function () {
+        console.log('starting a drag')
+        // d3.select(this).raise().classed('active', true)
+      })
+      .on('drag', function () {
+        console.log('dragging')
+      })
+      .on('end', function () {
+        console.log('drag ended')
+      }),
   }
 
   const countryDistance = Math.floor(mapDistance(georgiaCountry, you))
@@ -38,11 +50,15 @@ Promise.all([
 
   console.log(`You are ${countryDistance}km from Georgia (country)`)
   console.log(`You are ${stateDistance}km from Georgia (state)`)
-  const statement = d3.select("#statement")
+  const statement = d3.select('#statement')
   if (countryDistance < stateDistance) {
-    statement.text(`You are ${countryDistance} km from Georgia (country). This is closer than Georgia (state), which is ${stateDistance} km away from you.`)
+    statement.text(
+      `You are ${countryDistance} km from Georgia (country). This is closer than Georgia (state), which is ${stateDistance} km away from you.`
+    )
   } else {
-    statement.text(`You are ${stateDistance} km from Georgia (state). This is closer than Georgia (country), which is ${countryDistance} km away from you.`)
+    statement.text(
+      `You are ${stateDistance} km from Georgia (state). This is closer than Georgia (country), which is ${countryDistance} km away from you.`
+    )
   }
   // calculate which Georgia is closer
   const distanceToCountry = Math.sqrt(

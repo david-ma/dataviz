@@ -20,9 +20,10 @@ type chartOptions = {
     nav?: boolean;
 };
 export type Coordinates = {
-    label?: string;
     latitude: number;
     longitude: number;
+    label?: string;
+    drag?: Function;
 };
 type GeoipNames = {
     [key: string]: string;

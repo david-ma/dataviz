@@ -35,9 +35,10 @@ type commit = {
 }
 
 export type Coordinates = {
-  label?: string
   latitude: number
   longitude: number
+  label?: string
+  drag?: Function
 }
 type GeoipNames = {
   [key: string]: string
@@ -1263,36 +1264,44 @@ class Chart {
           .selectAll('.mark')
           .data(options.markers)
           .enter()
-          .append('g')
-          .classed('mark', true)
-          .attr('transform', (d: Coordinates) => {
-            console.log('Data is', d)
-            console.log(
-              'Translate',
-              `translate(${projection([d.longitude, d.latitude])}`
-            )
-            return `translate(${projection([d.longitude, d.latitude])})`
-          })
-          .append('image')
-          .attr('width', 20)
-          .attr('height', 20)
-          // push it up 20 pixels
-          .attr('y', -20)
-          .attr(
-            'xlink:href',
-            'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png'
-          )
+          .each((d: any, i, nodes) => {
+            const node = d3
+              .select(nodes[i])
+              .append('g')
+              .classed('mark', true)
+              .attr('transform', (d: Coordinates) => {
+                console.log('Data is', d)
+                console.log(
+                  'Translate',
+                  `translate(${projection([d.longitude, d.latitude])}`
+                )
+                return `translate(${projection([d.longitude, d.latitude])})`
+              })
 
-      svg
-        .selectAll('.mark')
-        .append('text')
-        .attr('x', 10)
-        .attr('y', -30)
-        .attr('font-size', 16)
-        .attr('font-weight', 'bold')
-        .attr('font-family', 'Roboto')
-        .attr('text-anchor', 'middle')
-        .text((d) => d.label || '')
+            node
+              .append('image')
+              .attr('width', 20)
+              .attr('height', 20)
+              // push it up 20 pixels
+              .attr('y', -20)
+              .attr(
+                'xlink:href',
+                'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png'
+              )
+
+            if (d.label)
+              node
+                .append('text')
+                .attr('x', 10)
+                .attr('y', -30)
+                .attr('font-size', 16)
+                .attr('font-weight', 'bold')
+                .attr('font-family', 'Roboto')
+                .attr('text-anchor', 'middle')
+                .text(d.label)
+
+            if (d.drag) node.call(d.drag)
+          })
     })
   }
 
