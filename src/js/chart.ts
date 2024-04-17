@@ -1297,8 +1297,14 @@ class Chart {
                     'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png'
                   )
 
-                if (d.label)
+                var label: d3.Selection<Element, unknown, null, undefined> =
                   node
+                if (d.url) {
+                  label = label.append('a').attr('xlink:href', d.url)
+                }
+
+                if (d.label)
+                  label
                     .append('text')
                     .classed('mark-label', true)
                     .attr('x', 10)
