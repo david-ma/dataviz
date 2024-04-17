@@ -43,6 +43,15 @@ if (true) {
         .then(function (d) {
         const blogposts = [
             {
+                shortname: 'georgia',
+                title: 'Which Georgia are you closest to?',
+                category: 'interactive',
+                summary: 'A simple interactive map to show which Georgia you are closest to',
+                image: 'images/georgia.png',
+                publish_date: '2024-04-17',
+                published: true,
+            },
+            {
                 shortname: 'war',
                 title: 'American Wartime',
                 category: '#MakeoverMonday',
