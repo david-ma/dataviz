@@ -37,6 +37,9 @@ type commit = {
 export type Coordinates = {
   latitude: number
   longitude: number
+  type?: string
+  url?: string
+  distance?: number
   label?: string
   draggable?: boolean
 }

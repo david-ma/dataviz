@@ -26,12 +26,32 @@ function calculate(chart: Chart, yourCoordinates: Coordinates) {
   const georgiaCountry: Coordinates = {
     latitude: 42.3154,
     longitude: 43.3569,
+    type: 'Country',
+    url: 'https://en.wikipedia.org/wiki/Georgia_(country)',
     label: 'Georgia',
   }
 
   const georgiaState: Coordinates = {
     latitude: 32.1656,
     longitude: -82.9001,
+    type: 'State',
+    url: 'https://en.wikipedia.org/wiki/Georgia_(U.S._state)',
+    label: 'Georgia',
+  }
+
+  const georgiaIsland: Coordinates = {
+    latitude: -54.2833,
+    longitude: -36.5,
+    type: 'Island',
+    url: 'https://en.wikipedia.org/wiki/South_Georgia_and_the_South_Sandwich_Islands',
+    label: 'South Georgia',
+  }
+
+  const georgiaHamlet: Coordinates = {
+    latitude: 50.173,
+    longitude: -5.525,
+    type: 'Hamlet',
+    url: 'https://en.wikipedia.org/wiki/Georgia,_Cornwall',
     label: 'Georgia',
   }
 
@@ -41,35 +61,25 @@ function calculate(chart: Chart, yourCoordinates: Coordinates) {
     draggable: true,
   }
 
-  const countryDistance = Math.floor(mapDistance(georgiaCountry, you))
-  const stateDistance = Math.floor(mapDistance(georgiaState, you))
+  georgiaCountry.distance = Math.floor(mapDistance(georgiaCountry, you))
+  georgiaState.distance = Math.floor(mapDistance(georgiaState, you))
+  georgiaIsland.distance = Math.floor(mapDistance(georgiaIsland, you))
+  georgiaHamlet.distance = Math.floor(mapDistance(georgiaHamlet, you))
+
+  const georgias = [
+    georgiaCountry,
+    georgiaState,
+    georgiaIsland,
+    georgiaHamlet,
+  ].sort((a, b) => a.distance - b.distance)
 
   const statement = d3.select('#statement')
-  if (countryDistance < stateDistance) {
-    statement.text(
-      `You are ${countryDistance} km from Georgia (country). This is closer than Georgia (state), which is ${stateDistance} km away from you.`
-    )
-  } else {
-    statement.text(
-      `You are ${stateDistance} km from Georgia (state). This is closer than Georgia (country), which is ${countryDistance} km away from you.`
-    )
-  }
-  // calculate which Georgia is closer
-  const distanceToCountry = Math.sqrt(
-    Math.pow(georgiaCountry.latitude - you.latitude, 2) +
-      Math.pow(georgiaCountry.longitude - you.longitude, 2)
+  const closestGeorgia = georgias[0]
+  statement.text(
+    `Your closest Georgia is ${closestGeorgia.label} (${closestGeorgia.type}), which is ${closestGeorgia.distance} km away`
   )
 
-  const distanceToState = Math.sqrt(
-    Math.pow(georgiaState.latitude - you.latitude, 2) +
-      Math.pow(georgiaState.longitude - you.longitude, 2)
-  )
+  you.label = `You are closer to ${closestGeorgia.label} (${closestGeorgia.type})`
 
-  if (distanceToCountry < distanceToState) {
-    you.label = 'You are closer to Georgia (the country)'
-  } else {
-    you.label = 'You are closer to Georgia (the state)'
-  }
-
-  return [you, georgiaCountry, georgiaState]
+  return [you, georgiaCountry, georgiaState, georgiaIsland, georgiaHamlet]
 }
