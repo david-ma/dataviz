@@ -1,4 +1,6 @@
 // import $ from 'jquery';
+import { $ } from '../js/chart'
+
 import 'datatables.net'
 declare let jsonPath: any
 

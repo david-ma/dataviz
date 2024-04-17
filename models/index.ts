@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import * as sequelize from 'sequelize'
+import { Sequelize, Options } from 'sequelize'
 // import { UserFactory } from "./user-model";
 // import { SkillsFactory } from "./skills-model";
 // import { WorksheetFactory } from './worksheet';
@@ -15,77 +15,37 @@ import { AwesomeProjectFactory } from './awesome'
 import { AwesomePhotoFactory } from './awesome'
 import { AwesomeMetadataFactory } from './awesome'
 
-import path = require('path')
+import { SeqObject } from 'thalia'
 
-// Default options
-let seqOptions: sequelize.Options = {
-  // Old defaults, from when mariaDB was the default
-  // database: process.env.DB_NAME || 'typescript_test',
-  // username: process.env.DB_USER || 'root',
-  // password: process.env.DB_PASSWORD || '',
-  // port: 3306,
-  // dialect: 'mariadb',
-  // // timezone: 'Australia/Melbourne',
-  // dialectOptions: {
-  //   timezone: 'Australia/Melbourne',
-  //   decimalNumbers: true,
-  // },
-  dialect: 'sqlite',
-  storage: path.resolve(__dirname, 'database.sqlite'),
-  logging: false,
-  define: {
-    underscored: true,
-  },
+export function datavizDBFactory(seqOptions: Options): SeqObject {
+  console.log("Running datavizDBFactory")
+
+  // Initialise Sequelize
+  const sequelize: Sequelize = new Sequelize(seqOptions)
+
+  // Initialise models
+  const Scrape = ScrapeFactory(sequelize)
+  const Family = FamilyFactory(sequelize)
+  const Camera = CameraFactory(sequelize)
+  const Blogpost = BlogpostFactory(sequelize)
+
+  // const AwesomeMetadata = AwesomeMetadataFactory(sequelize)
+  // const AwesomePhoto = AwesomePhotoFactory(sequelize)
+  // const AwesomeProject = AwesomeProjectFactory(sequelize)
+
+  // AwesomeProject.hasOne(AwesomeMetadata)
+
+  Camera.belongsTo(Family)
+  Family.hasMany(Camera)
+
+  return {
+    sequelize,
+    Scrape,
+    Family,
+    Camera,
+    Blogpost,
+    // AwesomeProject,
+    // AwesomePhoto,
+    // AwesomeMetadata,
+  }
 }
-
-// Load options from config.json if one is provided
-const env = process.env.NODE_ENV || 'development'
-console.log('env is:', env)
-try {
-  // const configOptions = require(__dirname + '/../config/config.json')[env]
-  const configOptions = require(path.resolve(
-    __dirname,
-    '..',
-    'config',
-    'config.json'
-  ))[env]
-  seqOptions = _.merge(seqOptions, configOptions)
-
-  console.log('seqOptions are:', seqOptions)
-} catch (e) {
-  console.error('No config.json provided for Sequelize', e)
-  process.exit(1)
-}
-
-// Do NOT log your password on production!!!
-if (env === 'development') {
-  console.log('Initialising Sequelize with options:', seqOptions)
-}
-
-// Initialise Sequelize
-export const dbConfig: sequelize.Sequelize = new sequelize.Sequelize(seqOptions)
-
-// Initialise models
-export const Scrape = ScrapeFactory(dbConfig)
-export const Family = FamilyFactory(dbConfig)
-export const Camera = CameraFactory(dbConfig)
-export const Blogpost = BlogpostFactory(dbConfig)
-// export const Family = FamilyFactory(dbConfig)
-// export const Worksheet = WorksheetFactory(dbConfig)
-
-export const AwesomeProject = AwesomeProjectFactory(dbConfig)
-export const AwesomePhoto = AwesomePhotoFactory(dbConfig)
-export const AwesomeMetadata = AwesomeMetadataFactory(dbConfig)
-// AwesomeProject.hasMany(AwesomePhoto)
-// AwesomePhoto.hasOne(AwesomeProject)
-
-AwesomeProject.hasOne(AwesomeMetadata)
-
-// AwesomeMetadata.belongsTo(AwesomeProject, { foreignKey: 'awesome_project_id', targetKey: 'id' })
-
-// AwesomePhoto.belongsTo(AwesomeProject, { foreignKey: 'awesome_project_id', targetKey: 'id' })
-// AwesomeProject.hasMany(AwesomePhoto, { foreignKey: 'awesome_project_id', sourceKey: 'id' })
-
-
-Camera.belongsTo(Family)
-Family.hasMany(Camera)

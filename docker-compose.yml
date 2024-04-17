@@ -1,8 +1,21 @@
 services:
+  web:
+    build: .
+    image: dataviz
+    ports:
+      - '1334:1337'
+    environment:
+      - NODE_ENV=docker
+    restart: always
+    volumes:
+      - ./data:/usr/app/Thalia/websites/dataviz/data
+
   db:
     image: postgres
     volumes:
       - dataviz_db:/var/lib/postgresql/data
+    expose:
+      - '5432'
     ports:
       - '5433:5432'
     environment:
@@ -13,17 +26,6 @@ services:
       test: ['CMD-SHELL', 'pg_isready', '-d', 'postgres']
     restart: always
 
-  web:
-    build: .
-    ports:
-      - '1334:1337'
-    environment:
-      - NODE_ENV=docker
-    depends_on:
-      db:
-        condition: service_healthy
-    # restart: always
-    entrypoint: ["/usr/app/Thalia/start.sh", "dataviz"]
-
 volumes:
   dataviz_db:
+  data:

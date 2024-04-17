@@ -1,4 +1,4 @@
-FROM frostickle/thalia:1.1.0 as base
+FROM frostickle/thalia:1.1.1 as base
 
 USER root
 
@@ -9,9 +9,9 @@ WORKDIR /usr/app/Thalia/websites/dataviz
 RUN pnpm install
 
 COPY . /usr/app/Thalia/websites/dataviz
-RUN pnpm run build
 
 RUN ln -sf /usr/app/Thalia /usr/app/Thalia/websites/dataviz/node_modules/thalia
+RUN pnpm run build
 
 WORKDIR /usr/app/Thalia
 USER chrome

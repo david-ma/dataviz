@@ -1,1 +1,1 @@
-(self.webpackChunkdataviz=self.webpackChunkdataviz||[]).push([[695],{531:()=>{console.log("hello world")}},l=>{l(l.s=531)}]);
+(self.webpackChunkdataviz=self.webpackChunkdataviz||[]).push([[695],{265:()=>{console.log("hello world")}},l=>{l(l.s=265)}]);

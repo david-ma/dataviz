@@ -1,62 +1,50 @@
-import { Model, Sequelize } from 'sequelize'
-import {
-  dbConfig,
-  Blogpost,
-  Scrape,
-  Camera,
-  Family,
-  AwesomeProject,
-  AwesomePhoto,
-  AwesomeMetadata,
-} from '../models'
+import { ModelStatic, Sequelize, Options } from 'sequelize'
+import { datavizDBFactory } from '../models'
 
-export interface seqObject {
-  [key: string]: Model | any | Sequelize
-  sequelize: Sequelize
+import path = require('path')
+import _ = require('lodash')
+import { SeqObject } from 'thalia'
+
+
+// Default options
+let seqOptions: Options = {
+  dialect: 'sqlite',
+  storage: path.resolve(__dirname, '..', 'models', 'database.sqlite'),
+  logging: false,
+  define: {
+    underscored: true,
+  },
 }
 
-const seq: seqObject = {
-  // @ts-ignore
-  sequelize: dbConfig,
-  Blogpost: Blogpost,
-  Scrape: Scrape,
-  Camera: Camera,
-  Family: Family,
-  AwesomeProject,
-  AwesomePhoto,
-  AwesomeMetadata,
+// Load options from config.json if one is provided
+const env = process.env.NODE_ENV || 'development'
+console.log('env is:', env)
+try {
+  // const configOptions = require(__dirname + '/../config/config.json')[env]
+  const configOptions = require(path.resolve(
+    __dirname,
+    '..',
+    'config',
+    'config.json'
+  ))[env]
+  seqOptions = _.merge(seqOptions, configOptions)
+
+  console.log('seqOptions are:', seqOptions)
+} catch (e) {
+  console.error('No config.json provided for Sequelize', e)
+  process.exit(1)
 }
 
-// Family.get()
-// if (false) {
-//   // eslint-disable-line
-//   Camera.findAll({
-//     where: {
-//       model: {
-//         [Op.like]: '%Coolpix%',
-//       },
-//     },
-//   }).then(function (cameras) {
-//     Family.findOne({
-//       where: {
-//         name: 'Coolpix',
-//       },
-//     }).then((family) => {
-//       cameras.forEach((camera) => {
-//         // camera.setFamily(family);
-//         // camera.addFamily(family);
-//         // console.log(camera);
-//         // camera.update({
-//         //   family: family,
-//         // })
-//       })
-//     })
-//   })
-// }
+// Do NOT log your password on production!!!
+if (env === 'development') {
+  console.log('Initialising Sequelize with options:', seqOptions)
+}
+
+const seq: SeqObject = datavizDBFactory(seqOptions)
 
 if (false) {
   // eslint-disable-line
-  Family.create({
+  seq.Family.create({
     brand: 'Nikon',
     name: 'Coolpix',
     description: 'None',
@@ -65,11 +53,13 @@ if (false) {
 
 // rebuild entire database & reload data..?
 if (true) {
+  console.log('sync true, force & alter')
+
   // eslint-disable-line
   seq.sequelize
     .sync({
-      // alter: true,
-      // force: true
+      alter: true,
+      force: true,
     })
     .then(function (d) {
       // eslint-disable-line
@@ -174,13 +164,13 @@ if (true) {
 
       blogposts.forEach(function (blogpost) {
         // console.log(`Adding ${blogpost.shortname}`)
-        Blogpost.findOne({
+        seq.Blogpost.findOne({
           where: {
             shortname: blogpost.shortname,
           },
         }).then((entry) => {
           if (!entry) {
-            Blogpost.create(blogpost)
+            seq.Blogpost.create(blogpost)
           } else {
             entry.update(blogpost)
           }

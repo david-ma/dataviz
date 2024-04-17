@@ -5,10 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.config = void 0;
 const smugmug_1 = require("./smugmug");
-const awesome_1 = require("./awesome");
-const camera_1 = require("./camera");
 const utilities_1 = require("./utilities");
-const atlassianBackend_1 = require("./atlassianBackend");
 const path_1 = __importDefault(require("path"));
 const http_1 = __importDefault(require("http"));
 const fs_1 = __importDefault(require("fs"));
@@ -185,6 +182,3 @@ if (fs_1.default.existsSync(path_1.default.resolve(__dirname, 'config.json'))) {
 else {
     console.warn('config.json not provided, skipping smugmug stuff');
 }
-exports.config = config = lodash_1.default.merge(config, awesome_1.config);
-exports.config = config = lodash_1.default.merge(config, camera_1.config);
-exports.config = config = lodash_1.default.merge(config, atlassianBackend_1.config);

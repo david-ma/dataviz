@@ -226,8 +226,9 @@ class Chart {
       grow()
     }
 
-    function keydownHandler(e: JQuery.Event) {
-      if (e && e.keyCode && e.keyCode === 27) {
+    // function keydownHandler(e: JQuery.Event) {
+    function keydownHandler(e: any) {
+        if (e && e.keyCode && e.keyCode === 27) {
         shrink()
       }
     }

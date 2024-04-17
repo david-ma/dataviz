@@ -1,26 +1,45 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const models_1 = require("../models");
-const seq = {
-    sequelize: models_1.dbConfig,
-    Blogpost: models_1.Blogpost,
-    Scrape: models_1.Scrape,
-    Camera: models_1.Camera,
-    Family: models_1.Family,
-    AwesomeProject: models_1.AwesomeProject,
-    AwesomePhoto: models_1.AwesomePhoto,
-    AwesomeMetadata: models_1.AwesomeMetadata,
+const path = require("path");
+const _ = require("lodash");
+let seqOptions = {
+    dialect: 'sqlite',
+    storage: path.resolve(__dirname, '..', 'models', 'database.sqlite'),
+    logging: false,
+    define: {
+        underscored: true,
+    },
 };
+const env = process.env.NODE_ENV || 'development';
+console.log('env is:', env);
+try {
+    const configOptions = require(path.resolve(__dirname, '..', 'config', 'config.json'))[env];
+    seqOptions = _.merge(seqOptions, configOptions);
+    console.log('seqOptions are:', seqOptions);
+}
+catch (e) {
+    console.error('No config.json provided for Sequelize', e);
+    process.exit(1);
+}
+if (env === 'development') {
+    console.log('Initialising Sequelize with options:', seqOptions);
+}
+const seq = (0, models_1.datavizDBFactory)(seqOptions);
 if (false) {
-    models_1.Family.create({
+    seq.Family.create({
         brand: 'Nikon',
         name: 'Coolpix',
         description: 'None',
     });
 }
 if (true) {
+    console.log('sync true, force & alter');
     seq.sequelize
-        .sync({})
+        .sync({
+        alter: true,
+        force: true,
+    })
         .then(function (d) {
         const blogposts = [
             {
@@ -115,13 +134,13 @@ if (true) {
             },
         ];
         blogposts.forEach(function (blogpost) {
-            models_1.Blogpost.findOne({
+            seq.Blogpost.findOne({
                 where: {
                     shortname: blogpost.shortname,
                 },
             }).then((entry) => {
                 if (!entry) {
-                    models_1.Blogpost.create(blogpost);
+                    seq.Blogpost.create(blogpost);
                 }
                 else {
                     entry.update(blogpost);

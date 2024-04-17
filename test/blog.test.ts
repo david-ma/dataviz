@@ -1,7 +1,7 @@
 // const puppeteer = require('puppeteer');
 import * as puppeteer from 'puppeteer'
 import path = require('path')
-import { seqObject } from '../config/db_bootstrap'
+import { SeqObject } from 'thalia'
 
 // import { describe, expect, test } from '@jest/globals'
 // import fs = require('fs')
@@ -10,7 +10,7 @@ import { seqObject } from '../config/db_bootstrap'
 // const jestURL = jestConfig.globals.URL
 const timeout = process.env.SLOWMO ? 30000 : 10000
 
-var database: seqObject = require(path.resolve(
+var database: SeqObject = require(path.resolve(
   __dirname,
   '..',
   'config',

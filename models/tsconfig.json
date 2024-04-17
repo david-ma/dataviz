@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
+    "declaration": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "incremental": true,
     "allowSyntheticDefaultImports": true,

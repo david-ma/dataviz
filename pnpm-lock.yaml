@@ -8,6 +8,9 @@ overrides:
   css-what: 5.0.1
 
 dependencies:
+  '@types/jquery':
+    specifier: ^3.5.29
+    version: 3.5.29
   amdefine:
     specifier: ^1.0.1
     version: 1.0.1
@@ -20,12 +23,18 @@ dependencies:
   d3-cloud:
     specifier: ^1.2.7
     version: 1.2.7
+  datatables.net:
+    specifier: ^2.0.3
+    version: 2.0.3
   formidable:
     specifier: ^3.5.1
     version: 3.5.1
   http-proxy:
     specifier: ^1.18.1
     version: 1.18.1
+  jquery:
+    specifier: ^3.7.1
+    version: 3.7.1
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
@@ -47,6 +56,9 @@ dependencies:
   sequelize:
     specifier: ^6.37.2
     version: 6.37.2(pg-hstore@2.3.4)(pg@8.11.5)(sqlite3@5.1.7)
+  showdown:
+    specifier: ^2.1.0
+    version: 2.1.0
   socket.io:
     specifier: ^4.7.5
     version: 4.7.5
@@ -82,15 +94,6 @@ devDependencies:
   csv:
     specifier: ^6.3.8
     version: 6.3.8
-  datatables.net:
-    specifier: ^2.0.3
-    version: 2.0.3
-  jquery:
-    specifier: ^3.7.1
-    version: 3.7.1
-  showdown:
-    specifier: ^2.1.0
-    version: 2.1.0
   tabletojson:
     specifier: ^2.1.1
     version: 2.1.1
@@ -1600,6 +1603,12 @@ packages:
     resolution: {integrity: sha512-WCfD5Ht3ZesJUsONdhvm84dmzWOiOzOAqOncN0++w0lBw1o8OuDNJF2McvvCef/yBqb/HYRahp1BYtODFQ8bRg==}
     dev: true
 
+  /@types/jquery@3.5.29:
+    resolution: {integrity: sha512-oXQQC9X9MOPRrMhPHHOsXqeQDnWeCDT3PelUIg/Oy8FAbzSZtFHRjc7IpbfFVmpLtJ+UOoywpRsuO5Jxjybyeg==}
+    dependencies:
+      '@types/sizzle': 2.3.8
+    dev: false
+
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
     dev: true
@@ -1612,6 +1621,10 @@ packages:
     resolution: {integrity: sha512-ArgCD39YpyyrtFKIqMDvjz79jto5fcI/SVUs2HwB+f0dAzq68yqOdyaSivLiLugSziTpNXLQrVb7RZFmdZzbhA==}
     dependencies:
       undici-types: 5.26.5
+
+  /@types/sizzle@2.3.8:
+    resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==}
+    dev: false
 
   /@types/validator@13.11.9:
     resolution: {integrity: sha512-FCTsikRozryfayPuiI46QzH3fnrOoctTjvOYZkho9BTFLCOZ2rgZJHMOVgCOfttjPJcgOx52EpkY0CMfy87MIw==}
@@ -3038,7 +3051,7 @@ packages:
   /commander@9.5.0:
     resolution: {integrity: sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==}
     engines: {node: ^12.20.0 || >=14}
-    dev: true
+    dev: false
 
   /common-path-prefix@3.0.0:
     resolution: {integrity: sha512-QE33hToZseCH3jS0qN96O/bSh3kaw/h+Tq7ngyY9eWDUnTlTNUyqfqvCXioLe5Na5jFsL78ra/wuBU4iuEgd4w==}
@@ -3436,7 +3449,7 @@ packages:
     resolution: {integrity: sha512-phq7jhkjIlVdahZYa2nd/yeiDgFrvT++Sily3GgztG3T7qqdAWkjtLuGA2Pv5p7XBwkJ0zwf+0KDRU54uR7WAg==}
     dependencies:
       jquery: 3.7.1
-    dev: true
+    dev: false
 
   /debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -4762,7 +4775,7 @@ packages:
 
   /jquery@3.7.1:
     resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
-    dev: true
+    dev: false
 
   /js-tokens@3.0.2:
     resolution: {integrity: sha512-RjTcuD4xjtthQkaWH7dFlH85L+QaVtSoOyGdZ3g6HFhS9dFNDfLyqgm2NFe2X6cQpeFmt0452FJjFG5UameExg==}
@@ -6202,7 +6215,7 @@ packages:
     hasBin: true
     dependencies:
       commander: 9.5.0
-    dev: true
+    dev: false
 
   /side-channel@1.0.6:
     resolution: {integrity: sha512-fDW/EZ6Q9RiO8eFG8Hj+7u/oW+XrPTIChwCOM2+th2A6OblDtYYIpve9m+KvI9Z4C9qSEXlaGR6bTEYHReuglA==}

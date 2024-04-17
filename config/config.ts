@@ -211,9 +211,8 @@ if (fs.existsSync(path.resolve(__dirname, 'config.json'))) {
   console.warn('config.json not provided, skipping smugmug stuff')
 }
 
-config = _.merge(config, awesomeConfig)
-config = _.merge(config, cameraConfig)
-
-config = _.merge(config, atlassianConfig)
+// config = _.merge(config, awesomeConfig)
+// config = _.merge(config, cameraConfig)
+// config = _.merge(config, atlassianConfig)
 
 export { config }
