@@ -1,7 +1,5 @@
 import { Chart, mapDistance, d3, Geoip, Coordinates } from './chart.js'
 
-console.log('hey')
-
 // Ingest data
 Promise.all([
   d3.json('https://monetiseyourwebsite.com/geoip'),
@@ -17,17 +15,14 @@ Promise.all([
   // Init chart
 
   chart.drawMap({
-    // center: you,
     json: '/world.geo.json',
     zoom: 100,
-    markers: updateChart(geoip.location, chart),
-    update: updateChart,
+    markers: calculate(chart, geoip.location),
+    calculate,
   })
 })
 
-function updateChart(yourLocation: Coordinates, chart: Chart) {
-  console.log('Updating chart', yourLocation)
-
+function calculate(chart: Chart, yourCoordinates: Coordinates) {
   const georgiaCountry: Coordinates = {
     latitude: 42.3154,
     longitude: 43.3569,
@@ -41,7 +36,7 @@ function updateChart(yourLocation: Coordinates, chart: Chart) {
   }
 
   const you: Coordinates = {
-    ...yourLocation,
+    ...yourCoordinates,
     label: 'You are here',
     draggable: true,
   }
@@ -70,16 +65,11 @@ function updateChart(yourLocation: Coordinates, chart: Chart) {
       Math.pow(georgiaState.longitude - you.longitude, 2)
   )
 
-  console.log('distanceToCountry', distanceToCountry)
-  console.log('distanceToState', distanceToState)
-
   if (distanceToCountry < distanceToState) {
-    console.log("You're closer to the country")
     you.label = 'You are closer to Georgia (the country)'
   } else {
-    console.log("You're closer to the state")
     you.label = 'You are closer to Georgia (the state)'
   }
 
-  return [georgiaCountry, georgiaState, you]
+  return [you, georgiaCountry, georgiaState]
 }

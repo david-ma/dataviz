@@ -68,7 +68,7 @@ declare class Chart {
     innerWidth: number;
     fullscreen: boolean;
     projection?: any;
-    update?: Function;
+    calculate?: Function;
     svg: any;
     plot: any;
     xScale: d3.ScaleLinear<number, number>;
@@ -107,7 +107,7 @@ declare class Chart {
         json?: string;
         zoom?: number;
         markers?: Coordinates[];
-        update: Function;
+        calculate: Function;
     }): void;
     venn(options: any): void;
 }

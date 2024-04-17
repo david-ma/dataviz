@@ -84,7 +84,7 @@ class Chart {
 
   // drawMap stuff
   projection?: any
-  update?: Function
+  calculate?: Function // recalculate the chart, based on data
 
   // svg: Selection<SVGSVGElement, any, HTMLElement, any>
   svg: any
@@ -1171,10 +1171,10 @@ class Chart {
     json?: string
     zoom?: number
     markers?: Coordinates[]
-    update: Function
+    calculate: Function
   }) {
     let chart: Chart = this
-    chart.update = options.update
+    chart.calculate = options.calculate
     let lat = options.center ? options.center.latitude : 0
     let long = options.center ? options.center.longitude : 0
     // let place = options.place || 'Somewhere'
@@ -1335,14 +1335,11 @@ class Chart {
                         svg
                           .selectAll('.mark')
                           .data(
-                            chart.update(
-                              {
-                                ...data,
-                                longitude,
-                                latitude,
-                              },
-                              chart
-                            ),
+                            chart.calculate(chart, {
+                              ...data,
+                              longitude,
+                              latitude,
+                            }),
                             (d, i) => i
                           )
                           .each((d: Coordinates, i: number, nodes) => {
