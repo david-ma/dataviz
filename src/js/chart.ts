@@ -1291,7 +1291,8 @@ class Chart {
                   .attr('width', 20)
                   .attr('height', 20)
                   // push it up 20 pixels
-                  .attr('y', -20)
+                  .attr('x', -10)
+                  .attr('y', -10)
                   .attr(
                     'xlink:href',
                     'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png'
