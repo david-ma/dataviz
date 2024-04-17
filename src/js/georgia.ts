@@ -1,6 +1,8 @@
 import { Chart, mapDistance, d3, Geoip, Coordinates } from './chart.js'
 
 console.log('hey')
+
+// Ingest data
 Promise.all([
   d3.json('https://monetiseyourwebsite.com/geoip'),
   new Chart({
@@ -12,8 +14,19 @@ Promise.all([
     nav: false,
   }),
 ]).then(([geoip, chart]: [Geoip, Chart]) => {
-  // console.log('geoip', geoip)
-  // console.log(JSON.stringify(geoip))
+  // Init chart
+
+  chart.drawMap({
+    // center: you,
+    json: '/world.geo.json',
+    zoom: 100,
+    markers: updateChart(geoip.location, chart),
+    update: updateChart,
+  })
+})
+
+function updateChart(yourLocation: Coordinates, chart: Chart) {
+  console.log('Updating chart', yourLocation)
 
   const georgiaCountry: Coordinates = {
     latitude: 42.3154,
@@ -28,61 +41,14 @@ Promise.all([
   }
 
   const you: Coordinates = {
-    ...geoip.location,
+    ...yourLocation,
     label: 'You are here',
-    drag: d3
-      .drag()
-      .on('start', function (d: DragEvent) {
-        // console.log('starting a drag', d)
-        // console.log(`Coordinates: ${chart.projection.invert([d.x, d.y])}`)
-        // d3.select(this).raise().classed('active', true)
-      })
-      .on('drag', function (d: DragEvent) {
-        console.log('dragging', d)
-        d3.select(this).classed('active', true)
-        // console.log(`Coordinates: ${chart.projection.invert([d.x, d.y])}`)
-
-        chart.drawMap({
-          json: '/world.geo.json',
-          zoom: 100,
-          markers: [
-            georgiaCountry,
-            georgiaState,
-            {
-              ...you,
-              latitude: chart.projection.invert([d.x, d.y])[1],
-              longitude: chart.projection.invert([d.x, d.y])[0],
-            },
-          ],
-        })
-      })
-      .on('end', function (d: DragEvent, data) {
-        d3.select(this).classed('active', false)
-
-        you.latitude = chart.projection.invert([d.x, d.y])[1]
-        you.longitude = chart.projection.invert([d.x, d.y])[0]
-
-        chart.drawMap({
-          json: '/world.geo.json',
-          zoom: 100,
-          markers: [
-            georgiaCountry,
-            georgiaState,
-            {
-              ...you,
-              latitude: chart.projection.invert([d.x, d.y])[1],
-              longitude: chart.projection.invert([d.x, d.y])[0],
-            },
-          ],
-        })
-      }),
+    draggable: true,
   }
 
   const countryDistance = Math.floor(mapDistance(georgiaCountry, you))
   const stateDistance = Math.floor(mapDistance(georgiaState, you))
 
-  console.log(`You are ${countryDistance}km from Georgia (country)`)
-  console.log(`You are ${stateDistance}km from Georgia (state)`)
   const statement = d3.select('#statement')
   if (countryDistance < stateDistance) {
     statement.text(
@@ -104,131 +70,16 @@ Promise.all([
       Math.pow(georgiaState.longitude - you.longitude, 2)
   )
 
+  console.log('distanceToCountry', distanceToCountry)
+  console.log('distanceToState', distanceToState)
+
   if (distanceToCountry < distanceToState) {
+    console.log("You're closer to the country")
     you.label = 'You are closer to Georgia (the country)'
   } else {
+    console.log("You're closer to the state")
     you.label = 'You are closer to Georgia (the state)'
   }
 
-  chart.drawMap({
-    // center: you,
-    json: '/world.geo.json',
-    zoom: 100,
-    markers: [georgiaCountry, georgiaState, you],
-  })
-})
-
-// drawMap(-17, 131, "asdf")
-
-// import { Chart } from './chart.js'
-// import * as Chart from './chart.js'
-// import Chart from './chart.js'
-// import * as Chart from './chart'
-// import { Chart } from 'chart'
-
-// const Chart = require('./chart.js');
-
-// console.log("Chart is:", Chart)
-// console.log(Object.entries(Chart))
-
-// // wait until chart is loaded, then do stuff?
-// $.when($.ready).then(function () {
-//   console.log('heyyyy')
-//   console.log("Chart", Chart)
-// })
-
-// Chart.d3.select("body")
-
-// import Test from './test.js'
-// console.log('test', Test)
-
-// const blah = new Test()
-
-// import * as d3 from 'd3'
-// import $ from 'jquery'
-// import 'datatables.net'
-
-// console.log('Running georgia.ts')
-
-// $.when($.ready).then(function () {
-//   const chart = new Chart({
-//     // eslint-disable-line
-//     element: 'exampleDiv',
-//     margin: 20,
-//     width: 800,
-//     height: 600,
-//     nav: false,
-//   }).scratchpad((chart: Chart) => {
-//     const svg = chart.svg
-//     // chart.svg
-
-//     // Define map projection
-//     const projection = d3
-//       .geoMercator()
-//       .center([Math.floor(long), Math.floor(lat)])
-//       .translate([w / 2, h / 2])
-//       .scale(1000)
-//     // Define path generator
-//     const path = d3.geoPath().projection(projection)
-
-//     d3.json('/world.geo.json').then((json) => {
-//       console.log('JSON', json)
-//       // Bind data and create one path per GeoJSON feature
-//       svg
-//         .selectAll('path')
-//         .data(json.features)
-//         .enter()
-//         .append('path')
-//         .attr('d', path)
-//         .attr('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
-//         .attr('fill', function (d, i) {
-//           return color(i)
-//         })
-
-//       // States
-//       svg
-//         .selectAll('text')
-//         .data(json.features)
-//         .enter()
-//         .append('text')
-//         .attr('fill', 'darkslategray')
-//         .attr('transform', function (d: any) {
-//           return 'translate(' + path.centroid(d) + ')'
-//         })
-//         .attr('text-anchor', 'middle')
-//         .attr('dy', '.35em')
-//         .style('opacity', 0.5)
-//         .text(function (d: any) {
-//           return d.properties.STATE_NAME
-//         })
-
-//       // Append the name
-//       svg
-//         .append('text')
-//         .attr('x', w / 2)
-//         .attr('y', h / 2 - 15)
-//         .attr('font-size', 16)
-//         .attr('font-weight', 'bold')
-//         .attr('font-family', 'FontAwesome')
-//         .attr('text-anchor', 'middle')
-//         .classed('fa fa-map-marker', true)
-//         .text('\uf041')
-
-//       svg
-//         .append('text')
-//         .attr('x', w / 2)
-//         .attr('y', h / 2)
-//         .attr('font-size', 16)
-//         .attr('font-weight', 'bold')
-//         .attr('font-family', 'Roboto')
-//         .attr('text-anchor', 'middle')
-//         .text(place)
-//     })
-//   })
-// })
-
-// console.log(" hello ")
-// console.log("World 2")
-
-console.log('new change., do we see it?')
-console.log('another new change')
+  return [georgiaCountry, georgiaState, you]
+}

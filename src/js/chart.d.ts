@@ -23,7 +23,7 @@ export type Coordinates = {
     latitude: number;
     longitude: number;
     label?: string;
-    drag?: Function;
+    draggable?: boolean;
 };
 type GeoipNames = {
     [key: string]: string;
@@ -68,6 +68,7 @@ declare class Chart {
     innerWidth: number;
     fullscreen: boolean;
     projection?: any;
+    update?: Function;
     svg: any;
     plot: any;
     xScale: d3.ScaleLinear<number, number>;
@@ -106,6 +107,7 @@ declare class Chart {
         json?: string;
         zoom?: number;
         markers?: Coordinates[];
+        update: Function;
     }): void;
     venn(options: any): void;
 }

@@ -38,7 +38,7 @@ export type Coordinates = {
   latitude: number
   longitude: number
   label?: string
-  drag?: Function
+  draggable?: boolean
 }
 type GeoipNames = {
   [key: string]: string
@@ -81,7 +81,10 @@ class Chart {
   innerHeight: number
   innerWidth: number
   fullscreen: boolean
+
+  // drawMap stuff
   projection?: any
+  update?: Function
 
   // svg: Selection<SVGSVGElement, any, HTMLElement, any>
   svg: any
@@ -1168,7 +1171,10 @@ class Chart {
     json?: string
     zoom?: number
     markers?: Coordinates[]
+    update: Function
   }) {
+    let chart: Chart = this
+    chart.update = options.update
     let lat = options.center ? options.center.latitude : 0
     let long = options.center ? options.center.longitude : 0
     // let place = options.place || 'Somewhere'
@@ -1300,12 +1306,59 @@ class Chart {
                     .attr('text-anchor', 'middle')
                     .text(d.label)
 
-                if (d.drag) node.call(d.drag)
+                if (d.draggable) {
+                  node.call(
+                    d3
+                      .drag()
+                      .on('start', function (d: DragEvent, data: object) {
+                        node.classed('active', true)
+                      })
+                      .on('drag', function (d: DragEvent, data: object) {
+                        const [longitude, latitude] = projection.invert([
+                          d.x,
+                          d.y,
+                        ])
+                        node
+                          .datum({
+                            ...data,
+                            longitude,
+                            latitude,
+                          })
+                          .attr('transform', `translate(${d.x},${d.y})`)
+                      })
+                      .on('end', function (d: DragEvent, data: Coordinates) {
+                        const [longitude, latitude] = projection.invert([
+                          d.x,
+                          d.y,
+                        ])
+                        node.classed('active', false)
+                        svg
+                          .selectAll('.mark')
+                          .data(
+                            chart.update(
+                              {
+                                ...data,
+                                longitude,
+                                latitude,
+                              },
+                              chart
+                            ),
+                            (d, i) => i
+                          )
+                          .each((d: Coordinates, i: number, nodes) => {
+                            d3.select(nodes[i])
+                              .select('.mark-label')
+                              .text(d.label)
+                          })
+                      })
+                  )
+                }
               })
               return d3.selectAll('.mark')
             },
             function (update) {
               update.each((d: any, i, nodes) => {
+                console.log('updating node', i)
                 const node = d3
                   .select(nodes[i])
                   .attr(
@@ -1313,6 +1366,7 @@ class Chart {
                     (d: Coordinates) =>
                       `translate(${projection([d.longitude, d.latitude])})`
                   )
+                node.select('.mark-label').text(d.label)
               })
               return d3.selectAll('.mark')
             },
