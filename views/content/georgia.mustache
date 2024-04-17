@@ -4,6 +4,7 @@
       <br>
       <div id="exampleDiv"></div>
       <p id="statement"></p>
+      <div id="todo"></div>
     </div>
   </div>
 </section>
@@ -31,8 +32,36 @@
     `Which Georgia are you closest to?
 This helpful world map will show you which Georgia you are closest to.
 
-Georgia the US State (32.1656° N, 82.9001° W) or Georgia the Country (42.3154° N, 43.3569° E)
-`
+Georgia the US State (32.1656° N, 82.9001° W) or Georgia the Country (42.3154° N, 43.3569° E)`
   ));
+
+  $("#todo").html(md.makeHtml(`
+##TODO
+
+Core features being practiced in this exericse:
+- geojson
+- d3 map projection
+- d3 drag and drop (for repositioning your pin)
+- geoip database lookup, to get visitor’s location by IP address
+- calculate distance (and take into account that the world is round and you might be closer to the other one if you go _left_ at the equator)
+- mobile friendly layout
+- deployment & quick redeployment
+
+Feature requests:
+- Extra Georgias (e.g. South Georgia island)
+- What if you’re inside a Georgia? Get boundaries of each Georgia and check if you’re in one? Find closest distance to edge of a Georgia, to return as the result? Currently each location is just based on point coordinates, not a shape/geojson feature.
+
+Stretch goal:
+- animation of pin being picked up & moved
+- different projections
+- animation between projections
+- Allow user comments/notes to be left? Or submit corrections if the wrong location is looked up?
+
+Tests to write:
+- Test that map builds?
+- Test geoip lookup is accurate
+- Test drag, dragging, drop?
+- Test coordinates -> kilometres calculation See less
+`))
 
 </script>
