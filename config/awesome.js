@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.config = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const datastore = {};
-var AwesomeMetadata = require('../config/db_bootstrap').seq.AwesomeMetadata;
+var AwesomeMetadata = require('./db_bootstrap').seq.AwesomeMetadata;
 AwesomeMetadata.findAll({}).then((data) => {
     data.reduce((acc, d) => {
         lodash_1.default.merge(acc, d.dataValues.value);

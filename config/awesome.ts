@@ -1,10 +1,13 @@
 // Transient data store, will need to use a real database in future.
 
 import _ from 'lodash'
-import { Thalia } from '../../../server/thalia'
+import { Thalia } from 'thalia'
 
 const datastore = {}
-var AwesomeMetadata = require('../config/db_bootstrap').seq.AwesomeMetadata
+
+// This stuff is being called before the database can be initialised.
+// Causes problems
+var AwesomeMetadata = require('./db_bootstrap').seq.AwesomeMetadata
 AwesomeMetadata.findAll({}).then((data) => {
   data.reduce((acc, d) => {
     _.merge(acc, d.dataValues.value)

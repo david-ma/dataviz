@@ -1,9 +1,6 @@
 import { Thalia } from 'thalia'
 import { config as smugmugConfig } from './smugmug'
-import { config as awesomeConfig } from './awesome'
-import { config as cameraConfig } from './camera'
 import { gitHash, loadTemplates } from './utilities'
-import { config as atlassianConfig } from './atlassianBackend'
 
 import path from 'path'
 import http from 'http'
@@ -211,8 +208,13 @@ if (fs.existsSync(path.resolve(__dirname, 'config.json'))) {
   console.warn('config.json not provided, skipping smugmug stuff')
 }
 
+// import { config as awesomeConfig } from './awesome'
 // config = _.merge(config, awesomeConfig)
+
+// import { config as cameraConfig } from './camera'
 // config = _.merge(config, cameraConfig)
+
+// import { config as atlassianConfig } from './atlassianBackend'
 // config = _.merge(config, atlassianConfig)
 
 export { config }

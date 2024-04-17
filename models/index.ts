@@ -11,15 +11,15 @@ import { FamilyFactory } from './family'
 import { CameraFactory } from './camera'
 import { BlogpostFactory } from './blogpost'
 
-import { AwesomeProjectFactory } from './awesome'
-import { AwesomePhotoFactory } from './awesome'
-import { AwesomeMetadataFactory } from './awesome'
+import {
+  AwesomeProjectFactory,
+  AwesomePhotoFactory,
+  AwesomeMetadataFactory,
+} from './awesome'
 
 import { SeqObject } from 'thalia'
 
 export function datavizDBFactory(seqOptions: Options): SeqObject {
-  console.log("Running datavizDBFactory")
-
   // Initialise Sequelize
   const sequelize: Sequelize = new Sequelize(seqOptions)
 
@@ -29,11 +29,11 @@ export function datavizDBFactory(seqOptions: Options): SeqObject {
   const Camera = CameraFactory(sequelize)
   const Blogpost = BlogpostFactory(sequelize)
 
-  // const AwesomeMetadata = AwesomeMetadataFactory(sequelize)
-  // const AwesomePhoto = AwesomePhotoFactory(sequelize)
-  // const AwesomeProject = AwesomeProjectFactory(sequelize)
+  const AwesomeMetadata = AwesomeMetadataFactory(sequelize)
+  const AwesomePhoto = AwesomePhotoFactory(sequelize)
+  const AwesomeProject = AwesomeProjectFactory(sequelize)
 
-  // AwesomeProject.hasOne(AwesomeMetadata)
+  AwesomeProject.hasOne(AwesomeMetadata)
 
   Camera.belongsTo(Family)
   Family.hasMany(Camera)
@@ -44,8 +44,8 @@ export function datavizDBFactory(seqOptions: Options): SeqObject {
     Family,
     Camera,
     Blogpost,
-    // AwesomeProject,
-    // AwesomePhoto,
-    // AwesomeMetadata,
+    AwesomeProject,
+    AwesomePhoto,
+    AwesomeMetadata,
   }
 }
