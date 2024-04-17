@@ -1,7 +1,6 @@
 import { Chart, mapDistance, d3, Geoip, Coordinates } from './chart.js'
 
 console.log('hey')
-
 Promise.all([
   d3.json('https://monetiseyourwebsite.com/geoip'),
   new Chart({
@@ -39,18 +38,31 @@ Promise.all([
         // d3.select(this).raise().classed('active', true)
       })
       .on('drag', function (d: DragEvent) {
-        // console.log('dragging', d)
+        console.log('dragging', d)
+        d3.select(this).classed('active', true)
         // console.log(`Coordinates: ${chart.projection.invert([d.x, d.y])}`)
+
+        chart.drawMap({
+          json: '/world.geo.json',
+          zoom: 100,
+          markers: [
+            georgiaCountry,
+            georgiaState,
+            {
+              ...you,
+              latitude: chart.projection.invert([d.x, d.y])[1],
+              longitude: chart.projection.invert([d.x, d.y])[0],
+            },
+          ],
+        })
       })
       .on('end', function (d: DragEvent, data) {
-        // console.log(d)
-        // console.log('drag ended')
-        // console.log(`Coordinates: ${chart.projection.invert([d.x, d.y])}`)
+        d3.select(this).classed('active', false)
 
         you.latitude = chart.projection.invert([d.x, d.y])[1]
         you.longitude = chart.projection.invert([d.x, d.y])[0]
 
-        chart.drawmap({
+        chart.drawMap({
           json: '/world.geo.json',
           zoom: 100,
           markers: [
@@ -98,7 +110,7 @@ Promise.all([
     you.label = 'You are closer to Georgia (the state)'
   }
 
-  chart.drawmap({
+  chart.drawMap({
     // center: you,
     json: '/world.geo.json',
     zoom: 100,

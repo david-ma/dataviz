@@ -63,6 +63,7 @@ export type Geoip = {
     names: GeoipNames
   }
 }
+
 /*
  * David Ma - March 2018
  */
@@ -1162,7 +1163,7 @@ class Chart {
 
   // Todo, draw markers?
   // Add more geoip helper stuff?
-  drawmap(options: {
+  drawMap(options: {
     center?: Coordinates
     json?: string
     zoom?: number
@@ -1173,14 +1174,6 @@ class Chart {
     // let place = options.place || 'Somewhere'
     let json = options.json || '/data/aust.json'
     let zoom = options.zoom || 100
-
-    console.log('Drawing map', {
-      lat: lat,
-      long: long,
-      json: json,
-      zoom: zoom,
-      markers: options.markers,
-    })
 
     // Width and height
     const w = this.width
@@ -1273,7 +1266,6 @@ class Chart {
           .data(options.markers, (d: any, i) => i)
           .join(
             function (enter) {
-              console.log('Enter', enter)
               enter.each((d: any, i, nodes) => {
                 const node = d3
                   .select(nodes[i])
@@ -1299,6 +1291,7 @@ class Chart {
                 if (d.label)
                   node
                     .append('text')
+                    .classed('mark-label', true)
                     .attr('x', 10)
                     .attr('y', -30)
                     .attr('font-size', 16)
