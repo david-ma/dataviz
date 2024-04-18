@@ -38,13 +38,12 @@ const extraGeorgias: Coordinates[] = [
 Promise.all([
   d3.json('https://monetiseyourwebsite.com/geoip'),
   new Chart({
-    // eslint-disable-line
     element: 'georgiaChart',
     margin: 20,
     width: 800,
     height: 600,
     nav: false,
-  }),
+  }).initMap(),
 ]).then(([geoip, chart]: [Geoip, Chart]) => {
   // Init chart
 

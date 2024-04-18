@@ -105,6 +105,7 @@ declare class Chart {
     squares(): this;
     treemap(): void;
     scratchpad(callback: (chart: Chart) => void): void;
+    initMap(): Promise<unknown>;
     drawMap(options: {
         center?: Coordinates;
         json?: string;

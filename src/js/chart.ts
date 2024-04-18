@@ -1168,6 +1168,38 @@ class Chart {
     callback(this)
   }
 
+  // Quickly initialise a map
+  // using very basic defaults
+  // Continents only, no markers
+  // Mercator projection
+  initMap() {
+    return new Promise((resolve) => {
+      const projection = d3
+        .geoMercator()
+        .center([0, 0])
+        .translate([this.width / 2, this.height / 2])
+        .scale(100)
+
+      const path = d3.geoPath().projection(projection)
+
+      d3.json('/ne_110m_land.json')
+        .then((json: any) => {
+          this.svg
+            .selectAll('path.map-outlines')
+            .data(json.features)
+            .enter()
+            .append('path')
+            .classed('map-outlines', true)
+            .attr('d', path)
+            .attr('stroke-width', 1)
+            .attr('stroke', 'black')
+            .attr('fill', 'rgba(0,0,0,0)')
+          return this
+        })
+        .then(resolve)
+    })
+  }
+
   // Todo, draw markers?
   // Add more geoip helper stuff?
   // Great resource: https://www.d3indepth.com/geographic/
@@ -1214,47 +1246,34 @@ class Chart {
     this.projection = projection
 
     const path = d3.geoPath().projection(projection)
-    const color = d3
-      .scaleOrdinal()
-      .range([
-        '#8dd3c7',
-        '#ffffb3',
-        '#bebada',
-        '#fb8072',
-        '#80b1d3',
-        '#fdb462',
-        '#b3de69',
-        '#fccde5',
-        '#d9d9d9',
-      ])
 
     // Create SVG
     const svg = this.svg
 
     // Load in GeoJSON data
-    Promise.all([d3.json(json)]).then(
+    Promise.all([d3.json(json), d3.json(usa), d3.json(aus)]).then(
       ([json, usa, aus]: any) => {
         // Bind data and create one path per GeoJSON feature
         const georgias = []
 
         svg
           .selectAll('path.map-outlines')
-          // .data([...json.features, ...usa.features, ...aus.features])
-          .data(json.features)
+          .data([...json.features, ...usa.features, ...aus.features])
+          // .data(json.features)
           .enter()
           .append('path')
-          // .attr('class', (d) => {
-          //   if (
-          //     d.properties.NAME === 'Georgia' ||
-          //     d.properties.name === 'Georgia'
-          //   ) {
-          //     georgias.push(d)
-          //     return 'map-outlines georgia'
-          //   }
-
-          //   return 'map-outlines'
-          // })
-          .classed('map-outlines', true)
+          .attr('class', (d) => {
+            if (
+              d.properties.NAME === 'Georgia' ||
+              d.properties.name === 'Georgia'
+            ) {
+              georgias.push(d)
+              return 'map-outlines georgia'
+            } else {
+              return 'map-outlines'
+            }
+          })
+          // .classed('map-outlines', true)
           .attr('d', path)
           .attr('stroke-width', 1)
           .attr('stroke', 'black')
