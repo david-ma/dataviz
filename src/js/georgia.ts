@@ -47,10 +47,8 @@ Promise.all([
 ]).then(([geoip, chart]: [Geoip, Chart]) => {
   // Init chart
 
-  // gz_2010_us_040_00_5m.json
   chart.drawMap({
-    json: '/ne_110m_land.json',
-    // json: '/world-50.geo.json',
+    json: '/world-50.geo.json',
     usa: '/gz_2010_us_040_00_5m.json',
     aus: '/aust.json',
     zoom: 100,
@@ -61,11 +59,13 @@ Promise.all([
   // For button#addButton
   globalThis.addExtraGeorgia = function () {
     if (extraGeorgias.length > 0) georgias.push(extraGeorgias.pop())
-    if (extraGeorgias.length === 0) d3.select('#addButton').text("That's all the Georgias!").attr("disabled", true)
+    if (extraGeorgias.length === 0)
+      d3.select('#addButton')
+        .text("That's all the Georgias!")
+        .attr('disabled', true)
 
     chart.drawMap({
-      json: '/ne_110m_land.json',
-      // json: '/world.geo.json',
+      json: '/world-50.geo.json',
       usa: '/gz_2010_us_040_00_5m.json',
       aus: '/aust.json',
       zoom: 100,

@@ -1189,10 +1189,8 @@ class Chart {
             .data(json.features)
             .enter()
             .append('path')
-            .classed('map-outlines', true)
+            .classed('continent map-outlines', true)
             .attr('d', path)
-            .attr('stroke-width', 1)
-            .attr('stroke', 'black')
             .attr('fill', 'rgba(0,0,0,0)')
           return this
         })
@@ -1255,6 +1253,8 @@ class Chart {
       ([json, usa, aus]: any) => {
         // Bind data and create one path per GeoJSON feature
         const georgias = []
+
+        svg.selectAll('.continent').remove()
 
         svg
           .selectAll('path.map-outlines')
