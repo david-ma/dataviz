@@ -1233,6 +1233,8 @@ class Chart {
     Promise.all([d3.json(json), d3.json(usa), d3.json(aus)]).then(
       ([json, usa, aus]: any) => {
         // Bind data and create one path per GeoJSON feature
+        const georgias = []
+
         svg
           .selectAll('path.map-outlines')
           .data([...json.features, ...usa.features, ...aus.features])
@@ -1243,7 +1245,7 @@ class Chart {
               d.properties.NAME === 'Georgia' ||
               d.properties.name === 'Georgia'
             ) {
-              console.log('Georgia', d)
+              georgias.push(d)
               return 'map-outlines georgia'
             }
 
@@ -1375,6 +1377,12 @@ class Chart {
                             d.y,
                           ])
                           node.classed('active', false)
+
+                          georgias.forEach((georgia) => {
+                            if (d3.geoContains(georgia, [longitude, latitude]))
+                              alert('You are in Georgia!')
+                          })
+
                           svg
                             .selectAll('.mark')
                             .data(
