@@ -48,8 +48,10 @@ Promise.all([
 ]).then(([geoip, chart]: [Geoip, Chart]) => {
   // Init chart
 
+  // gz_2010_us_040_00_5m.json
   chart.drawMap({
     json: '/world-50.geo.json',
+    // json: '/gz_2010_us_040_00_5m.json',
     zoom: 100,
     markers: calculate(chart, geoip.location),
     calculate,

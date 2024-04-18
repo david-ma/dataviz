@@ -15,6 +15,20 @@
 
 
 <style>
+  g.marker {
+    circle {
+      fill: none;
+      stroke: #f00;
+      stroke-width: 1px;
+    }
+
+    line {
+      stroke: #f00;
+      stroke-width: 1px;
+    }
+  }
+
+
   button#addButton {
     background-color: #4CAF50;
     border: none;
@@ -30,9 +44,11 @@
 
   #georgiaChart {
     text {
+      text-anchor: middle;
       font: message-box;
+      color: white;
       fill: white;
-      filter: drop-shadow(0 0 1px rgb(39, 144, 44));
+      filter: drop-shadow(0 0 2px rgb(39, 144, 44));
     }
 
     svg g.plot rect {

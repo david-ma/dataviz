@@ -1289,17 +1289,28 @@ class Chart {
                       `translate(${projection([d.longitude, d.latitude])})`
                   )
 
-                node
-                  .append('image')
-                  .attr('width', 20)
-                  .attr('height', 20)
-                  // push it up 20 pixels
-                  .attr('x', -10)
-                  .attr('y', -10)
-                  .attr(
-                    'xlink:href',
-                    'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png'
-                  )
+                const marker = node.append('g').classed('marker', true)
+
+                marker
+                  .append('circle')
+                  .attr('r', 10)
+                  .attr('cx', 0)
+                  .attr('cy', 0)
+                  .attr('fill', 'rgba(0,0,0,0)')
+
+                marker
+                  .append('line')
+                  .attr('x1', 0)
+                  .attr('y1', -10)
+                  .attr('x2', 0)
+                  .attr('y2', 10)
+
+                marker
+                  .append('line')
+                  .attr('x1', -10)
+                  .attr('y1', 0)
+                  .attr('x2', 10)
+                  .attr('y2', 0)
 
                 var label: d3.Selection<Element, unknown, null, undefined> =
                   node
@@ -1311,12 +1322,8 @@ class Chart {
                   label
                     .append('text')
                     .classed('mark-label', true)
-                    .attr('x', 10)
-                    .attr('y', -30)
-                    .attr('font-size', 16)
-                    .attr('font-weight', 'bold')
-                    .attr('font-family', 'Roboto')
-                    .attr('text-anchor', 'middle')
+                    .attr('x', 0)
+                    .attr('y', -15)
                     .text(d.label)
 
                 if (d.draggable) {
