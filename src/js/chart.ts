@@ -1281,7 +1281,7 @@ class Chart {
               enter.each((d: any, i, nodes) => {
                 const node = d3
                   .select(nodes[i])
-                  .append('g')
+                  .insert('g', 'g.mark')
                   .classed('mark', true)
                   .attr(
                     'transform',
@@ -1290,6 +1290,15 @@ class Chart {
                   )
 
                 const marker = node.append('g').classed('marker', true)
+
+                marker
+                  .append('rect')
+                  .attr('width', 100)
+                  .attr('height', 80)
+                  .attr('x', -50)
+                  .attr('y', -40)
+                  .attr('rx', 50)
+                  .attr('fill', 'rgba(0,0,0,0.01)')
 
                 marker
                   .append('circle')
