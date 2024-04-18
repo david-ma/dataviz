@@ -228,7 +228,7 @@ class Chart {
 
     // function keydownHandler(e: JQuery.Event) {
     function keydownHandler(e: any) {
-        if (e && e.keyCode && e.keyCode === 27) {
+      if (e && e.keyCode && e.keyCode === 27) {
         shrink()
       }
     }
@@ -1235,10 +1235,12 @@ class Chart {
         .append('path')
         .classed('map-outlines', true)
         .attr('d', path)
-        .attr('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
-        .attr('fill', function (d, i) {
-          return color(i.toString())
-        })
+        .attr('stroke-width', 1)
+        .attr('stroke', 'black')
+        .attr('fill', 'rgba(0,0,0,0)')
+      // .attr('fill', function (d, i) {
+      //   return color(i.toString())
+      // })
 
       // States
       svg
@@ -1247,7 +1249,7 @@ class Chart {
         .enter()
         .append('text')
         .classed('map-labels', true)
-        .attr('fill', 'darkslategray')
+        // .attr('fill', 'darkslategray')
         .attr('transform', function (d: any) {
           return 'translate(' + path.centroid(d) + ')'
         })
@@ -1273,7 +1275,7 @@ class Chart {
       if (options.markers)
         svg
           .selectAll('.mark')
-          .data(options.markers, (d: any, i) => i)
+          .data(options.markers, (d: Coordinates) => d.type)
           .join(
             function (enter) {
               enter.each((d: any, i, nodes) => {
@@ -1351,7 +1353,7 @@ class Chart {
                               longitude,
                               latitude,
                             }),
-                            (d, i) => i
+                            (d: Coordinates) => d.type
                           )
                           .each((d: Coordinates, i: number, nodes) => {
                             d3.select(nodes[i])
@@ -1366,7 +1368,6 @@ class Chart {
             },
             function (update) {
               update.each((d: any, i, nodes) => {
-                console.log('updating node', i)
                 const node = d3
                   .select(nodes[i])
                   .attr(

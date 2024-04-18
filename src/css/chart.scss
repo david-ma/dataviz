@@ -34,7 +34,8 @@
 
   /* Axes */
   path {
-    stroke: none;
+    // Why would I hide the stroke here..?
+    // stroke: none;
   }
   .y.axis text {
     font-size: 14px;

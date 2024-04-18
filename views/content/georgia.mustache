@@ -2,7 +2,9 @@
   <div class="row" id="contentBox">
     <div class="col-xs-12">
       <br>
-      <div id="exampleDiv"></div>
+      <div id="intro"></div>
+      <button onclick="addExtraGeorgia()">Add more Georgias</button>
+      <div id="georgiaChart"></div>
       <p id="statement"></p>
       <div id="todo"></div>
     </div>
@@ -13,13 +15,31 @@
 
 
 <style>
-  .active {
-    image {
-      transform: scaleX(-1);
+  #georgiaChart {
+    text {
+      font: message-box;
+      fill: white;
+      filter: drop-shadow(0 0 1px rgb(39, 144, 44));
     }
 
-    .mark-label {
-      display: none;
+    svg g.plot rect {
+      fill: #231f50;
+    }
+
+    svg path {
+      stroke: rgba(255, 255, 255, 0.7);
+      stroke-width: 0.5;
+      filter: drop-shadow(0 0 1px rgb(112, 39, 238));
+    }
+
+    .active {
+      image {
+        transform: scaleX(-1);
+      }
+
+      .mark-label {
+        display: none;
+      }
     }
   }
 </style>
@@ -28,7 +48,7 @@
 <script>
   var md = new showdown.Converter({ openLinksInNewWindow: true });
 
-  $("#exampleDiv").html(md.makeHtml(
+  $("#intro").html(md.makeHtml(
     `Which Georgia are you closest to?
 This helpful world map will show you which Georgia you are closest to.
 
