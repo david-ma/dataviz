@@ -1361,24 +1361,19 @@ class Chart {
                           d3.select('path.travel-line').classed('active', true)
                         })
                         .on('drag', function (d: DragEvent, data: object) {
-                          const [longitude, latitude] = projection.invert([
-                            d.x,
-                            d.y,
-                          ])
-                          node
-                            .datum({
-                              ...data,
-                              longitude,
-                              latitude,
-                            })
-                            .attr('transform', `translate(${d.x},${d.y})`)
+                          node.attr('transform', `translate(${d.x},${d.y})`)
                         })
                         .on('end', function (d: DragEvent, data: Coordinates) {
                           const [longitude, latitude] = projection.invert([
                             d.x,
                             d.y,
                           ])
-                          node.classed('active', false)
+
+                          node.classed('active', false).datum({
+                            ...data,
+                            longitude,
+                            latitude,
+                          })
 
                           georgias.forEach((georgia) => {
                             if (d3.geoContains(georgia, [longitude, latitude]))
