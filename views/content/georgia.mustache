@@ -16,16 +16,13 @@
 
 <style>
   g.marker {
-    circle {
+    circle, line {
       fill: none;
-      stroke: #f00;
+      stroke: rgb(255, 247, 156);
       stroke-width: 1px;
+      filter: drop-shadow(0 0 1px rgb(255, 234, 0));
     }
 
-    line {
-      stroke: #f00;
-      stroke-width: 1px;
-    }
   }
 
 
@@ -59,6 +56,11 @@
       stroke: #ad9090b3;
       stroke-width: 0.5;
       filter: drop-shadow(0 0 1px rgb(112, 39, 238));
+
+      &.georgia {
+        fill: #f00;
+        stroke: #f00;
+      }
     }
 
     .active {

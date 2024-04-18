@@ -108,6 +108,8 @@ declare class Chart {
     drawMap(options: {
         center?: Coordinates;
         json?: string;
+        usa?: string;
+        aus?: string;
         zoom?: number;
         markers?: Coordinates[];
         calculate: Function;

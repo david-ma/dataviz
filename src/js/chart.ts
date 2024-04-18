@@ -1173,6 +1173,8 @@ class Chart {
   drawMap(options: {
     center?: Coordinates
     json?: string
+    usa?: string
+    aus?: string
     zoom?: number
     markers?: Coordinates[]
     calculate: Function
@@ -1182,7 +1184,9 @@ class Chart {
     let lat = options.center ? options.center.latitude : 0
     let long = options.center ? options.center.longitude : 0
     // let place = options.place || 'Somewhere'
-    let json = options.json || '/data/aust.json'
+    let json = options.json || '/world-50.geo.json' // https://geojson-maps.kyd.au/
+    let aus = options.aus || '/aust.json' // https://github.com/tonywr71/GeoJson-Data
+    let usa = options.usa || '/gz_2010_us_040_00_5m.json' // https://eric.clst.org/tech/usgeojson/
     let zoom = options.zoom || 100
 
     // Width and height
@@ -1226,191 +1230,202 @@ class Chart {
     const svg = this.svg
 
     // Load in GeoJSON data
-    d3.json(json).then((json: any) => {
-      // Bind data and create one path per GeoJSON feature
-      svg
-        .selectAll('path.map-outlines')
-        .data(json.features)
-        .enter()
-        .append('path')
-        .classed('map-outlines', true)
-        .attr('d', path)
-        .attr('stroke-width', 1)
-        .attr('stroke', 'black')
-        .attr('fill', 'rgba(0,0,0,0)')
-      // .attr('fill', function (d, i) {
-      //   return color(i.toString())
-      // })
-
-      // States
-      svg
-        .selectAll('text.map-labels')
-        .data(json.features)
-        .enter()
-        .append('text')
-        .classed('map-labels', true)
-        // .attr('fill', 'darkslategray')
-        .attr('transform', function (d: any) {
-          return 'translate(' + path.centroid(d) + ')'
-        })
-        .attr('text-anchor', 'middle')
-        .attr('dy', '.35em')
-        .style('opacity', 0.5)
-        .text(function (d: any) {
-          return d.properties.STATE_NAME
-        })
-
-      // var marks = [{long: -75, lat: 43},{long: -78, lat: 41},{long: -70, lat: 53}];
-
-      // svg.selectAll(".mark")
-      //     .data(marks)
-      //     .enter()
-      //     .append("image")
-      //     .attr('class','mark')
-      //     .attr('width', 20)
-      //     .attr('height', 20)
-      //     .attr("xlink:href",'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png')
-      //     .attr("transform", d => `translate(${projection([d.long,d.lat])}`);
-
-      if (options.markers)
+    Promise.all([d3.json(json), d3.json(usa), d3.json(aus)]).then(
+      ([json, usa, aus]: any) => {
+        // Bind data and create one path per GeoJSON feature
         svg
-          .selectAll('.mark')
-          .data(options.markers, (d: Coordinates) => d.type)
-          .join(
-            function (enter) {
-              enter.each((d: any, i, nodes) => {
-                const node = d3
-                  .select(nodes[i])
-                  .insert('g', 'g.mark')
-                  .classed('mark', true)
-                  .attr(
-                    'transform',
-                    (d: Coordinates) =>
-                      `translate(${projection([d.longitude, d.latitude])})`
-                  )
+          .selectAll('path.map-outlines')
+          .data([...json.features, ...usa.features, ...aus.features])
+          .enter()
+          .append('path')
+          .attr('class', (d) => {
+            if (
+              d.properties.NAME === 'Georgia' ||
+              d.properties.name === 'Georgia'
+            ) {
+              console.log('Georgia', d)
+              return 'map-outlines georgia'
+            }
 
-                const marker = node.append('g').classed('marker', true)
+            return 'map-outlines'
+          })
+          // .classed('map-outlines', true)
+          .attr('d', path)
+          .attr('stroke-width', 1)
+          .attr('stroke', 'black')
+          .attr('fill', 'rgba(0,0,0,0)')
 
-                marker
-                  .append('rect')
-                  .attr('width', 100)
-                  .attr('height', 80)
-                  .attr('x', -50)
-                  .attr('y', -40)
-                  .attr('rx', 50)
-                  .attr('fill', 'rgba(0,0,0,0.01)')
+        // States
+        svg
+          .selectAll('text.map-labels')
+          .data(json.features)
+          .enter()
+          .append('text')
+          .classed('map-labels', true)
+          // .attr('fill', 'darkslategray')
+          .attr('transform', function (d: any) {
+            return 'translate(' + path.centroid(d) + ')'
+          })
+          .attr('text-anchor', 'middle')
+          .attr('dy', '.35em')
+          .style('opacity', 0.5)
+          .text(function (d: any) {
+            return d.properties.STATE_NAME
+          })
 
-                marker
-                  .append('circle')
-                  .attr('r', 10)
-                  .attr('cx', 0)
-                  .attr('cy', 0)
-                  .attr('fill', 'rgba(0,0,0,0)')
+        // var marks = [{long: -75, lat: 43},{long: -78, lat: 41},{long: -70, lat: 53}];
 
-                marker
-                  .append('line')
-                  .attr('x1', 0)
-                  .attr('y1', -10)
-                  .attr('x2', 0)
-                  .attr('y2', 10)
+        // svg.selectAll(".mark")
+        //     .data(marks)
+        //     .enter()
+        //     .append("image")
+        //     .attr('class','mark')
+        //     .attr('width', 20)
+        //     .attr('height', 20)
+        //     .attr("xlink:href",'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png')
+        //     .attr("transform", d => `translate(${projection([d.long,d.lat])}`);
 
-                marker
-                  .append('line')
-                  .attr('x1', -10)
-                  .attr('y1', 0)
-                  .attr('x2', 10)
-                  .attr('y2', 0)
+        if (options.markers)
+          svg
+            .selectAll('.mark')
+            .data(options.markers, (d: Coordinates) => d.type)
+            .join(
+              function (enter) {
+                enter.each((d: any, i, nodes) => {
+                  const node = d3
+                    .select(nodes[i])
+                    .insert('g', 'g.mark')
+                    .classed('mark', true)
+                    .attr(
+                      'transform',
+                      (d: Coordinates) =>
+                        `translate(${projection([d.longitude, d.latitude])})`
+                    )
 
-                var label: d3.Selection<Element, unknown, null, undefined> =
-                  node
-                if (d.url) {
-                  label = label.append('a').attr('xlink:href', d.url)
-                }
+                  const marker = node.append('g').classed('marker', true)
 
-                if (d.label)
-                  label
-                    .append('text')
-                    .classed('mark-label', true)
-                    .attr('x', 0)
-                    .attr('y', -15)
-                    .text(d.label)
+                  marker
+                    .append('rect')
+                    .attr('width', 100)
+                    .attr('height', 80)
+                    .attr('x', -50)
+                    .attr('y', -40)
+                    .attr('rx', 50)
+                    .attr('fill', 'rgba(0,0,0,0.01)')
 
-                if (d.draggable) {
-                  node.call(
-                    d3
-                      .drag()
-                      .on('start', function (d: DragEvent, data: object) {
-                        node.classed('active', true)
-                      })
-                      .on('drag', function (d: DragEvent, data: object) {
-                        const [longitude, latitude] = projection.invert([
-                          d.x,
-                          d.y,
-                        ])
-                        node
-                          .datum({
-                            ...data,
-                            longitude,
-                            latitude,
-                          })
-                          .attr('transform', `translate(${d.x},${d.y})`)
-                      })
-                      .on('end', function (d: DragEvent, data: Coordinates) {
-                        const [longitude, latitude] = projection.invert([
-                          d.x,
-                          d.y,
-                        ])
-                        node.classed('active', false)
-                        svg
-                          .selectAll('.mark')
-                          .data(
-                            chart.calculate(chart, {
+                  if (d.type !== 'Country' && d.type !== 'State') {
+                    marker
+                      .append('circle')
+                      .attr('r', 10)
+                      .attr('cx', 0)
+                      .attr('cy', 0)
+
+                    marker
+                      .append('line')
+                      .attr('x1', 0)
+                      .attr('y1', -10)
+                      .attr('x2', 0)
+                      .attr('y2', 10)
+
+                    marker
+                      .append('line')
+                      .attr('x1', -10)
+                      .attr('y1', 0)
+                      .attr('x2', 10)
+                      .attr('y2', 0)
+                  }
+
+                  var label: d3.Selection<Element, unknown, null, undefined> =
+                    node
+                  if (d.url) {
+                    label = label.append('a').attr('xlink:href', d.url)
+                  }
+
+                  if (d.label)
+                    label
+                      .append('text')
+                      .classed('mark-label', true)
+                      .attr('x', 0)
+                      .attr('y', -15)
+                      .text(d.label)
+
+                  if (d.draggable) {
+                    node.call(
+                      d3
+                        .drag()
+                        .on('start', function (d: DragEvent, data: object) {
+                          node.classed('active', true)
+                        })
+                        .on('drag', function (d: DragEvent, data: object) {
+                          const [longitude, latitude] = projection.invert([
+                            d.x,
+                            d.y,
+                          ])
+                          node
+                            .datum({
                               ...data,
                               longitude,
                               latitude,
-                            }),
-                            (d: Coordinates) => d.type
-                          )
-                          .each((d: Coordinates, i: number, nodes) => {
-                            d3.select(nodes[i])
-                              .select('.mark-label')
-                              .text(d.label)
-                          })
-                      })
-                  )
-                }
-              })
-              return d3.selectAll('.mark')
-            },
-            function (update) {
-              update.each((d: any, i, nodes) => {
-                const node = d3
-                  .select(nodes[i])
-                  .attr(
-                    'transform',
-                    (d: Coordinates) =>
-                      `translate(${projection([d.longitude, d.latitude])})`
-                  )
-                node.select('.mark-label').text(d.label)
-              })
-              return d3.selectAll('.mark')
-            },
-            function (exit) {
-              exit.each((d: any, i, nodes) => {
-                console.log('removing node', i)
-                d3.select(nodes[i]).remove()
-              })
-              return d3.selectAll('.mark')
-            }
-          )
+                            })
+                            .attr('transform', `translate(${d.x},${d.y})`)
+                        })
+                        .on('end', function (d: DragEvent, data: Coordinates) {
+                          const [longitude, latitude] = projection.invert([
+                            d.x,
+                            d.y,
+                          ])
+                          node.classed('active', false)
+                          svg
+                            .selectAll('.mark')
+                            .data(
+                              chart.calculate(chart, {
+                                ...data,
+                                longitude,
+                                latitude,
+                              }),
+                              (d: Coordinates) => d.type
+                            )
+                            .each((d: Coordinates, i: number, nodes) => {
+                              d3.select(nodes[i])
+                                .select('.mark-label')
+                                .text(d.label)
+                            })
+                        })
+                    )
+                  }
+                })
+                return d3.selectAll('.mark')
+              },
+              function (update) {
+                update.each((d: any, i, nodes) => {
+                  const node = d3
+                    .select(nodes[i])
+                    .attr(
+                      'transform',
+                      (d: Coordinates) =>
+                        `translate(${projection([d.longitude, d.latitude])})`
+                    )
+                  node.select('.mark-label').text(d.label)
+                })
+                return d3.selectAll('.mark')
+              },
+              function (exit) {
+                exit.each((d: any, i, nodes) => {
+                  console.log('removing node', i)
+                  d3.select(nodes[i]).remove()
+                })
+                return d3.selectAll('.mark')
+              }
+            )
 
-      // .enter()
-      // .each((d: any, i, nodes) => )
-      // .update()
-      // .each((d: any, i, nodes) => {
-      //   console.log("Updating node", i)
-      // })
-    })
+        // .enter()
+        // .each((d: any, i, nodes) => )
+        // .update()
+        // .each((d: any, i, nodes) => {
+        //   console.log("Updating node", i)
+        // })
+      }
+    )
   }
 
   venn(options: any) {

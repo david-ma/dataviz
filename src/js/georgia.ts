@@ -51,7 +51,8 @@ Promise.all([
   // gz_2010_us_040_00_5m.json
   chart.drawMap({
     json: '/world-50.geo.json',
-    // json: '/gz_2010_us_040_00_5m.json',
+    usa: '/gz_2010_us_040_00_5m.json',
+    aus: '/aust.json',
     zoom: 100,
     markers: calculate(chart, geoip.location),
     calculate,
