@@ -1185,6 +1185,7 @@ class Chart {
     let lat = options.center ? options.center.latitude : 0
     let long = options.center ? options.center.longitude : 0
     // let place = options.place || 'Somewhere'
+    // let json = '/ne_110m_land.json'
     let json = options.json || '/world-50.geo.json' // https://geojson-maps.kyd.au/
     let aus = options.aus || '/aust.json' // https://github.com/tonywr71/GeoJson-Data
     let usa = options.usa || '/gz_2010_us_040_00_5m.json' // https://eric.clst.org/tech/usgeojson/
@@ -1231,28 +1232,29 @@ class Chart {
     const svg = this.svg
 
     // Load in GeoJSON data
-    Promise.all([d3.json(json), d3.json(usa), d3.json(aus)]).then(
+    Promise.all([d3.json(json)]).then(
       ([json, usa, aus]: any) => {
         // Bind data and create one path per GeoJSON feature
         const georgias = []
 
         svg
           .selectAll('path.map-outlines')
-          .data([...json.features, ...usa.features, ...aus.features])
+          // .data([...json.features, ...usa.features, ...aus.features])
+          .data(json.features)
           .enter()
           .append('path')
-          .attr('class', (d) => {
-            if (
-              d.properties.NAME === 'Georgia' ||
-              d.properties.name === 'Georgia'
-            ) {
-              georgias.push(d)
-              return 'map-outlines georgia'
-            }
+          // .attr('class', (d) => {
+          //   if (
+          //     d.properties.NAME === 'Georgia' ||
+          //     d.properties.name === 'Georgia'
+          //   ) {
+          //     georgias.push(d)
+          //     return 'map-outlines georgia'
+          //   }
 
-            return 'map-outlines'
-          })
-          // .classed('map-outlines', true)
+          //   return 'map-outlines'
+          // })
+          .classed('map-outlines', true)
           .attr('d', path)
           .attr('stroke-width', 1)
           .attr('stroke', 'black')

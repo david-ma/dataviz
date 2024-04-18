@@ -50,7 +50,8 @@ Promise.all([
 
   // gz_2010_us_040_00_5m.json
   chart.drawMap({
-    json: '/world-50.geo.json',
+    json: '/ne_110m_land.json',
+    // json: '/world-50.geo.json',
     usa: '/gz_2010_us_040_00_5m.json',
     aus: '/aust.json',
     zoom: 100,
@@ -64,7 +65,8 @@ Promise.all([
     if (extraGeorgias.length === 0) d3.select('#addButton').text("That's all the Georgias!").attr("disabled", true)
 
     chart.drawMap({
-      json: '/world-50.geo.json',
+      json: '/ne_110m_land.json',
+      // json: '/world.geo.json',
       usa: '/gz_2010_us_040_00_5m.json',
       aus: '/aust.json',
       zoom: 100,
