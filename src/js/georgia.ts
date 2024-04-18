@@ -55,8 +55,10 @@ Promise.all([
     calculate,
   })
 
+  // For button#addButton
   globalThis.addExtraGeorgia = function () {
     if (extraGeorgias.length > 0) georgias.push(extraGeorgias.pop())
+    if (extraGeorgias.length === 0) d3.select('#addButton').text("That's all the Georgias!").attr("disabled", true)
 
     chart.drawMap({
       json: '/world-50.geo.json',
