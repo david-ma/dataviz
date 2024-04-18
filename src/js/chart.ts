@@ -1170,6 +1170,7 @@ class Chart {
 
   // Todo, draw markers?
   // Add more geoip helper stuff?
+  // Great resource: https://www.d3indepth.com/geographic/
   drawMap(options: {
     center?: Coordinates
     json?: string
@@ -1287,7 +1288,7 @@ class Chart {
         //     .attr("xlink:href",'https://cdn3.iconfinder.com/data/icons/softwaredemo/PNG/24x24/DrawingPin1_Blue.png')
         //     .attr("transform", d => `translate(${projection([d.long,d.lat])}`);
 
-        if (options.markers)
+        if (options.markers) {
           svg
             .selectAll('.mark')
             .data(options.markers, (d: Coordinates) => d.type)
@@ -1357,6 +1358,7 @@ class Chart {
                         .drag()
                         .on('start', function (d: DragEvent, data: object) {
                           node.classed('active', true)
+                          d3.select('path.travel-line').classed('active', true)
                         })
                         .on('drag', function (d: DragEvent, data: object) {
                           const [longitude, latitude] = projection.invert([
@@ -1383,21 +1385,39 @@ class Chart {
                               alert('You are in Georgia!')
                           })
 
+                          const newMarkers = chart.calculate(chart, {
+                            ...data,
+                            longitude,
+                            latitude,
+                          })
+
                           svg
                             .selectAll('.mark')
-                            .data(
-                              chart.calculate(chart, {
-                                ...data,
-                                longitude,
-                                latitude,
-                              }),
-                              (d: Coordinates) => d.type
-                            )
+                            .data(newMarkers, (d: Coordinates) => d.type)
                             .each((d: Coordinates, i: number, nodes) => {
                               d3.select(nodes[i])
                                 .select('.mark-label')
                                 .text(d.label)
                             })
+
+                          d3.select('path.travel-line')
+                            .classed('active', false)
+                            .attr(
+                              'd',
+                              path({
+                                type: 'LineString',
+                                coordinates: [
+                                  [
+                                    newMarkers[0].longitude,
+                                    newMarkers[0].latitude,
+                                  ],
+                                  [
+                                    newMarkers[1].longitude,
+                                    newMarkers[1].latitude,
+                                  ],
+                                ],
+                              })
+                            )
                         })
                     )
                   }
@@ -1426,12 +1446,23 @@ class Chart {
               }
             )
 
-        // .enter()
-        // .each((d: any, i, nodes) => )
-        // .update()
-        // .each((d: any, i, nodes) => {
-        //   console.log("Updating node", i)
-        // })
+          const [start, end] = options.markers
+          svg
+            .append('path')
+            .classed('travel-line', true)
+            .attr(
+              'd',
+              path({
+                type: 'LineString',
+                coordinates: [
+                  [start.longitude, start.latitude],
+                  [end.longitude, end.latitude],
+                ],
+              })
+            )
+            .attr('stroke', 'red')
+            .attr('stroke-width', 2)
+        }
       }
     )
   }

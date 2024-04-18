@@ -16,7 +16,9 @@
 
 <style>
   g.marker {
-    circle, line {
+
+    circle,
+    line {
       fill: none;
       stroke: rgb(255, 247, 156);
       stroke-width: 1px;
@@ -61,6 +63,14 @@
         fill: #f00;
         stroke: #f00;
       }
+
+      &.travel-line {
+        stroke: rgb(147, 237, 255);
+        filter: drop-shadow(0 0 1px rgb(0, 255, 255));
+        fill: none;
+
+        /* add a moving ball to the line */
+      }
     }
 
     .active {
@@ -69,6 +79,10 @@
       }
 
       .mark-label {
+        display: none;
+      }
+
+      &.travel-line {
         display: none;
       }
     }
