@@ -1766,4 +1766,7 @@ console.debug(`lodash version: ${_.VERSION}`)
 
 export { Chart, decorateTable, _, $, d3 }
 
+var hello = "world"
+export { hello }
+
 // export default Chart

@@ -1,4 +1,4 @@
-import { Chart, mapDistance, d3, Geoip, Coordinates } from './chart.js'
+import { Chart, mapDistance, d3, Geoip, Coordinates } from './chart'
 
 const georgias: Coordinates[] = [
   {

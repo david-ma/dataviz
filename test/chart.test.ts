@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { describe, expect, test } from '@jest/globals'
 
 import { camelize } from '../src/js/utils'
@@ -30,5 +34,17 @@ describe('Test camelize', () => {
     test(`camelize(${input})`, () => {
       expect(camelize(input)).toBe(expected)
     })
+  })
+})
+
+// import { Chart, hello } from '../dist/js/chart.js'
+import { Chart, hello } from '../src/js/chart'
+// import { Chart } from '../public/js/chart'
+
+describe('Test Chart', () => {
+  test('Chart', () => {
+    // expect(new Chart()).toBeTruthy()
+    expect(hello).toBe('world')
+
   })
 })

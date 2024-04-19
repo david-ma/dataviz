@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 // const puppeteer = require('puppeteer');
 import * as puppeteer from 'puppeteer'
 import path = require('path')
@@ -18,6 +22,16 @@ var database: SeqObject = require(path.resolve(
 )).seq
 
 var site = 'dataviz'
+const blogs = [
+  'war',
+  'wealth',
+  'georgia',
+  'matrix',
+  'breathe',
+  'AusIncome',
+  'winamp',
+  'earthquake',
+]
 
 describe('Test blogposts', () => {
   var blogposts: any[]
@@ -41,7 +55,7 @@ describe('Test blogposts', () => {
 
   afterAll(() => {
     // setTimeout(function () {
-      browser.close().catch((e) => console.log(e))
+    browser.close().catch((e) => console.log(e))
     // }, timeout / 5)
   })
 
@@ -98,32 +112,57 @@ describe('Test blogposts', () => {
     timeout
   )
 
-  test(`war blog`, async () => {
+  test(
+    `war blog`,
+    async () => {
+      const page = await browser.newPage()
 
-    const page = await browser.newPage()
+      page.on('console', (mes) => {
+        if (mes.type() === 'error') {
+          // console.error("ERROR!", mes.text())
+          // done(mes.text())
+          return mes.text()
+        }
+      })
 
-    page.on('console', (mes) => {
-      if (mes.type() === 'error') {
-        // console.error("ERROR!", mes.text())
-        // done(mes.text())
-        return mes.text()
-      }
+      await page.goto('http://localhost:1337/blog/war')
+      await page.setViewport({ width: 1920, height: 1080, isMobile: false })
+      await page.screenshot({
+        path: './coverage/war.jpeg',
+        type: 'jpeg',
+      })
+
+      await page.type('#birthyear', '1988')
+      // await page.type('#deathyear', '1925') // cause an error on purpose?
+      await page.click('input[type="button"]#drawPieChart')
+
+      return
+    },
+    timeout
+  )
+
+  blogs.forEach((blogpost) => {
+    test(`Check ${blogpost} for console errors`, async () => {
+      const page = await browser.newPage()
+
+      page.on('error', (err) => {
+        console.error('PAGE LOG:', err.message)
+      })
+      page.on('pageerror', (err) => {
+        console.error('PAGE LOG:', err.message)
+      })
+      page.on('console', (mes) => {
+        if (mes.type() === 'error') {
+          console.error(`Console Error in /blog/${blogpost}:\n${mes.text()}`)
+        }
+      })
+
+      page.setViewport({
+        width: 1920,
+        height: 1080,
+        isMobile: false,
+      })
+      await page.goto(`http://localhost:1337/blog/${blogpost}`)
     })
-
-    await page.goto('http://localhost:1337/blog/war')
-    await page.setViewport({ width: 1920, height: 1080, isMobile: false })
-    await page.screenshot({
-      path: './coverage/war.jpeg',
-      type: 'jpeg' 
-    })
-
-    await page.type('#birthyear', '1988')
-    // await page.type('#deathyear', '1925') // cause an error on purpose?
-    await page.click('input[type="button"]#drawPieChart')
-
-    return
-  }, timeout)
-
-
-
+  })
 })
