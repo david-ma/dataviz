@@ -10,6 +10,7 @@
     "build": "webpack --mode production",
     "develop:webpack": "webpack --watch --mode development",
     "scrape": "node config/scripts/scrape_awesome.js",
+    "deploy:quick": "sh config/scripts/quick_update.sh",
     "wiki": "node scripts/wiki.js",
     "blog": "bash scripts/newBlogpost.sh",
     "start": "echo 'todo, write a start script'",
