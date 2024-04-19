@@ -37,14 +37,33 @@ describe('Test camelize', () => {
   })
 })
 
-// import { Chart, hello } from '../dist/js/chart.js'
-import { Chart, hello } from '../src/js/chart'
-// import { Chart } from '../public/js/chart'
+import { Chart, _, $, d3 } from '../src/js/chart' // Source code
+// import { Chart, hello } from '../dist/js/chart.js' // Development artifact
+// import { Chart } from '../public/js/chart' // Production artifact
 
 describe('Test Chart', () => {
-  test('Chart', () => {
-    // expect(new Chart()).toBeTruthy()
-    expect(hello).toBe('world')
+  test('Chart exports', () => {
+    expect(Chart).toBeTruthy()
+    expect(_).toBeTruthy()
+    expect($).toBeTruthy()
+    expect(d3).toBeTruthy()
 
+    expect($.fn.jquery).toBe('3.7.1')
+    expect(_.VERSION).toBe('4.17.21')
+  })
+
+  test('Chart constructor', () => {
+    document.body.innerHTML = '<div id="war_chart"></div>'
+
+    const chart = new Chart({
+      element: 'war_chart',
+      data: {},
+      nav: false,
+    })
+
+    expect(chart).toBeTruthy()
+    expect(chart.element).toBe('war_chart')
+    expect(chart.data).toEqual({})
+    // expect(chart.nav).toBe(false)
   })
 })
