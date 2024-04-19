@@ -1,5 +1,7 @@
-// Function for removing spaces and other characters from words,
-// so it can be used as a CSS class name
+/**
+ * Function for removing spaces and other characters from words,
+ * so it can be used as a CSS class name
+ */
 export function camelize(str: string) {
   return str.replace(
     /(?:^\w|[A-Z]|\b\w|\s+)/g,

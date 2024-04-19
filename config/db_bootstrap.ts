@@ -18,7 +18,7 @@ let seqOptions: Options = {
 
 // Load options from config.json if one is provided
 const env = process.env.NODE_ENV || 'development'
-console.log('env is:', env)
+console.debug('env is:', env)
 try {
   // const configOptions = require(__dirname + '/../config/config.json')[env]
   const configOptions = require(path.resolve(
@@ -29,7 +29,7 @@ try {
   ))[env]
   seqOptions = _.merge(seqOptions, configOptions)
 
-  console.log('seqOptions are:', seqOptions)
+  // console.log('seqOptions are:', seqOptions)
 } catch (e) {
   console.error('No config.json provided for Sequelize', e)
   process.exit(1)
@@ -37,7 +37,7 @@ try {
 
 // Do NOT log your password on production!!!
 if (env === 'development') {
-  console.log('Initialising Sequelize with options:', seqOptions)
+  console.debug('Initialising Sequelize with options:', seqOptions)
 }
 
 const seq: SeqObject = datavizDBFactory(seqOptions)
@@ -53,13 +53,13 @@ if (false) {
 
 // rebuild entire database & reload data..?
 if (true) {
-  console.log('sync true, force & alter')
+  // console.log('sync true, force & alter')
 
   // eslint-disable-line
   seq.sequelize
     .sync({
       alter: true,
-      force: true,
+      // force: true,
     })
     .then(function (d) {
       // eslint-disable-line

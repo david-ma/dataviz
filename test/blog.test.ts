@@ -113,6 +113,34 @@ describe('Test blogposts', () => {
   )
 
   test(
+    `georgia blog`,
+    async () => {
+      const page = await browser.newPage()
+
+      page.on('console', (mes) => {
+        if (mes.type() === 'error') {
+          // console.error("ERROR!", mes.text())
+          // done(mes.text())
+          return mes.text()
+        }
+      })
+
+      await page.goto('http://localhost:1337/blog/georgia')
+      await page.setViewport({ width: 1920, height: 1080, isMobile: false })
+      await page.screenshot({
+        path: './coverage/georgia.jpeg',
+        type: 'jpeg',
+      })
+
+      // await page.type('#birthyear', '1988')
+      // await page.type('#deathyear', '1925') // cause an error on purpose?
+      // await page.click('input[type="button"]#drawPieChart')
+
+      return
+    }
+  )
+
+  test(
     `war blog`,
     async () => {
       const page = await browser.newPage()

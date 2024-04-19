@@ -18,13 +18,13 @@ const georgias: Coordinates[] = [
 ]
 
 const extraGeorgias: Coordinates[] = [
-  // {
-  //   latitude: 50.173,
-  //   longitude: -5.525,
-  //   type: 'Hamlet',
-  //   url: 'https://en.wikipedia.org/wiki/Georgia,_Cornwall',
-  //   label: 'Georgia',
-  // },
+  {
+    latitude: 50.173,
+    longitude: -5.525,
+    type: 'Hamlet',
+    url: 'https://en.wikipedia.org/wiki/Georgia,_Cornwall',
+    label: 'Georgia',
+  },
   {
     latitude: -54.2833,
     longitude: -36.5,

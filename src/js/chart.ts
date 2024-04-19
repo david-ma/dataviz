@@ -1,6 +1,6 @@
 // Language: typescript
 // Path: src/js/chart.ts
-console.log('Running chart.ts')
+// console.log('Running chart.ts')
 
 import * as d3 from 'd3'
 
@@ -1265,10 +1265,7 @@ class Chart {
           .enter()
           .append('path')
           .attr('class', (d) => {
-            if (d.properties.name === 'United Kingdom') {
-              console.log("It's the UK!")
-              return 'map-outlines uk'
-            } else if (
+            if (
               d.properties.NAME === 'Georgia' ||
               d.properties.name === 'Georgia' ||
               d.properties.name === 'S. Geo. and the Is.'
@@ -1348,7 +1345,7 @@ class Chart {
                     .attr('rx', 50)
                     .attr('fill', 'rgba(0,0,0,0.01)')
 
-                  if (d.type !== 'Country' && d.type !== 'State') {
+                  if (d.type !== 'Country' && d.type !== 'State' && d.type !== 'Island') {
                     marker
                       .append('circle')
                       .attr('r', 10)
@@ -1761,8 +1758,8 @@ function deg2rad(deg: number) {
 
 // D3 version is no longer exposed in v7 and above
 // console.debug(`D3 version: ${d3.version}`)
-console.debug(`jQuery version: ${$.fn.jquery}`)
-console.debug(`lodash version: ${_.VERSION}`)
+// console.debug(`jQuery version: ${$.fn.jquery}`)
+// console.debug(`lodash version: ${_.VERSION}`)
 
 export { Chart, decorateTable, _, $, d3 }
 
