@@ -113,7 +113,7 @@ describe('Test blogposts', () => {
     await page.goto('http://localhost:1337/blog/war')
     await page.setViewport({ width: 1920, height: 1080, isMobile: false })
     await page.screenshot({
-      path: './tmp/war.jpeg',
+      path: './coverage/war.jpeg',
       type: 'jpeg' 
     })
 
