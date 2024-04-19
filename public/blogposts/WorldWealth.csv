@@ -1,0 +1,207 @@
+country,region,wealth_b
+United States,North America,105990
+China,Asia-Pacific,63827
+Japan,Asia-Pacific,24992
+Germany,Europe,14660
+United Kingdom,Europe,14341
+France,Europe,13729
+India,Asia-Pacific,12614
+Italy,Europe,11358
+Canada,North America,8573
+Spain,Europe,7772
+Korea,Asia-Pacific,7302
+Australia,Asia-Pacific,7202
+Taiwan,Asia-Pacific,4062
+Switzerland,Europe,3877
+Netherlands,Europe,3719
+Brazil,Latin America,3535
+Hong Kong,Asia-Pacific,3066
+Russia,Europe,3052
+Mexico,Latin America,2701
+Belgium,Europe,2194
+Sweden,Europe,2049
+Austria,Europe,1950
+Indonesia,Asia-Pacific,1823
+Poland,Europe,1771
+Saudi Arabia,Asia-Pacific,1556
+Singapore,Asia-Pacific,1381
+Turkey,Asia-Pacific,1355
+Denmark,Europe,1271
+Thailand,Asia-Pacific,1160
+Portugal,Europe,1098
+Norway,Europe,1096
+Israel,Asia-Pacific,1081
+New Zealand,Asia-Pacific,1072
+Ireland,Europe,951
+United Arab Emirates,Asia-Pacific,922
+Egypt,Africa,898
+Greece,Europe,867
+Vietnam,Asia-Pacific,797
+Finland,Europe,795
+Iran,Asia-Pacific,775
+South Africa,Africa,770
+Philippines,Asia-Pacific,764
+Chile,Latin America,759
+Bangladesh,Asia-Pacific,697
+Malaysia,Asia-Pacific,682
+Romania,Europe,668
+Colombia,Latin America,562
+Czech Republic,Europe,550
+Pakistan,Asia-Pacific,465
+Nigeria,Africa,443
+Kuwait,Asia-Pacific,405
+Peru,Latin America,377
+Hungary,Europe,346
+Qatar,Asia-Pacific,328
+Iraq,Asia-Pacific,327
+Kazakhstan,Asia-Pacific,320
+Argentina,Latin America,311
+Ukraine,Europe,308
+Morocco,Africa,305
+Sri Lanka,Asia-Pacific,297
+Slovakia,Europe,287
+Algeria,Africa,252
+Kenya,Africa,249
+Bulgaria,Europe,243
+Lebanon,Asia-Pacific,232
+Croatia,Europe,209
+Ecuador,Latin America,205
+Slovenia,Europe,205
+Cuba,Latin America,198
+Uzbekistan,Asia-Pacific,173
+Serbia,Europe,170
+Luxembourg,Europe,165
+Ethiopia,Africa,163
+Oman,Asia-Pacific,156
+Korea North,Asia-Pacific,153
+Dominican Republic,Latin America,149
+Jordan,Asia-Pacific,146
+Puerto Rico,Latin America,145
+Belarus,Europe,123
+El Salvador,Latin America,122
+Costa Rica,Latin America,119
+Myanmar,Asia-Pacific,116
+Lithuania,Europe,115
+Macao,Asia-Pacific,114
+Tunisia,Africa,112
+Guatemala,Latin America,109
+Panama,Latin America,108
+Cyprus,Europe,107
+Bahrain,Asia-Pacific,106
+Iceland,Europe,95
+Cote d'Ivoire,Africa,93
+Latvia,Europe,93
+Azerbaijan,Asia-Pacific,83
+Tanzania,Africa,82
+Estonia,Europe,81
+Libya,Africa,81
+Bolivia,Latin America,78
+Uruguay,Latin America,76
+Yemen,Asia-Pacific,72
+Albania,Europe,70
+Nepal,Asia-Pacific,68
+Ghana,Africa,66
+Honduras,Latin America,64
+Turkmenistan,Asia-Pacific,57
+Cambodia,Asia-Pacific,53
+Paraguay,Latin America,51
+Malta,Europe,50
+Angola,Africa,49
+Mauritius,Africa,48
+French Polynesia,Asia-Pacific,43
+New Caledonia,Asia-Pacific,43
+Armenia,Asia-Pacific,42
+Jamaica,Latin America,42
+Macedonia,Europe,42
+Moldova,Europe,41
+Trinidad and Tobago,Latin America,41
+Congo Dem. Rep.,Africa,40
+Zimbabwe,Africa,39
+Georgia,Asia-Pacific,37
+Nicaragua,Latin America,37
+Kosovo,Europe,36
+Cameroon,Africa,33
+Senegal,Africa,33
+Papua New Guinea,Asia-Pacific,30
+Uganda,Africa,30
+Laos,Asia-Pacific,27
+Montenegro,Europe,26
+Afghanistan,Asia-Pacific,25
+Guam,Asia-Pacific,24
+Namibia,Africa,24
+Bermuda,North America,23
+Bahamas,Latin America,22
+Rwanda,Africa,22
+Botswana,Africa,21
+Greenland,North America,21
+Kyrgyzstan,Asia-Pacific,21
+Madagascar,Africa,21
+Syria,Asia-Pacific,21
+Zambia,Africa,20
+Guadeloupe,Latin America,18
+Tajikistan,Asia-Pacific,18
+Andorra,Europe,17
+Gabon,Africa,17
+Isle of Man,Europe,16
+Mali,Africa,16
+Martinique,Latin America,15
+Barbados,Latin America,14
+Brunei,Asia-Pacific,14
+Guinea,Africa,14
+Somalia,Africa,14
+Burkina Faso,Africa,13
+Equatorial Guinea,Africa,13
+Benin,Africa,12
+Malawi,Africa,12
+Mongolia,Asia-Pacific,12
+Mozambique,Africa,12
+Sudan,Africa,11
+Eritrea,Africa,10
+Faeroe Islands,Europe,10
+Niger,Africa,10
+Reunion,Africa,10
+Fiji,Asia-Pacific,9
+French Guiana,Latin America,9
+San Marino,Europe,9
+Chad,Africa,8
+Liechtenstein,Europe,8
+Congo Rep.,Africa,7
+Maldives,Asia-Pacific,7
+Monaco,Europe,7
+Mauritania,Africa,6
+Swaziland,Africa,6
+Aruba,Latin America,5
+Guyana,Latin America,5
+Haiti,Latin America,5
+Liberia,Africa,5
+St. Lucia,Latin America,5
+Togo,Africa,5
+Bhutan,Asia-Pacific,4
+Palau,Asia-Pacific,4
+Samoa,Asia-Pacific,4
+Seychelles,Africa,4
+Solomon Islands,Asia-Pacific,4
+Virgin Islands (U.S.),Latin America,4
+Burundi,Africa,3
+Grenada,Latin America,3
+Sierra Leone,Africa,3
+Timor-Leste,Asia-Pacific,3
+Tonga,Asia-Pacific,3
+Antigua and Barbuda,Latin America,2
+Belize,Latin America,2
+Cayman Islands,Latin America,2
+Comoros,Africa,2
+Djibouti,Africa,2
+Dominica,Latin America,2
+Gambia,Africa,2
+Guinea-Bissau,Africa,2
+Lesotho,Africa,2
+Suriname,Latin America,2
+Vanuatu,Asia-Pacific,2
+American Samoa,Asia-Pacific,1
+Kiribati,Asia-Pacific,1
+Marshall Islands,Asia-Pacific,1
+Mayotte,Africa,0
+Micronesia,Asia-Pacific,0
+Sao Tome and Principe,Africa,0
+Venezuela,Latin America,
