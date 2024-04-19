@@ -98,14 +98,15 @@ describe('Test blogposts', () => {
     timeout
   )
 
-  test(`war blog`, async (done) => {
+  test(`war blog`, async () => {
 
     const page = await browser.newPage()
 
     page.on('console', (mes) => {
       if (mes.type() === 'error') {
         // console.error("ERROR!", mes.text())
-        done(mes.text())
+        // done(mes.text())
+        return mes.text()
       }
     })
 
@@ -120,8 +121,7 @@ describe('Test blogposts', () => {
     // await page.type('#deathyear', '1925') // cause an error on purpose?
     await page.click('input[type="button"]#drawPieChart')
 
-    done()
-
+    return
   }, timeout)
 
 

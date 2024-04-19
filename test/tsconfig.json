@@ -1,16 +1,34 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
     "module": "CommonJS",
-    // "allowSyntheticDefaultImports": true,
-    // "esModuleInterop": true,
-    "moduleResolution": "node",
-    "skipLibCheck": false,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
+    "moduleResolution": "Node",
+    "removeComments": true,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "incremental": true,
-    "target": "ES2020"
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false
   }
 }
+
+// {
+//   "compilerOptions": {
+//     "noImplicitAny": false,
+//     "noImplicitThis": false,
+//     "noImplicitReturns": false,
+//     "noUnusedLocals": false,
+//     "allowSyntheticDefaultImports": true,
+//     // "declaration": true,
+//     // "allowImportingTsExtensions": true,
+//     // "noEmit": true,
+//     // "esModuleInterop": true,
+//     "skipLibCheck": false,
+//     "assumeChangesOnlyAffectDirectDependencies": true,
+//     "incremental": true,
+//     "moduleResolution": "Node",
+//     "module": "ESNext",
+//     "target": "ES2020"
+//   }
+// }

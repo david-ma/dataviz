@@ -1263,14 +1263,20 @@ class Chart {
           .enter()
           .append('path')
           .attr('class', (d) => {
-            if (
+            if (d.properties.name === 'United Kingdom') {
+              console.log("It's the UK!")
+              return 'map-outlines uk'
+            } else if (
               d.properties.NAME === 'Georgia' ||
-              d.properties.name === 'Georgia'
+              d.properties.name === 'Georgia' ||
+              d.properties.name === 'S. Geo. and the Is.'
             ) {
               georgias.push(d)
               return 'map-outlines georgia'
             } else {
-              return 'map-outlines'
+              // name_en
+              const name = d.properties.name || d.properties.NAME || d.properties.STATE_NAME
+              return `map-outlines ${camelize(name)}`
             }
           })
           // .classed('map-outlines', true)
@@ -1652,7 +1658,9 @@ function average(array: Array<any>) {
   }
 }
 
-function camelize(str: any) {
+// Function for removing spaces and other characters from words,
+// so it can be used as a CSS class name
+export function camelize(str: any) {
   return str.replace(
     /(?:^\w|[A-Z]|\b\w|\s+)/g,
     function (match: any, index: number) {
