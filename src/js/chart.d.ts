@@ -117,7 +117,6 @@ declare class Chart {
     }): void;
     venn(options: any): void;
 }
-export declare function camelize(str: any): any;
 type chartDataTableSettings = any & {
     element?: string;
     titles?: any;

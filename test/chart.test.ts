@@ -1,9 +1,34 @@
 import { describe, expect, test } from '@jest/globals'
 
+import { camelize } from '../src/js/utils'
+
+const testCases = [
+  {
+    input: 'Georgia',
+    expected: 'georgia',
+  },
+  {
+    input: 'Georgia, USA',
+    expected: 'georgiaUSA',
+  },
+  {
+    input: 'Georgia, USA, 2021',
+    expected: 'georgiaUSA2021',
+  },
+  {
+    input: 'Abcjijew.awejfi. aw.efawef. awef',
+    expected: 'abcjijewAwejfiAwEfawefAwef',
+  },
+  {
+    input: 'Apples and Grapes (1879–1880).jpg',
+    expected: 'applesAndGrapes18791880Jpg',
+  }
+]
 
 describe('Test camelize', () => {
-  test('camelize', () => {
-    expect("1").toBeTruthy()
+  testCases.forEach(({ input, expected }) => {
+    test(`camelize(${input})`, () => {
+      expect(camelize(input)).toBe(expected)
+    })
   })
 })
-

@@ -9,6 +9,8 @@ import 'datatables.net'
 
 import _ from 'lodash'
 
+import { camelize } from './utils'
+
 // interface or type?
 type chartOptions = {
   element?: string
@@ -1275,7 +1277,10 @@ class Chart {
               return 'map-outlines georgia'
             } else {
               // name_en
-              const name = d.properties.name || d.properties.NAME || d.properties.STATE_NAME
+              const name =
+                d.properties.name ||
+                d.properties.NAME ||
+                d.properties.STATE_NAME
               return `map-outlines ${camelize(name)}`
             }
           })
@@ -1656,18 +1661,6 @@ function average(array: Array<any>) {
     console.error(e)
     return null
   }
-}
-
-// Function for removing spaces and other characters from words,
-// so it can be used as a CSS class name
-export function camelize(str: any) {
-  return str.replace(
-    /(?:^\w|[A-Z]|\b\w|\s+)/g,
-    function (match: any, index: number) {
-      if (+match === 0) return '' // or if (/\s+/.test(match)) for white spaces
-      return index === 0 ? match.toLowerCase() : match.toUpperCase()
-    }
-  )
 }
 
 function injectStyles(rule: any) {
