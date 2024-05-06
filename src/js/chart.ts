@@ -1192,7 +1192,7 @@ class Chart {
       svg = this.plot
 
     const root = d3.hierarchy(options.data).sum((d: any) => d[options.target])
-    const tree = d3.treemap().size([width, height]).padding(2)(root)
+    const tree = d3.treemap().size([width, height]).padding(0)(root)
 
     const opacity = d3
       .scaleLinear()
@@ -1244,7 +1244,7 @@ class Chart {
         return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1
       })
       .each(function (d) {
-        console.log("next level...", d)
+        console.log('next level...', d)
 
         const rWidth = d.x1 - d.x0
         const rHeight = d.y1 - d.y0
@@ -1257,7 +1257,8 @@ class Chart {
           })
           .sum((d: any) => d.filesize)
 
-        const myTreemap = d3.treemap().size([rWidth, rHeight]).padding(2)
+        const myTreemap = d3.treemap().size([rWidth, rHeight])
+        // .padding(2)
         const regionTree = myTreemap(nextLevel)
 
         const regionGroupTranslate = `translate(${d.x0},${d.y0})`
@@ -1311,7 +1312,7 @@ class Chart {
             $('.plot').append($(`#${classifyName(d.data.region)}`).detach())
             // datatable.search(d.data.region).draw()
 
-            const zoomedTreemap = d3.treemap().size([width, height]).padding(2)
+            const zoomedTreemap = d3.treemap().size([width, height]).padding(0)
             const zoomedRegionTree = zoomedTreemap(nextLevel)
 
             const speed = 1000
@@ -1409,10 +1410,8 @@ class Chart {
                       d3.selectAll('.tempText').remove()
                       // datatable.search('').draw()
 
-                      const myTreemap = d3
-                        .treemap()
-                        .size([rWidth, rHeight])
-                        .padding(2)
+                      const myTreemap = d3.treemap().size([rWidth, rHeight])
+                      // .padding(2)
                       const regionTree = myTreemap(nextLevel)
 
                       regionGroup
@@ -2087,8 +2086,6 @@ export { Chart, decorateTable, _, $, d3 }
 
 // export default Chart
 
-
 function classifyName(name: string): string {
   return name.replace(/[ \(\)\.\']/gi, '-') // eslint-disable-line
 }
-

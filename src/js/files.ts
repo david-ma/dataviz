@@ -67,7 +67,7 @@ function hierarchyInsert(
         ...data,
         breadcrumbs: data.breadcrumbs.slice(1),
       })
-      nextLevel.filesize += data.filesize
+      // nextLevel.filesize += data.filesize
     } else {
       console.error('Node with no children? Folder with same name as a file?')
     }
@@ -107,7 +107,7 @@ d3.csv('/filesizes.txt')
           ...files[path],
           breadcrumbs: path.split('/'),
         })
-        hierarchy.filesize += files[path].filesize
+        // hierarchy.filesize += files[path].filesize
       })
     })
     return hierarchy
