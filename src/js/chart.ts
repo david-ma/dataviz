@@ -69,6 +69,17 @@ export type Geoip = {
   }
 }
 
+type TreemapData = {
+  children: (TreemapNode | TreemapData)[]
+  name: string
+  filesize: number
+}
+
+type TreemapNode = {
+  name: string
+  filesize: number
+}
+
 /*
  * David Ma - March 2018
  */
@@ -1170,6 +1181,15 @@ class Chart {
     callback(this)
   }
 
+  /**
+   * Initialise a treemap
+   */
+  initTreemap(options: { data: TreemapData; target: string }) {
+    console.log('Data', this.data)
+
+    const root = d3.hierarchy(this.data).sum((d: any) => d[options.target])
+  }
+
   // Quickly initialise a map
   // using very basic defaults
   // Continents only, no markers
@@ -1345,7 +1365,11 @@ class Chart {
                     .attr('rx', 50)
                     .attr('fill', 'rgba(0,0,0,0.01)')
 
-                  if (d.type !== 'Country' && d.type !== 'State' && d.type !== 'Island') {
+                  if (
+                    d.type !== 'Country' &&
+                    d.type !== 'State' &&
+                    d.type !== 'Island'
+                  ) {
                     marker
                       .append('circle')
                       .attr('r', 10)

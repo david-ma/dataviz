@@ -51,6 +51,15 @@ export type Geoip = {
         names: GeoipNames;
     };
 };
+type TreemapData = {
+    children: (TreemapNode | TreemapData)[];
+    name: string;
+    filesize: number;
+};
+type TreemapNode = {
+    name: string;
+    filesize: number;
+};
 declare class Chart {
     opts: any;
     element: string;
@@ -105,6 +114,10 @@ declare class Chart {
     squares(): this;
     treemap(): void;
     scratchpad(callback: (chart: Chart) => void): void;
+    initTreemap(options: {
+        data: TreemapData;
+        target: string;
+    }): void;
     initMap(): Promise<unknown>;
     drawMap(options: {
         center?: Coordinates;

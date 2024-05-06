@@ -12,18 +12,17 @@ let seqOptions = {
     },
 };
 const env = process.env.NODE_ENV || 'development';
-// console.log('env is:', env);
+console.debug('env is:', env);
 try {
     const configOptions = require(path.resolve(__dirname, '..', 'config', 'config.json'))[env];
     seqOptions = _.merge(seqOptions, configOptions);
-    // console.log('seqOptions are:', seqOptions);
 }
 catch (e) {
     console.error('No config.json provided for Sequelize', e);
     process.exit(1);
 }
 if (env === 'development') {
-    // console.log('Initialising Sequelize with options:', seqOptions);
+    console.debug('Initialising Sequelize with options:', seqOptions);
 }
 const seq = (0, models_1.datavizDBFactory)(seqOptions);
 if (false) {
@@ -34,11 +33,9 @@ if (false) {
     });
 }
 if (true) {
-    // console.log('sync true, force & alter');
     seq.sequelize
         .sync({
         alter: true,
-        // force: true,
     })
         .then(function (d) {
         const blogposts = [
