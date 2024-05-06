@@ -1238,7 +1238,7 @@ class Chart {
       })
       .style('stroke', 'black')
       .style('fill', function (d) {
-        return color(d.data.name)
+        return color(d.data.filetype)
       })
       .style('opacity', function (d: any) {
         return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1
@@ -1288,7 +1288,7 @@ class Chart {
             return d.y1 - d.y0
           })
           .style('stroke', 'black')
-          .style('fill', color(d.data.name))
+          .style('fill', color(d.data.filetype))
           .style('opacity', function (d: any) {
             return d.parent
               ? opacity.domain([10, d.parent.total])(d.data.value)

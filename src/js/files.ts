@@ -11,6 +11,8 @@ type Branch = {
 type Leaf = {
   name: string
   filesize: number
+  filetype: string
+  children: undefined
 }
 
 const files = {}
@@ -53,12 +55,14 @@ function hierarchyInsert(
   }
 ) {
   if (data.breadcrumbs.length === 2 && data.breadcrumbs[1] === '') {
+    // Found a Folder
     hierarchy.children.push({
       children: [],
       name: data.breadcrumbs[0],
       filesize: data.filesize,
     })
   } else if (data.breadcrumbs.length > 1) {
+    // Go deeper
     const nextLevel = hierarchy.children.find(
       (d) => 'children' in d && d.name === data.breadcrumbs[0]
     )
@@ -72,10 +76,14 @@ function hierarchyInsert(
       console.error('Node with no children? Folder with same name as a file?')
     }
   } else {
-    hierarchy.children.push({
+    // Found a file
+    const leaf: Leaf = {
+      children: undefined,
       name: data.breadcrumbs[0],
       filesize: data.filesize,
-    })
+      filetype: data.breadcrumbs[0].split('.').pop(),
+    }
+    hierarchy.children.push(leaf)
   }
 }
 
@@ -114,19 +122,15 @@ d3.csv('/filesizes.txt')
   })
   .then((hierarchy) => {
     console.log(files)
-    console.log("Hierarchy", hierarchy)
+    console.log('Hierarchy', hierarchy)
 
     new Chart({
       element: 'treemap',
       // data: [files],
       width: 600,
       height: 800,
-    })
-    .initTreemap({
+    }).initTreemap({
       data: hierarchy,
-      target: "filesize",
+      target: 'filesize',
     })
   })
-
-
-
