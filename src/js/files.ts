@@ -3,12 +3,12 @@ console.log('files.ts')
 import { d3, Chart } from './chart'
 
 type Branch = {
-  children: (Node | Branch)[]
+  children: (Leaf | Branch)[]
   name: string
   filesize: number
 }
 
-type Node = {
+type Leaf = {
   name: string
   filesize: number
 }
@@ -19,6 +19,25 @@ const root: Branch = {
   name: 'root',
   filesize: 0,
 }
+
+// class Hierarchy {
+//   children: (Node | Branch)[]
+//   name: string
+//   tally: number
+//   tallyLabel?: string
+
+//   constructor() {
+//     this.children = []
+//     this.name = 'root'
+//     this.tally = 0
+//   }
+
+//   addData(branch: Branch,
+//     data: { name: string; filesize: number }) {
+//     this.children.push(data)
+//     this.tally += data.filesize
+//   }
+// }
 
 /**
  * Take a row and insert it into a d3 hierarchy at the appropriate place
@@ -95,16 +114,19 @@ d3.csv('/filesizes.txt')
   })
   .then((hierarchy) => {
     console.log(files)
-    console.log(hierarchy)
+    console.log("Hierarchy", hierarchy)
 
     new Chart({
       element: 'treemap',
-      data: [files],
+      // data: [files],
       width: 600,
       height: 800,
     })
-    // .initTreemap({
-    //   root,
-    //   "asdf"}
-    // )
+    .initTreemap({
+      data: hierarchy,
+      target: "filesize",
+    })
   })
+
+
+
