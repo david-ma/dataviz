@@ -1192,7 +1192,16 @@ class Chart {
       svg = this.plot
 
     const root = d3.hierarchy(options.data).sum((d: any) => d[options.target])
-    const tree = d3.treemap().size([width, height]).padding(0)(root)
+    const tree = d3
+      .treemap()
+      .tile(d3.treemapBinary)
+      // .tile(d3.treemapDice)
+      // .tile(d3.treemapSlice)
+      // .tile(d3.treemapSliceDice)
+      // .tile(d3.treemapSquarify)
+      // .tile(d3.treemapResquarify)
+      .size([width, height])
+      .padding(0)(root)
 
     const opacity = d3
       .scaleLinear()
@@ -1244,7 +1253,7 @@ class Chart {
         return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1
       })
       .each(function (d) {
-        console.log('next level...', d)
+        // console.log('next level...', d)
 
         const rWidth = d.x1 - d.x0
         const rHeight = d.y1 - d.y0
