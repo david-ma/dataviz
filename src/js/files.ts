@@ -22,6 +22,8 @@ const root: Branch = {
   filesize: 0,
 }
 
+const filetypes = {}
+
 // class Hierarchy {
 //   children: (Node | Branch)[]
 //   name: string
@@ -83,6 +85,18 @@ function hierarchyInsert(
       filesize: data.filesize,
       filetype: data.breadcrumbs[0].split('.').pop(),
     }
+
+    const filetype = (filetypes[leaf.filetype] = filetypes[leaf.filetype] || {
+      name: leaf.filetype,
+      list: [],
+      count: 0,
+      filesize: 0,
+    })
+
+    filetype.count += 1
+    filetype.filesize += leaf.filesize
+    filetype.list.push(leaf)
+
     hierarchy.children.push(leaf)
   }
 }
@@ -118,11 +132,24 @@ d3.csv('/filesizes.txt')
         // hierarchy.filesize += files[path].filesize
       })
     })
-    return hierarchy
+    return [hierarchy, filetypes]
   })
-  .then((hierarchy) => {
+  .then(([hierarchy, filetypes]: [Branch, any]) => {
     console.log(files)
     console.log('Hierarchy', hierarchy)
+    console.log('Filetypes', filetypes)
+
+    // Draw legend
+    d3.select('#legend')
+      .append('table')
+      .selectAll('tr')
+      .data(Object.values(filetypes))
+      .enter()
+      .append('tr')
+      .html(
+        (d: any) =>
+          `<td>${d.name}</td><td>${d.count}</td><td>${d.filesize}</td>`
+      )
 
     new Chart({
       element: 'treemap',

@@ -1215,6 +1215,9 @@ class Chart {
       .scaleOrdinal()
       // .domain(Object.keys(regions))
       .range([
+        // 'url(#Gradient1)',
+        // 'url(#Gradient2)',
+        // 'linear-gradient(72deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%)',
         '#7fc97f',
         '#beaed4',
         '#fdc086',
@@ -1303,13 +1306,13 @@ class Chart {
               ? opacity.domain([10, d.parent.total])(d.data.value)
               : 1
           })
-          .on('mouseover', function (d) {
+          .on('mouseover', function (event, d) {
             d3.select(`#row-${classifyName(d.data.name)}`).classed(
               'highlight',
               true
             )
           })
-          .on('mouseout', function (d) {
+          .on('mouseout', function (event, d) {
             d3.select(`#row-${classifyName(d.data.name)}`).classed(
               'highlight',
               false
@@ -1352,148 +1355,10 @@ class Chart {
                 if (!done) {
                   done = true
                   console.log('Finished zooming in')
-
-                  // and to add the text labels
-                  regionGroup
-                    .selectAll('text')
-                    .data(zoomedRegionTree.leaves())
-                    .enter()
-                    .append('text')
-                    .classed('tempText', true)
-                    .attr('x', function (d) {
-                      return d.x0 + 5
-                    }) // +10 to adjust position (more right)
-                    .attr('y', function (d) {
-                      return d.y0 + 20
-                    }) // +20 to adjust position (lower)
-                    .text(function (d) {
-                      return d.data.name
-                    })
-                    .attr('font-size', '19px')
-                    .attr('font-weight', '700')
-                    .attr('fill', 'black')
-                    .each(function (d) {
-                      const width = d.x1 - d.x0
-                      const node = d3.select(this).node()
-                      if (node != null && width < node.getBBox().width) {
-                        d3.select(this).remove()
-                      }
-                    })
-
-                  // and to add the text labels
-                  regionGroup
-                    .selectAll('.countryVals')
-                    .data(zoomedRegionTree.leaves())
-                    .enter()
-                    .append('text')
-                    .classed('tempText', true)
-                    .attr('x', function (d) {
-                      return d.x0 + 5
-                    }) // +10 to adjust position (more right)
-                    .attr('y', function (d) {
-                      return d.y0 + 35
-                    }) // +20 to adjust position (lower)
-                    .text(function (d) {
-                      return `${d3.format('$,')(d.data.wealth)} billion`
-                    })
-                    .attr('font-size', '11px')
-                    .attr('fill', 'black')
-                    .each(function (d) {
-                      const width = d.x1 - d.x0
-                      const node = d3.select(this).node()
-                      if (node != null && width < node.getBBox().width) {
-                        d3.select(this).remove()
-                      }
-                    })
-
-                  svg
-                    .append('rect')
-                    .attr('id', 'blocker')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', width)
-                    .attr('height', height)
-                    .attr('fill', 'rgba(0,0,0,0)')
-                    .on('click', function () {
-                      console.log('Reverse time!!!')
-                      d3.selectAll('.tempText').remove()
-                      // datatable.search('').draw()
-
-                      const myTreemap = d3.treemap().size([rWidth, rHeight])
-                      // .padding(2)
-                      const regionTree = myTreemap(nextLevel)
-
-                      regionGroup
-                        .transition()
-                        .duration(speed)
-                        .attr('transform', regionGroupTranslate)
-                      regionGroup
-                        .selectAll('rect.country')
-                        .data(regionTree.leaves())
-                        .transition()
-                        .duration(speed)
-                        .attr('x', function (d) {
-                          return d.x0
-                        })
-                        .attr('y', function (d) {
-                          return d.y0
-                        })
-                        .attr('width', function (d) {
-                          return d.x1 - d.x0
-                        })
-                        .attr('height', function (d) {
-                          return d.y1 - d.y0
-                        })
-
-                      d3.select('#blocker').remove()
-                    })
                 }
               })
           })
       })
-      .on('click', function (d) {
-        console.log(d)
-        // datatable.search(d.data.name).draw()
-
-        // console.log(regionTree);
-      })
-
-    // and to add the text labels
-    svg
-      .selectAll('text')
-      .data(root.leaves())
-      .enter()
-      .append('text')
-      .attr('x', function (d) {
-        return d.x0 + 5
-      }) // +10 to adjust position (more right)
-      .attr('y', function (d) {
-        return d.y0 + 20
-      }) // +20 to adjust position (lower)
-      .text(function (d) {
-        return d.data.name
-      })
-      .attr('font-size', '19px')
-      .attr('font-weight', '700')
-      .attr('fill', 'black')
-
-    // and to add the text labels
-    svg
-      .selectAll('vals')
-      .data(root.leaves())
-      .enter()
-      .append('text')
-      .attr('x', function (d) {
-        return d.x0 + 5
-      }) // +10 to adjust position (more right)
-      .attr('y', function (d) {
-        return d.y0 + 35
-      }) // +20 to adjust position (lower)
-      .text(function (d) {
-        return `${d3.format('$,')(d.data.wealth)} billion`
-      })
-      .attr('font-size', '11px')
-      .attr('fill', 'black')
   }
 
   // Quickly initialise a map
