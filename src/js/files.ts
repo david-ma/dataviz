@@ -151,13 +151,30 @@ d3.csv('/filesizes.txt')
           `<td>${d.name}</td><td>${d.count}</td><td>${d.filesize}</td>`
       )
 
+    drawDirs(hierarchy, d3.select('#filestructure'))
+
     new Chart({
       element: 'treemap',
       // data: [files],
-      width: 600,
-      height: 800,
+      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+      width: 800,
+      height: 400,
     }).initTreemap({
       data: hierarchy,
       target: 'filesize',
     })
   })
+
+function drawDirs(hierarchy, selection) {
+  const details = selection.append('details').attr('open', true)
+  details.append('summary').text(hierarchy.name)
+  const ul = details.append('ul')
+  hierarchy.children.forEach((child) => {
+    const li = ul.append('li')
+    if (child.children !== undefined) {
+      drawDirs(child, li)
+    } else {
+      li.text(child.name)
+    }
+  })
+}

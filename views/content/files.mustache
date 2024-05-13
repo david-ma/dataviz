@@ -12,10 +12,38 @@
     background: rgb(2, 0, 36);
     fill: linear-gradient(72deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%) !important;
   }
+  #legend {
+    float: left;
+  }
+  #filestructure {
+    float: left;
+    details {
+      margin: 0;
+      padding: 0;
+      li {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        padding-left: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        margin-bottom: 5px;
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.2);
+        }
+      }
+    }
+  }
 </style>
 
+<div id="treemap"></div>
+<div id="legend"></div>
+<div id="filestructure"></div>
+
 <svg>
-    <defs>
+  <defs>
     <linearGradient id="Gradient1">
       <stop class="stop1" offset="0%" />
       <stop class="stop2" offset="50%" />
@@ -28,11 +56,5 @@
     </linearGradient>
   </defs>
 </svg>
-
-<div id="legend"></div>
-
-<div id="treemap">
-
-</div>
 
 {{> require }}
