@@ -12,7 +12,7 @@ type Leaf = {
   name: string
   filesize: number
   filetype: string
-  children: undefined
+  children: Branch[]
 }
 
 const files = {}
@@ -49,13 +49,13 @@ const filetypes = {}
 function hierarchyInsert(
   hierarchy: Branch,
   data: {
-    permissions: string
     filesize: number
     timestamp: string
     path: string
     breadcrumbs: string[]
   }
 ) {
+  // console.log("Processing", data.path)
   if (data.breadcrumbs.length === 2 && data.breadcrumbs[1] === '') {
     // Found a Folder
     hierarchy.children.push({
@@ -78,9 +78,11 @@ function hierarchyInsert(
       console.error('Node with no children? Folder with same name as a file?')
     }
   } else {
+    if (data.filesize < 10485760) return
+
     // Found a file
     const leaf: Leaf = {
-      children: undefined,
+      children: [],
       name: data.breadcrumbs[0],
       filesize: data.filesize,
       filetype: data.breadcrumbs[0].split('.').pop(),
@@ -101,7 +103,8 @@ function hierarchyInsert(
   }
 }
 
-d3.csv('/filesizes.txt')
+// d3.csv('/filesizes.txt')
+d3.csv('/file_audit.csv')
   .then((data) => {
     console.log(data)
 
@@ -111,25 +114,17 @@ d3.csv('/filesizes.txt')
       filesize: 0,
     }
 
-    data.forEach(function (row) {
-      Object.values(row).forEach(function (string) {
-        if (string.length === 0) return
-        if (string.includes('total size is')) return
-        if (string.includes('bytes/sec')) return
+    data.forEach(function ({ bytes, timestamp, path }) {
+      files[path] = {
+        filesize: parseInt(bytes),
+        // filesize,
+        timestamp,
+        path,
+      }
 
-        const [permissions, filesizeString, timestamp, path] = string.split(' ')
-        files[path] = {
-          permissions,
-          filesize: parseInt(filesizeString),
-          timestamp,
-          path,
-        }
-
-        hierarchyInsert(hierarchy, {
-          ...files[path],
-          breadcrumbs: path.split('/'),
-        })
-        // hierarchy.filesize += files[path].filesize
+      hierarchyInsert(hierarchy, {
+        ...files[path],
+        breadcrumbs: path.split('/'),
       })
     })
     return [hierarchy, filetypes]
@@ -140,18 +135,10 @@ d3.csv('/filesizes.txt')
     console.log('Filetypes', filetypes)
 
     // Draw legend
-    d3.select('#legend')
-      .append('table')
-      .selectAll('tr')
-      .data(Object.values(filetypes))
-      .enter()
-      .append('tr')
-      .html(
-        (d: any) =>
-          `<td>${d.name}</td><td>${d.count}</td><td>${d.filesize}</td>`
-      )
+    drawLegend(filetypes)
 
     drawDirs(hierarchy, d3.select('#filestructure'))
+    console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 
     new Chart({
       element: 'treemap',
@@ -174,7 +161,26 @@ function drawDirs(hierarchy, selection) {
     if (child.children !== undefined) {
       drawDirs(child, li)
     } else {
-      li.text(child.name)
+      // li.text(child.name)
+      li.text(`${child.name} (${Math.floor(child.filesize / 1024)} kb)`)
     }
   })
+}
+
+function drawLegend(filetypes) {
+  // filetypes = filetypes.sort((a, b) => b.filesize - a.filesize)
+
+  // const filesizeMB = d3.format(".2f")(d.filesize / 1048576);
+
+  d3.select('#legend table tbody')
+    .selectAll('tr')
+    .data(
+      Object.values(filetypes).sort((a: any, b: any) => b.filesize - a.filesize)
+    )
+    .enter()
+    .append('tr')
+    .html((d: any) => {
+      const filesizeMB = d3.format('.2f')(d.filesize / 1048576)
+      return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeMB} mb</td>`
+    })
 }
