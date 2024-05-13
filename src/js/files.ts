@@ -78,7 +78,6 @@ function hierarchyInsert(
       console.error('Node with no children? Folder with same name as a file?')
     }
   } else {
-    if (data.filesize < 10485760) return
 
     // Found a file
     const leaf: Leaf = {
@@ -104,10 +103,15 @@ function hierarchyInsert(
 }
 
 // d3.csv('/filesizes.txt')
-d3.csv('/file_audit.csv')
+// d3.csv('/file_audit.csv')
+d3.text('/AGRF/A22H3JVLT3.csv')
+  .then((text) => {
+    return d3.csvParseRows(text).map((row, i, acc: any[]) => {
+      const [bytes, rsync, timestamp, path] = row
+      return { bytes: parseInt(bytes), rsync, timestamp, path }
+    })
+  })
   .then((data) => {
-    console.log(data)
-
     const hierarchy = {
       children: [],
       name: 'root',
@@ -116,8 +120,7 @@ d3.csv('/file_audit.csv')
 
     data.forEach(function ({ bytes, timestamp, path }) {
       files[path] = {
-        filesize: parseInt(bytes),
-        // filesize,
+        filesize: bytes,
         timestamp,
         path,
       }
