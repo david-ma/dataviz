@@ -1184,7 +1184,13 @@ class Chart {
   /**
    * Initialise a treemap
    */
-  initTreemap(options: { data: TreemapData; target: string }) {
+  initTreemap(options: {
+    data: TreemapData
+    target: string
+    mouseover: any
+    mouseout: any
+    // click: any
+  }) {
     console.log('initTreemap with TreemapData', this.data)
 
     const width = this.innerWidth,
@@ -1236,6 +1242,8 @@ class Chart {
       .enter()
       .append('rect')
       .classed('region', true)
+      .on('mouseover', options.mouseover)
+      .on('mouseout', options.mouseout)
       .attr('x', function (d) {
         return d.x0
       })

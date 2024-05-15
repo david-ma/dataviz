@@ -113,10 +113,6 @@ function hierarchyInsert(
   }
 }
 
-// // .                   A22H3JVLT3.txt      CAGRF12711.csv      CAGRF24010125.csv
-// ..                  B2272MKLT3.csv      CAGRF220610939.csv  CAGRF24010169-1.csv
-// A22H3JVLT3.csv      B2272MKLT3.txt      CAGRF23110233-9.csv
-
 const CSVs = [
   'A22H3JVLT3.csv',
   'B2272MKLT3.csv',
@@ -184,6 +180,12 @@ d3.select('#buttons')
         }).initTreemap({
           data: hierarchy,
           target: 'filesize',
+          mouseover: (d) => {
+            console.log('Mousing over!', d)
+          },
+          mouseout: (d) => {
+            console.log('Mouse Out!', d)
+          },
         })
       })
   })
@@ -194,11 +196,24 @@ function drawDirs(hierarchy, selection) {
   const ul = details.append('ul')
   hierarchy.children.forEach((child) => {
     const li = ul.append('li')
-    if (child.children !== undefined) {
+    if (child.children !== undefined && child.children.length > 0) {
       drawDirs(child, li)
     } else {
-      // li.text(child.name)
-      li.text(`${child.name} (${Math.floor(child.filesize / 1024)} kb)`)
+      if (child.filesize > 1073741824) {
+        li.text(
+          `${child.name} (${d3.format('.2f')(child.filesize / 1073741824)} gb)`
+        )
+      } else if (child.filesize > 1048576) {
+        li.text(
+          `${child.name} (${d3.format('.2f')(child.filesize / 1048576)} mb)`
+        )
+      } else if (child.filesize > 1024024) {
+        li.text(
+          `${child.name} (${d3.format('.2f')(child.filesize / 1024024)} mb)`
+        )
+      } else {
+        li.text(`${child.name} (${d3.format('.2f')(child.filesize / 1024)} kb)`)
+      }
     }
   })
 }
@@ -210,29 +225,52 @@ function drawLegend(
     filesize: number
   }[]
 ) {
-  // filetypes = filetypes.sort((a, b) => b.filesize - a.filesize)
+  const mainFiletypes = [
+    'fastq.gz',
+    'bam',
+    'bai',
+    'vcf',
+    'vcf.gz',
+    'gvcf',
+    'gvcf.gz',
+    // 'bed', // bedgraph? bedpe? Is this a main one to keep?
+  ]
 
-  // const filesizeMB = d3.format(".2f")(d.filesize / 1048576);
-
-  const total = Object.values(filetypes).reduce(
-    (file, acc) => {
-      return {
+  const [total, misc] = Object.values(filetypes).reduce(
+    ([total, misc], file) => {
+      total = {
         name: 'total',
-        count: acc.count + file.count,
-        filesize: acc.filesize + file.filesize,
+        count: total.count + file.count,
+        filesize: total.filesize + file.filesize,
       }
+      if (!mainFiletypes.includes(file.name)) {
+        misc = {
+          name: 'misc files (no: ' + mainFiletypes.join(', ') + ')',
+          count: misc.count + file.count,
+          filesize: misc.filesize + file.filesize,
+        }
+      }
+      return [total, misc]
     },
-    {
-      name: 'total',
-      count: 0,
-      filesize: 0,
-    }
+    [
+      {
+        name: 'total',
+        count: 0,
+        filesize: 0,
+      },
+      {
+        name: 'misc files (no: ' + mainFiletypes.join(', ') + ')',
+        count: 0,
+        filesize: 0,
+      },
+    ]
   )
 
   d3.select('#legend table tbody')
     .selectAll('tr')
     .data([
       total,
+      misc,
       ...Object.values(filetypes).sort(
         (a: any, b: any) => b.filesize - a.filesize
       ),

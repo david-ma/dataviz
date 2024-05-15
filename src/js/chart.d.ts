@@ -117,6 +117,8 @@ declare class Chart {
     initTreemap(options: {
         data: TreemapData;
         target: string;
+        mouseover: any;
+        mouseout: any;
     }): void;
     initMap(): Promise<unknown>;
     drawMap(options: {
