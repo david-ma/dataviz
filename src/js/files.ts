@@ -78,13 +78,24 @@ function hierarchyInsert(
       console.error('Node with no children? Folder with same name as a file?')
     }
   } else {
+    let extension = data.breadcrumbs[0].split('.').pop()
+
+    const archiveExtensions = ['tar', 'gz', 'zip']
+    if (
+      archiveExtensions.includes(extension) &&
+      data.breadcrumbs[0].split('.').length > 2
+    ) {
+      extension = data.breadcrumbs[0].split('.').slice(-2).join('.')
+    }
+
+    extension = extension.toLowerCase() || 'unknown'
 
     // Found a file
     const leaf: Leaf = {
       children: [],
       name: data.breadcrumbs[0],
       filesize: data.filesize,
-      filetype: data.breadcrumbs[0].split('.').pop(),
+      filetype: extension,
     }
 
     const filetype = (filetypes[leaf.filetype] = filetypes[leaf.filetype] || {
@@ -102,57 +113,79 @@ function hierarchyInsert(
   }
 }
 
-// d3.csv('/filesizes.txt')
-// d3.csv('/file_audit.csv')
-d3.text('/AGRF/A22H3JVLT3.csv')
-  .then((text) => {
-    return d3.csvParseRows(text).map((row, i, acc: any[]) => {
-      const [bytes, rsync, timestamp, path] = row
-      return { bytes: parseInt(bytes), rsync, timestamp, path }
-    })
-  })
-  .then((data) => {
-    const hierarchy = {
-      children: [],
-      name: 'root',
-      filesize: 0,
-    }
+// // .                   A22H3JVLT3.txt      CAGRF12711.csv      CAGRF24010125.csv
+// ..                  B2272MKLT3.csv      CAGRF220610939.csv  CAGRF24010169-1.csv
+// A22H3JVLT3.csv      B2272MKLT3.txt      CAGRF23110233-9.csv
 
-    data.forEach(function ({ bytes, timestamp, path }) {
-      files[path] = {
-        filesize: bytes,
-        timestamp,
-        path,
-      }
+const CSVs = [
+  'A22H3JVLT3.csv',
+  'B2272MKLT3.csv',
+  'CAGRF12711.csv',
+  'CAGRF220610939.csv',
+  'CAGRF24010125.csv',
+  'CAGRF24010169-1.csv',
+  'CAGRF23110233-9.csv',
+]
 
-      hierarchyInsert(hierarchy, {
-        ...files[path],
-        breadcrumbs: path.split('/'),
+d3.select('#buttons')
+  .selectAll('button')
+  .data(CSVs)
+  .enter()
+  .append('button')
+  .text((d) => d)
+  .on('click', function (e, d) {
+    console.log('click', d)
+
+    d3.text(`/AGRF/${d}`)
+      .then((text) => {
+        return d3.csvParseRows(text).map((row, i, acc: any[]) => {
+          const [bytes, rsync, timestamp, path] = row
+          return { bytes: parseInt(bytes), rsync, timestamp, path }
+        })
       })
-    })
-    return [hierarchy, filetypes]
-  })
-  .then(([hierarchy, filetypes]: [Branch, any]) => {
-    console.log(files)
-    console.log('Hierarchy', hierarchy)
-    console.log('Filetypes', filetypes)
+      .then((data) => {
+        const hierarchy = {
+          children: [],
+          name: 'root',
+          filesize: 0,
+        }
 
-    // Draw legend
-    drawLegend(filetypes)
+        data.forEach(function ({ bytes, timestamp, path }) {
+          files[path] = {
+            filesize: bytes,
+            timestamp,
+            path,
+          }
 
-    drawDirs(hierarchy, d3.select('#filestructure'))
-    console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
+          hierarchyInsert(hierarchy, {
+            ...files[path],
+            breadcrumbs: path.split('/'),
+          })
+        })
+        return [hierarchy, filetypes]
+      })
+      .then(([hierarchy, filetypes]: [Branch, any]) => {
+        console.log(files)
+        console.log('Hierarchy', hierarchy)
+        console.log('Filetypes', filetypes)
 
-    new Chart({
-      element: 'treemap',
-      // data: [files],
-      margin: { top: 10, right: 10, bottom: 10, left: 10 },
-      width: 800,
-      height: 400,
-    }).initTreemap({
-      data: hierarchy,
-      target: 'filesize',
-    })
+        // Draw legend
+        drawLegend(filetypes)
+
+        drawDirs(hierarchy, d3.select('#filestructure'))
+        console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
+
+        new Chart({
+          element: 'treemap',
+          // data: [files],
+          margin: { top: 10, right: 10, bottom: 10, left: 10 },
+          width: 800,
+          height: 400,
+        }).initTreemap({
+          data: hierarchy,
+          target: 'filesize',
+        })
+      })
   })
 
 function drawDirs(hierarchy, selection) {
@@ -170,20 +203,49 @@ function drawDirs(hierarchy, selection) {
   })
 }
 
-function drawLegend(filetypes) {
+function drawLegend(
+  filetypes: {
+    name: string
+    count: number
+    filesize: number
+  }[]
+) {
   // filetypes = filetypes.sort((a, b) => b.filesize - a.filesize)
 
   // const filesizeMB = d3.format(".2f")(d.filesize / 1048576);
 
+  const total = Object.values(filetypes).reduce(
+    (file, acc) => {
+      return {
+        name: 'total',
+        count: acc.count + file.count,
+        filesize: acc.filesize + file.filesize,
+      }
+    },
+    {
+      name: 'total',
+      count: 0,
+      filesize: 0,
+    }
+  )
+
   d3.select('#legend table tbody')
     .selectAll('tr')
-    .data(
-      Object.values(filetypes).sort((a: any, b: any) => b.filesize - a.filesize)
-    )
+    .data([
+      total,
+      ...Object.values(filetypes).sort(
+        (a: any, b: any) => b.filesize - a.filesize
+      ),
+    ])
     .enter()
     .append('tr')
     .html((d: any) => {
       const filesizeMB = d3.format('.2f')(d.filesize / 1048576)
-      return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeMB} mb</td>`
+      const filesizeGB = d3.format('.2f')(d.filesize / 1073741824)
+      if (d.filesize / 1073741824 > 1) {
+        return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeGB} gb</td>`
+      } else {
+        return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeMB} mb</td>`
+      }
     })
 }

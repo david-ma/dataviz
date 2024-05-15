@@ -1,4 +1,7 @@
 <style>
+  header, div.sidebar, footer {
+    display: none;
+  }
   text {
     fill: rgba(0, 0, 0, 0);
 
@@ -36,7 +39,30 @@
       }
     }
   }
+  #popup {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    display: none;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    th, td {
+      border: 1px solid black;
+      padding: 5px;
+    }
+  
+  }
 </style>
+
+<div id="popup">
+  {{!-- <div id="filename">File: asdfs_filename_goes_here.txt</div> --}}
+</div>
+
+<div id="buttons"></div>
 
 <div id="treemap"></div>
 <div id="legend">
