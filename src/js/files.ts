@@ -118,9 +118,12 @@ const CSVs = [
   'B2272MKLT3.csv',
   'CAGRF12711.csv',
   'CAGRF220610939.csv',
+  'CAGRF23110233-9.csv',
+  'CAGRF24010007.csv',
   'CAGRF24010125.csv',
   'CAGRF24010169-1.csv',
-  'CAGRF23110233-9.csv',
+  'CAGRF24020097.csv',
+  'CAGRF24020290.csv',
 ]
 
 d3.select('#buttons')
@@ -168,7 +171,7 @@ d3.select('#buttons')
         // Draw legend
         drawLegend(filetypes)
 
-        drawDirs(hierarchy, d3.select('#filestructure'))
+        // drawDirs(hierarchy, d3.select('#filestructure'))
         console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 
         new Chart({
@@ -268,16 +271,41 @@ function drawLegend(
 
   d3.select('#legend table tbody')
     .selectAll('tr')
-    .data([
-      total,
-      misc,
-      ...Object.values(filetypes).sort(
-        (a: any, b: any) => b.filesize - a.filesize
-      ),
-    ])
+    .data(
+      [
+        total,
+        misc,
+        ...Object.values(filetypes).sort(
+          (a: any, b: any) => b.filesize - a.filesize
+        ),
+      ],
+      (d: any) => d.name
+    )
+    // .join(
+    //   function(enter) {
+    //     return enter.html((d: any) => {
+    //       console.log("writing tr", d.name)
+    //       const filesizeMB = d3.format('.2f')(d.filesize / 1048576)
+    //       const filesizeGB = d3.format('.2f')(d.filesize / 1073741824)
+    //       if (d.filesize / 1073741824 > 1) {
+    //         return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeGB} gb</td>`
+    //       } else {
+    //         return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeMB} mb</td>`
+    //       }
+    //     })
+    //   },
+    //   function(update) {
+    //     return update
+    //   },
+    //   function(exit){
+    //     return exit
+    //   }
+
+    // )
     .enter()
     .append('tr')
     .html((d: any) => {
+      console.log('writing tr', d.name)
       const filesizeMB = d3.format('.2f')(d.filesize / 1048576)
       const filesizeGB = d3.format('.2f')(d.filesize / 1073741824)
       if (d.filesize / 1073741824 > 1) {
@@ -286,4 +314,5 @@ function drawLegend(
         return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeMB} mb</td>`
       }
     })
+  // .update()
 }
