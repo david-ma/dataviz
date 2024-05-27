@@ -225,7 +225,7 @@ function drawDirs(
 
   const summary = details.append('summary')
   summary.append('h3').text(`>${hierarchy.data.name}`)
-  summary.append('p').text(`Filesize: ${decimalFilesize(hierarchy.value)}`)
+  summary.append('p').text(`Filesize: ${filesizeLabel(hierarchy.value)}`)
 
   const ul = details.append('ul')
   hierarchy.children
@@ -236,12 +236,23 @@ function drawDirs(
         drawDirs(child, li)
       } else {
         const li = ul.append('li').attr('class', 'file')
-        li.text(`${child.data.name} ${decimalFilesize(child.value)}`)
+        li.text(`${child.data.name} ${filesizeLabel(child.value)}`)
       }
     })
 }
 
-function decimalFilesize(filesize: number) {
+function filesizeLabel(filesize: number, binary: boolean = false) {
+  if (binary) {
+    if (filesize > 1024 * 1024 * 1024 * 1024) {
+      return `${d3.format('.2f')(filesize / (1024 * 1024 * 1024 * 1024))} TiB`
+    } else if (filesize > 1024 * 1024 * 1024) {
+      return `${d3.format('.2f')(filesize / (1024 * 1024 * 1024))} GiB`
+    } else if (filesize > 1024 * 1024) {
+      return `${d3.format('.2f')(filesize / (1024 * 1024))} MiB`
+    } else {
+      return `${d3.format('.2f')(filesize / 1024)} KiB`
+    }
+  }
   if (filesize > 1000000000000) {
     return `${d3.format('.2f')(filesize / 1000000000000)} TB`
   } else if (filesize > 1000000000) {
@@ -250,18 +261,6 @@ function decimalFilesize(filesize: number) {
     return `${d3.format('.2f')(filesize / 1000000)} MB`
   } else {
     return `${d3.format('.2f')(filesize / 1000)} KB`
-  }
-}
-
-function readableFilesize(filesize: number) {
-  if (filesize > 1024 * 1024 * 1024 * 1024) {
-    return `${d3.format('.2f')(filesize / (1024 * 1024 * 1024 * 1024))} TiB`
-  } else if (filesize > 1024 * 1024 * 1024) {
-    return `${d3.format('.2f')(filesize / (1024 * 1024 * 1024))} GiB`
-  } else if (filesize > 1024 * 1024) {
-    return `${d3.format('.2f')(filesize / (1024 * 1024))} MiB`
-  } else {
-    return `${d3.format('.2f')(filesize / 1024)} KiB`
   }
 }
 
@@ -357,7 +356,7 @@ function drawLegend(
 
       return `<td style="background-color:${thisColor}"></td><td>${
         d.name
-      }</td><td>${d.count}</td><td>${decimalFilesize(d.filesize)}</td>`
+      }</td><td>${d.count}</td><td>${filesizeLabel(d.filesize)}</td>`
     })
   // .update()
 }
