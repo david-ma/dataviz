@@ -132,10 +132,10 @@ d3.select('#buttons')
   .enter()
   .append('button')
   .text((d) => d)
-  .on('click', function (e, d) {
-    console.log('click', d)
+  .on('click', function (e, filename) {
+    console.log('click', filename)
 
-    d3.text(`/AGRF/${d}`)
+    d3.text(`/AGRF/${filename}`)
       .then((text) => {
         return d3.csvParseRows(text).map((row, i, acc: any[]) => {
           const [bytes, rsync, timestamp, path] = row
@@ -171,10 +171,11 @@ d3.select('#buttons')
         // Draw legend
         drawLegend(filetypes)
 
-        // drawDirs(hierarchy, d3.select('#filestructure'))
+        drawDirs(hierarchy, d3.select('#filestructure'))
         console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 
         new Chart({
+          title: filename,
           element: 'treemap',
           // data: [files],
           margin: { top: 10, right: 10, bottom: 10, left: 10 },
@@ -194,8 +195,15 @@ d3.select('#buttons')
   })
 
 function drawDirs(hierarchy, selection) {
+  // console.log(hierarchy)
+
   const details = selection.append('details').attr('open', true)
-  details.append('summary').text(hierarchy.name)
+  const summary = details.append('summary')
+  summary.append('h3').text(hierarchy.name)
+  summary
+    .append('p')
+    .text(`Filesize: ${d3.format('.2f')(hierarchy.filesize / 1048576)} mb`)
+
   const ul = details.append('ul')
   hierarchy.children.forEach((child) => {
     const li = ul.append('li')

@@ -1,7 +1,10 @@
 <style>
-  header, div.sidebar, footer {
+  header,
+  div.sidebar,
+  footer {
     display: none;
   }
+
   text {
     fill: rgba(0, 0, 0, 0);
 
@@ -15,14 +18,18 @@
     background: rgb(2, 0, 36);
     fill: linear-gradient(72deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%) !important;
   }
+
   #legend {
     float: left;
   }
+
   #filestructure {
     float: left;
+
     details {
       margin: 0;
       padding: 0;
+
       li {
         list-style-type: none;
         padding: 0;
@@ -33,12 +40,14 @@
         background-color: rgba(0, 0, 0, 0.1);
         border-radius: 5px;
         margin-bottom: 5px;
+
         &:hover {
           background-color: rgba(0, 0, 0, 0.2);
         }
       }
     }
   }
+
   #popup {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.5);
@@ -47,14 +56,17 @@
     border-radius: 5px;
     display: none;
   }
+
   table {
     border-collapse: collapse;
     width: 100%;
-    th, td {
+
+    th,
+    td {
       border: 1px solid black;
       padding: 5px;
     }
-  
+
   }
 </style>
 
@@ -65,31 +77,39 @@
 <div id="buttons"></div>
 
 <div id="treemap"></div>
-<div id="legend">
-  <table>
-    <thead>
-      <th>filename</th>
-      <th>count</th>
-      <th>size</th>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
-<div id="filestructure"></div>
 
-<svg>
-  <defs>
-    <linearGradient id="Gradient1">
-      <stop class="stop1" offset="0%" />
-      <stop class="stop2" offset="50%" />
-      <stop class="stop3" offset="100%" />
-    </linearGradient>
-    <linearGradient id="Gradient2" x1="0" x2="0" y1="0" y2="1">
-      <stop offset="0%" stop-color="red" />
-      <stop offset="50%" stop-color="black" stop-opacity="0" />
-      <stop offset="100%" stop-color="blue" />
-    </linearGradient>
-  </defs>
-</svg>
+<div class="row">
+  <div id="legend" class="col-xs-4">
+    <table>
+      <thead>
+        <th>filename</th>
+        <th>count</th>
+        <th>size</th>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div id="filestructure" class="col-xs-8">
+    Filestructure
+  </div>
+</div>
+
+
+<div style="display: none;">
+  <svg>
+    <defs>
+      <linearGradient id="Gradient1">
+        <stop class="stop1" offset="0%" />
+        <stop class="stop2" offset="50%" />
+        <stop class="stop3" offset="100%" />
+      </linearGradient>
+      <linearGradient id="Gradient2" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="red" />
+        <stop offset="50%" stop-color="black" stop-opacity="0" />
+        <stop offset="100%" stop-color="blue" />
+      </linearGradient>
+    </defs>
+  </svg>
+</div>
 
 {{> require }}

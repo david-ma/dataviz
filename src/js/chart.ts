@@ -1197,7 +1197,13 @@ class Chart {
       height = this.innerHeight,
       svg = this.plot
 
+    svg.append("text").text(this.title)
+
+
     const root = d3.hierarchy(options.data).sum((d: any) => d[options.target])
+
+    console.log("Root", root)
+
     const tree = d3
       .treemap()
       .tile(d3.treemapBinary)
