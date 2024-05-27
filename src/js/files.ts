@@ -165,9 +165,6 @@ d3.select('#buttons')
         return [hierarchy, filetypes]
       })
       .then(([hierarchy, filetypes]: [Branch, any]) => {
-        // Draw legend
-        drawLegend(filetypes)
-
         let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
         const box = d3.select('#filestructure')
 
@@ -178,7 +175,7 @@ d3.select('#buttons')
 
         console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 
-        new Chart({
+        const myChart = new Chart({
           title: filename,
           element: 'treemap',
           // data: [files],
@@ -195,6 +192,9 @@ d3.select('#buttons')
             console.log('Mouse Out!', d)
           },
         })
+
+        // Draw legend
+        drawLegend(filetypes, myChart.color)
       })
   })
 
@@ -205,8 +205,19 @@ function drawDirs(
   // console.log(hierarchy)
 
   const details = selection.append('details').attr('open', () => {
-    return hierarchy.depth < 2 ? 'open' : null
+    if (
+      hierarchy.depth === 1 ||
+      hierarchy.data.name === 'BarcodeLengths' ||
+      hierarchy.data.name === 'secondary_analysis' ||
+      hierarchy.data.name === 'contracts'
+    ) {
+      return 'open'
+    }
+    return null
   })
+  // .attr('open', () => {
+  //   return hierarchy.depth < 2 ? 'open' : null
+  // })
 
   const summary = details.append('summary')
   summary.append('h3').text(`>${hierarchy.data.name}`)
@@ -255,7 +266,8 @@ function drawLegend(
     name: string
     count: number
     filesize: number
-  }[]
+  }[],
+  color: d3.ScaleOrdinal<string, any>
 ) {
   const mainFiletypes = [
     'fastq.gz',
@@ -334,14 +346,62 @@ function drawLegend(
     .enter()
     .append('tr')
     .html((d: any) => {
-      return `<td>${d.name}</td><td>${d.count}</td><td>${decimalFilesize(
-        d.filesize
-      )}</td>`
+      let thisColor = color(d.name)
+      if (
+        d.name === 'total' ||
+        d.name.includes('misc files')
+      ) {
+        thisColor = 'transparent'
+      }
+
+      return `<td style="background-color:${thisColor}"></td><td>${
+        d.name
+      }</td><td>${d.count}</td><td>${decimalFilesize(d.filesize)}</td>`
     })
   // .update()
 }
 
+const allFiles = {}
+// CSVs.forEach((filename) => {
+const filename = 'A22H3JVLT3.csv'
+d3.text(`/AGRF/${filename}`)
+  .then((text) => {
+    return d3.csvParseRows(text).map((row, i, acc: any[]) => {
+      const [bytes, rsync, timestamp, path] = row
+      return { bytes: parseInt(bytes), rsync, timestamp, path }
+    })
+  })
+  .then((data) => {
+    const hierarchy = {
+      children: [],
+      name: 'root',
+      filesize: 0,
+    }
+
+    data.forEach(function ({ bytes, timestamp, path }) {
+      files[path] = {
+        filesize: bytes,
+        timestamp,
+        path,
+      }
+
+      hierarchyInsert(hierarchy, {
+        ...files[path],
+        breadcrumbs: path.split('/'),
+      })
+    })
+    return [hierarchy, filetypes]
+  })
+  .then(([hierarchy, filetypes]: [Branch, any]) => {
+    let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
+
+    console.log('Folder data', root)
+  })
+
+// })
+
 // Wait
 // setTimeout(() => {
 // $('#CAGRF12711').trigger('click')
+// $('#A22H3JVLT3').trigger('click')
 // }, 100)

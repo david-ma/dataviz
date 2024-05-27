@@ -94,6 +94,7 @@ class Chart {
   height: number
   margin: { top: number; right: number; bottom: number; left: number }
   colours: Array<string>
+  color?: d3.ScaleOrdinal<string, any>
   innerHeight: number
   innerWidth: number
   fullscreen: boolean
@@ -1197,12 +1198,11 @@ class Chart {
       height = this.innerHeight,
       svg = this.plot
 
-    svg.append("text").text(this.title)
-
+    svg.append('text').text(this.title)
 
     const root = d3.hierarchy(options.data).sum((d: any) => d[options.target])
 
-    console.log("Root", root)
+    console.log('Root', root)
 
     const tree = d3
       .treemap()
@@ -1239,7 +1239,9 @@ class Chart {
         '#bf5b17',
       ])
 
-    console.log('leaves', tree.leaves())
+    this.color = color
+
+    // console.log('leaves', tree.leaves())
 
     // use this information to add rectangles:
     svg
@@ -1373,6 +1375,7 @@ class Chart {
               })
           })
       })
+    return this
   }
 
   // Quickly initialise a map

@@ -76,6 +76,7 @@ declare class Chart {
         left: number;
     };
     colours: Array<string>;
+    color?: d3.ScaleOrdinal<string, any>;
     innerHeight: number;
     innerWidth: number;
     fullscreen: boolean;
@@ -119,7 +120,7 @@ declare class Chart {
         target: string;
         mouseover: any;
         mouseout: any;
-    }): void;
+    }): this;
     initMap(): Promise<unknown>;
     drawMap(options: {
         center?: Coordinates;
