@@ -89,6 +89,10 @@ function hierarchyInsert(
     }
 
     extension = extension.toLowerCase() || 'unknown'
+    // console.log("Extension", extension)
+    if (extension === 'fastq') {
+      console.log('Found a fastq file', data)
+    }
 
     // Found a file
     const leaf: Leaf = {
@@ -347,10 +351,7 @@ function drawLegend(
     .append('tr')
     .html((d: any) => {
       let thisColor = color(d.name)
-      if (
-        d.name === 'total' ||
-        d.name.includes('misc files')
-      ) {
+      if (d.name === 'total' || d.name.includes('misc files')) {
         thisColor = 'transparent'
       }
 
@@ -361,42 +362,42 @@ function drawLegend(
   // .update()
 }
 
-const allFiles = {}
-// CSVs.forEach((filename) => {
-const filename = 'A22H3JVLT3.csv'
-d3.text(`/AGRF/${filename}`)
-  .then((text) => {
-    return d3.csvParseRows(text).map((row, i, acc: any[]) => {
-      const [bytes, rsync, timestamp, path] = row
-      return { bytes: parseInt(bytes), rsync, timestamp, path }
-    })
-  })
-  .then((data) => {
-    const hierarchy = {
-      children: [],
-      name: 'root',
-      filesize: 0,
-    }
+// const allFiles = {}
+// // CSVs.forEach((filename) => {
+// const filename = 'A22H3JVLT3.csv'
+// d3.text(`/AGRF/${filename}`)
+//   .then((text) => {
+//     return d3.csvParseRows(text).map((row, i, acc: any[]) => {
+//       const [bytes, rsync, timestamp, path] = row
+//       return { bytes: parseInt(bytes), rsync, timestamp, path }
+//     })
+//   })
+//   .then((data) => {
+//     const hierarchy = {
+//       children: [],
+//       name: 'root',
+//       filesize: 0,
+//     }
 
-    data.forEach(function ({ bytes, timestamp, path }) {
-      files[path] = {
-        filesize: bytes,
-        timestamp,
-        path,
-      }
+//     data.forEach(function ({ bytes, timestamp, path }) {
+//       files[path] = {
+//         filesize: bytes,
+//         timestamp,
+//         path,
+//       }
 
-      hierarchyInsert(hierarchy, {
-        ...files[path],
-        breadcrumbs: path.split('/'),
-      })
-    })
-    return [hierarchy, filetypes]
-  })
-  .then(([hierarchy, filetypes]: [Branch, any]) => {
-    let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
+//       hierarchyInsert(hierarchy, {
+//         ...files[path],
+//         breadcrumbs: path.split('/'),
+//       })
+//     })
+//     return [hierarchy, filetypes]
+//   })
+//   .then(([hierarchy, filetypes]: [Branch, any]) => {
+//     let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
 
-    console.log('Folder data', root)
-  })
+//     console.log('Folder data', root)
+//   })
 
 // })
 
@@ -404,4 +405,5 @@ d3.text(`/AGRF/${filename}`)
 // setTimeout(() => {
 // $('#CAGRF12711').trigger('click')
 // $('#A22H3JVLT3').trigger('click')
+// $('#CAGRF12711').trigger('click')
 // }, 100)
