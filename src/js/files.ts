@@ -1,6 +1,6 @@
 console.log('files.ts')
 
-import { d3, Chart } from './chart'
+import { d3, Chart, classifyName } from './chart'
 
 type Branch = {
   children: (Leaf | Branch)[]
@@ -89,10 +89,6 @@ function hierarchyInsert(
     }
 
     extension = extension.toLowerCase() || 'unknown'
-    // console.log("Extension", extension)
-    if (extension === 'fastq') {
-      console.log('Found a fastq file', data)
-    }
 
     // Found a file
     const leaf: Leaf = {
@@ -232,7 +228,23 @@ function drawDirs(
     .sort((a, b) => b.value - a.value)
     .forEach((child) => {
       if (child.children !== undefined && child.children.length > 0) {
-        const li = ul.insert('li', ':first-child')
+        // If it's a folder
+        // console.log('Drawing folder', child)
+        const li = ul
+          .insert('li', ':first-child')
+          .attr('id', `directory-${classifyName(child.data.name)}`)
+          .on('mouseover', function (e, d) {
+            d3.select(`#folder-${classifyName(child.data.name)}`).classed(
+              'mouseover',
+              true
+            )
+          })
+          .on('mouseout', function (e, d) {
+            d3.select(`#folder-${classifyName(child.data.name)}`).classed(
+              'mouseover',
+              false
+            )
+          })
         drawDirs(child, li)
       } else {
         const li = ul.append('li').attr('class', 'file')
@@ -364,6 +376,8 @@ function drawLegend(
 // const allFiles = {}
 // // CSVs.forEach((filename) => {
 // const filename = 'A22H3JVLT3.csv'
+// // $('#A22H3JVLT3').trigger('click')
+
 // d3.text(`/AGRF/${filename}`)
 //   .then((text) => {
 //     return d3.csvParseRows(text).map((row, i, acc: any[]) => {
@@ -403,6 +417,5 @@ function drawLegend(
 // Wait
 // setTimeout(() => {
 // $('#CAGRF12711').trigger('click')
-// $('#A22H3JVLT3').trigger('click')
 // $('#CAGRF12711').trigger('click')
 // }, 100)

@@ -1253,7 +1253,11 @@ class Chart {
 
     this.color = color
 
-    // console.log('leaves', tree.leaves())
+    // console.log('leaves', tree.children)
+    // console.log("links", tree.links())
+
+    // tree.
+    // console.log(tree)
 
     // use this information to add rectangles:
     svg
@@ -1285,6 +1289,12 @@ class Chart {
       })
       .each(function (d) {
         // console.log('next level...', d)
+        // if(d.depth === 2) {
+        //   // console.log("We're at depth 2", d.data.children)
+        //   console.log(d)
+        //   if(d.data.children.length > 0) {
+        //   }
+        // }
 
         const rWidth = d.x1 - d.x0
         const rHeight = d.y1 - d.y0
@@ -1387,6 +1397,46 @@ class Chart {
               })
           })
       })
+
+    console.log('descendants', tree.descendants())
+    const folders = tree.descendants().filter((d) => d.children)
+    // .filter((d) => d.depth === 2)
+    console.log('Folders', folders)
+
+    svg
+      .append('g')
+      .classed('hoverOver', true)
+      .selectAll('rect.folder')
+      .data(folders)
+      .enter()
+      .append('rect')
+      .classed('folder', true)
+      .attr('id', (d: any) => `folder-${classifyName(d.data.name)}`)
+      .attr('x', function (d) {
+        return d.x0
+      })
+      .attr('y', function (d) {
+        return d.y0
+      })
+      .attr('width', function (d) {
+        return d.x1 - d.x0
+      })
+      .attr('height', function (d) {
+        return d.y1 - d.y0
+      })
+      .style('stroke', 'black')
+      .style('fill', 'rgba(0,0,0,0.1)')
+      .style('opacity', 0.5)
+      .on('mouseover', function (event, d) {
+        d3.select(this).classed('mouseover', true)
+        console.log('hey, mousing over folder', d)
+        console.log(d.data.name)
+        // d3.select(`#rect-${d.data.id}`).attr('fill', 'red')
+      })
+      .on('mouseout', function (event, d) {
+        d3.select(this).classed('mouseover', false)
+      })
+
     return this
   }
 
@@ -1985,7 +2035,7 @@ function deg2rad(deg: number) {
 // console.debug(`jQuery version: ${$.fn.jquery}`)
 // console.debug(`lodash version: ${_.VERSION}`)
 
-export { Chart, decorateTable, _, $, d3 }
+export { Chart, decorateTable, _, $, d3, classifyName }
 
 // export default Chart
 
