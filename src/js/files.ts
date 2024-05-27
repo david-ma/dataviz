@@ -168,9 +168,13 @@ d3.select('#buttons')
         // Draw legend
         drawLegend(filetypes)
 
-        const root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
+        let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
         const box = d3.select('#filestructure')
-        drawDirs(root.children[0], box)
+
+        if (root.children.length === 1) {
+          root = root.children[0]
+        }
+        drawDirs(root, box)
 
         console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 
@@ -219,15 +223,27 @@ function drawDirs(
   })
 }
 
-function readableFilesize(filesize: number) {
-  if (filesize > 1073741824) {
-    return `${d3.format('.2f')(filesize / 1073741824)} gb`
-  } else if (filesize > 1048576) {
-    return `${d3.format('.2f')(filesize / 1048576)} mb`
-  } else if (filesize > 1024024) {
-    return `${d3.format('.2f')(filesize / 1024024)} mb`
+function decimalFilesize(filesize: number) {
+  if (filesize > 1000000000000) {
+    return `${d3.format('.2f')(filesize / 1000000000000)} TB`
+  } else if (filesize > 1000000000) {
+    return `${d3.format('.2f')(filesize / 1000000000)} GB`
+  } else if (filesize > 1000000) {
+    return `${d3.format('.2f')(filesize / 1000000)} MB`
   } else {
-    return `${d3.format('.2f')(filesize / 1024)} kb`
+    return `${d3.format('.2f')(filesize / 1000)} KB`
+  }
+}
+
+function readableFilesize(filesize: number) {
+  if (filesize > 1024 * 1024 * 1024 * 1024) {
+    return `${d3.format('.2f')(filesize / (1024 * 1024 * 1024 * 1024))} TiB`
+  } else if (filesize > 1024 * 1024 * 1024) {
+    return `${d3.format('.2f')(filesize / (1024 * 1024 * 1024))} GiB`
+  } else if (filesize > 1024 * 1024) {
+    return `${d3.format('.2f')(filesize / (1024 * 1024))} MiB`
+  } else {
+    return `${d3.format('.2f')(filesize / 1024)} KiB`
   }
 }
 
@@ -315,19 +331,14 @@ function drawLegend(
     .enter()
     .append('tr')
     .html((d: any) => {
-      console.log('writing tr', d.name)
-      const filesizeMB = d3.format('.2f')(d.filesize / 1048576)
-      const filesizeGB = d3.format('.2f')(d.filesize / 1073741824)
-      if (d.filesize / 1073741824 > 1) {
-        return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeGB} gb</td>`
-      } else {
-        return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeMB} mb</td>`
-      }
+      return `<td>${d.name}</td><td>${d.count}</td><td>${readableFilesize(
+        d.filesize
+      )}</td>`
     })
   // .update()
 }
 
 // Wait
 // setTimeout(() => {
-//   $('#CAGRF12711').trigger('click')
+$('#CAGRF12711').trigger('click')
 // }, 100)
