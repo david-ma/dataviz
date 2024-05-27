@@ -131,6 +131,7 @@ d3.select('#buttons')
   .data(CSVs)
   .enter()
   .append('button')
+  .attr('id', (d) => d.split('.')[0])
   .text((d) => d)
   .on('click', function (e, filename) {
     console.log('click', filename)
@@ -164,14 +165,13 @@ d3.select('#buttons')
         return [hierarchy, filetypes]
       })
       .then(([hierarchy, filetypes]: [Branch, any]) => {
-        console.log(files)
-        console.log('Hierarchy', hierarchy)
-        console.log('Filetypes', filetypes)
-
         // Draw legend
         drawLegend(filetypes)
 
-        drawDirs(hierarchy, d3.select('#filestructure'))
+        const root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
+        const box = d3.select('#filestructure')
+        drawDirs(root.children[0], box)
+
         console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 
         new Chart({
@@ -194,15 +194,19 @@ d3.select('#buttons')
       })
   })
 
-function drawDirs(hierarchy, selection) {
+function drawDirs(
+  hierarchy: d3.HierarchyNode<Branch>,
+  selection: d3.Selection<d3.BaseType, unknown, HTMLElement, any>
+) {
   // console.log(hierarchy)
 
-  const details = selection.append('details').attr('open', true)
+  const details = selection.append('details').attr('open', () => {
+    return hierarchy.depth < 2 ? 'open' : null
+  })
+
   const summary = details.append('summary')
-  summary.append('h3').text(hierarchy.name)
-  summary
-    .append('p')
-    .text(`Filesize: ${d3.format('.2f')(hierarchy.filesize / 1048576)} mb`)
+  summary.append('h3').text(hierarchy.data.name)
+  summary.append('p').text(`Filesize: ${readableFilesize(hierarchy.value)}`)
 
   const ul = details.append('ul')
   hierarchy.children.forEach((child) => {
@@ -210,23 +214,21 @@ function drawDirs(hierarchy, selection) {
     if (child.children !== undefined && child.children.length > 0) {
       drawDirs(child, li)
     } else {
-      if (child.filesize > 1073741824) {
-        li.text(
-          `${child.name} (${d3.format('.2f')(child.filesize / 1073741824)} gb)`
-        )
-      } else if (child.filesize > 1048576) {
-        li.text(
-          `${child.name} (${d3.format('.2f')(child.filesize / 1048576)} mb)`
-        )
-      } else if (child.filesize > 1024024) {
-        li.text(
-          `${child.name} (${d3.format('.2f')(child.filesize / 1024024)} mb)`
-        )
-      } else {
-        li.text(`${child.name} (${d3.format('.2f')(child.filesize / 1024)} kb)`)
-      }
+      li.text(`${child.data.name} ${readableFilesize(child.value)}`)
     }
   })
+}
+
+function readableFilesize(filesize: number) {
+  if (filesize > 1073741824) {
+    return `${d3.format('.2f')(filesize / 1073741824)} gb`
+  } else if (filesize > 1048576) {
+    return `${d3.format('.2f')(filesize / 1048576)} mb`
+  } else if (filesize > 1024024) {
+    return `${d3.format('.2f')(filesize / 1024024)} mb`
+  } else {
+    return `${d3.format('.2f')(filesize / 1024)} kb`
+  }
 }
 
 function drawLegend(
@@ -324,3 +326,8 @@ function drawLegend(
     })
   // .update()
 }
+
+// Wait
+// setTimeout(() => {
+//   $('#CAGRF12711').trigger('click')
+// }, 100)
