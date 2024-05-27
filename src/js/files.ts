@@ -209,18 +209,21 @@ function drawDirs(
   })
 
   const summary = details.append('summary')
-  summary.append('h3').text(hierarchy.data.name)
-  summary.append('p').text(`Filesize: ${readableFilesize(hierarchy.value)}`)
+  summary.append('h3').text(`>${hierarchy.data.name}`)
+  summary.append('p').text(`Filesize: ${decimalFilesize(hierarchy.value)}`)
 
   const ul = details.append('ul')
-  hierarchy.children.forEach((child) => {
-    const li = ul.append('li')
-    if (child.children !== undefined && child.children.length > 0) {
-      drawDirs(child, li)
-    } else {
-      li.text(`${child.data.name} ${readableFilesize(child.value)}`)
-    }
-  })
+  hierarchy.children
+    .sort((a, b) => b.value - a.value)
+    .forEach((child) => {
+      if (child.children !== undefined && child.children.length > 0) {
+        const li = ul.insert('li', ':first-child')
+        drawDirs(child, li)
+      } else {
+        const li = ul.append('li').attr('class', 'file')
+        li.text(`${child.data.name} ${decimalFilesize(child.value)}`)
+      }
+    })
 }
 
 function decimalFilesize(filesize: number) {
@@ -331,7 +334,7 @@ function drawLegend(
     .enter()
     .append('tr')
     .html((d: any) => {
-      return `<td>${d.name}</td><td>${d.count}</td><td>${readableFilesize(
+      return `<td>${d.name}</td><td>${d.count}</td><td>${decimalFilesize(
         d.filesize
       )}</td>`
     })
@@ -340,5 +343,5 @@ function drawLegend(
 
 // Wait
 // setTimeout(() => {
-$('#CAGRF12711').trigger('click')
+// $('#CAGRF12711').trigger('click')
 // }, 100)
