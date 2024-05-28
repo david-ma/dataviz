@@ -132,7 +132,7 @@ d3.select('#buttons')
   .enter()
   .append('button')
   .attr('id', (d) => d.split('.')[0])
-  .text((d) => d)
+  .text((d) => d.split('.')[0])
   .on('click', function (e, filename) {
     console.log('click', filename)
 
@@ -180,8 +180,8 @@ d3.select('#buttons')
           element: 'treemap',
           // data: [files],
           margin: { top: 10, right: 10, bottom: 10, left: 10 },
-          width: 800,
-          height: 400,
+          width: 600,
+          height: 600,
         }).initTreemap({
           data: hierarchy,
           target: 'filesize',
@@ -471,6 +471,6 @@ Promise.all(
 
 // Wait
 // setTimeout(() => {
-$('#CAGRF12711').trigger('click')
+// $('#CAGRF12711').trigger('click')
 // $('#CAGRF12711').trigger('click')
 // }, 100)
