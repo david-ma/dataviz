@@ -237,7 +237,18 @@ function drawDirs(
 
   const ul = details.append('ul')
   hierarchy.children
-    .sort((a, b) => b.value - a.value)
+    .sort((a, b) => {
+      let first = a.value,
+        second = b.value
+      if (a.data.filetype === 'folder') {
+        first = -first
+      }
+      if (b.data.filetype === 'folder') {
+        second = -second
+      }
+
+      return second - first
+    })
     .forEach((child) => {
       // Force child branch here
       // if (child.data === undefined) {
@@ -525,20 +536,22 @@ const filefilter = {
  * Return it's tags if it should be tagged
  */
 function fileStatus(data: Leaf | Branch) {
-  var result = '<span class="status green">Keep</span>'
-  if (data.filetype === 'folder') {
+  let result = '<span class="status green">Keep</span>'
+  if (data.path.includes('demultiplex')) {
+    result = '<span class="status red">Delete</span>'
+  } else if (data.filetype === 'folder') {
     // Should recursively check if anytihng is deleted in here
     result = '<span class="status green">Keep</span>'
-  }
-
-  Object.entries(filefilter).forEach(([foldername, patterns]) => {
-    if (data.path.includes(foldername)) {
-      const match = patterns.find((pattern) => pattern.test(data.path))
-      if (!match) {
-        result = '<span class="status red">Delete</span>'
+  } else {
+    Object.entries(filefilter).forEach(([foldername, patterns]) => {
+      if (data.path.includes(foldername)) {
+        const match = patterns.find((pattern) => pattern.test(data.path))
+        if (!match) {
+          result = '<span class="status red">Delete</span>'
+        }
       }
-    }
-  })
+    })
+  }
 
   return result
 }
