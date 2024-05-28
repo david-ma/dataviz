@@ -30,6 +30,16 @@
 
   #filestructure {
     float: left;
+    h4, p, li {
+      margin: 0;
+    }
+
+    span.filesize {
+      float: right;
+    }
+    summary {
+      cursor: pointer;
+    }
 
     details {
       margin: 0;
@@ -39,12 +49,10 @@
         list-style-type: none;
         padding: 0;
         margin: 0;
-        padding-left: 10px;
-        padding-top: 5px;
-        padding-bottom: 5px;
+        padding-left: 5px;
         background-color: rgba(0, 0, 0, 0.1);
         border-radius: 5px;
-        margin-bottom: 5px;
+        margin-bottom: 2px;
 
         &:hover {
           background-color: rgba(0, 0, 0, 0.2);
@@ -73,6 +81,7 @@
     }
 
   }
+  
 </style>
 
 <div id="popup">

@@ -220,8 +220,12 @@ function drawDirs(
   // })
 
   const summary = details.append('summary')
-  summary.append('h3').text(`>${hierarchy.data.name}`)
-  summary.append('p').text(`Filesize: ${filesizeLabel(hierarchy.value)}`)
+  summary
+    .append('h4')
+    .text(`>${hierarchy.data.name}`)
+    .append('span')
+    .classed('filesize', true)
+    .text(filesizeLabel(hierarchy.value))
 
   const ul = details.append('ul')
   hierarchy.children
@@ -248,14 +252,18 @@ function drawDirs(
         drawDirs(child, li)
       } else {
         const li = ul.append('li').attr('class', 'file')
-        li.text(`${child.data.name} ${filesizeLabel(child.value)}`)
+        li.html(
+          `${child.data.name} <span class="filesize">${filesizeLabel(
+            child.value
+          )}</span>`
+        )
       }
     })
 }
 
-function filesizeLabel(filesize: number, binary: boolean = false) {
+function filesizeLabel(filesize: number, binary: boolean = true, tb = true) {
   if (binary) {
-    if (filesize > 1024 * 1024 * 1024 * 1024) {
+    if (tb && filesize > 1024 * 1024 * 1024 * 1024) {
       return `${d3.format('.2f')(filesize / (1024 * 1024 * 1024 * 1024))} TiB`
     } else if (filesize > 1024 * 1024 * 1024) {
       return `${d3.format('.2f')(filesize / (1024 * 1024 * 1024))} GiB`
@@ -265,7 +273,7 @@ function filesizeLabel(filesize: number, binary: boolean = false) {
       return `${d3.format('.2f')(filesize / 1024)} KiB`
     }
   }
-  if (filesize > 1000000000000) {
+  if (tb && filesize > 1000000000000) {
     return `${d3.format('.2f')(filesize / 1000000000000)} TB`
   } else if (filesize > 1000000000) {
     return `${d3.format('.2f')(filesize / 1000000000)} GB`
@@ -373,49 +381,96 @@ function drawLegend(
   // .update()
 }
 
-// const allFiles = {}
-// // CSVs.forEach((filename) => {
-// const filename = 'A22H3JVLT3.csv'
-// // $('#A22H3JVLT3').trigger('click')
+const allFiles = {}
 
-// d3.text(`/AGRF/${filename}`)
-//   .then((text) => {
-//     return d3.csvParseRows(text).map((row, i, acc: any[]) => {
-//       const [bytes, rsync, timestamp, path] = row
-//       return { bytes: parseInt(bytes), rsync, timestamp, path }
-//     })
-//   })
-//   .then((data) => {
-//     const hierarchy = {
-//       children: [],
-//       name: 'root',
-//       filesize: 0,
-//     }
+Promise.all(
+  CSVs.map((filename) =>
+    d3
+      .text(`/AGRF/${filename}`)
+      .then((text) => {
+        return d3.csvParseRows(text).map((row, i, acc: any[]) => {
+          const [bytes, rsync, timestamp, path] = row
+          return { bytes: parseInt(bytes), rsync, timestamp, path }
+        })
+      })
+      .then((data) => {
+        const hierarchy = {
+          children: [],
+          name: 'root',
+          filesize: 0,
+        }
 
-//     data.forEach(function ({ bytes, timestamp, path }) {
-//       files[path] = {
-//         filesize: bytes,
-//         timestamp,
-//         path,
-//       }
+        data.forEach(function ({ bytes, timestamp, path }) {
+          files[path] = {
+            filesize: bytes,
+            timestamp,
+            path,
+          }
 
-//       hierarchyInsert(hierarchy, {
-//         ...files[path],
-//         breadcrumbs: path.split('/'),
+          hierarchyInsert(hierarchy, {
+            ...files[path],
+            breadcrumbs: path.split('/'),
+          })
+        })
+
+        let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
+        return [root, filetypes]
+      })
+  )
+).then((results) => {
+  results.forEach(([root, filetypes]: [any, any], i) => {
+    console.log(CSVs[i], filesizeLabel(root.value, false, false))
+    allFiles[CSVs[i]] = {
+      root,
+      filesize: root.value,
+      hr: filesizeLabel(root.value),
+      filetypes,
+    }
+  })
+  console.log('All files', allFiles)
+})
+
+// CSVs.forEach((filename) => {
+//   // const filename = 'A22H3JVLT3.csv'
+//   // $('#A22H3JVLT3').trigger('click')
+
+//   d3.text(`/AGRF/${filename}`)
+//     .then((text) => {
+//       return d3.csvParseRows(text).map((row, i, acc: any[]) => {
+//         const [bytes, rsync, timestamp, path] = row
+//         return { bytes: parseInt(bytes), rsync, timestamp, path }
 //       })
 //     })
-//     return [hierarchy, filetypes]
-//   })
-//   .then(([hierarchy, filetypes]: [Branch, any]) => {
-//     let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
+//     .then((data) => {
+//       const hierarchy = {
+//         children: [],
+//         name: 'root',
+//         filesize: 0,
+//       }
 
-//     console.log('Folder data', root)
-//   })
+//       data.forEach(function ({ bytes, timestamp, path }) {
+//         files[path] = {
+//           filesize: bytes,
+//           timestamp,
+//           path,
+//         }
 
+//         hierarchyInsert(hierarchy, {
+//           ...files[path],
+//           breadcrumbs: path.split('/'),
+//         })
+//       })
+//       return [hierarchy, filetypes]
+//     })
+//     .then(([hierarchy, filetypes]: [Branch, any]) => {
+//       let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
+
+//       console.log('Folder data', root.value)
+//     })
 // })
 
 // Wait
 // setTimeout(() => {
-// $('#CAGRF12711').trigger('click')
+$('#CAGRF12711').trigger('click')
 // $('#CAGRF12711').trigger('click')
 // }, 100)
