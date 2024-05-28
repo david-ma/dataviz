@@ -12,6 +12,7 @@ type Leaf = {
   name: string
   filesize: number
   filetype: string
+  path: string
   children: Branch[]
 }
 
@@ -59,7 +60,7 @@ function hierarchyInsert(
   if (data.breadcrumbs.length === 2 && data.breadcrumbs[1] === '') {
     // Found a Folder
     hierarchy.children.push({
-      children: [],
+      children: new Array<Leaf>(),
       name: data.breadcrumbs[0],
       filesize: data.filesize,
     })
@@ -95,6 +96,7 @@ function hierarchyInsert(
       children: [],
       name: data.breadcrumbs[0],
       filesize: data.filesize,
+      path: data.path,
       filetype: extension,
     }
 
@@ -199,7 +201,7 @@ d3.select('#buttons')
   })
 
 function drawDirs(
-  hierarchy: d3.HierarchyNode<Branch>,
+  hierarchy: d3.HierarchyNode<Branch | Leaf>,
   selection: d3.Selection<d3.BaseType, unknown, HTMLElement, any>
 ) {
   // console.log(hierarchy)
@@ -219,20 +221,19 @@ function drawDirs(
   //   return hierarchy.depth < 2 ? 'open' : null
   // })
 
-  const summary = details.append('summary')
-  summary
-    .append('h4')
-    .text(`${hierarchy.data.name}`)
-    .append('span')
-    .classed('filesize', true)
-    .text(filesizeLabel(hierarchy.value))
+  const summary = details.append('summary').append('h4').classed('folder', true)
+    .html(`<span class="foldername">${hierarchy.data.name}</span>
+<span class="fileStatus">${fileStatus(hierarchy.data)}</span>
+<span class="filesize">${filesizeLabel(hierarchy.value)}</span>`)
 
   const ul = details.append('ul')
   hierarchy.children
     .sort((a, b) => b.value - a.value)
     .forEach((child) => {
+      // Force child branch here
+      // if (child.data === undefined) {
       if (child.children !== undefined && child.children.length > 0) {
-        // If it's a folder
+        // If it's a folder / branch
         // console.log('Drawing folder', child)
         const li = ul
           .insert('li', ':first-child')
@@ -251,12 +252,13 @@ function drawDirs(
           })
         drawDirs(child, li)
       } else {
-        const li = ul.append('li').attr('class', 'file')
-        li.html(
-          `${child.data.name} <span class="filesize">${filesizeLabel(
-            child.value
-          )}</span>`
-        )
+        // We know it must be a leaf here.
+        const leafChild = child as d3.HierarchyNode<Leaf>
+
+        const li = ul.append('li').classed('file', true)
+          .html(`<span class="filename">${leafChild.data.name}</span>
+<span class="fileStatus">${fileStatus(leafChild.data)}</span>
+<span class="filesize">${filesizeLabel(child.value)}</span>`)
       }
     })
 }
@@ -472,5 +474,16 @@ Promise.all(
 // Wait
 // setTimeout(() => {
 // $('#CAGRF12711').trigger('click')
-$('#CAGRF12711').trigger('click')
+// $('#CAGRF12711').trigger('click')
+$('#CAGRF220610939').trigger('click')
 // }, 100)
+
+/**
+ * Determine if we should keep or delete a file
+ * Return it's tags if it should be tagged
+ */
+function fileStatus(data: any) {
+  console.log(data)
+
+  return 'hey'
+}
