@@ -488,6 +488,19 @@ Promise.all(
 // $('#CAGRF12711').trigger('click')
 // $('#CAGRF220610939').trigger('click')
 // }, 100)
+const hash = window.location.hash
+if (CSVs.map((d) => d.split('.')[0]).indexOf(hash)) {
+  $(hash).trigger('click')
+}
+
+const keep = {
+  secondary_analysis: [
+    /commands.*.txt/,
+    /parameters.*.txt/,
+    /Results.*/,
+    /Intermediate.*/,
+  ],
+}
 
 /**
  * Determine if we should keep or delete a file
@@ -495,12 +508,19 @@ Promise.all(
  */
 function fileStatus(data: any) {
   if (data.filetype === 'folder') {
+    // Should recursively check if anytihng is deleted in here
     return '<span class="status yellow">Folder</span>'
   }
 
-  if (data.path.includes('fastq.gz')) {
-    return '<span class="status red">Delete</span>'
-  }
+  Object.entries(keep).forEach(([folder, patterns]) => {
+    if (data.path.includes(folder)) {
+      if (data.depth !== 1) {
+        if (!patterns.some((pattern) => pattern.test(data.path))) {
+          return '<span class="status red">Delete</span>'
+        }
+      }
+    }
+  })
 
   return '<span class="status green">Keep</span>'
 }
