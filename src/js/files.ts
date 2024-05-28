@@ -88,7 +88,7 @@ function hierarchyInsert(
   } else {
     let extension = data.breadcrumbs[0].split('.').pop()
 
-    const archiveExtensions = ['tar', 'gz', 'zip']
+    const archiveExtensions = ['tar', 'gz', 'zip', 'txt']
     if (
       archiveExtensions.includes(extension) &&
       data.breadcrumbs[0].split('.').length > 2
@@ -248,6 +248,8 @@ function drawDirs(
           .insert('li', ':first-child')
           .attr('id', `directory-${classifyName(child.data.name)}`)
           .on('mouseover', function (e, d) {
+            // stop propogate
+            e.stopPropagation()
             d3.select(`#folder-${classifyName(child.data.name)}`).classed(
               'mouseover',
               true
@@ -309,6 +311,7 @@ function drawLegend(
     'bai',
     'vcf',
     'vcf.gz',
+    'hist.txt',
     'gvcf',
     'gvcf.gz',
     // 'bed', // bedgraph? bedpe? Is this a main one to keep?
@@ -493,34 +496,49 @@ if (CSVs.map((d) => d.split('.')[0]).indexOf(hash)) {
   $(hash).trigger('click')
 }
 
-const keep = {
+const filefilter = {
   secondary_analysis: [
-    /commands.*.txt/,
-    /parameters.*.txt/,
-    /Results.*/,
-    /Intermediate.*/,
+    /secondary_analysis\/Results.*/,
+    /secondary_analysis\/Intermediate.*/,
+    /secondary_analysis\/commands.*.txt$/,
+    /secondary_analysis\/parameters.*.txt$/,
   ],
 }
+
+// DATA_TYPE_TAG_MAPPING_NESTED = {
+//   "fastq": ["*.fastq.gz"],
+//   "bam": ["*.bam"],
+//   "vcf": ["*.gvcf.gz", "*.vcf.gz"],
+//   "lab-records": ["commands*.txt", "parameters*.txt"],
+//   "auxiliary": ["*.md5", "*.sha1"],
+// }
+// const data_type_tags = {
+//   fastq: ['*.fastq.gz'],
+//   bam: ['*.bam'],
+//   vcf: ['*.gvcf.gz', '*.vcf.gz'],
+//   'lab-records': ['commands*.txt', 'parameters*.txt'],
+//   auxiliary: ['*.md5', '*.sha1'],
+// }
 
 /**
  * Determine if we should keep or delete a file
  * Return it's tags if it should be tagged
  */
-function fileStatus(data: any) {
+function fileStatus(data: Leaf | Branch) {
+  var result = '<span class="status green">Keep</span>'
   if (data.filetype === 'folder') {
     // Should recursively check if anytihng is deleted in here
-    return '<span class="status yellow">Folder</span>'
+    result = '<span class="status green">Keep</span>'
   }
 
-  Object.entries(keep).forEach(([folder, patterns]) => {
-    if (data.path.includes(folder)) {
-      if (data.depth !== 1) {
-        if (!patterns.some((pattern) => pattern.test(data.path))) {
-          return '<span class="status red">Delete</span>'
-        }
+  Object.entries(filefilter).forEach(([foldername, patterns]) => {
+    if (data.path.includes(foldername)) {
+      const match = patterns.find((pattern) => pattern.test(data.path))
+      if (!match) {
+        result = '<span class="status red">Delete</span>'
       }
     }
   })
 
-  return '<span class="status green">Keep</span>'
+  return result
 }

@@ -1250,6 +1250,23 @@ class Chart {
         '#ffff99',
         '#b15928',
       ])
+      .domain([
+        'fastq',
+        'fastq.gz',
+        'txt',
+        'hist.txt',
+        'json.gz',
+        'bam',
+        'mate2',
+        'mate1',
+        'pairsam',
+        'vcf',
+        'tmp',
+        'gvcf',
+        'bed',
+        'junction',
+        'sam',
+      ])
 
     this.color = color
 
