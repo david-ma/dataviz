@@ -1,10 +1,13 @@
 console.log('files.ts')
 
+import { path } from 'd3'
 import { d3, Chart, classifyName } from './chart'
 
 type Branch = {
   children: (Leaf | Branch)[]
   name: string
+  filetype: string
+  path: string
   filesize: number
 }
 
@@ -20,6 +23,8 @@ const files = {}
 const root: Branch = {
   children: [],
   name: 'root',
+  path: '',
+  filetype: 'folder',
   filesize: 0,
 }
 
@@ -62,6 +67,8 @@ function hierarchyInsert(
     hierarchy.children.push({
       children: new Array<Leaf>(),
       name: data.breadcrumbs[0],
+      path: data.path,
+      filetype: 'folder',
       filesize: data.filesize,
     })
   } else if (data.breadcrumbs.length > 1) {
@@ -149,6 +156,8 @@ d3.select('#buttons')
         const hierarchy = {
           children: [],
           name: 'root',
+          path: '',
+          filetype: 'folder',
           filesize: 0,
         }
 
@@ -399,6 +408,8 @@ Promise.all(
         const hierarchy = {
           children: [],
           name: 'root',
+          path: '',
+          filetype: 'folder',
           filesize: 0,
         }
 
@@ -475,7 +486,7 @@ Promise.all(
 // setTimeout(() => {
 // $('#CAGRF12711').trigger('click')
 // $('#CAGRF12711').trigger('click')
-$('#CAGRF220610939').trigger('click')
+// $('#CAGRF220610939').trigger('click')
 // }, 100)
 
 /**
@@ -483,7 +494,13 @@ $('#CAGRF220610939').trigger('click')
  * Return it's tags if it should be tagged
  */
 function fileStatus(data: any) {
-  console.log(data)
+  if (data.filetype === 'folder') {
+    return '<span class="status yellow">Folder</span>'
+  }
 
-  return 'hey'
+  if (data.path.includes('fastq.gz')) {
+    return '<span class="status red">Delete</span>'
+  }
+
+  return '<span class="status green">Keep</span>'
 }
