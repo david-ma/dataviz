@@ -3,10 +3,13 @@ console.log('files.ts')
 import { path } from 'd3'
 import { d3, Chart, classifyName } from './chart'
 
+type Filestatus = 'keep' | 'delete' | 'mixed'
+
 type Branch = {
   children: (Leaf | Branch)[]
   name: string
   filetype: string
+  filestatus: Filestatus
   path: string
   filesize: number
 }
@@ -15,6 +18,7 @@ type Leaf = {
   name: string
   filesize: number
   filetype: string
+  filestatus: Filestatus
   path: string
   children: Branch[]
 }
@@ -24,6 +28,7 @@ const root: Branch = {
   children: [],
   name: 'root',
   path: '',
+  filestatus: null,
   filetype: 'folder',
   filesize: 0,
 }
@@ -70,6 +75,7 @@ function hierarchyInsert(
       path: data.path,
       filetype: 'folder',
       filesize: data.filesize,
+      filestatus: null,
     })
   } else if (data.breadcrumbs.length > 1) {
     // Go deeper
@@ -105,6 +111,7 @@ function hierarchyInsert(
       filesize: data.filesize,
       path: data.path,
       filetype: extension,
+      filestatus: null,
     }
 
     const filetype = (filetypes[leaf.filetype] = filetypes[leaf.filetype] || {
@@ -160,6 +167,7 @@ d3.select('#buttons')
           path: '',
           filetype: 'folder',
           filesize: 0,
+          filestatus: null,
         }
 
         data.forEach(function ({ bytes, timestamp, path }) {
@@ -233,7 +241,7 @@ function drawDirs(
 
   const summary = details.append('summary').append('h4').classed('folder', true)
     .html(`<span class="foldername">${hierarchy.data.name}</span>
-<span class="fileStatus">${fileStatus(hierarchy.data)}</span>
+<span class="fileStatus">${showFileStatus(hierarchy.data)}</span>
 <span class="filesize">${filesizeLabel(hierarchy.value)}</span>`)
 
   const ul = details.append('ul')
@@ -280,7 +288,7 @@ function drawDirs(
 
         const li = ul.append('li').classed('file', true)
           .html(`<span class="filename">${leafChild.data.name}</span>
-<span class="fileStatus">${fileStatus(leafChild.data)}</span>
+<span class="fileStatus">${showFileStatus(leafChild.data)}</span>
 <span class="filesize">${filesizeLabel(child.value)}</span>`)
       }
     })
@@ -428,6 +436,7 @@ if (false) {
             path: '',
             filetype: 'folder',
             filesize: 0,
+            filestatus: null,
           }
 
           data.forEach(function ({ bytes, timestamp, path }) {
@@ -539,23 +548,38 @@ const filefilter = {
  * Determine if we should keep or delete a file
  * Return it's tags if it should be tagged
  */
-function fileStatus(data: Leaf | Branch) {
-  let result = '<span class="status green">Keep</span>'
-  if (data.path.includes('demultiplex')) {
-    result = '<span class="status red">Delete</span>'
-  } else if (data.filetype === 'folder') {
-    // Should recursively check if anytihng is deleted in here
-    result = '<span class="status green">Keep</span>'
-  } else {
-    Object.entries(filefilter).forEach(([foldername, patterns]) => {
-      if (data.path.includes(foldername)) {
-        const match = patterns.find((pattern) => pattern.test(data.path))
-        if (!match) {
-          result = '<span class="status red">Delete</span>'
-        }
+function showFileStatus(data: Leaf | Branch) {
+  const fileflag = {
+    keep: '<span class="status green">Keep</span>',
+    delete: '<span class="status red">Delete</span>',
+    mixed: '<span class="status yellow">Mixed</span>',
+  }
+  return fileflag[data.filestatus || getFileStatus(data)]
+}
+
+function getFileStatus(data: Leaf | Branch) {
+  if (!data.filestatus) {
+    if (data.filetype === 'folder') {
+      const childStatuses = data.children.map((child) => getFileStatus(child))
+      const uniqueStatuses = [...new Set(childStatuses)]
+      if (uniqueStatuses.length === 1) {
+        data.filestatus = uniqueStatuses[0]
+        console.log('Setting', data.path, data.filestatus)
+      } else {
+        data.filestatus = 'mixed'
       }
-    })
+    } else {
+      data.filestatus = 'keep'
+      Object.entries(filefilter).forEach(([foldername, patterns]) => {
+        if (data.path.includes(foldername)) {
+          const match = patterns.find((pattern) => pattern.test(data.path))
+          if (!match) {
+            data.filestatus = 'delete'
+          }
+        }
+      })
+    }
   }
 
-  return result
+  return data.filestatus
 }
