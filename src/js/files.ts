@@ -133,6 +133,7 @@ const CSVs = [
   'CAGRF24010169-1.csv',
   'CAGRF24020097.csv',
   'CAGRF24020290.csv',
+  'CAGRF12711-4.csv',
 ]
 
 d3.select('#buttons')
@@ -406,56 +407,59 @@ function drawLegend(
   // .update()
 }
 
-const allFiles = {}
+// Feature flag, experimental stuff?
+if (false) {
+  const allFiles = {}
 
-Promise.all(
-  CSVs.map((filename) =>
-    d3
-      .text(`/AGRF/${filename}`)
-      .then((text) => {
-        return d3.csvParseRows(text).map((row, i, acc: any[]) => {
-          const [bytes, rsync, timestamp, path] = row
-          return { bytes: parseInt(bytes), rsync, timestamp, path }
-        })
-      })
-      .then((data) => {
-        const hierarchy = {
-          children: [],
-          name: 'root',
-          path: '',
-          filetype: 'folder',
-          filesize: 0,
-        }
-
-        data.forEach(function ({ bytes, timestamp, path }) {
-          files[path] = {
-            filesize: bytes,
-            timestamp,
-            path,
-          }
-
-          hierarchyInsert(hierarchy, {
-            ...files[path],
-            breadcrumbs: path.split('/'),
+  Promise.all(
+    CSVs.map((filename) =>
+      d3
+        .text(`/AGRF/${filename}`)
+        .then((text) => {
+          return d3.csvParseRows(text).map((row, i, acc: any[]) => {
+            const [bytes, rsync, timestamp, path] = row
+            return { bytes: parseInt(bytes), rsync, timestamp, path }
           })
         })
+        .then((data) => {
+          const hierarchy = {
+            children: [],
+            name: 'root',
+            path: '',
+            filetype: 'folder',
+            filesize: 0,
+          }
 
-        let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
-        return [root, filetypes]
-      })
-  )
-).then((results) => {
-  results.forEach(([root, filetypes]: [any, any], i) => {
-    console.log(CSVs[i], filesizeLabel(root.value, false, false))
-    allFiles[CSVs[i]] = {
-      root,
-      filesize: root.value,
-      hr: filesizeLabel(root.value),
-      filetypes,
-    }
+          data.forEach(function ({ bytes, timestamp, path }) {
+            files[path] = {
+              filesize: bytes,
+              timestamp,
+              path,
+            }
+
+            hierarchyInsert(hierarchy, {
+              ...files[path],
+              breadcrumbs: path.split('/'),
+            })
+          })
+
+          let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
+          return [root, filetypes]
+        })
+    )
+  ).then((results) => {
+    results.forEach(([root, filetypes]: [any, any], i) => {
+      console.log(CSVs[i], filesizeLabel(root.value, false, false))
+      allFiles[CSVs[i]] = {
+        root,
+        filesize: root.value,
+        hr: filesizeLabel(root.value),
+        filetypes,
+      }
+    })
+    console.log('All files', allFiles)
   })
-  console.log('All files', allFiles)
-})
+}
 
 // CSVs.forEach((filename) => {
 //   // const filename = 'A22H3JVLT3.csv'
