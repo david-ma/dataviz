@@ -37,6 +37,14 @@
       margin: 0;
     }
 
+    h4 {
+      font-weight: bold;
+    }
+
+    ul {
+      padding-left: 10px;
+    }
+
     span.filesize {
       float: right;
     }
@@ -48,6 +56,20 @@
     details {
       margin: 0;
       padding: 0;
+
+      summary h4::before {
+        content: '📂';
+        content: '🗃️';
+        content: '🗄️';
+        content: '▶️';
+      }
+
+      &[open]>summary h4::before {
+        content: '📂';
+        content: '🗃️';
+        content: '🗄️';
+        content: '▼';
+      }
 
       li {
         list-style-type: none;

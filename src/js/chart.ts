@@ -1425,7 +1425,7 @@ class Chart {
         return d.y1 - d.y0
       })
       .style('stroke', 'black')
-      .style('fill', 'rgba(0,0,0,0.1)')
+      .style('fill', 'rgba(0,0,0,0.05)')
       .style('opacity', 0.5)
       .on('mouseover', function (event, d) {
         d3.select(this).classed('mouseover', true)

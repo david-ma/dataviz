@@ -222,7 +222,7 @@ function drawDirs(
   const summary = details.append('summary')
   summary
     .append('h4')
-    .text(`>${hierarchy.data.name}`)
+    .text(`${hierarchy.data.name}`)
     .append('span')
     .classed('filesize', true)
     .text(filesizeLabel(hierarchy.value))
@@ -472,5 +472,5 @@ Promise.all(
 // Wait
 // setTimeout(() => {
 // $('#CAGRF12711').trigger('click')
-// $('#CAGRF12711').trigger('click')
+$('#CAGRF12711').trigger('click')
 // }, 100)
