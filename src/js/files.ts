@@ -562,7 +562,9 @@ function getFileStatus(data: Leaf | Branch) {
     if (data.filetype === 'folder') {
       const childStatuses = data.children.map((child) => getFileStatus(child))
       const uniqueStatuses = [...new Set(childStatuses)]
-      if (uniqueStatuses.length === 1) {
+      if (childStatuses.length === 0) {
+        data.filestatus = 'delete'
+      } else if (uniqueStatuses.length === 1) {
         data.filestatus = uniqueStatuses[0]
         console.log('Setting', data.path, data.filestatus)
       } else {
