@@ -1213,7 +1213,7 @@ class Chart {
       // .tile(d3.treemapSquarify)
       // .tile(d3.treemapResquarify)
       .size([width, height])
-      .padding(0.5)(root)
+      .padding(0)(root)
 
     const opacity = d3
       .scaleLinear()

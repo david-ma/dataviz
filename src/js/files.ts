@@ -1,6 +1,5 @@
 console.log('files.ts')
 
-import { path } from 'd3'
 import { d3, Chart, classifyName } from './chart'
 
 type Filestatus = 'keep' | 'delete' | 'mixed'
@@ -23,36 +22,24 @@ type Leaf = {
   children: Branch[]
 }
 
-const files = {}
-const root: Branch = {
-  children: [],
-  name: 'root',
-  path: '',
-  filestatus: null,
-  filetype: 'folder',
-  filesize: 0,
+type File = {
+  filesize: number
+  timestamp: string
+  path: string
 }
 
-const filetypes = {}
+const files: {
+  [path: string]: File
+} = {}
 
-// class Hierarchy {
-//   children: (Node | Branch)[]
-//   name: string
-//   tally: number
-//   tallyLabel?: string
-
-//   constructor() {
-//     this.children = []
-//     this.name = 'root'
-//     this.tally = 0
-//   }
-
-//   addData(branch: Branch,
-//     data: { name: string; filesize: number }) {
-//     this.children.push(data)
-//     this.tally += data.filesize
-//   }
-// }
+const filetypes: {
+  [filetype: string]: {
+    name: string
+    list: Leaf[]
+    count: number
+    filesize: number
+  }
+} = {}
 
 /**
  * Take a row and insert it into a d3 hierarchy at the appropriate place
@@ -94,15 +81,20 @@ function hierarchyInsert(
   } else {
     let extension = data.breadcrumbs[0].split('.').pop()
 
-    const archiveExtensions = ['tar', 'gz', 'zip', 'txt']
-    if (
-      archiveExtensions.includes(extension) &&
-      data.breadcrumbs[0].split('.').length > 2
-    ) {
-      extension = data.breadcrumbs[0].split('.').slice(-2).join('.')
-    }
+    if (data.breadcrumbs[0].indexOf('.') === -1) {
+      extension = 'unknown'
+    } else {
+      const archiveExtensions = ['tar', 'gz', 'zip', 'txt']
+      // const archiveExtensions = ['gz']
+      if (
+        archiveExtensions.includes(extension) &&
+        data.breadcrumbs[0].split('.').length > 2
+      ) {
+        extension = data.breadcrumbs[0].split('.').slice(-2).join('.')
+      }
 
-    extension = extension.toLowerCase() || 'unknown'
+      extension = extension.toLowerCase() || 'unknown'
+    }
 
     // Found a file
     const leaf: Leaf = {
@@ -262,7 +254,7 @@ function drawDirs(
       // Force child branch here
       // if (child.data === undefined) {
 
-// TODO: Empty folders should not appear as leaves?
+      // TODO: Empty folders should not appear as leaves?
       if (child.children !== undefined && child.children.length > 0) {
         // if (child.data.filetype === 'folder') {
         // If it's a folder / branch
