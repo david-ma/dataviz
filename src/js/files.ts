@@ -261,7 +261,10 @@ function drawDirs(
     .forEach((child) => {
       // Force child branch here
       // if (child.data === undefined) {
+
+// TODO: Empty folders should not appear as leaves?
       if (child.children !== undefined && child.children.length > 0) {
+        // if (child.data.filetype === 'folder') {
         // If it's a folder / branch
         // console.log('Drawing folder', child)
         const li = ul
@@ -566,7 +569,7 @@ function getFileStatus(data: Leaf | Branch) {
         data.filestatus = 'delete'
       } else if (uniqueStatuses.length === 1) {
         data.filestatus = uniqueStatuses[0]
-        console.log('Setting', data.path, data.filestatus)
+        // console.log('Setting', data.path, data.filestatus)
       } else {
         data.filestatus = 'mixed'
       }

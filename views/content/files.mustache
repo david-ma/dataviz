@@ -1,8 +1,13 @@
 <style>
   header,
+  header.hidden-xs,
   div.sidebar,
   footer {
     display: none;
+  }
+
+  div#dataviz_blog {
+    min-height: 100vh;
   }
 
   text {
@@ -63,13 +68,14 @@
       }
 
       span.filesize {
-        min-width: 90px;
+        min-width: 100px;
         padding-left: 5px;
       }
 
       span.status {
+        display: inline-block;
         width: 50px;
-        height: 50px;
+        text-align: center;
         padding: 2px;
         font-size: 12px;
         text-transform: capitalize;
@@ -77,12 +83,17 @@
         border-radius: 5px;
 
         &.green {
+          color: white;
           background-color: green;
         }
+
         &.yellow {
+          color: black;
           background-color: yellow;
         }
+
         &.red {
+          color: white;
           background-color: red;
         }
       }
