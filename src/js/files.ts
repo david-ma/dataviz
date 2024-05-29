@@ -515,6 +515,107 @@ if (CSVs.map((d) => d.split('.')[0]).indexOf(hash)) {
   $(hash).trigger('click')
 }
 
+if (hash === '#home') {
+  console.log('#home selected, trying to process file_audit_full.csv')
+  d3.text(`/AGRF/file_audit_full.csv`)
+    .then((text) => {
+      return d3.csvParseRows(text).map((row, i, acc: any[]) => {
+        const [bytes, timestamp, ...path] = row
+        return { bytes: parseInt(bytes), timestamp, path: path.join() }
+      })
+    })
+    .then((data) => {
+      console.log('CSV read', data)
+      console.log('Now trying to build a hierarchy')
+      const hierarchy = {
+        children: [],
+        name: 'root',
+        path: '',
+        filetype: 'folder',
+        filesize: 0,
+        filestatus: null,
+      }
+
+      data.forEach(function ({ bytes, timestamp, path }) {
+        files[path] = {
+          filesize: bytes,
+          timestamp,
+          path,
+        }
+
+        hierarchyInsert(hierarchy, {
+          ...files[path],
+          breadcrumbs: path.split('/'),
+        })
+      })
+      return [hierarchy, filetypes]
+    })
+    .then(([hierarchy, filetypes]: [Branch, any]) => {
+      console.log('Here is the hierarchy', hierarchy)
+      console.log(
+        'There are this many filetypes:',
+        Object.entries(filetypes).length
+      )
+      console.log('Filetypes', filetypes)
+
+      let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
+      const box = d3.select('#filestructure')
+
+      let shallow = getShallowHierarchy(root, 5)
+
+      // drawDirs(root, box)
+
+      // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
+
+      // const myChart = new Chart({
+      //   title: "All my files",
+      //   element: 'treemap',
+      //   // data: [files],
+      //   margin: { top: 10, right: 10, bottom: 10, left: 10 },
+      //   width: 600,
+      //   height: 600,
+      // }).initTreemap({
+      //   data: hierarchy,
+      //   target: 'filesize',
+      //   mouseover: (d) => {
+      //     console.log('Mousing over!', d)
+      //   },
+      //   mouseout: (d) => {
+      //     console.log('Mouse Out!', d)
+      //   },
+      // })
+
+      // Draw legend
+      // drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
+    })
+}
+
+function getShallowHierarchy(
+  hierarchy: d3.HierarchyNode<Branch | Leaf>,
+  depth: number
+) {
+  console.log('Getting shallow hierarchy', hierarchy)
+
+  if (hierarchy.depth === depth) {
+    const filesize = hierarchy.children.reduce(
+      (acc, child) => acc + child.value,
+      0
+    )
+    return {
+      name: hierarchy.data.name,
+      filesize: filesize,
+      children: [],
+    }
+  } else {
+    return {
+      ...hierarchy,
+      children: hierarchy.children.map((child) =>
+        getShallowHierarchy(child, depth)
+      ),
+    }
+  }
+}
+
 const filefilter = {
   secondary_analysis: [
     /secondary_analysis\/Results.*/,
