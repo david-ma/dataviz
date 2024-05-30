@@ -169,12 +169,12 @@ function drawDirs(
     .sort((a, b) => {
       let first = a.value,
         second = b.value
-      // if (a.data.filetype === 'folder') {
-      //   first = -first
-      // }
-      // if (b.data.filetype === 'folder') {
-      //   second = -second
-      // }
+      if (a.data && a.data.filetype === 'folder') {
+        first = -first
+      }
+      if (b.data && b.data.filetype === 'folder') {
+        second = -second
+      }
 
       return second - first
     })
