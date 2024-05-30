@@ -163,7 +163,29 @@ d3.select('#buttons')
           const path = rest.join()
           const parts = path.split('/')
           const name = parts.pop() || parts.pop()
-          const filetype = name.split('.').pop()
+          let filetype = name.split('.').pop()
+
+          if (path.slice(-1) === '/') {
+            console.log('Folder', path)
+            filetype = 'folder'
+          } else {
+            const doubleExtensions = [
+              'tar',
+              'gz',
+              'zip',
+              'txt',
+              'bai',
+              'out',
+              'err',
+              'log',
+            ]
+            if (doubleExtensions.indexOf(filetype) !== -1) {
+              const archiveParts = name.split('.')
+              if (archiveParts.length > 2) {
+                filetype = archiveParts.slice(-2).join('.')
+              }
+            }
+          }
 
           const node: FileNode = {
             filesize: parseInt(bytes),
@@ -356,7 +378,7 @@ function drawLegend(
       }
       if (!mainFiletypes.includes(file.name)) {
         misc = {
-          name: 'misc files (no: ' + mainFiletypes.join(', ') + ')',
+          name: 'misc files (not including: ' + mainFiletypes.join(', ') + ')',
           count: misc.count + file.count,
           filesize: misc.filesize + file.filesize,
         }
@@ -370,7 +392,7 @@ function drawLegend(
         filesize: 0,
       },
       {
-        name: 'misc files (no: ' + mainFiletypes.join(', ') + ')',
+        name: 'misc files (not including: ' + mainFiletypes.join(', ') + ')',
         count: 0,
         filesize: 0,
       },
@@ -669,7 +691,7 @@ function showFileStatus(node: d3.HierarchyNode<FileNode>) {
 function getFileStatus(node: d3.HierarchyNode<FileNode>) {
   const data = node.data
   if (!data.filestatus) {
-    if (data.filetype === 'folder') {
+    if (data.filetype === 'folder' && node.children) {
       const childStatuses = node.children.map((child) => getFileStatus(child))
       const uniqueStatuses = [...new Set(childStatuses)]
       if (childStatuses.length === 0) {
