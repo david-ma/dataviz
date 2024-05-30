@@ -4,24 +4,6 @@ import { d3, Chart, classifyName } from './chart'
 
 type Filestatus = 'keep' | 'delete' | 'mixed'
 
-// type Branch = {
-//   children: (Leaf | Branch)[]
-//   name: string
-//   filetype: string
-//   filestatus: Filestatus
-//   path: string
-//   filesize: number
-// }
-
-// type Leaf = {
-//   name: string
-//   filesize: number
-//   filetype: string
-//   filestatus: Filestatus
-//   path: string
-//   children: Branch[]
-// }
-
 type File = {
   filesize: number
   timestamp: string
@@ -40,86 +22,6 @@ const filetypes: {
     filesize: number
   }
 } = {}
-
-/**
- * Take a row and insert it into a d3 hierarchy at the appropriate place
- */
-// function hierarchyInsert(
-//   hierarchy: Branch,
-//   data: {
-//     filesize: number
-//     timestamp: string
-//     path: string
-//     breadcrumbs: string[]
-//   }
-// ) {
-//   // console.log("Processing", data.path)
-//   if (data.breadcrumbs.length === 2 && data.breadcrumbs[1] === '') {
-//     // Found a Folder
-//     hierarchy.children.push({
-//       children: new Array<Leaf>(),
-//       name: data.breadcrumbs[0],
-//       path: data.path,
-//       filetype: 'folder',
-//       filesize: data.filesize,
-//       filestatus: null,
-//     })
-//   } else if (data.breadcrumbs.length > 1) {
-//     // Go deeper
-//     const nextLevel = hierarchy.children.find(
-//       (d) => 'children' in d && d.name === data.breadcrumbs[0]
-//     )
-//     if ('children' in nextLevel) {
-//       hierarchyInsert(nextLevel, {
-//         ...data,
-//         breadcrumbs: data.breadcrumbs.slice(1),
-//       })
-//       // nextLevel.filesize += data.filesize
-//     } else {
-//       console.error('Node with no children? Folder with same name as a file?')
-//     }
-//   } else {
-//     let extension = data.breadcrumbs[0].split('.').pop()
-
-//     if (data.breadcrumbs[0].indexOf('.') === -1) {
-//       extension = 'unknown'
-//     } else {
-//       const archiveExtensions = ['tar', 'gz', 'zip', 'txt']
-//       // const archiveExtensions = ['gz']
-//       if (
-//         archiveExtensions.includes(extension) &&
-//         data.breadcrumbs[0].split('.').length > 2
-//       ) {
-//         extension = data.breadcrumbs[0].split('.').slice(-2).join('.')
-//       }
-
-//       extension = extension.toLowerCase() || 'unknown'
-//     }
-
-//     // Found a file
-//     const leaf: Leaf = {
-//       children: [],
-//       name: data.breadcrumbs[0],
-//       filesize: data.filesize,
-//       path: data.path,
-//       filetype: extension,
-//       filestatus: null,
-//     }
-
-//     const filetype = (filetypes[leaf.filetype] = filetypes[leaf.filetype] || {
-//       name: leaf.filetype,
-//       list: [],
-//       count: 0,
-//       filesize: 0,
-//     })
-
-//     filetype.count += 1
-//     filetype.filesize += leaf.filesize
-//     filetype.list.push(leaf)
-
-//     hierarchy.children.push(leaf)
-//   }
-// }
 
 const CSVs = [
   'A22H3JVLT3.csv',
@@ -411,27 +313,6 @@ function drawLegend(
       ],
       (d: any) => d.name
     )
-    // .join(
-    //   function(enter) {
-    //     return enter.html((d: any) => {
-    //       console.log("writing tr", d.name)
-    //       const filesizeMB = d3.format('.2f')(d.filesize / 1048576)
-    //       const filesizeGB = d3.format('.2f')(d.filesize / 1073741824)
-    //       if (d.filesize / 1073741824 > 1) {
-    //         return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeGB} gb</td>`
-    //       } else {
-    //         return `<td>${d.name}</td><td>${d.count}</td><td>${filesizeMB} mb</td>`
-    //       }
-    //     })
-    //   },
-    //   function(update) {
-    //     return update
-    //   },
-    //   function(exit){
-    //     return exit
-    //   }
-
-    // )
     .enter()
     .append('tr')
     .html((d: any) => {
