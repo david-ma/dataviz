@@ -41,6 +41,54 @@ const filetypes: {
   }
 } = {}
 
+class HierarchyNode {
+  children: HierarchyNode[]
+  name: string
+  path: string
+  filesize: number
+  filetype: string
+  filestatus: Filestatus
+  depth: number
+
+  constructor({ filesize, timestamp, depth, name, path, filetype }) {
+    this.name = name
+    this.path = path
+    this.filetype = filetype
+    this.filesize = 0
+    this.children = []
+    this.filestatus = null
+    this.depth = depth
+  }
+
+  addNode(data: { filesize: number; timestamp: string; path: string }) {
+    this.filesize += data.filesize
+    // if (data.path.split('/').length > 1) {
+    //   const nextLevel = this.children.find(
+    //     (d) => 'children' in d && d.name === data.path.split('/')[0]
+    //   )
+    //   // if ('children' in nextLevel) {
+    //   //   nextLevel.addNode({
+    //   //     ...data,
+    //   //     path: data.path.split('/').slice(1).join('/'),
+    //   //   })
+    //   // } else {
+    //   //   console.error('Node with no children? Folder with same name as a file?')
+    //   // }
+    // } else {
+    // }
+    this.children.push(
+      new HierarchyNode({
+        filesize: data.filesize,
+        timestamp: data.timestamp,
+        name: data.path.split('/').pop() || data.path,
+        path: data.path,
+        filetype: null,
+        depth: this.depth + 1,
+      })
+    )
+  }
+}
+
 /**
  * Take a row and insert it into a d3 hierarchy at the appropriate place
  */
@@ -135,6 +183,17 @@ const CSVs = [
   'CAGRF12711-4.csv',
 ]
 
+type FileNode = {
+  filesize: number
+  rsync: string
+  timestamp: string
+  path: string
+  name: string
+  filetype: string
+  filestatus?: any
+  // data?: FileNode
+}
+
 d3.select('#buttons')
   .selectAll('button')
   .data(CSVs)
@@ -146,46 +205,31 @@ d3.select('#buttons')
     console.log('click', filename)
 
     d3.text(`/AGRF/${filename}`)
-      .then((text) => {
-        return d3.csvParseRows(text).map((row, i, acc: any[]) => {
-          const [bytes, rsync, timestamp, path] = row
-          return { bytes: parseInt(bytes), rsync, timestamp, path }
-        })
-      })
-      .then((data) => {
-        const hierarchy = {
-          children: [],
-          name: 'root',
-          path: '',
-          filetype: 'folder',
-          filesize: 0,
-          filestatus: null,
-        }
-
-        data.forEach(function ({ bytes, timestamp, path }) {
-          files[path] = {
-            filesize: bytes,
+      .then((fileBody: string): FileNode[] =>
+        d3.csvParseRows(fileBody).map((row) => {
+          const [bytes, rsync, timestamp, ...rest] = row
+          const path = rest.join()
+          const parts = path.split('/')
+          const name = parts.pop() || parts.pop()
+          const filetype = name.split('.').pop()
+          return {
+            filesize: parseInt(bytes),
+            rsync,
             timestamp,
             path,
+            name,
+            filetype,
           }
-
-          hierarchyInsert(hierarchy, {
-            ...files[path],
-            breadcrumbs: path.split('/'),
-          })
         })
-        return [hierarchy, filetypes]
-      })
-      .then(([hierarchy, filetypes]: [Branch, any]) => {
-        let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
-        const box = d3.select('#filestructure')
+      )
+      .then(d3.stratify<FileNode>().path((d) => d.path))
+      .then((root: d3.HierarchyNode<FileNode>) => {
+        root.sum((d) => d.filesize)
 
-        if (root.children.length === 1) {
-          root = root.children[0]
-        }
+        const box = d3.select('#filestructure')
         drawDirs(root, box)
 
-        console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
+        // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 
         const myChart = new Chart({
           title: filename,
@@ -195,7 +239,7 @@ d3.select('#buttons')
           width: 600,
           height: 600,
         }).initTreemap({
-          data: hierarchy,
+          data: root,
           target: 'filesize',
           mouseover: (d) => {
             console.log('Mousing over!', d)
@@ -206,19 +250,17 @@ d3.select('#buttons')
         })
 
         // Draw legend
-        drawLegend(filetypes, myChart.color)
+        // drawLegend(filetypes, myChart.color)
       })
   })
 
 function drawDirs(
-  hierarchy: d3.HierarchyNode<Branch | Leaf>,
+  hierarchy: d3.HierarchyNode<FileNode>,
   selection: d3.Selection<d3.BaseType, unknown, HTMLElement, any>
 ) {
-  // console.log(hierarchy)
-
   const details = selection.append('details').attr('open', () => {
     if (
-      hierarchy.depth === 1 ||
+      hierarchy.depth === 0 ||
       hierarchy.data.name === 'BarcodeLengths' ||
       hierarchy.data.name === 'secondary_analysis' ||
       hierarchy.data.name === 'contracts'
@@ -279,7 +321,8 @@ function drawDirs(
         drawDirs(child, li)
       } else {
         // We know it must be a leaf here.
-        const leafChild = child as d3.HierarchyNode<Leaf>
+        // const leafChild = child as d3.HierarchyNode<FileNode>
+        const leafChild = child
 
         const li = ul.append('li').classed('file', true)
           .html(`<span class="filename">${leafChild.data.name}</span>
@@ -561,9 +604,9 @@ if (hash === '#home') {
       let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
       const box = d3.select('#filestructure')
 
-      let shallow = getShallowHierarchy(root, 5)
+      let shallow = getShallowHierarchy(root, 3)
 
-      // drawDirs(root, box)
+      drawDirs(shallow, box)
 
       // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 
@@ -594,22 +637,19 @@ function getShallowHierarchy(
   hierarchy: d3.HierarchyNode<Branch | Leaf>,
   depth: number
 ) {
-  console.log('Getting shallow hierarchy', hierarchy)
-
-  if (hierarchy.depth === depth) {
-    const filesize = hierarchy.children.reduce(
-      (acc, child) => acc + child.value,
-      0
-    )
-    return {
-      name: hierarchy.data.name,
-      filesize: filesize,
-      children: [],
-    }
+  if (!hierarchy.data.children || hierarchy.data.children.length === 0) {
+    return this
+  } else if (hierarchy.depth === depth) {
+    // const filesize = hierarchy.data.children.reduce((acc, child) => acc + child.data.filesize, 0)
+    // return {
+    //   name: hierarchy.data.name,
+    //   filesize: filesize,
+    //   children: [],
+    // }
   } else {
     return {
       ...hierarchy,
-      children: hierarchy.children.map((child) =>
+      children: hierarchy.data.children.map((child) =>
         getShallowHierarchy(child, depth)
       ),
     }
@@ -644,7 +684,7 @@ const filefilter = {
  * Determine if we should keep or delete a file
  * Return it's tags if it should be tagged
  */
-function showFileStatus(data: Leaf | Branch) {
+function showFileStatus(data: any) {
   const fileflag = {
     keep: '<span class="status green">Keep</span>',
     delete: '<span class="status red">Delete</span>',

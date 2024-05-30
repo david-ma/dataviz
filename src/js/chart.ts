@@ -1186,7 +1186,8 @@ class Chart {
    * Initialise a treemap
    */
   initTreemap(options: {
-    data: TreemapData
+    // data: TreemapData
+    data: any
     target: string
     mouseover: any
     mouseout: any
@@ -1200,7 +1201,8 @@ class Chart {
 
     svg.append('text').text(this.title)
 
-    const root = d3.hierarchy(options.data).sum((d: any) => d[options.target])
+    const root = options.data.sum((d: any) => d[options.target])
+    // const root = options.data
 
     console.log('Root', root)
 
