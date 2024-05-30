@@ -1201,8 +1201,8 @@ class Chart {
 
     svg.append('text').text(this.title)
 
-    const root = options.data.sum((d: any) => d[options.target])
-    // const root = options.data
+    // const root = options.data.sum((d: any) => d[options.target])
+    const root = options.data
 
     console.log('Root', root)
 
@@ -2065,5 +2065,5 @@ export { Chart, decorateTable, _, $, d3, classifyName }
 // export default Chart
 
 function classifyName(name: string): string {
-  return name.replace(/[ \(\)\.\']/gi, '-') // eslint-disable-line
+  return name.replace(/[\!\[\]\&\s\(\)\.\']/gi, '-') // eslint-disable-line
 }

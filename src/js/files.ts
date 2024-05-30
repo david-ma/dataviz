@@ -455,32 +455,56 @@ if (hash === '#home') {
         .map((row, i, acc: any[]) => {
           const [bytes, timestamp, ...rest] = row
 
+          const filesize = parseInt(bytes)
           const path = rest.join()
           const parts = path.split('/')
           const name = parts.pop() || parts.pop()
           let filetype = 'unknown'
 
-          if (parts.length > 4) {
-            // console.log("too many parts", parts)
-            return null
-          }
-
           if (path.slice(-1) === '/') {
             filetype = 'folder'
           } else if (name.indexOf('.') !== -1) {
-            filetype = name.split('.').pop()
+            filetype = name.split('.').pop().toLowerCase()
           }
 
-          const node: FileNode = {
-            filesize: parseInt(bytes),
-            timestamp,
-            path,
-            name,
-            filetype,
-            filestatus: 'keep',
-          }
+          if (
+            parts.length > 8 ||
+            path.length > 512 ||
+            (filetype !== 'folder' && filesize < 1024 * 1024 * 50) || // 50mb filesize cuts off the raw photos
+            path.indexOf('node_modules') !== -1 ||
+            path.indexOf('bower_components') !== -1 ||
+            path.indexOf('/.') !== -1 ||
+            path.indexOf('AppData') !== -1 ||
+            path.indexOf('Media/Games') !== -1 ||
+            path.indexOf('Cache') !== -1 ||
+            path.indexOf('Frameworks') !== -1 ||
+            path.indexOf('Contents') !== -1 ||
+            path.indexOf('/lib/') !== -1 ||
+            path.indexOf('plugins/') !== -1 ||
+            path.indexOf('.lrdata/') !== -1 ||
+            path.indexOf('/.git/') !== -1 ||
+            path.indexOf('/.metadata/') !== -1 ||
+            path.indexOf('/common/') !== -1 ||
+            path.indexOf('/.retroarch/') !== -1 ||
+            path.indexOf('/iPhoto Library/Masters/') !== -1 ||
+            path.indexOf('/.meteor/') !== -1 ||
+            path.indexOf('/src/') !== -1 ||
+            path.indexOf('/iPhoto Library/Database') !== -1
+          ) {
+            // console.log('Rejecting', path)
+            return null
+          } else {
+            const node: FileNode = {
+              filesize,
+              timestamp,
+              path,
+              name,
+              filetype,
+              filestatus: 'keep',
+            }
 
-          return recordFile(node)
+            return recordFile(node)
+          }
         })
         .filter((d) => d !== null)
     )
