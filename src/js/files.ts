@@ -39,13 +39,12 @@ const CSVs = [
 
 type FileNode = {
   filesize: number
-  rsync: string
+  rsync?: string
   timestamp: string
   path: string
   name: string
   filetype: string
   filestatus: Filestatus
-  // data?: FileNode
 }
 
 d3.select('#buttons')
@@ -68,7 +67,6 @@ d3.select('#buttons')
           let filetype = name.split('.').pop()
 
           if (path.slice(-1) === '/') {
-            console.log('Folder', path)
             filetype = 'folder'
           } else {
             const doubleExtensions = [
@@ -99,20 +97,7 @@ d3.select('#buttons')
             filestatus: null,
           }
 
-          const filerecord = (filetypes[node.filetype] = filetypes[
-            node.filetype
-          ] || {
-            name: node.filetype,
-            list: [],
-            count: 0,
-            filesize: 0,
-          })
-
-          filerecord.count += 1
-          filerecord.filesize += node.filesize
-          filerecord.list.push(node)
-
-          return node
+          return recordFile(node)
         })
       )
       .then(d3.stratify<FileNode>().path((d) => d.path))
@@ -151,12 +136,20 @@ function drawDirs(
   hierarchy: d3.HierarchyNode<FileNode>,
   selection: d3.Selection<d3.BaseType, unknown, HTMLElement, any>
 ) {
+  if (!hierarchy.data) {
+    console.log('Error, no data on this node', hierarchy)
+    return
+  }
+  const data = hierarchy.data || {
+    name: 'unknown',
+    filestatus: 'delete',
+  }
   const details = selection.append('details').attr('open', () => {
     if (
       hierarchy.depth === 0 ||
-      hierarchy.data.name === 'BarcodeLengths' ||
-      hierarchy.data.name === 'secondary_analysis' ||
-      hierarchy.data.name === 'contracts'
+      data.name === 'BarcodeLengths' ||
+      data.name === 'secondary_analysis' ||
+      data.name === 'contracts'
     ) {
       return 'open'
     }
@@ -167,7 +160,7 @@ function drawDirs(
   // })
 
   const summary = details.append('summary').append('h4').classed('folder', true)
-    .html(`<span class="foldername">${hierarchy.data.name}</span>
+    .html(`<span class="foldername">${data.name}</span>
 <span class="fileStatus">${showFileStatus(hierarchy)}</span>
 <span class="filesize">${filesizeLabel(hierarchy.value)}</span>`)
 
@@ -176,12 +169,12 @@ function drawDirs(
     .sort((a, b) => {
       let first = a.value,
         second = b.value
-      if (a.data.filetype === 'folder') {
-        first = -first
-      }
-      if (b.data.filetype === 'folder') {
-        second = -second
-      }
+      // if (a.data.filetype === 'folder') {
+      //   first = -first
+      // }
+      // if (b.data.filetype === 'folder') {
+      //   second = -second
+      // }
 
       return second - first
     })
@@ -191,22 +184,24 @@ function drawDirs(
 
       // TODO: Empty folders should not appear as leaves?
       if (child.children !== undefined && child.children.length > 0) {
-        // if (child.data.filetype === 'folder') {
-        // If it's a folder / branch
-        // console.log('Drawing folder', child)
+        const childData = child.data || {
+          name: 'unknown',
+          filestatus: 'delete',
+        }
+
         const li = ul
           .insert('li', ':first-child')
-          .attr('id', `directory-${classifyName(child.data.name)}`)
+          .attr('id', `directory-${classifyName(childData.name)}`)
           .on('mouseover', function (e, d) {
             // stop propogate
             e.stopPropagation()
-            d3.select(`#folder-${classifyName(child.data.name)}`).classed(
+            d3.select(`#folder-${classifyName(childData.name)}`).classed(
               'mouseover',
               true
             )
           })
           .on('mouseout', function (e, d) {
-            d3.select(`#folder-${classifyName(child.data.name)}`).classed(
+            d3.select(`#folder-${classifyName(childData.name)}`).classed(
               'mouseover',
               false
             )
@@ -216,6 +211,10 @@ function drawDirs(
         // We know it must be a leaf here.
         // const leafChild = child as d3.HierarchyNode<FileNode>
         const leafChild = child
+        if (!leafChild.data) {
+          console.log('Error, no data on this leaf node', hierarchy)
+          return
+        }
 
         const li = ul.append('li').classed('file', true)
           .html(`<span class="filename">${leafChild.data.name}</span>
@@ -433,103 +432,139 @@ if (CSVs.map((d) => d.split('.')[0]).indexOf(hash)) {
   $(hash).trigger('click')
 }
 
-// if (hash === '#home') {
-//   console.log('#home selected, trying to process file_audit_full.csv')
-//   d3.text(`/AGRF/file_audit_full.csv`)
-//     .then((text) => {
-//       return d3.csvParseRows(text).map((row, i, acc: any[]) => {
-//         const [bytes, timestamp, ...path] = row
-//         return { bytes: parseInt(bytes), timestamp, path: path.join() }
-//       })
-//     })
-//     .then((data) => {
-//       console.log('CSV read', data)
-//       console.log('Now trying to build a hierarchy')
-//       const hierarchy = {
-//         children: [],
-//         name: 'root',
-//         path: '',
-//         filetype: 'folder',
-//         filesize: 0,
-//         filestatus: null,
-//       }
+function recordFile(file: FileNode) {
+  const filerecord = (filetypes[file.filetype] = filetypes[file.filetype] || {
+    name: file.filetype,
+    list: [],
+    count: 0,
+    filesize: 0,
+  })
 
-//       data.forEach(function ({ bytes, timestamp, path }) {
-//         files[path] = {
-//           filesize: bytes,
-//           timestamp,
-//           path,
-//         }
+  filerecord.count += 1
+  filerecord.filesize += file.filesize
+  filerecord.list.push(file)
+  return file
+}
 
-//         // hierarchyInsert(hierarchy, {
-//         //   ...files[path],
-//         //   breadcrumbs: path.split('/'),
-//         // })
-//       })
-//       return [hierarchy, filetypes]
-//     })
-//     .then(([hierarchy, filetypes]: [Branch, any]) => {
-//       console.log('Here is the hierarchy', hierarchy)
-//       console.log(
-//         'There are this many filetypes:',
-//         Object.entries(filetypes).length
-//       )
-//       console.log('Filetypes', filetypes)
+if (hash === '#home') {
+  console.log('#home selected, trying to process file_audit_full.csv')
+  d3.text(`/AGRF/file_audit_full.csv`)
+    .then((fileBody: string): FileNode[] =>
+      d3
+        .csvParseRows(fileBody)
+        .map((row, i, acc: any[]) => {
+          const [bytes, timestamp, ...rest] = row
 
-//       let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
-//       const box = d3.select('#filestructure')
+          const path = rest.join()
+          const parts = path.split('/')
+          const name = parts.pop() || parts.pop()
+          let filetype = 'unknown'
 
-//       let shallow = getShallowHierarchy(root, 3)
+          if (parts.length > 4) {
+            // console.log("too many parts", parts)
+            return null
+          }
 
-//       drawDirs(shallow, box)
+          if (path.slice(-1) === '/') {
+            filetype = 'folder'
+          } else if (name.indexOf('.') !== -1) {
+            filetype = name.split('.').pop()
+          }
 
-//       // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
+          const node: FileNode = {
+            filesize: parseInt(bytes),
+            timestamp,
+            path,
+            name,
+            filetype,
+            filestatus: 'keep',
+          }
 
-//       // const myChart = new Chart({
-//       //   title: "All my files",
-//       //   element: 'treemap',
-//       //   // data: [files],
-//       //   margin: { top: 10, right: 10, bottom: 10, left: 10 },
-//       //   width: 600,
-//       //   height: 600,
-//       // }).initTreemap({
-//       //   data: hierarchy,
-//       //   target: 'filesize',
-//       //   mouseover: (d) => {
-//       //     console.log('Mousing over!', d)
-//       //   },
-//       //   mouseout: (d) => {
-//       //     console.log('Mouse Out!', d)
-//       //   },
-//       // })
+          return recordFile(node)
+        })
+        .filter((d) => d !== null)
+    )
+    .then(d3.stratify<FileNode>().path((d) => d.path))
+    .then((root: d3.HierarchyNode<FileNode>) => {
+      console.log('Here is the hierarchy', root)
+      console.log(
+        'There are this many filetypes:',
+        Object.entries(filetypes).length
+      )
 
-//       // Draw legend
-//       // drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
-//     })
-// }
+      console.log('Filetypes', filetypes)
 
-// function getShallowHierarchy(
-//   hierarchy: d3.HierarchyNode<FileNode>,
-//   depth: number
-// ) {
-//   if (!hierarchy.data.children || hierarchy.data.children.length === 0) {
-//     return this
-//   } else if (hierarchy.depth === depth) {
-//     // const filesize = hierarchy.data.children.reduce((acc, child) => acc + child.data.filesize, 0)
-//     // return {
-//     //   name: hierarchy.data.name,
-//     //   filesize: filesize,
-//     //   children: [],
-//     // }
-//   } else {
-//     return {
-//       ...hierarchy,
-//       children: hierarchy.data.children.map((child) =>
-//         getShallowHierarchy(child, depth)
-//       ),
-//     }
-//   }
-// }
+      root.sum((d: any) => {
+        return d ? d.filesize : 0
+      })
+
+      const box = d3.select('#filestructure')
+
+      // let shallow = getShallowHierarchy(root, 3)
+
+      // console.log("Here's the shallow hierarchy", shallow)
+
+      // drawDirs(shallow, box)
+      drawDirs(root, box)
+
+      // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
+
+      const myChart = new Chart({
+        title: 'All my files',
+        element: 'treemap',
+        // data: [files],
+        margin: { top: 10, right: 10, bottom: 10, left: 10 },
+        width: 600,
+        height: 600,
+      }).initTreemap({
+        data: root,
+        target: 'filesize',
+        mouseover: (d) => {
+          console.log('Mousing over!', d)
+        },
+        mouseout: (d) => {
+          console.log('Mouse Out!', d)
+        },
+      })
+
+      // Draw legend
+      drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
+    })
+}
+
+function getShallowHierarchy(
+  hierarchy: d3.HierarchyNode<FileNode>,
+  depth: number
+): d3.HierarchyNode<FileNode> {
+  if (!hierarchy.children) {
+    return hierarchy
+  }
+
+  if (hierarchy.depth > depth) {
+    return Object.assign({}, hierarchy, {
+      ...hierarchy,
+      height: depth - hierarchy.depth,
+      // children: [],
+      children: hierarchy.children.filter(
+        (child) => child.data.filetype !== 'folder'
+      ),
+    })
+  } else if (hierarchy.depth === depth) {
+    return Object.assign({}, hierarchy, {
+      ...hierarchy,
+      height: depth - hierarchy.depth,
+      children: hierarchy.children.map((child) =>
+        getShallowHierarchy(child, depth)
+      ),
+    })
+  } else {
+    return hierarchy
+  }
+}
+
+// if (!hierarchy.data.children || hierarchy.data.children.length === 0) {
+//   return this
+// } else
 
 const filefilter = {
   secondary_analysis: [
@@ -560,6 +595,10 @@ const filefilter = {
  * Return it's tags if it should be tagged
  */
 function showFileStatus(node: d3.HierarchyNode<FileNode>) {
+  if (!node.data) {
+    console.log('Error, no data on this node', node)
+    return ''
+  }
   const status = node.data.filestatus || getFileStatus(node)
   const fileflag = {
     keep: '<span class="status green">Keep</span>',
