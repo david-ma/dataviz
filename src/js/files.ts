@@ -107,24 +107,13 @@ d3.select('#buttons')
         const box = d3.select('#filestructure')
         drawDirs(root, box)
 
-        // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
-
         const myChart = new Chart({
           title: filename,
           element: 'treemap',
-          // data: [files],
-          margin: { top: 10, right: 10, bottom: 10, left: 10 },
-          width: 600,
-          height: 600,
+          margin: 10,
         }).initTreemap({
           hierachy: root,
           target: 'filesize',
-          mouseover: (d) => {
-            console.log('Mousing over!', d)
-          },
-          mouseout: (d) => {
-            console.log('Mouse Out!', d)
-          },
         })
 
         // Draw legend
@@ -470,72 +459,40 @@ if (hash === '#aws') {
       })
     })
     .then(d3.stratify<FileNode>().path((d) => d.path))
-    .then(
-      (root: d3.HierarchyNode<FileNode>) => {
-        console.log('Here is the hierarchy', root)
-        console.log(
-          'There are this many filetypes:',
-          Object.entries(filetypes).length
-        )
-
-        console.log('Filetypes', filetypes)
-        root
-          .each((node) => {
-            if (!node.data) {
-              node.data = {
-                timestamp: '', // could find the child with the latest timestamp
-                path: node.id,
-                name: node.id.split('/').pop() || node.id,
-                filetype: 'folder',
-                filestatus: 'keep',
-                filesize: 0,
-              }
+    .then((root: d3.HierarchyNode<FileNode>) => {
+      root
+        .each((node) => {
+          if (!node.data) {
+            node.data = {
+              timestamp: '', // could find the child with the latest timestamp
+              path: node.id,
+              name: node.id.split('/').pop() || node.id,
+              filetype: 'folder',
+              filestatus: 'keep',
+              filesize: 0,
             }
-          })
-          .sum((data) => data.filesize)
-
-        root.sum((data) => {
-          return data ? data.filesize : 0
+          }
         })
+        .sum((data) => data.filesize)
 
-        console.log('Here is the hierarchy again', root)
+      root.sum((data) => {
+        return data ? data.filesize : 0
+      })
 
-        const box = d3.select('#filestructure')
+      const box = d3.select('#filestructure')
+      drawDirs(root, box)
 
-        // let shallow = getShallowHierarchy(root, 3)
+      const myChart = new Chart({
+        element: 'treemap',
+        margin: 10,
+      }).initTreemap({
+        hierachy: root,
+        target: 'filesize',
+      })
 
-        // console.log("Here's the shallow hierarchy", shallow)
-
-        // drawDirs(shallow, box)
-        drawDirs(root, box)
-
-        // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
-
-        const myChart = new Chart({
-          title: 'All my files',
-          element: 'treemap',
-          // data: [files],
-          margin: { top: 10, right: 10, bottom: 10, left: 10 },
-          width: 600,
-          height: 600,
-        }).initTreemap({
-          hierachy: root,
-          target: 'filesize',
-          mouseover: (d) => {
-            console.log('Mousing over!', d)
-          },
-          mouseout: (d) => {
-            console.log('Mouse Out!', d)
-          },
-        })
-
-        // Draw legend
-        drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
-      },
-      (error) => {
-        console.log('Error in stratify', error)
-      }
-    )
+      // Draw legend
+      drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
+    })
 }
 
 if (hash === '#home') {
@@ -626,21 +583,11 @@ if (hash === '#home') {
       // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 
       const myChart = new Chart({
-        title: 'All my files',
         element: 'treemap',
-        // data: [files],
-        margin: { top: 10, right: 10, bottom: 10, left: 10 },
-        width: 600,
-        height: 600,
+        margin: 10,
       }).initTreemap({
         hierachy: root,
         target: 'filesize',
-        mouseover: (d) => {
-          console.log('Mousing over!', d)
-        },
-        mouseout: (d) => {
-          console.log('Mouse Out!', d)
-        },
       })
 
       // Draw legend

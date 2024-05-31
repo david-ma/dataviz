@@ -1192,12 +1192,10 @@ class Chart {
    * Initialise a treemap
    */
   initTreemap(options: {
-    // data: TreemapData
     hierachy: d3.HierarchyNode<any>
     target: string
-    mouseover: any
-    mouseout: any
-    // click: any
+    mouseover?: EventListener
+    mouseout?: EventListener
   }) {
     console.log('initTreemap with TreemapData', this.data)
 
