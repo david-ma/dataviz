@@ -1194,8 +1194,7 @@ class Chart {
   initTreemap(options: {
     hierachy: d3.HierarchyNode<any>
     target: string
-    mouseover?: EventListener
-    mouseout?: EventListener
+    color?: d3.ScaleOrdinal<string, any>
   }) {
     console.log('initTreemap with TreemapData', this.data)
 
@@ -1210,14 +1209,10 @@ class Chart {
 
     console.log('Root', root)
 
+    // tree is of type d3.HierarchyRectangularNode<any>
     const tree = d3
       .treemap()
       .tile(d3.treemapBinary)
-      // .tile(d3.treemapDice)
-      // .tile(d3.treemapSlice)
-      // .tile(d3.treemapSliceDice)
-      // .tile(d3.treemapSquarify)
-      // .tile(d3.treemapResquarify)
       .size([width, height])
       .padding(0)(root)
 
@@ -1229,204 +1224,30 @@ class Chart {
       ])
       .range([0.5, 1])
 
-    const color = d3
-      .scaleOrdinal()
-      // .domain(Object.keys(regions))
-      .range([
-        // 'url(#Gradient1)',
-        // 'url(#Gradient2)',
-        // 'linear-gradient(72deg, rgba(2, 0, 36, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%)',
-        // '#7fc97f',
-        // '#beaed4',
-        // '#fdc086',
-        // '#ffff99',
-        // '#386cb0',
-        // '#f0027f',
-        // '#bf5b17',
-        '#a6cee3',
-        '#1f78b4',
-        '#b2df8a',
-        '#33a02c',
-        '#fb9a99',
-        '#e31a1c',
-        '#fdbf6f',
-        '#ff7f00',
-        '#cab2d6',
-        '#6a3d9a',
-        '#ffff99',
-        '#b15928',
-      ])
-      .domain([
-        'fastq',
-        'fastq.gz',
-        'txt',
-        'hist.txt',
-        'json',
-        'json.gz',
-        'bam',
-        'mate2',
-        'mate1',
-        'pairsam',
-        'sam',
-        'vcf',
-        'gvcf',
-        'tmp',
-        'bed',
-        'junction',
-        'log',
-        'pac',
-        'fa',
-        'bin',
-        'out',
-      ])
-
-    this.color = color
-
-    // console.log('leaves', tree.children)
-    // console.log("links", tree.links())
-
-    // tree.
-    // console.log(tree)
+    const color = (this.color =
+      options.color || d3.scaleOrdinal().range(d3.schemeCategory10))
 
     // use this information to add rectangles:
     svg
-      .selectAll('rect.region')
+      .selectAll('rect.leaf')
       .data(tree.leaves())
       .enter()
       .append('rect')
-      .classed('region', true)
-      .on('mouseover', options.mouseover)
-      .on('mouseout', options.mouseout)
-      .attr('x', function (d) {
-        return d.x0
-      })
-      .attr('y', function (d) {
-        return d.y0
-      })
-      .attr('width', function (d) {
-        return d.x1 - d.x0
-      })
-      .attr('height', function (d) {
-        return d.y1 - d.y0
-      })
+      .classed('leaf', true)
+      .attr('x', (d) => d.x0)
+      .attr('y', (d) => d.y0)
+      .attr('width', (d) => d.x1 - d.x0)
+      .attr('height', (d) => d.y1 - d.y0)
       .style('stroke', 'black')
-      .style('fill', function (d) {
-        // Doesn't do anything?
-        // Is overwritten later?
-        return color(d.data.filetype)
-      })
+      .style('fill', (d) => color(d.data.filetype))
       .style('opacity', function (d: any) {
         return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1
       })
-      .each(function (d) {
-        // console.log('next level...', d)
-        // if(d.depth === 2) {
-        //   // console.log("We're at depth 2", d.data.children)
-        //   console.log(d)
-        //   if(d.data.children.length > 0) {
-        //   }
-        // }
-
-        const rWidth = d.x1 - d.x0
-        const rHeight = d.y1 - d.y0
-
-        const nextLevel = d3
-          .hierarchy({
-            name: d.data.name,
-            children: d.data.countries,
-            filesize: 0,
-          })
-          .sum((d: any) => d.filesize)
-
-        const myTreemap = d3.treemap().size([rWidth, rHeight])
-        // .padding(2)
-        const regionTree = myTreemap(nextLevel)
-
-        const regionGroupTranslate = `translate(${d.x0},${d.y0})`
-
-        const regionGroup = svg
-          .append('g')
-          .attr('id', `${classifyName(d.data.name)}`)
-          .attr('transform', regionGroupTranslate)
-
-        regionGroup
-          .selectAll('rect.country')
-          .data(regionTree.leaves())
-          .enter()
-          .append('rect')
-          .classed('country', true)
-          .attr('id', (d) => classifyName(d.data.name))
-          .attr('x', function (d) {
-            return d.x0
-          })
-          .attr('y', function (d) {
-            return d.y0
-          })
-          .attr('width', function (d) {
-            return d.x1 - d.x0
-          })
-          .attr('height', function (d) {
-            return d.y1 - d.y0
-          })
-          .style('stroke', 'black')
-          .style('fill', color(d.data.filetype))
-          .style('opacity', function (d: any) {
-            return d.parent
-              ? opacity.domain([10, d.parent.total])(d.data.value)
-              : 1
-          })
-          .on('mouseover', function (event, d) {
-            d3.select(`#row-${classifyName(d.data.name)}`).classed(
-              'highlight',
-              true
-            )
-          })
-          .on('mouseout', function (event, d) {
-            d3.select(`#row-${classifyName(d.data.name)}`).classed(
-              'highlight',
-              false
-            )
-          })
-          .on('click', function (d) {
-            console.log('Zoom in!')
-
-            $('.plot').append($(`#${classifyName(d.data.region)}`).detach())
-            // datatable.search(d.data.region).draw()
-
-            const zoomedTreemap = d3.treemap().size([width, height]).padding(0)
-            const zoomedRegionTree = zoomedTreemap(nextLevel)
-
-            const speed = 1000
-            let done = false
-
-            regionGroup
-              .transition()
-              .duration(speed)
-              .attr('transform', 'translate(0,0)')
-            regionGroup
-              .selectAll('rect.country')
-              .data(zoomedRegionTree.leaves())
-              .transition()
-              .duration(speed)
-              .attr('x', function (d) {
-                return d.x0
-              })
-              .attr('y', function (d) {
-                return d.y0
-              })
-              .attr('width', function (d) {
-                return d.x1 - d.x0
-              })
-              .attr('height', function (d) {
-                return d.y1 - d.y0
-              })
-              .on('end', function () {
-                if (!done) {
-                  done = true
-                  console.log('Finished zooming in')
-                }
-              })
-          })
+      .each((d) => {
+        // console.log('Hey, drawing a leaf', d)
+        if(d.data.filetype === 'folder') {
+          console.log("This is a folder!", d)
+        }
       })
 
     console.log('descendants', tree.descendants())
@@ -1443,18 +1264,10 @@ class Chart {
       .append('rect')
       .classed('folder', true)
       .attr('id', (d) => `folder-${classifyName(d.id)}`)
-      .attr('x', function (d) {
-        return d.x0
-      })
-      .attr('y', function (d) {
-        return d.y0
-      })
-      .attr('width', function (d) {
-        return d.x1 - d.x0
-      })
-      .attr('height', function (d) {
-        return d.y1 - d.y0
-      })
+      .attr('x', (d) => d.x0)
+      .attr('y', (d) => d.y0)
+      .attr('width', (d) => d.x1 - d.x0)
+      .attr('height', (d) => d.y1 - d.y0)
       .style('stroke', 'black')
       .style('fill', 'rgba(0,0,0,0.05)')
       .style('opacity', 0.5)

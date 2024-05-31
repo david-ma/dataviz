@@ -110,8 +110,7 @@ declare class Chart {
     initTreemap(options: {
         hierachy: d3.HierarchyNode<any>;
         target: string;
-        mouseover?: EventListener;
-        mouseout?: EventListener;
+        color?: d3.ScaleOrdinal<string, any>;
     }): this;
     initMap(): Promise<unknown>;
     drawMap(options: {

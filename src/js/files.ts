@@ -37,6 +37,46 @@ const CSVs = [
   'CAGRF12711-4.csv',
 ]
 
+const color = d3
+  .scaleOrdinal()
+  .range([
+    '#a6cee3',
+    '#1f78b4',
+    '#b2df8a',
+    '#33a02c',
+    '#fb9a99',
+    '#e31a1c',
+    '#fdbf6f',
+    '#ff7f00',
+    '#cab2d6',
+    '#6a3d9a',
+    '#ffff99',
+    '#b15928',
+  ])
+  .domain([
+    'fastq',
+    'fastq.gz',
+    'txt',
+    'hist.txt',
+    'json',
+    'json.gz',
+    'bam',
+    'mate2',
+    'mate1',
+    'pairsam',
+    'sam',
+    'vcf',
+    'gvcf',
+    'tmp',
+    'bed',
+    'junction',
+    'log',
+    'pac',
+    'fa',
+    'bin',
+    'out',
+  ])
+
 type FileNode = {
   filesize: number
   rsync?: string
@@ -114,6 +154,7 @@ d3.select('#buttons')
         }).initTreemap({
           hierachy: root,
           target: 'filesize',
+          color,
         })
 
         // Draw legend
@@ -488,6 +529,7 @@ if (hash === '#aws') {
       }).initTreemap({
         hierachy: root,
         target: 'filesize',
+        color,
       })
 
       // Draw legend
@@ -588,6 +630,7 @@ if (hash === '#home') {
       }).initTreemap({
         hierachy: root,
         target: 'filesize',
+        color,
       })
 
       // Draw legend
