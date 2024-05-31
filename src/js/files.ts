@@ -168,10 +168,7 @@ function drawDirs(
     d3.HierarchyNode<FileNode>,
     HTMLElement,
     any
-  >,
-  options?: {
-    openFolders: string[]
-  }
+  >
 ) {
   const hierarchy = selection.datum()
   if (!hierarchy.data) {
@@ -179,21 +176,13 @@ function drawDirs(
     return
   }
 
-  const details = selection.append('details').attr('open', () => {
-    if (
-      hierarchy.depth === 0 ||
-      (options &&
-        options.openFolders &&
-        options.openFolders.includes(hierarchy.data.name))
-    ) {
-      return 'open'
-    }
-    return null
-  })
+  const details = selection
+    .append('details')
+    .attr('open', () => (hierarchy.depth <= 1 ? true : null))
 
   const summary = details.append('summary').datum(hierarchy)
 
-  drawFolder(summary, hierarchy)
+  drawFolder(summary)
 
   const children = hierarchy.children || []
   const sorted = children.sort((a, b) => {
@@ -206,28 +195,30 @@ function drawDirs(
       second = -second
     }
 
-    return first - second
+    return second - first
   })
 
-  details
-    .append('ul')
-    .selectAll('li')
-    .data(sorted)
-    .enter()
-    .append('li')
-    .each((node, i, all) => {
-      const li = d3.select(all[i])
-      if (
-        node.children !== undefined ||
-        (node && node.data && node.data.filetype === 'folder')
-      ) {
-        drawDirs(li.datum(node))
-      } else {
-        drawLeaf(li, node)
-      }
-    })
+  const ul = details.append('ul')
+  sorted.forEach((node) => {
+    if (
+      node.children !== undefined ||
+      (node && node.data && node.data.filetype === 'folder')
+    ) {
+      drawDirs(ul.insert('li', ':first-child').datum(node))
+    } else {
+      drawLeaf(ul.append('li').datum(node))
+    }
+  })
 
-  function drawLeaf(element: any, node: d3.HierarchyNode<FileNode>) {
+  function drawLeaf(
+    element: d3.Selection<
+      HTMLElement,
+      d3.HierarchyNode<FileNode>,
+      HTMLElement,
+      any
+    >
+  ) {
+    const node = element.datum()
     return element.classed('file', true).html(`<span class="filename">${
       node.data.name
     }</span>
@@ -235,7 +226,15 @@ function drawDirs(
     <span class="filesize">${filesizeLabel(node.value)}</span>`)
   }
 
-  function drawFolder(element: any, node: d3.HierarchyNode<FileNode>) {
+  function drawFolder(
+    element: d3.Selection<
+      HTMLElement,
+      d3.HierarchyNode<FileNode>,
+      HTMLElement,
+      any
+    >
+  ) {
+    const node = element.datum()
     return element
       .html(
         `<span class="foldername">${node.data.name}</span>
