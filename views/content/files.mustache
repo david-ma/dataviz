@@ -10,6 +10,10 @@
     min-height: 100vh;
   }
 
+  div#content_reactive_wrapper {
+    width: 100%;
+  }
+
   text {
     fill: rgba(0, 0, 0, 0);
 
@@ -59,6 +63,14 @@
       span.filename,
       span.foldername {
         flex-grow: 1;
+      }
+
+      span.filename {
+        font-size: 0.8em;
+
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
       }
 
       span.filesize,

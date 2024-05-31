@@ -1182,12 +1182,18 @@ class Chart {
     callback(this)
   }
 
+  updateTreemap(data: any) {
+    const tree = d3.select('svg').selectAll('g')
+
+    return this
+  }
+
   /**
    * Initialise a treemap
    */
   initTreemap(options: {
     // data: TreemapData
-    data: any
+    hierachy: d3.HierarchyNode<any>
     target: string
     mouseover: any
     mouseout: any
@@ -1202,7 +1208,7 @@ class Chart {
     svg.append('text').text(this.title)
 
     // const root = options.data.sum((d: any) => d[options.target])
-    const root = options.data
+    const root = options.hierachy
 
     console.log('Root', root)
 
@@ -1221,7 +1227,7 @@ class Chart {
       .scaleLinear()
       .domain([
         10,
-        Math.max(...options.data.children.map((d) => d[options.target])),
+        Math.max(...options.hierachy.children.map((d) => d[options.target])),
       ])
       .range([0.5, 1])
 
@@ -1307,6 +1313,8 @@ class Chart {
       })
       .style('stroke', 'black')
       .style('fill', function (d) {
+        // Doesn't do anything?
+        // Is overwritten later?
         return color(d.data.filetype)
       })
       .style('opacity', function (d: any) {
@@ -1436,7 +1444,7 @@ class Chart {
       .enter()
       .append('rect')
       .classed('folder', true)
-      .attr('id', (d: any) => `folder-${classifyName(d.data.name)}`)
+      .attr('id', (d) => `folder-${classifyName(d.id)}`)
       .attr('x', function (d) {
         return d.x0
       })
@@ -2065,5 +2073,5 @@ export { Chart, decorateTable, _, $, d3, classifyName }
 // export default Chart
 
 function classifyName(name: string): string {
-  return name.replace(/[\!\[\]\&\s\(\)\.\']/gi, '-') // eslint-disable-line
+  return name.replace(/[\/\\\!\[\]\&\s\(\)\.\']/gi, '-') // eslint-disable-line
 }

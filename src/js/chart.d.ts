@@ -106,8 +106,9 @@ declare class Chart {
     squares(): this;
     treemap(): void;
     scratchpad(callback: (chart: Chart) => void): void;
+    updateTreemap(data: any): this;
     initTreemap(options: {
-        data: any;
+        hierachy: d3.HierarchyNode<any>;
         target: string;
         mouseover: any;
         mouseout: any;

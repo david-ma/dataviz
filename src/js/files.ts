@@ -117,7 +117,7 @@ d3.select('#buttons')
           width: 600,
           height: 600,
         }).initTreemap({
-          data: root,
+          hierachy: root,
           target: 'filesize',
           mouseover: (d) => {
             console.log('Mousing over!', d)
@@ -178,39 +178,34 @@ function drawDirs(
 
       return second - first
     })
-    .forEach((child) => {
+    .forEach((node) => {
       // Force child branch here
       // if (child.data === undefined) {
 
       // TODO: Empty folders should not appear as leaves?
-      if (child.children !== undefined && child.children.length > 0) {
-        const childData = child.data || {
-          name: 'unknown',
-          filestatus: 'delete',
-        }
-
+      if (node.children !== undefined && node.children.length > 0) {
         const li = ul
           .insert('li', ':first-child')
-          .attr('id', `directory-${classifyName(childData.name)}`)
+          .attr('id', `directory-${classifyName(node.id)}`)
           .on('mouseover', function (e, d) {
             // stop propogate
             e.stopPropagation()
-            d3.select(`#folder-${classifyName(childData.name)}`).classed(
+            d3.select(`#folder-${classifyName(node.id)}`).classed(
               'mouseover',
               true
             )
           })
           .on('mouseout', function (e, d) {
-            d3.select(`#folder-${classifyName(childData.name)}`).classed(
+            d3.select(`#folder-${classifyName(node.id)}`).classed(
               'mouseover',
               false
             )
           })
-        drawDirs(child, li)
+        drawDirs(node, li)
       } else {
         // We know it must be a leaf here.
         // const leafChild = child as d3.HierarchyNode<FileNode>
-        const leafChild = child
+        const leafChild = node
         if (!leafChild.data) {
           console.log('Error, no data on this leaf node', hierarchy)
           return
@@ -219,7 +214,7 @@ function drawDirs(
         const li = ul.append('li').classed('file', true)
           .html(`<span class="filename">${leafChild.data.name}</span>
 <span class="fileStatus">${showFileStatus(leafChild)}</span>
-<span class="filesize">${filesizeLabel(child.value)}</span>`)
+<span class="filesize">${filesizeLabel(node.value)}</span>`)
       }
     })
 }
@@ -446,13 +441,110 @@ function recordFile(file: FileNode) {
   return file
 }
 
+type AWS_S3_LIST_JSON = {
+  Contents: {
+    Key: string
+    LastModified: string
+    ETag: string
+    ChecksumAlgorithm: string[]
+    Size: number
+    StorageClass: string
+  }[]
+}
+
+if (hash === '#aws') {
+  console.log('#aws selected, trying to process aws.tsv')
+  d3.json(`/AGRF/aws.json`)
+    .then((data: AWS_S3_LIST_JSON): FileNode[] => {
+      return data.Contents.map((row) => {
+        const node: FileNode = {
+          filesize: row.Size,
+          timestamp: row.LastModified,
+          path: row.Key,
+          name: row.Key.split('/').pop(),
+          filetype: row.Key.split('.').pop().toLowerCase(),
+          filestatus: 'keep',
+        }
+        recordFile(node)
+        return node
+      })
+    })
+    .then(d3.stratify<FileNode>().path((d) => d.path))
+    .then(
+      (root: d3.HierarchyNode<FileNode>) => {
+        console.log('Here is the hierarchy', root)
+        console.log(
+          'There are this many filetypes:',
+          Object.entries(filetypes).length
+        )
+
+        console.log('Filetypes', filetypes)
+        root
+          .each((node) => {
+            if (!node.data) {
+              node.data = {
+                timestamp: '', // could find the child with the latest timestamp
+                path: node.id,
+                name: node.id.split('/').pop() || node.id,
+                filetype: 'folder',
+                filestatus: 'keep',
+                filesize: 0,
+              }
+            }
+          })
+          .sum((data) => data.filesize)
+
+        root.sum((data) => {
+          return data ? data.filesize : 0
+        })
+
+        console.log('Here is the hierarchy again', root)
+
+        const box = d3.select('#filestructure')
+
+        // let shallow = getShallowHierarchy(root, 3)
+
+        // console.log("Here's the shallow hierarchy", shallow)
+
+        // drawDirs(shallow, box)
+        drawDirs(root, box)
+
+        // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
+
+        const myChart = new Chart({
+          title: 'All my files',
+          element: 'treemap',
+          // data: [files],
+          margin: { top: 10, right: 10, bottom: 10, left: 10 },
+          width: 600,
+          height: 600,
+        }).initTreemap({
+          hierachy: root,
+          target: 'filesize',
+          mouseover: (d) => {
+            console.log('Mousing over!', d)
+          },
+          mouseout: (d) => {
+            console.log('Mouse Out!', d)
+          },
+        })
+
+        // Draw legend
+        drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
+      },
+      (error) => {
+        console.log('Error in stratify', error)
+      }
+    )
+}
+
 if (hash === '#home') {
   console.log('#home selected, trying to process file_audit_full.csv')
   d3.text(`/AGRF/file_audit_full.csv`)
     .then((fileBody: string): FileNode[] =>
       d3
         .csvParseRows(fileBody)
-        .map((row, i, acc: any[]) => {
+        .map((row) => {
           const [bytes, timestamp, ...rest] = row
 
           const filesize = parseInt(bytes)
@@ -541,7 +633,7 @@ if (hash === '#home') {
         width: 600,
         height: 600,
       }).initTreemap({
-        data: root,
+        hierachy: root,
         target: 'filesize',
         mouseover: (d) => {
           console.log('Mousing over!', d)
