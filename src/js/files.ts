@@ -162,14 +162,14 @@ d3.select('#buttons')
       })
   })
 
-function drawDirs(
-  selection: d3.Selection<
-    d3.BaseType,
-    d3.HierarchyNode<FileNode>,
-    HTMLElement,
-    any
-  >
-) {
+type ElementWithDatum<Datum> = d3.Selection<
+  d3.BaseType,
+  Datum,
+  HTMLElement,
+  any
+>
+
+function drawDirs(selection: ElementWithDatum<d3.HierarchyNode<FileNode>>) {
   const hierarchy = selection.datum()
   if (!hierarchy.data) {
     console.log('Error, no data on this node', hierarchy)
@@ -185,39 +185,22 @@ function drawDirs(
   drawFolder(summary)
 
   const children = hierarchy.children || []
-  const sorted = children.sort((a, b) => {
-    let first = a.value,
-      second = b.value
-    if (a.data && a.data.filetype === 'folder') {
-      first = -first
-    }
-    if (b.data && b.data.filetype === 'folder') {
-      second = -second
-    }
+  const sorted = children.sort((a, b) => b.value - a.value)
 
-    return second - first
-  })
-
-  const ul = details.append('ul')
+  const branches = details.append('ul')
+  const leaves = details.append('ul')
   sorted.forEach((node) => {
     if (
       node.children !== undefined ||
       (node && node.data && node.data.filetype === 'folder')
     ) {
-      drawDirs(ul.insert('li', ':first-child').datum(node))
+      drawDirs(branches.append('li').datum(node))
     } else {
-      drawLeaf(ul.append('li').datum(node))
+      drawLeaf(leaves.append('li').datum(node))
     }
   })
 
-  function drawLeaf(
-    element: d3.Selection<
-      HTMLElement,
-      d3.HierarchyNode<FileNode>,
-      HTMLElement,
-      any
-    >
-  ) {
+  function drawLeaf(element: ElementWithDatum<d3.HierarchyNode<FileNode>>) {
     const node = element.datum()
     return element.classed('file', true).html(`<span class="filename">${
       node.data.name
@@ -226,14 +209,7 @@ function drawDirs(
     <span class="filesize">${filesizeLabel(node.value)}</span>`)
   }
 
-  function drawFolder(
-    element: d3.Selection<
-      HTMLElement,
-      d3.HierarchyNode<FileNode>,
-      HTMLElement,
-      any
-    >
-  ) {
+  function drawFolder(element: ElementWithDatum<d3.HierarchyNode<FileNode>>) {
     const node = element.datum()
     return element
       .html(
