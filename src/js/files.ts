@@ -144,8 +144,8 @@ d3.select('#buttons')
       .then((root: d3.HierarchyNode<FileNode>) => {
         root.sum((d) => d.filesize)
 
-        const box = d3.select('#filestructure')
-        drawDirs(root, box)
+        const box = d3.select('#filestructure').datum(root)
+        drawDirs(box)
 
         const myChart = new Chart({
           title: filename,
@@ -163,39 +163,42 @@ d3.select('#buttons')
   })
 
 function drawDirs(
-  hierarchy: d3.HierarchyNode<FileNode>,
-  selection: d3.Selection<d3.BaseType, unknown, HTMLElement, any>
+  selection: d3.Selection<
+    d3.BaseType,
+    d3.HierarchyNode<FileNode>,
+    HTMLElement,
+    any
+  >,
+  options?: {
+    openFolders: string[]
+  }
 ) {
+  const hierarchy = selection.datum()
   if (!hierarchy.data) {
     console.log('Error, no data on this node', hierarchy)
     return
   }
-  const data = hierarchy.data || {
-    name: 'unknown',
-    filestatus: 'delete',
-  }
+
   const details = selection.append('details').attr('open', () => {
     if (
       hierarchy.depth === 0 ||
-      data.name === 'BarcodeLengths' ||
-      data.name === 'secondary_analysis' ||
-      data.name === 'contracts'
+      (options &&
+        options.openFolders &&
+        options.openFolders.includes(hierarchy.data.name))
     ) {
       return 'open'
     }
     return null
   })
-  // .attr('open', () => {
-  //   return hierarchy.depth < 2 ? 'open' : null
-  // })
 
-  const summary = details.append('summary').append('h4').classed('folder', true)
-    .html(`<span class="foldername">${data.name}</span>
-<span class="fileStatus">${showFileStatus(hierarchy)}</span>
-<span class="filesize">${filesizeLabel(hierarchy.value)}</span>`)
+  const summary = details.append('summary').datum(hierarchy)
+
+  drawFolder(summary)
 
   const ul = details.append('ul')
-  hierarchy.children
+
+  const tempdata = hierarchy.children || []
+  tempdata
     .sort((a, b) => {
       let first = a.value,
         second = b.value
@@ -213,40 +216,65 @@ function drawDirs(
       // if (child.data === undefined) {
 
       // TODO: Empty folders should not appear as leaves?
-      if (node.children !== undefined && node.children.length > 0) {
-        const li = ul
-          .insert('li', ':first-child')
-          .attr('id', `directory-${classifyName(node.id)}`)
-          .on('mouseover', function (e, d) {
-            // stop propogate
-            e.stopPropagation()
-            d3.select(`#folder-${classifyName(node.id)}`).classed(
-              'mouseover',
-              true
-            )
-          })
-          .on('mouseout', function (e, d) {
-            d3.select(`#folder-${classifyName(node.id)}`).classed(
-              'mouseover',
-              false
-            )
-          })
-        drawDirs(node, li)
+      // if (node.children !== undefined && node.children.length > 0) {
+      if (
+        node.children !== undefined ||
+        (node && node.data && node.data.filetype === 'folder')
+      ) {
+        // If it's a folder, draw a directory
+        drawDirs(ul.insert('li', 'li:first-child').datum(node))
       } else {
         // We know it must be a leaf here.
         // const leafChild = child as d3.HierarchyNode<FileNode>
-        const leafChild = node
-        if (!leafChild.data) {
+        if (!node.data) {
           console.log('Error, no data on this leaf node', hierarchy)
           return
+        } else {
+          drawLeaf(node, ul)
         }
-
-        const li = ul.append('li').classed('file', true)
-          .html(`<span class="filename">${leafChild.data.name}</span>
-<span class="fileStatus">${showFileStatus(leafChild)}</span>
-<span class="filesize">${filesizeLabel(node.value)}</span>`)
       }
     })
+
+  function drawLeaf(
+    node: d3.HierarchyNode<FileNode>,
+    element: d3.Selection<d3.BaseType, unknown, HTMLElement, any>
+  ) {
+    return element.append('li').classed('file', true)
+      .html(`<span class="filename">${node.data.name}</span>
+    <span class="fileStatus">${showFileStatus(node)}</span>
+    <span class="filesize">${filesizeLabel(node.value)}</span>`)
+  }
+
+  function drawFolder(
+    element: d3.Selection<
+      HTMLElement,
+      d3.HierarchyNode<FileNode>,
+      HTMLElement,
+      any
+    >
+  ) {
+    const node = element.datum()
+
+    return element
+      .html(
+        `<span class="foldername">${hierarchy.data.name}</span>
+    <span class="fileStatus">${showFileStatus(hierarchy)}</span>
+    <span class="filesize">${filesizeLabel(hierarchy.value)}</span>`
+      )
+      .classed('folder', true)
+      .attr('id', `directory-${classifyName(node.id)}`)
+      .on('mouseover', function (e, d) {
+        e.stopPropagation()
+
+        d3.select(`#folder-${classifyName(node.id)}`).classed('mouseover', true)
+      })
+      .on('mouseout', function (e, d) {
+        d3.select(`#folder-${classifyName(node.id)}`).classed(
+          'mouseover',
+          false
+        )
+      })
+  }
 }
 
 function filesizeLabel(filesize: number, binary: boolean = true, tb = true) {
@@ -520,8 +548,8 @@ if (hash === '#aws') {
         return data ? data.filesize : 0
       })
 
-      const box = d3.select('#filestructure')
-      drawDirs(root, box)
+      const box = d3.select('#filestructure').datum(root)
+      drawDirs(box)
 
       const myChart = new Chart({
         element: 'treemap',
@@ -620,7 +648,7 @@ if (hash === '#home') {
       // console.log("Here's the shallow hierarchy", shallow)
 
       // drawDirs(shallow, box)
-      drawDirs(root, box)
+      drawDirs(box.datum(root))
 
       // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
 

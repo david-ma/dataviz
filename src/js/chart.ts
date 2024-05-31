@@ -1210,7 +1210,7 @@ class Chart {
     console.log('Root', root)
 
     // tree is of type d3.HierarchyRectangularNode<any>
-    const tree = d3
+    const treemap = d3
       .treemap()
       .tile(d3.treemapBinary)
       .size([width, height])
@@ -1230,7 +1230,7 @@ class Chart {
     // use this information to add rectangles:
     svg
       .selectAll('rect.leaf')
-      .data(tree.leaves())
+      .data(treemap.leaves())
       .enter()
       .append('rect')
       .classed('leaf', true)
@@ -1250,8 +1250,8 @@ class Chart {
         }
       })
 
-    console.log('descendants', tree.descendants())
-    const folders = tree.descendants().filter((d) => d.children)
+    console.log('descendants', treemap.descendants())
+    const folders = treemap.descendants().filter((d) => d.children)
     // .filter((d) => d.depth === 2)
     console.log('Folders', folders)
 

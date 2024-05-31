@@ -40,23 +40,28 @@
   #filestructure {
     float: left;
 
-    h4,
     p,
     li {
       margin: 0;
-    }
-
-    h4 {
-      font-weight: bold;
     }
 
     ul {
       padding-left: 1 0px;
     }
 
+    summary.folder,
+    li.folder {
+      font-weight: bold;
+
+      span.foldername {
+        flex: auto;
+        flex-grow: 1;
+      }
+    }
 
     li.file,
-    h4.folder {
+    summary.folder,
+    li.folder {
       display: flex;
       justify-content: end;
 
@@ -118,14 +123,16 @@
       margin: 0;
       padding: 0;
 
-      summary h4::before {
+      summary.folder::before,
+            summary li.folder::before {
         content: '📂';
         content: '🗃️';
         content: '🗄️';
         content: '▶️';
       }
 
-      &[open]>summary h4::before {
+      &[open]>summary li.folder::before,
+      &[open]>summary.folder::before {
         content: '📂';
         content: '🗃️';
         content: '🗄️';
