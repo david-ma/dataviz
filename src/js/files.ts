@@ -193,73 +193,54 @@ function drawDirs(
 
   const summary = details.append('summary').datum(hierarchy)
 
-  drawFolder(summary)
+  drawFolder(summary, hierarchy)
 
-  const ul = details.append('ul')
+  const children = hierarchy.children || []
+  const sorted = children.sort((a, b) => {
+    let first = a.value,
+      second = b.value
+    if (a.data && a.data.filetype === 'folder') {
+      first = -first
+    }
+    if (b.data && b.data.filetype === 'folder') {
+      second = -second
+    }
 
-  const tempdata = hierarchy.children || []
-  tempdata
-    .sort((a, b) => {
-      let first = a.value,
-        second = b.value
-      if (a.data && a.data.filetype === 'folder') {
-        first = -first
-      }
-      if (b.data && b.data.filetype === 'folder') {
-        second = -second
-      }
+    return first - second
+  })
 
-      return second - first
-    })
-    .forEach((node) => {
-      // Force child branch here
-      // if (child.data === undefined) {
-
-      // TODO: Empty folders should not appear as leaves?
-      // if (node.children !== undefined && node.children.length > 0) {
+  details
+    .append('ul')
+    .selectAll('li')
+    .data(sorted)
+    .enter()
+    .append('li')
+    .each((node, i, all) => {
+      const li = d3.select(all[i])
       if (
         node.children !== undefined ||
         (node && node.data && node.data.filetype === 'folder')
       ) {
-        // If it's a folder, draw a directory
-        drawDirs(ul.insert('li', 'li:first-child').datum(node))
+        drawDirs(li.datum(node))
       } else {
-        // We know it must be a leaf here.
-        // const leafChild = child as d3.HierarchyNode<FileNode>
-        if (!node.data) {
-          console.log('Error, no data on this leaf node', hierarchy)
-          return
-        } else {
-          drawLeaf(node, ul)
-        }
+        drawLeaf(li, node)
       }
     })
 
-  function drawLeaf(
-    node: d3.HierarchyNode<FileNode>,
-    element: d3.Selection<d3.BaseType, unknown, HTMLElement, any>
-  ) {
-    return element.append('li').classed('file', true)
-      .html(`<span class="filename">${node.data.name}</span>
+  function drawLeaf(element: any, node: d3.HierarchyNode<FileNode>) {
+    return element.classed('file', true).html(`<span class="filename">${
+      node.data.name
+    }</span>
     <span class="fileStatus">${showFileStatus(node)}</span>
     <span class="filesize">${filesizeLabel(node.value)}</span>`)
   }
 
-  function drawFolder(
-    element: d3.Selection<
-      HTMLElement,
-      d3.HierarchyNode<FileNode>,
-      HTMLElement,
-      any
-    >
-  ) {
-    const node = element.datum()
-
+  function drawFolder(element: any, node: d3.HierarchyNode<FileNode>) {
     return element
       .html(
-        `<span class="foldername">${hierarchy.data.name}</span>
-    <span class="fileStatus">${showFileStatus(hierarchy)}</span>
-    <span class="filesize">${filesizeLabel(hierarchy.value)}</span>`
+        `<span class="foldername">${node.data.name}</span>
+    <span class="fileStatus">${showFileStatus(node)}</span>
+    <span class="filesize">${filesizeLabel(node.value)}</span>`
       )
       .classed('folder', true)
       .attr('id', `directory-${classifyName(node.id)}`)
