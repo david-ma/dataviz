@@ -176,29 +176,36 @@ function drawDirs(selection: ElementWithDatum<d3.HierarchyNode<FileNode>>) {
     return
   }
 
-  const details = selection
-    .append('details')
-    .attr('open', () => (hierarchy.depth <= 1 ? true : null))
+  const details = selection.append('details')
+  const branches = details.append('ul')
+  const leaves = details.append('ul')
+
+  details
+    .attr('open', () => (hierarchy.depth < 2 ? true : null))
+    .on('toggle', function (e, d) {
+      // Use a flag to prevent re-drawing, the "drawn" attribute
+      // Consider using a flag on FileNode instead
+      if (!d3.select(this).attr('drawn')) {
+        d3.select(this).attr('drawn', true)
+        const children = hierarchy.children || []
+        const sorted = children.sort((a, b) => b.value - a.value)
+
+        sorted.forEach((node) => {
+          if (
+            node.children !== undefined ||
+            (node && node.data && node.data.filetype === 'folder')
+          ) {
+            drawDirs(branches.append('li').datum(node))
+          } else {
+            drawLeaf(leaves.append('li').datum(node))
+          }
+        })
+      }
+    })
 
   const summary = details.append('summary').datum(hierarchy)
 
   drawFolder(summary)
-
-  const children = hierarchy.children || []
-  const sorted = children.sort((a, b) => b.value - a.value)
-
-  const branches = details.append('ul')
-  const leaves = details.append('ul')
-  sorted.forEach((node) => {
-    if (
-      node.children !== undefined ||
-      (node && node.data && node.data.filetype === 'folder')
-    ) {
-      drawDirs(branches.append('li').datum(node))
-    } else {
-      drawLeaf(leaves.append('li').datum(node))
-    }
-  })
 
   function drawLeaf(element: ElementWithDatum<d3.HierarchyNode<FileNode>>) {
     const node = element.datum()
