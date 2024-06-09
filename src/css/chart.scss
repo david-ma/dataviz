@@ -21,6 +21,20 @@
 .chart {
   font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
+  .map {
+    .loading {
+      path {
+        stroke-dasharray: 100;
+        animation: dash 5s linear;
+      }
+      @keyframes dash {
+        to {
+          stroke-dashoffset: 1000;
+        }
+      }
+    }
+  }
+
   .chart-title {
     text-anchor: middle;
     font-size: 24px;

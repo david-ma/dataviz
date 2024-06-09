@@ -1298,6 +1298,8 @@ class Chart {
 
       const path = d3.geoPath().projection(projection)
 
+      this.svg.classed('map', true)
+
       d3.json('/ne_110m_land.json')
         .then((json: any) => {
           this.svg
@@ -1308,6 +1310,62 @@ class Chart {
             .classed('continent map-outlines', true)
             .attr('d', path)
             .attr('fill', 'rgba(0,0,0,0)')
+
+          // https://css-tricks.com/svg-line-animation-works/
+          const loading = this.svg.append('g').classed('loading', true)
+
+          loading
+            .selectAll('path.map-outlines')
+            .data(json.features)
+            .enter()
+            .append('path')
+            .classed('continent map-outlines', true)
+            .attr('d', path)
+            .attr('fill', 'rgba(0,0,0,0)')
+
+          animateLine(this, 600)
+
+          function animateLine(that, speed = 500) {
+            if (that.svg.select('.loading').empty()) {
+              return
+            }
+            console.log('Animating line')
+
+            const line = loading
+              .append('line')
+              .classed('loading', true)
+              .attr('x1', 0)
+              .attr('y1', 0)
+              .attr('x2', 0)
+              .attr('y2', that.height)
+              .attr('stroke', 'rgba(0,255,0,0.5)')
+              .attr('stroke-width', 1)
+              .transition()
+              .ease(d3.easeLinear)
+              .duration(speed)
+              .attr('x1', that.width)
+              .attr('x2', that.width)
+              .on('end', () => {
+                // this.remove()
+                // line.remove()
+                animateLine(that, speed)
+              })
+            const line2 = loading
+              .append('line')
+              .classed('loading', true)
+              .attr('x1', 0)
+              .attr('y1', 0)
+              .attr('x2', that.width)
+              .attr('y2', 0)
+              .attr('stroke', 'rgba(0,255,0,0.5)')
+              .attr('stroke-width', 1)
+              .transition()
+              .ease(d3.easeLinear)
+              .duration(speed)
+              .attr('y1', that.height)
+              .attr('y2', that.height)
+          }
+
           return this
         })
         .then(resolve)
@@ -1326,6 +1384,8 @@ class Chart {
     markers?: Coordinates[]
     calculate: Function
   }) {
+    this.svg.selectAll('.loading').remove()
+
     let chart: Chart = this
     chart.calculate = options.calculate
     let lat = options.center ? options.center.latitude : 0
@@ -1380,9 +1440,9 @@ class Chart {
           .append('path')
           .attr('class', (d) => {
             if (
+              // d.properties.name === 'S. Geo. and the Is.' ||
               d.properties.NAME === 'Georgia' ||
-              d.properties.name === 'Georgia' ||
-              d.properties.name === 'S. Geo. and the Is.'
+              d.properties.name === 'Georgia'
             ) {
               georgias.push(d)
               return 'map-outlines georgia'
