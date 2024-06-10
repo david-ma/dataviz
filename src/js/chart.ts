@@ -102,7 +102,7 @@ class Chart {
   // drawMap stuff
   projection?: any
   calculate?: Function // recalculate the chart, based on data
-  loadingAnimation?: MapLoadingAnimation
+  loadingAnimation?: LoadingAnimation
 
   // svg: Selection<SVGSVGElement, any, HTMLElement, any>
   svg: any
@@ -1318,7 +1318,7 @@ class Chart {
             projectionPath: path,
           })
 
-          this.loadingAnimation.animateForwards()
+          this.loadingAnimation.animate()
 
           return this
         })
@@ -1861,8 +1861,13 @@ function decorateTable(dataset: any, newOptions?: chartDataTableSettings): any {
   return $(element).DataTable(options)
 }
 
+interface LoadingAnimation {
+  animate: () => void
+  stop: () => void
+}
+
 // https://css-tricks.com/svg-line-animation-works/
-class MapLoadingAnimation {
+class MapLoadingAnimation implements LoadingAnimation {
   chart: Chart
   loadingSvg: any
   horizontalLine: any
@@ -1918,6 +1923,10 @@ class MapLoadingAnimation {
     this.horizontalLine.interrupt()
     this.verticalLine.interrupt()
     this.loadingSvg.selectAll('.loading').remove()
+  }
+
+  animate() {
+    this.animateForwards()
   }
 
   animateForwards() {

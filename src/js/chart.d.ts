@@ -73,7 +73,7 @@ declare class Chart {
     fullscreen: boolean;
     projection?: any;
     calculate?: Function;
-    loadingAnimation?: MapLoadingAnimation;
+    loadingAnimation?: LoadingAnimation;
     svg: any;
     plot: any;
     xScale: d3.ScaleLinear<number, number>;
@@ -131,22 +131,9 @@ type chartDataTableSettings = any & {
     render?: any;
 };
 declare function decorateTable(dataset: any, newOptions?: chartDataTableSettings): any;
-declare class MapLoadingAnimation {
-    chart: Chart;
-    loadingSvg: any;
-    horizontalLine: any;
-    verticalLine: any;
-    speed: number;
-    constructor({ chart, features, projectionPath, speed, }: {
-        chart: Chart;
-        features: any;
-        projectionPath: any;
-        speed?: number;
-    });
-    stop(): void;
-    animateForwards(): void;
-    animateBackwards(): void;
-    animateRandom(): void;
+interface LoadingAnimation {
+    animate: () => void;
+    stop: () => void;
 }
 export declare function mapDistance(a: Coordinates, b: Coordinates): number;
 export { Chart, decorateTable, _, $, d3, classifyName };
