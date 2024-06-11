@@ -133,7 +133,9 @@ type chartDataTableSettings = any & {
 declare function decorateTable(dataset: any, newOptions?: chartDataTableSettings): any;
 interface LoadingAnimation {
     animate: () => void;
-    stop: () => void;
+    stop: (options?: {
+        goto?: [number, number];
+    }) => Promise<any>;
 }
 export declare function mapDistance(a: Coordinates, b: Coordinates): number;
 export { Chart, decorateTable, _, $, d3, classifyName };

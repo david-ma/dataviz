@@ -1338,8 +1338,6 @@ class Chart {
     markers?: Coordinates[]
     calculate: Function
   }) {
-    this.loadingAnimation.stop()
-
     let chart: Chart = this
     chart.calculate = options.calculate
     let lat = options.center ? options.center.latitude : 0
@@ -1446,178 +1444,207 @@ class Chart {
         //     .attr("transform", d => `translate(${projection([d.long,d.lat])}`);
 
         if (options.markers) {
-          svg
-            .selectAll('.mark')
-            .data(options.markers, (d: Coordinates) => d.type)
-            .join(
-              function (enter) {
-                enter.each((d: any, i, nodes) => {
-                  const node = d3
-                    .select(nodes[i])
-                    .insert('g', 'g.mark')
-                    .classed('mark', true)
-                    .attr(
-                      'transform',
-                      (d: Coordinates) =>
-                        `translate(${projection([d.longitude, d.latitude])})`
-                    )
-
-                  const marker = node.append('g').classed('marker', true)
-
-                  marker
-                    .append('rect')
-                    .attr('width', 100)
-                    .attr('height', 80)
-                    .attr('x', -50)
-                    .attr('y', -40)
-                    .attr('rx', 50)
-                    .attr('fill', 'rgba(0,0,0,0.01)')
-
-                  if (
-                    d.type !== 'Country' &&
-                    d.type !== 'State' &&
-                    d.type !== 'Island'
-                  ) {
-                    marker
-                      .append('circle')
-                      .attr('r', 10)
-                      .attr('cx', 0)
-                      .attr('cy', 0)
-
-                    marker
-                      .append('line')
-                      .attr('x1', 0)
-                      .attr('y1', -10)
-                      .attr('x2', 0)
-                      .attr('y2', 10)
-
-                    marker
-                      .append('line')
-                      .attr('x1', -10)
-                      .attr('y1', 0)
-                      .attr('x2', 10)
-                      .attr('y2', 0)
-                  }
-
-                  var label: d3.Selection<Element, unknown, null, undefined> =
-                    node
-                  if (d.url) {
-                    label = label.append('a').attr('xlink:href', d.url)
-                  }
-
-                  if (d.label)
-                    label
-                      .append('text')
-                      .classed('mark-label', true)
-                      .attr('x', 0)
-                      .attr('y', -15)
-                      .text(d.label)
-
-                  if (d.draggable) {
-                    node.call(
-                      d3
-                        .drag()
-                        .on('start', function (d: DragEvent, data: object) {
-                          node.classed('active', true)
-                          d3.select('path.travel-line').classed('active', true)
-                        })
-                        .on('drag', function (d: DragEvent, data: object) {
-                          node.attr('transform', `translate(${d.x},${d.y})`)
-                        })
-                        .on('end', function (d: DragEvent, data: Coordinates) {
-                          const [longitude, latitude] = projection.invert([
-                            d.x,
-                            d.y,
-                          ])
-
-                          node.classed('active', false).datum({
-                            ...data,
-                            longitude,
-                            latitude,
-                          })
-
-                          georgias.forEach((georgia) => {
-                            if (d3.geoContains(georgia, [longitude, latitude]))
-                              alert('You are in Georgia!')
-                          })
-
-                          const newMarkers = chart.calculate(chart, {
-                            ...data,
-                            longitude,
-                            latitude,
-                          })
-
-                          svg
-                            .selectAll('.mark')
-                            .data(newMarkers, (d: Coordinates) => d.type)
-                            .each((d: Coordinates, i: number, nodes) => {
-                              d3.select(nodes[i])
-                                .select('.mark-label')
-                                .text(d.label)
-                            })
-
-                          d3.select('path.travel-line')
-                            .classed('active', false)
-                            .attr(
-                              'd',
-                              path({
-                                type: 'LineString',
-                                coordinates: [
-                                  [
-                                    newMarkers[0].longitude,
-                                    newMarkers[0].latitude,
-                                  ],
-                                  [
-                                    newMarkers[1].longitude,
-                                    newMarkers[1].latitude,
-                                  ],
-                                ],
-                              })
-                            )
-                        })
-                    )
-                  }
-                })
-                return d3.selectAll('.mark')
-              },
-              function (update) {
-                update.each((d: any, i, nodes) => {
-                  const node = d3
-                    .select(nodes[i])
-                    .attr(
-                      'transform',
-                      (d: Coordinates) =>
-                        `translate(${projection([d.longitude, d.latitude])})`
-                    )
-                  node.select('.mark-label').text(d.label)
-                })
-                return d3.selectAll('.mark')
-              },
-              function (exit) {
-                exit.each((d: any, i, nodes) => {
-                  console.log('removing node', i)
-                  d3.select(nodes[i]).remove()
-                })
-                return d3.selectAll('.mark')
-              }
-            )
-
           const [start, end] = options.markers
-          svg
-            .append('path')
-            .classed('travel-line', true)
-            .attr(
-              'd',
-              path({
-                type: 'LineString',
-                coordinates: [
-                  [start.longitude, start.latitude],
-                  [end.longitude, end.latitude],
-                ],
-              })
-            )
-            .attr('stroke', 'red')
-            .attr('stroke-width', 2)
+
+          this.loadingAnimation
+            .stop({
+              goto: chart.projection([start.longitude, start.latitude]),
+            })
+            .then(() => {
+              svg
+                .selectAll('.mark')
+                .data(options.markers, (d: Coordinates) => d.type)
+                .join(
+                  function (enter) {
+                    enter.each((d: any, i, nodes) => {
+                      const node = d3
+                        .select(nodes[i])
+                        .insert('g', 'g.mark')
+                        .classed('mark', true)
+                        .attr(
+                          'transform',
+                          (d: Coordinates) =>
+                            `translate(${projection([
+                              d.longitude,
+                              d.latitude,
+                            ])})`
+                        )
+
+                      const marker = node.append('g').classed('marker', true)
+
+                      marker
+                        .append('rect')
+                        .attr('width', 100)
+                        .attr('height', 80)
+                        .attr('x', -50)
+                        .attr('y', -40)
+                        .attr('rx', 50)
+                        .attr('fill', 'rgba(0,0,0,0.01)')
+
+                      if (
+                        d.type !== 'Country' &&
+                        d.type !== 'State' &&
+                        d.type !== 'Island'
+                      ) {
+                        marker
+                          .append('circle')
+                          .attr('r', 10)
+                          .attr('cx', 0)
+                          .attr('cy', 0)
+
+                        marker
+                          .append('line')
+                          .attr('x1', 0)
+                          .attr('y1', -10)
+                          .attr('x2', 0)
+                          .attr('y2', 10)
+
+                        marker
+                          .append('line')
+                          .attr('x1', -10)
+                          .attr('y1', 0)
+                          .attr('x2', 10)
+                          .attr('y2', 0)
+                      }
+
+                      var label: d3.Selection<
+                        Element,
+                        unknown,
+                        null,
+                        undefined
+                      > = node
+                      if (d.url) {
+                        label = label.append('a').attr('xlink:href', d.url)
+                      }
+
+                      if (d.label)
+                        label
+                          .append('text')
+                          .classed('mark-label', true)
+                          .attr('x', 0)
+                          .attr('y', -15)
+                          .text(d.label)
+
+                      if (d.draggable) {
+                        node.call(
+                          d3
+                            .drag()
+                            .on('start', function (d: DragEvent, data: object) {
+                              node.classed('active', true)
+                              d3.select('path.travel-line').classed(
+                                'active',
+                                true
+                              )
+                            })
+                            .on('drag', function (d: DragEvent, data: object) {
+                              node.attr('transform', `translate(${d.x},${d.y})`)
+                            })
+                            .on(
+                              'end',
+                              function (d: DragEvent, data: Coordinates) {
+                                const [longitude, latitude] = projection.invert(
+                                  [d.x, d.y]
+                                )
+
+                                node.classed('active', false).datum({
+                                  ...data,
+                                  longitude,
+                                  latitude,
+                                })
+
+                                georgias.forEach((georgia) => {
+                                  if (
+                                    d3.geoContains(georgia, [
+                                      longitude,
+                                      latitude,
+                                    ])
+                                  )
+                                    alert('You are in Georgia!')
+                                })
+
+                                const newMarkers = chart.calculate(chart, {
+                                  ...data,
+                                  longitude,
+                                  latitude,
+                                })
+
+                                svg
+                                  .selectAll('.mark')
+                                  .data(newMarkers, (d: Coordinates) => d.type)
+                                  .each((d: Coordinates, i: number, nodes) => {
+                                    d3.select(nodes[i])
+                                      .select('.mark-label')
+                                      .text(d.label)
+                                  })
+
+                                d3.select('path.travel-line')
+                                  .classed('active', false)
+                                  .attr(
+                                    'd',
+                                    path({
+                                      type: 'LineString',
+                                      coordinates: [
+                                        [
+                                          newMarkers[0].longitude,
+                                          newMarkers[0].latitude,
+                                        ],
+                                        [
+                                          newMarkers[1].longitude,
+                                          newMarkers[1].latitude,
+                                        ],
+                                      ],
+                                    })
+                                  )
+                              }
+                            )
+                        )
+                      }
+                    })
+                    return d3.selectAll('.mark')
+                  },
+                  function (update) {
+                    update.each((d: any, i, nodes) => {
+                      const node = d3
+                        .select(nodes[i])
+                        .attr(
+                          'transform',
+                          (d: Coordinates) =>
+                            `translate(${projection([
+                              d.longitude,
+                              d.latitude,
+                            ])})`
+                        )
+                      node.select('.mark-label').text(d.label)
+                    })
+                    return d3.selectAll('.mark')
+                  },
+                  function (exit) {
+                    exit.each((d: any, i, nodes) => {
+                      console.log('removing node', i)
+                      d3.select(nodes[i]).remove()
+                    })
+                    return d3.selectAll('.mark')
+                  }
+                )
+
+              // this.loadingAnimation.animate
+
+              svg
+                .append('path')
+                .classed('travel-line', true)
+                .attr(
+                  'd',
+                  path({
+                    type: 'LineString',
+                    coordinates: [
+                      [start.longitude, start.latitude],
+                      [end.longitude, end.latitude],
+                    ],
+                  })
+                )
+                .attr('stroke', 'red')
+                .attr('stroke-width', 2)
+            })
         }
       }
     )
@@ -1863,7 +1890,7 @@ function decorateTable(dataset: any, newOptions?: chartDataTableSettings): any {
 
 interface LoadingAnimation {
   animate: () => void
-  stop: () => void
+  stop: (options?: { goto?: [number, number] }) => Promise<any>
 }
 
 // https://css-tricks.com/svg-line-animation-works/
@@ -1919,10 +1946,37 @@ class MapLoadingAnimation implements LoadingAnimation {
       .attr('stroke-width', 1)
   }
 
-  stop() {
-    this.horizontalLine.interrupt()
-    this.verticalLine.interrupt()
-    this.loadingSvg.selectAll('.loading').remove()
+  animateTo([x, y]: [number, number]) {
+    this.horizontalLine
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(300)
+      .attr('y1', y)
+      .attr('y2', y)
+
+    return this.verticalLine
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(300)
+      .attr('x1', x)
+      .attr('x2', x)
+  }
+
+  stop({ goto }: { goto?: [number, number] }) {
+    return new Promise((resolve) => {
+      var that = this
+      this.horizontalLine.interrupt()
+      this.verticalLine.interrupt()
+      if (goto) {
+        this.animateTo(goto).on('end', () => {
+          that.loadingSvg.selectAll('.loading').remove()
+          resolve(true)
+        })
+      } else {
+        this.loadingSvg.selectAll('.loading').remove()
+        resolve(true)
+      }
+    })
   }
 
   animate() {
