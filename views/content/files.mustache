@@ -1,4 +1,26 @@
 <style>
+  #dataviz_blog.darkmode {
+    background: #212728;
+    color: #56b9c8;
+    {{!-- another highlight color: #1e2c2e --}}
+  }
+
+  canvas#hideme {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background: pink;
+    display: none;
+  }
+
+  #treemap {
+    svg {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+    }
+  }
+
   header,
   header.hidden-xs,
   div.sidebar,
@@ -124,8 +146,9 @@
       margin: 0;
       padding: 0;
 
-      summary.folder::before,
-            summary li.folder::before {
+{{!--  Not sure why this breaks
+      summary li.folder::before,
+      summary .folder::before {
         content: '📂';
         content: '🗃️';
         content: '🗄️';
@@ -138,7 +161,7 @@
         content: '🗃️';
         content: '🗄️';
         content: '▼';
-      }
+      } --}}
 
       li {
         list-style-type: none;
@@ -195,7 +218,9 @@
 
 <div class="row">
   <div class="col-xs-6">
-    <div id="treemap"></div>
+    <div id="treemap">
+      <canvas height="600px" id="hideme"></canvas>
+    </div>
     <div id="legend">
       <table>
         <thead>

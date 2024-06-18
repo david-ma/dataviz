@@ -517,11 +517,13 @@ if (hash === '#aws') {
       const myChart = new Chart({
         element: 'treemap',
         margin: 10,
-      }).initTreemap({
-        hierachy: root,
-        target: 'filesize',
-        color,
       })
+        .initCanvas()
+        .initTreemap({
+          hierachy: root,
+          target: 'filesize',
+          color,
+        })
 
       // Draw legend
       drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
