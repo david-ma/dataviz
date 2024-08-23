@@ -118,19 +118,14 @@ Promise.all([
       //   return
       // }
 
-      var row2 = d3.select(this).attr('id', `row2-${log_id}`)
-      // .classed('hidden', true)
+      var row2 = d3
+        .select(this)
+        .attr('id', `row2-${log_id}`)
+        .classed('hidden', true)
       var row = tbody
         .insert('tr', `#row2-${log_id}`)
         .attr('id', `row-${log_id}`)
-      row
-        .append('td')
-        .append('a')
-        .attr('href', `#`)
-        .on('click', function () {
-          $(`#row2-${log_id}`).toggleClass('hidden')
-        })
-        .text(log_id)
+      var row_id = row.append('td').append('a').attr('href', `#`).text(log_id)
 
       row2
         .append('td')
@@ -145,6 +140,11 @@ Promise.all([
 
       d3.json(`/AGRF/summary_jsons/${log_id}.json`).then(
         function (data: any) {
+          row_id.on('click', function () {
+            $(`#row2-${log_id}`).toggleClass('hidden')
+            drawTreeMap(data, log_id)
+          })
+
           row
             .append('td')
             .append('a')
@@ -196,20 +196,6 @@ Promise.all([
           data.info.forEach((info) => {
             infoBox.append('li').text(info)
           })
-
-          var modal = d3.select(`#modal-${log_id}`)
-          modal.html('')
-          modal
-            .append('a')
-            .attr('href', '#')
-            .text('Click me')
-            .on('click', function () {
-              drawTreeMap(modal, data, log_id)
-            })
-
-          // if (log_id == '22FG5GLT3_CAGRF12711') {
-          //   drawTreeMap(modal, data, log_id)
-          // }
         },
         (error) => {
           row.remove()
@@ -259,7 +245,12 @@ const color = d3
     'out',
   ])
 
-function drawTreeMap(container, data, log_id) {
+function drawTreeMap(data, log_id) {
+  d3.select(`#row2-${log_id} td`)
+    .html('')
+    .append('div')
+    .attr('id', `treemap-${log_id}`)
+
   console.log(data)
   const contract = data.contract_dir.split('/').pop()
   const omit_prefix = data.contract_dir
@@ -284,11 +275,8 @@ function drawTreeMap(container, data, log_id) {
   console.log(root)
   // .then(d3.stratify<FileNode>().path((d) => d.path))
 
-  container.append('div').attr('id', 'treemap')
-
   const myChart = new Chart({
-    // title: log_id,
-    element: 'treemap',
+    element: `treemap-${log_id}`,
     margin: 5,
     width: 2000,
     height: 500,
