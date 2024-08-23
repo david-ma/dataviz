@@ -112,9 +112,13 @@ Promise.all([
     .enter()
     .append('tr')
     .each(function ([log_id, contract]: [string, Contract]) {
-      var that = this
-      d3.select(this).attr('id', `${log_id}-row`).append('td').text(log_id)
-      var row = d3.select(this)
+      var row2 = d3.select(this).attr('id', `row2-${log_id}`)
+      var row = tbody
+        .insert('tr', `#row2-${log_id}`)
+        .attr('id', `row-${log_id}`)
+      row.append('td').text(log_id)
+
+      row2.append('td').text(`Second row for ${log_id}`)
 
       // d3.select(this).append('td').text(named_jobs[log_id])
       // d3.select(this).append('td').text(contract.Purge)
@@ -128,7 +132,7 @@ Promise.all([
             .append('a')
             .attr('href', `#`)
             .on('click', function () {
-              $(`#${log_id}-row .files`).toggleClass('hidden')
+              $(`#row-${log_id} .files`).toggleClass('hidden')
             })
             .html(
               `${data.summary.include.file_count} files<br>${data.summary.include.file_size_human}`
@@ -138,7 +142,7 @@ Promise.all([
             .append('a')
             .attr('href', `#`)
             .on('click', function () {
-              $(`#${log_id}-row .info`).toggleClass('hidden')
+              $(`#row-${log_id} .info`).toggleClass('hidden')
             })
             .html(
               `${data.summary.exclude.file_count} files<br>${data.summary.exclude.file_size_human}`
@@ -176,7 +180,8 @@ Promise.all([
           })
         },
         (error) => {
-          that.remove()
+          row.remove()
+          row2.remove()
         }
       )
     })
