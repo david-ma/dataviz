@@ -125,6 +125,11 @@ Promise.all([
         function (data: any) {
           row
             .append('td')
+            .append('a')
+            .attr('href', `#`)
+            .on('click', function () {
+              $(`#${log_id}-row .files`).toggleClass('hidden')
+            })
             .html(
               `${data.summary.include.file_count} files<br>${data.summary.include.file_size_human}`
             )
@@ -147,6 +152,19 @@ Promise.all([
           var warnings = row.append('td').append('ul')
           data.warnings.forEach((warning) => {
             warnings.append('li').text(warning)
+          })
+
+          var fileBox = row
+            .append('td')
+            .classed('hidden files', true)
+            .append('ul')
+          data.files.forEach((file) => {
+            // console.log(file)
+            if (file[4] !== 'exclude' && file[4] !== 'included_folder') {
+              fileBox
+                .append('li')
+                .text(`${file[1].replace('s3_archive_tmp/./', '')}/${file[0]}`)
+            }
           })
 
           var infoBox = row
@@ -195,8 +213,8 @@ function get_log_id(jobs: Job[]) {
   }, null)
 
   if (!job_name) {
-    console.log('No match found')
-    console.log(job_names)
+    // console.log('No match found')
+    // console.log(job_names)
     return null
   } else {
     return job_name[1]
