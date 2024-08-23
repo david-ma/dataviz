@@ -113,7 +113,7 @@ Promise.all([
     .append('tr')
     .each(function ([log_id, contract]: [string, Contract]) {
       var that = this
-      d3.select(this).append('td').text(log_id)
+      d3.select(this).attr('id', `${log_id}-row`).append('td').text(log_id)
       var row = d3.select(this)
 
       // d3.select(this).append('td').text(named_jobs[log_id])
@@ -130,6 +130,11 @@ Promise.all([
             )
           row
             .append('td')
+            .append('a')
+            .attr('href', `#`)
+            .on('click', function () {
+              $(`#${log_id}-row .info`).toggleClass('hidden')
+            })
             .html(
               `${data.summary.exclude.file_count} files<br>${data.summary.exclude.file_size_human}`
             )
@@ -140,9 +145,16 @@ Promise.all([
             )
 
           var warnings = row.append('td').append('ul')
-
           data.warnings.forEach((warning) => {
             warnings.append('li').text(warning)
+          })
+
+          var infoBox = row
+            .append('td')
+            .classed('hidden info', true)
+            .append('ul')
+          data.info.forEach((info) => {
+            infoBox.append('li').text(info)
           })
         },
         (error) => {
