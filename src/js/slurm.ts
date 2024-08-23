@@ -1,5 +1,7 @@
 console.log('Hello world')
 
+import { d3, Chart, classifyName } from './chart'
+
 const jobs: {
   [key: string]: Job[]
 } = {}
@@ -112,10 +114,12 @@ Promise.all([
     .enter()
     .append('tr')
     .each(function ([log_id, contract]: [string, Contract]) {
-      var row2 = d3
-        .select(this)
-        .attr('id', `row2-${log_id}`)
-        .classed('hidden', true)
+      if (log_id !== '22FG5GLT3_CAGRF12711') {
+        return
+      }
+
+      var row2 = d3.select(this).attr('id', `row2-${log_id}`)
+      // .classed('hidden', true)
       var row = tbody
         .insert('tr', `#row2-${log_id}`)
         .attr('id', `row-${log_id}`)
@@ -192,6 +196,20 @@ Promise.all([
           data.info.forEach((info) => {
             infoBox.append('li').text(info)
           })
+
+          var modal = d3.select(`#modal-${log_id}`)
+          modal.html('')
+          modal
+            .append('a')
+            .attr('href', '#')
+            .text('Click me')
+            .on('click', function () {
+              drawTreeMap(modal, data)
+            })
+
+          if (log_id == '22FG5GLT3_CAGRF12711') {
+            drawTreeMap(modal, data)
+          }
         },
         (error) => {
           row.remove()
@@ -200,6 +218,54 @@ Promise.all([
       )
     })
 })
+
+function drawTreeMap(container, data) {
+  console.log(data)
+  const contract = data.contract_dir.split('/').pop()
+  const omit_prefix = data.contract_dir
+
+  console
+
+  const files = data.files
+    .map((file) => {
+      // if (file[4] === 'included_folder') file[0] = ''
+      return {
+        path: `${contract}${file[1].replace(omit_prefix, '')}/${file[0]}`,
+        filename: file[0],
+        directory: file[1],
+        filesize: file[2],
+        date_modified: file[3],
+        status: file[4],
+        level: file[5],
+      }
+    })
+    .filter((file) => file.status !== 'included_folder')
+  // files.push({
+  //   path: contract,
+  //   filename: 'root',
+  //   directory: contract,
+  //   filesize: 0,
+  //   date_modified: '',
+  //   status: 'root',
+  //   level: 0,
+  // })
+  // files.sort((a, b) => a.path.localeCompare(b.path))
+  console.log(files)
+
+  const root = d3.stratify().path((d: any) => d.path)(files)
+  console.log(root)
+  // .then(d3.stratify<FileNode>().path((d) => d.path))
+
+  // const myChart = new Chart({
+  //   title: filename,
+  //   element: 'treemap',
+  //   margin: 10,
+  // }).initTreemap({
+  //   hierachy: root,
+  //   target: 'filesize',
+  //   color,
+  // })
+}
 
 // Possible Job names:
 // ['s3_sbatch_archive_ACJ2FVM5_CAGRF12711', 'batch', 's3_ACJ2FVM5_CAGRF12711_etag_contract', 's3_ACJ2FVM5_CAGRF12711_etag_secondary', 's3_ACJ2FVM5_CAGRF12711_etag_secondary', 's3_ACJ2FVM5_CAGRF12711_etag_secondary', 's3_ACJ2FVM5_CAGRF12711_etag_secondary', 's3_ACJ2FVM5_CAGRF12711_archive_vast', 's3_ACJ2FVM5_CAGRF12711_archive_aws']
