@@ -109,7 +109,7 @@ declare class Chart {
     scratchpad(callback: (chart: Chart) => void): void;
     updateTreemap(data: any): this;
     initTreemap(options: {
-        hierachy: d3.HierarchyNode<any>;
+        hierarchy: d3.HierarchyNode<any>;
         target: string;
         color?: d3.ScaleOrdinal<string, any>;
     }): this;

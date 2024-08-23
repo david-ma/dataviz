@@ -1193,7 +1193,7 @@ class Chart {
    * Initialise a treemap
    */
   initTreemap(options: {
-    hierachy: d3.HierarchyNode<any>
+    hierarchy: d3.HierarchyNode<any>
     target: string
     color?: d3.ScaleOrdinal<string, any>
   }) {
@@ -1203,10 +1203,10 @@ class Chart {
       height = this.innerHeight,
       svg = this.plot
 
-    svg.append('text').text(this.title)
+    // svg.append('text').text(this.title)
 
     // const root = options.data.sum((d: any) => d[options.target])
-    const root = options.hierachy
+    const root = options.hierarchy
 
     console.log('Root', root)
 
@@ -1221,7 +1221,7 @@ class Chart {
       .scaleLinear()
       .domain([
         10,
-        Math.max(...options.hierachy.children.map((d) => d[options.target])),
+        Math.max(...options.hierarchy.children.map((d) => d[options.target])),
       ])
       .range([0.5, 1])
 

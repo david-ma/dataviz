@@ -1,3 +1,5 @@
+{{> clean }}
+
 <style>
   #dataviz_blog.darkmode {
     background: #212728;
@@ -5,13 +7,6 @@
     {{!-- another highlight color: #1e2c2e --}}
   }
 
-  canvas#hideme {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    background: pink;
-    display: none;
-  }
 
   #treemap {
     svg {
@@ -19,21 +14,6 @@
       top: 0px;
       left: 0px;
     }
-  }
-
-  header,
-  header.hidden-xs,
-  div.sidebar,
-  footer {
-    display: none;
-  }
-
-  div#dataviz_blog {
-    min-height: 100vh;
-  }
-
-  div#content_reactive_wrapper {
-    width: 100%;
   }
 
   text {
@@ -212,7 +192,8 @@
 </div>
 
 <div id="options">
-  <div id="buttons"></div>
+  CSVs of project folders on Cloudian / VAST: <div id="buttons"></div>
+  JSONs of data uploaded to AWS: <div id="jsonButtons"></div>
 
 </div>
 
@@ -221,6 +202,20 @@
     <div id="treemap">
       <canvas height="600px" id="hideme"></canvas>
     </div>
+
+    <div id="keep">
+      File Retention
+      <table>
+        <thead>
+          <th>Retention</th>
+          <th>count</th>
+          <th>size</th>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <br>
+
     <div id="legend">
       <table>
         <thead>

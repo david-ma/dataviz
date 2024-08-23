@@ -35,6 +35,18 @@ const CSVs = [
   'CAGRF24020097.csv',
   'CAGRF24020290.csv',
   'CAGRF12711-4.csv',
+  '20240124_LH00406_0051_B22J25VLT3-CAGRF12711.csv',
+
+  // New format, has more rows
+  'CAGRF23101260.csv',
+  'CAGRF23110233-10.csv',
+  'CAGRF24010125-new.csv',
+]
+
+const JSONs = [
+  'CAGRF23101260.json',
+  'CAGRF23110233-10.json',
+  'CAGRF24010125.json',
 ]
 
 const color = d3
@@ -87,6 +99,105 @@ type FileNode = {
   filestatus: Filestatus
 }
 
+type FileJson = {
+  files: {
+    ETag: string
+    Key: string
+    LastModified: string
+    Size: number
+    StorageClass: string
+    TagSet: { Key: string; Value: string }[]
+    VersionId: string
+  }[]
+  deleteMarkers: {
+    Key: string
+    LastModified: string
+    IsLatest: boolean
+    VersionId: string
+  }[]
+}
+
+d3.select('#jsonButtons')
+  .selectAll('button')
+  .data(JSONs)
+  .enter()
+  .append('button')
+  .attr('id', (d) => d.split('.')[0])
+  .text((d) => d.split('.')[0])
+  .on('click', function (e, filename) {
+    console.log('click', filename)
+
+    d3.json(`/AGRF/new/${filename}`)
+      .then((data: FileJson) => {
+        return data.files
+          .map((file) => {
+            // console.log(file)
+            const node: FileNode = {
+              filesize: file.Size || 0,
+              timestamp: file.LastModified,
+              path: file.Key,
+              name: file.Key.split('/').pop() || file.Key,
+              filetype: file.Key.split('.').pop().toLowerCase(),
+              filestatus: 'keep',
+            }
+
+            return recordFile(node)
+          })
+          .filter((d) => d !== null)
+      })
+      .then(d3.stratify<FileNode>().path((d) => d.path))
+      .then((root: d3.HierarchyNode<FileNode>) => {
+        console.log(root)
+        root.sum((d) => {
+          // console.log('Summing', d)
+          if (d) {
+            return d.filesize
+          }
+          return 0
+        })
+
+        const box = d3.select('#filestructure').datum(root)
+        drawDirs(box)
+
+        const myChart = new Chart({
+          title: filename,
+          element: 'treemap',
+          margin: 10,
+        }).initTreemap({
+          hierarchy: root,
+          target: 'filesize',
+          color,
+        })
+
+        // Draw legend
+        drawLegend(filetypes, myChart.color)
+      })
+
+    // .then((data: FileNode[]) => {
+    //   console.log("Data", data);
+
+    //   const root = d3
+    //     .stratify<FileNode>()
+    //     .id((d) => d.path)
+    //     .parentId((d) => {
+    //       const parts = d.path.split("/");
+    //       parts.pop();
+    //       return parts.join("/");
+    //     })(data);
+
+    //   root.each((node) => {
+    //     if (!node.data) {
+    //       console.log("Error, no data on this node", node);
+    //       // node.data = {
+    //       //   timestamp: "", // could find the child with the latest timestamp
+
+    //       // }
+    //     }}).sum((d) => d.filesize);
+    //     return root;
+
+    // })
+  })
+
 d3.select('#buttons')
   .selectAll('button')
   .data(CSVs)
@@ -100,7 +211,11 @@ d3.select('#buttons')
     d3.text(`/AGRF/${filename}`)
       .then((fileBody: string): FileNode[] =>
         d3.csvParseRows(fileBody).map((row) => {
-          const [bytes, rsync, timestamp, ...rest] = row
+          let [bytes, rsync, timestamp, group, user, ...rest] = row
+          if (row.length < 5) {
+            ;[bytes, rsync, timestamp, ...rest] = row
+          }
+
           const path = rest.join()
           const parts = path.split('/')
           const name = parts.pop() || parts.pop()
@@ -152,7 +267,7 @@ d3.select('#buttons')
           element: 'treemap',
           margin: 10,
         }).initTreemap({
-          hierachy: root,
+          hierarchy: root,
           target: 'filesize',
           color,
         })
@@ -172,8 +287,15 @@ type ElementWithDatum<Datum> = d3.Selection<
 function drawDirs(selection: ElementWithDatum<d3.HierarchyNode<FileNode>>) {
   const hierarchy = selection.datum()
   if (!hierarchy.data) {
-    console.log('Error, no data on this node', hierarchy)
-    return
+    console.log('Error, no data on this node, creating one', hierarchy)
+    hierarchy.data = {
+      filesize: 0,
+      path: hierarchy.id,
+      name: hierarchy.id.split('/').pop() || hierarchy.id,
+      filetype: 'folder',
+      filestatus: 'keep',
+      timestamp: '', // could find the child with the latest timestamp
+    }
   }
 
   const details = selection.append('details')
@@ -514,16 +636,107 @@ if (hash === '#aws') {
       const box = d3.select('#filestructure').datum(root)
       drawDirs(box)
 
+      // const myChart = new Chart({
+      //   element: 'treemap',
+      //   margin: 10,
+      // })
+      //   .initCanvas()
+      //   .initTreemap({
+      //     hierarchy: root,
+      //     target: 'filesize',
+      //     color,
+      //   })
+
+      // Draw legend
+      drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
+    })
+}
+
+// rsync -na --out-format='%l,%i,%M,%G,%U,%n'
+// 20240709_LH00620_0027_A22KVHVLT3.csv
+// Columns are:
+// filesize, rsync, timestamp, owner, group, path
+
+if (hash === '#rsync') {
+  console.log(
+    '#rsync selected, trying to process 20240709_LH00620_0027_A22KVHVLT3.csv'
+  )
+  d3.text(`/AGRF/20240709_LH00620_0027_A22KVHVLT3.csv`)
+    .then((fileBody: string): FileNode[] =>
+      d3.csvParseRows(fileBody).map((row) => {
+        const [bytes, rsync, timestamp, owner, group, ...rest] = row
+        const path = rest.join()
+        const parts = path.split('/')
+        const name = parts.pop() || parts.pop()
+        let filetype = name.split('.').pop()
+
+        if (path.slice(-1) === '/') {
+          filetype = 'folder'
+        } else {
+          const doubleExtensions = [
+            'tar',
+            'gz',
+            'zip',
+            'txt',
+            'bai',
+            'out',
+            'err',
+            'log',
+          ]
+          if (doubleExtensions.indexOf(filetype) !== -1) {
+            const archiveParts = name.split('.')
+            if (archiveParts.length > 2) {
+              filetype = archiveParts.slice(-2).join('.')
+            }
+          }
+        }
+
+        const node: FileNode = {
+          filesize: parseInt(bytes),
+          rsync,
+          timestamp,
+          path,
+          name,
+          filetype,
+          filestatus: null,
+        }
+
+        return recordFile(node)
+      })
+    )
+    .then(d3.stratify<FileNode>().path((d) => d.path))
+    .then((root: d3.HierarchyNode<FileNode>) => {
+      console.log('Here is the hierarchy', root)
+      console.log(
+        'There are this many filetypes:',
+        Object.entries(filetypes).length
+      )
+
+      console.log('Filetypes', filetypes)
+
+      root.sum((d: any) => {
+        return d ? d.filesize : 0
+      })
+
+      const box = d3.select('#filestructure')
+
+      // let shallow = getShallowHierarchy(root, 3)
+
+      // console.log("Here's the shallow hierarchy", shallow)
+
+      // drawDirs(shallow, box)
+      drawDirs(box.datum(root))
+
+      // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
+
       const myChart = new Chart({
         element: 'treemap',
         margin: 10,
+      }).initTreemap({
+        hierarchy: root,
+        target: 'filesize',
+        color,
       })
-        .initCanvas()
-        .initTreemap({
-          hierachy: root,
-          target: 'filesize',
-          color,
-        })
 
       // Draw legend
       drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
@@ -621,7 +834,7 @@ if (hash === '#home') {
         element: 'treemap',
         margin: 10,
       }).initTreemap({
-        hierachy: root,
+        hierarchy: root,
         target: 'filesize',
         color,
       })
@@ -665,12 +878,15 @@ function getShallowHierarchy(
 //   return this
 // } else
 
+// TODO:
+// Not matching when secondary_analysis/secondary_analysis happens.
+// I.e. When a secondary_analysis is inside a secondary_analysis
 const filefilter = {
   secondary_analysis: [
-    /secondary_analysis\/Results.*/,
-    /secondary_analysis\/Intermediate.*/,
-    /secondary_analysis\/commands.*.txt$/,
-    /secondary_analysis\/parameters.*.txt$/,
+    /^secondary_analysis\/Results.*/,
+    /^secondary_analysis\/Intermediate.*/,
+    /^secondary_analysis\/commands.*.txt$/,
+    /^secondary_analysis\/parameters.*.txt$/,
   ],
 }
 
@@ -701,7 +917,7 @@ function showFileStatus(node: d3.HierarchyNode<FileNode>) {
   const status = node.data.filestatus || getFileStatus(node)
   const fileflag = {
     keep: '<span class="status green">Keep</span>',
-    delete: '<span class="status red">Delete</span>',
+    delete: '<span class="status red">Ignore</span>',
     mixed: '<span class="status yellow">Mixed</span>',
   }
   return fileflag[status]

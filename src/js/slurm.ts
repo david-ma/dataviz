@@ -114,9 +114,9 @@ Promise.all([
     .enter()
     .append('tr')
     .each(function ([log_id, contract]: [string, Contract]) {
-      if (log_id !== '22FG5GLT3_CAGRF12711') {
-        return
-      }
+      // if (log_id !== '22FG5GLT3_CAGRF12711') {
+      //   return
+      // }
 
       var row2 = d3.select(this).attr('id', `row2-${log_id}`)
       // .classed('hidden', true)
@@ -207,9 +207,9 @@ Promise.all([
               drawTreeMap(modal, data, log_id)
             })
 
-          if (log_id == '22FG5GLT3_CAGRF12711') {
-            drawTreeMap(modal, data, log_id)
-          }
+          // if (log_id == '22FG5GLT3_CAGRF12711') {
+          //   drawTreeMap(modal, data, log_id)
+          // }
         },
         (error) => {
           row.remove()
@@ -287,12 +287,14 @@ function drawTreeMap(container, data, log_id) {
   container.append('div').attr('id', 'treemap')
 
   const myChart = new Chart({
-    title: log_id,
+    // title: log_id,
     element: 'treemap',
-    margin: 50,
+    margin: 5,
+    width: 2000,
+    height: 500,
     nav: false,
   }).initTreemap({
-    hierachy: root,
+    hierarchy: root,
     target: 'filesize',
     color,
   })
