@@ -94,13 +94,8 @@ Promise.all([
   const thead = table.append('thead')
   const tbody = table.append('tbody')
 
-  const columns = [
-    'Log ID',
-    'Jobs',
-    'Purge',
-    'Analysis Path',
-    'Date Sent'
-  ]
+  const columns = ['Log ID', 'Included', 'Excluded', 'Total', 'Warnings']
+  // const columns = ['Log ID', 'Jobs', 'Purge', 'Analysis Path', 'Date Sent']
   thead
     .append('tr')
     .selectAll('th')
@@ -117,14 +112,45 @@ Promise.all([
     .enter()
     .append('tr')
     .each(function ([log_id, contract]: [string, Contract]) {
+      var that = this
       d3.select(this).append('td').text(log_id)
-      d3.select(this).append('td').text(named_jobs[log_id])
-      d3.select(this).append('td').text(contract.Purge)
-      d3.select(this).append('td').text(contract['Analysis Path'])
-      d3.select(this).append('td').text(contract['Date Sent'])
+      var row = d3.select(this)
+
+      // d3.select(this).append('td').text(named_jobs[log_id])
+      // d3.select(this).append('td').text(contract.Purge)
+      // d3.select(this).append('td').text(contract['Analysis Path'])
+      // d3.select(this).append('td').text(contract['Date Sent'])
+
+      d3.json(`/AGRF/summary_jsons/${log_id}.json`).then(
+        function (data: any) {
+          row
+            .append('td')
+            .html(
+              `${data.summary.include.file_count} files<br>${data.summary.include.file_size_human}`
+            )
+          row
+            .append('td')
+            .html(
+              `${data.summary.exclude.file_count} files<br>${data.summary.exclude.file_size_human}`
+            )
+          row
+            .append('td')
+            .html(
+              `${data.summary.total.file_count} files<br>${data.summary.total.file_size_human}`
+            )
+
+          var warnings = row.append('td').append('ul')
+
+          data.warnings.forEach((warning) => {
+            warnings.append('li').text(warning)
+          })
+        },
+        (error) => {
+          that.remove()
+        }
+      )
     })
 })
-
 
 // Possible Job names:
 // ['s3_sbatch_archive_ACJ2FVM5_CAGRF12711', 'batch', 's3_ACJ2FVM5_CAGRF12711_etag_contract', 's3_ACJ2FVM5_CAGRF12711_etag_secondary', 's3_ACJ2FVM5_CAGRF12711_etag_secondary', 's3_ACJ2FVM5_CAGRF12711_etag_secondary', 's3_ACJ2FVM5_CAGRF12711_etag_secondary', 's3_ACJ2FVM5_CAGRF12711_archive_vast', 's3_ACJ2FVM5_CAGRF12711_archive_aws']
