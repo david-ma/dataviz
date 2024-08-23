@@ -112,13 +112,27 @@ Promise.all([
     .enter()
     .append('tr')
     .each(function ([log_id, contract]: [string, Contract]) {
-      var row2 = d3.select(this).attr('id', `row2-${log_id}`)
+      var row2 = d3
+        .select(this)
+        .attr('id', `row2-${log_id}`)
+        .classed('hidden', true)
       var row = tbody
         .insert('tr', `#row2-${log_id}`)
         .attr('id', `row-${log_id}`)
-      row.append('td').text(log_id)
+      row
+        .append('td')
+        .append('a')
+        .attr('href', `#`)
+        .on('click', function () {
+          $(`#row2-${log_id}`).toggleClass('hidden')
+        })
+        .text(log_id)
 
-      row2.append('td').text(`Second row for ${log_id}`)
+      row2
+        .append('td')
+        .attr('id', `modal-${log_id}`)
+        .attr('colspan', columns.length)
+        .text(`Second row for ${log_id}`)
 
       // d3.select(this).append('td').text(named_jobs[log_id])
       // d3.select(this).append('td').text(contract.Purge)
