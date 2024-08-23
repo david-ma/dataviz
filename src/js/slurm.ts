@@ -204,11 +204,11 @@ Promise.all([
             .attr('href', '#')
             .text('Click me')
             .on('click', function () {
-              drawTreeMap(modal, data)
+              drawTreeMap(modal, data, log_id)
             })
 
           if (log_id == '22FG5GLT3_CAGRF12711') {
-            drawTreeMap(modal, data)
+            drawTreeMap(modal, data, log_id)
           }
         },
         (error) => {
@@ -219,52 +219,83 @@ Promise.all([
     })
 })
 
-function drawTreeMap(container, data) {
+const color = d3
+  .scaleOrdinal()
+  .range([
+    '#a6cee3',
+    '#1f78b4',
+    '#b2df8a',
+    '#33a02c',
+    '#fb9a99',
+    '#e31a1c',
+    '#fdbf6f',
+    '#ff7f00',
+    '#cab2d6',
+    '#6a3d9a',
+    '#ffff99',
+    '#b15928',
+  ])
+  .domain([
+    'fastq',
+    'fastq.gz',
+    'txt',
+    'hist.txt',
+    'json',
+    'json.gz',
+    'bam',
+    'mate2',
+    'mate1',
+    'pairsam',
+    'sam',
+    'vcf',
+    'gvcf',
+    'tmp',
+    'bed',
+    'junction',
+    'log',
+    'pac',
+    'fa',
+    'bin',
+    'out',
+  ])
+
+function drawTreeMap(container, data, log_id) {
   console.log(data)
   const contract = data.contract_dir.split('/').pop()
   const omit_prefix = data.contract_dir
 
-  console
-
   const files = data.files
+    .filter((file) => file[4] !== 'included_folder')
     .map((file) => {
-      // if (file[4] === 'included_folder') file[0] = ''
       return {
         path: `${contract}${file[1].replace(omit_prefix, '')}/${file[0]}`,
+        name: `${contract}${file[1].replace(omit_prefix, '')}/${file[0]}`,
         filename: file[0],
         directory: file[1],
         filesize: file[2],
+        filetype: file[0].split('.').pop(),
         date_modified: file[3],
         status: file[4],
         level: file[5],
       }
     })
-    .filter((file) => file.status !== 'included_folder')
-  // files.push({
-  //   path: contract,
-  //   filename: 'root',
-  //   directory: contract,
-  //   filesize: 0,
-  //   date_modified: '',
-  //   status: 'root',
-  //   level: 0,
-  // })
-  // files.sort((a, b) => a.path.localeCompare(b.path))
-  console.log(files)
-
   const root = d3.stratify().path((d: any) => d.path)(files)
+  root.sum((d: any) => (d ? d.filesize || 0 : 0))
   console.log(root)
   // .then(d3.stratify<FileNode>().path((d) => d.path))
 
-  // const myChart = new Chart({
-  //   title: filename,
-  //   element: 'treemap',
-  //   margin: 10,
-  // }).initTreemap({
-  //   hierachy: root,
-  //   target: 'filesize',
-  //   color,
-  // })
+  container.append('div').attr('id', 'treemap')
+
+  const myChart = new Chart({
+    title: log_id,
+    element: 'treemap',
+    margin: 50,
+    nav: false,
+  }).initTreemap({
+    hierachy: root,
+    target: 'filesize',
+    color,
+  })
 }
 
 // Possible Job names:
