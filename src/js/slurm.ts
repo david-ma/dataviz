@@ -132,6 +132,140 @@ type Clinical_Excel_Data = {
   secondary_analysis_folder_size: string
 }
 
+var easy_wins = [
+  'H5CWWDSX3_CAGRF21046364-23',
+  'HW2GHDRXY_CAGRF21046364-16',
+  'HCM37DSX3_CAGRF21046364-23',
+  'H7K2KDSX5_CAGRF21046364-35',
+  'HVW2CDRXY_CAGRF21046364-16',
+  'H5CWWDSX3_CAGRF21046364-24',
+  'H7HKJDSX5_CAGRF220711207-6',
+  'HCM37DSX3_CAGRF21046364-24',
+  'HJTNGDSX3_CAGRF22029669',
+  'HJTNGDSX3_CAGRF22029669_demux_8983',
+  'HCKNVDSX3_CAGRF22029811',
+  'H3WGNDSX5_CAGRF220711207-1',
+  'HWJMTDSX2_CAGRF21129338',
+  'HK5N7DSX3_CAGRF22029669',
+  'H7JT7DSX5_CAGRF220912078',
+  'H3YVVDSX5_CAGRF220711207-1',
+  'HW2GHDRXY_CAGRF21046364-17',
+  'H7HKJDSX5_CAGRF220510631_demux_10273',
+  'HK7V5DRX2_CAGRF220711294',
+  'HFT37DRXY_CAGRF21035731',
+  'HLHCVDSX2_CAGRF21035731',
+  'H3CCWDSX3_CAGRF21035731',
+  'HWJMTDSX2_CAGRF21129338-1',
+  'HLMN2DRX3_CAGRF230615291',
+  'HM27FDRXY_CAGRF21056905',
+  'H7KHFDRX2_CAGRF22029669_demux_9120',
+  'H3CCWDSX3_CAGRF12711',
+  'HJVWWDSX3_CAGRF21035731-24',
+  'HHLW5DSX7_CAGRF230213575',
+  'H23WMDRXY_CAGRF20104215',
+  'HC3JVDSX3_CAGRF21035731',
+  'HFNLNDRX3_CAGRF220610939',
+  'H7K2KDSX5_CAGRF21046364-37',
+  'HJVWWDSX3_CAGRF21035731-25',
+  'HJVWWDSX3_CAGRF21035731-23',
+  'HVKMLDSX3_CAGRF21046364-34',
+  'H7KHFDRX2_CAGRF22029669_demux_9121',
+  'HVW2CDRXY_CAGRF21046364-17',
+  'HVJHGDRXX_CAGRF20104215',
+  'HWWC5DSX5_CAGRF220310041-4',
+  'HH3JVDRXY_CAGRF20104215',
+  'HT25LDRXY_CAGRF21087908',
+  'HJJVLDSX3_CAGRF22029811',
+  'HJFLHDSX2_CAGRF21046364-19',
+  '22H7NMLT3_CAGRF23110168_demux_12951',
+  'HJFLHDSX2_CAGRF21046364-16',
+  'HM27FDRXY_CAGRF20104215',
+  'HJFLHDSX2_CAGRF21046364-20',
+  'HT25LDRXY_CAGRF22019402-4',
+  'HJGVMDSX7_CAGRF230715533',
+  'HJFLHDSX2_CAGRF21046364-18',
+  'HFL2HDRXY_CAGRF21046364',
+  'HLMLVDRX3_CAGRF230213575',
+  'HL7JJDSX3_CAGRF22019402-9',
+  'HWK2HDRXX_CAGRF20114368',
+  'HVJJFDSX3_CAGRF21046364-34',
+  'HV33MDSX5_CAGRF220711207-10',
+  'HFYG5DSX3_CAGRF21046364-13',
+  '22GYHHLT3_CAGRF23081352_demux_12849',
+  'HL253DRXX_CAGRF20042025',
+  'HJFLHDSX2_CAGRF21046364-17',
+  'HJNFTDSX3_CAGRF220310041',
+  'H7GYHDSX7_CAGRF230313853-2_demux_11326',
+  'HCKNVDSX3_CAGRF21046364-28',
+  'HLHC3DSX3_CAGRF22019402',
+  'HHLTFDSX7_CAGRF230313853-4',
+  'HTKTTDSX3_CAGRF220912022',
+  'HLK7TDSX7_CAGRF230715533',
+  'HFYGJDSX3_CAGRF21046364-14',
+  'HFYGJDSX3_CAGRF21046364-15',
+  'HTKTTDSX3_CAGRF220912078',
+  'H7KHFDRX2_CAGRF21087908_demux_9120',
+  'H7KHFDRX2_CAGRF21087908_demux_9143',
+  'H5F3NDSX3_CAGRF21046364-21',
+  'HF5NHDRXY_CAGRF21046364',
+  'HWMHTDSX2_CAGRF21046364-17',
+  'HFYG5DSX3_CAGRF21046364-14',
+  'HFYGJDSX3_CAGRF21046364-13',
+  'HVFK2DMXX_CAGRF21035636',
+  'HHKW5DRXY_CAGRF21067141',
+  'HFYG5DSX3_CAGRF21046364-15',
+  'HC3JVDSX3_CAGRF21108639',
+  'H5CVCDSX3_CAGRF21046364-21',
+  'HV5MKDMXX_CAGRF20073103',
+  'H7KFGDSX2_CAGRF21046364',
+  'HVJYKDSX3_CAGRF21046364-34',
+  'HWMHTDSX2_CAGRF21046364-19',
+  'HHNM5DSX7_CAGRF230313853',
+  'HJGVMDSX7_CAGRF21088051',
+  'HWMHTDSX2_CAGRF21046364-16',
+  'HV33MDSX5_CAGRF220711207-12',
+  'HWMHTDSX2_CAGRF21046364-20',
+  'HJVM5DSX3_CAGRF21046364-28',
+  'H7JYGDSX5_CAGRF220811535',
+  'HCKNWDSX3_CAGRF21046364-27',
+  'HFGNLDSXY_CAGRF20021112-3',
+  'H5CVCDSX3_CAGRF21046364-24',
+  'HCL5KDSX3_CAGRF20104215',
+  'H7JWFDSX5_CAGRF220711207-5',
+  'H375LDSX3_CAGRF21118974',
+  'HWMHTDSX2_CAGRF21046364-18',
+  'HTVG2DSX2_CAGRF21098111',
+  'HJK2JDSX3_CAGRF21046364-29',
+  'HC3YTDSX3_CAGRF21108639',
+  'HVJYKDSX3_CAGRF21046364-37',
+  'H5CVCDSX3_CAGRF21046364-23',
+  'HVJYKDSX3_CAGRF21046364-35',
+  'HVJYKDSX3_CAGRF21046364-36',
+  'HCKNWDSX3_CAGRF21046364-25',
+  'H5CVCDSX3_CAGRF21046364-22',
+  'H3YW5DSX5_CAGRF21046364-33',
+  'HJK2JDSX3_CAGRF21046364-30',
+  'HCKNWDSX3_CAGRF21046364-26',
+  'HJK2JDSX3_CAGRF21046364-31',
+  'H3YW5DSX5_CAGRF21046364-32',
+  'H7GYHDSX7_CAGRF220711207-13_demux_11317',
+  'H7GYHDSX7_CAGRF220711207-13_demux_11326',
+  'H7GYHDSX7_CAGRF220711207-13',
+  'H7GYHDSX7_CAGRF230313853-2',
+  'HHLTFDSX7_CAGRF230313853-1',
+  '22CF5LLT3_CAGRF23081082',
+  'H7KWTDSX2_CAGRF21046364',
+  'H3VCJDSX2_CAGRF21035636',
+  'HGCMJDSX5_CAGRF220711207-6',
+  'HV33MDSX5_CAGRF220711207-11',
+  'HHN77DSX7_CAGRF230313853-1',
+  'H3CCWDSX3_CAGRF21118974',
+  '22JWNMLT3_CAGRF23101260',
+  'H7K2VDSX2_CAGRF21046364',
+  '22CFWFLT3_CAGRF23081082',
+  'H7JYGDSX5_CAGRF220711294',
+]
+
 d3.csv('/AGRF/clinical_2024_06_06.csv')
   .then((data) => {
     console.log('clinical_2024_06_06.csv', data)
@@ -146,155 +280,189 @@ d3.csv('/AGRF/clinical_2024_06_06.csv')
     console.log('Clean-ish data from Excel', data)
   })
 
-d3.json('/clinical').then(function (JSONs: string[]) {
-  console.log('Clinical Data', JSONs)
-  Promise.all([
-    d3.csv('/AGRF/clinical_2024_06_06.csv').then((data) => {
-      console.log('clinical_2024_06_06.csv', data)
-      return data.map((d: Clinical_Excel_Data) => {
-        Object.entries(d).map(([key, value]) => {
-          d[key] = value.trim()
-        })
-        return d
-      })
-    }),
-    ...JSONs.map((json) => d3.json(`/AGRF/clinical/${json}`)),
-  ])
-    .then(function ([excelData, ...data]: [
-      Clinical_Excel_Data[],
-      ClinicalData
-    ]) {
-      const result: [Clinical_Excel_Data[], ClinicalData[]] = [
-        excelData,
-        data.sort((a, b) => {
-          return a.summary.total.file_size_bytes <
-            b.summary.total.file_size_bytes
-            ? -1
-            : 1
-        }),
-      ]
-      return result
-    })
-    .then(function ([excelData, data]) {
-      console.log('Excel data', excelData)
-      console.log('All Clinical JSON data', data)
-
-      const table = d3.select('table#clinical')
-      const columns = [
-        'Log ID',
-        'Included',
-        'Excluded',
-        'Total',
-        'BAMs',
-        'Analyst<br>First Approver<br>Date',
-        'Contract Dir',
-      ]
-
-      table
-        .select('thead')
-        .append('tr')
-        .selectAll('th')
-        .data(columns)
-        .enter()
-        .append('th')
-        .html(function (d) {
+d3.json('/clinical')
+  .then(function (JSONs: string[]) {
+    return JSONs.filter((json) => easy_wins.includes(json.slice(0, -5)))
+  })
+  .then(function (JSONs: string[]) {
+    console.log('Clinical Data', JSONs)
+    Promise.all([
+      d3.csv('/AGRF/clinical_2024_06_06.csv').then((data) => {
+        console.log('clinical_2024_06_06.csv', data)
+        return data.map((d: Clinical_Excel_Data) => {
+          Object.entries(d).map(([key, value]) => {
+            d[key] = value.trim()
+          })
           return d
         })
+      }),
+      ...JSONs.map((json) => d3.json(`/AGRF/clinical/${json}`)),
+    ])
+      .then(function ([excelData, ...data]: [
+        Clinical_Excel_Data[],
+        ClinicalData
+      ]) {
+        const result: [Clinical_Excel_Data[], ClinicalData[]] = [
+          excelData,
+          data.sort((a, b) => {
+            return a.summary.total.file_size_bytes <
+              b.summary.total.file_size_bytes
+              ? -1
+              : 1
+          }),
+        ]
+        return result
+      })
+      .then(function ([excelData, data]) {
+        console.log('Excel data', excelData)
+        console.log('All Clinical JSON data', data)
 
-      table
-        .select('tbody')
-        .selectAll('tr')
-        .data(data)
-        .enter()
-        .append('tr')
-        .each(function (d) {
-          var tr = d3.select(this)
-          const { instrument, run, flowcell, contract_id } =
-            extract_info_from_folder(d.contract_dir)
-          const log_id = `${flowcell}_${contract_id}`
-          tr.append('td').text(log_id)
-          tr.append('td')
-            .html(
-              `
+        const table = d3.select('table#clinical')
+        const columns = [
+          'Log ID',
+          // 'Included',
+          'Total File Size',
+          'Total File Count',
+          // 'BAMs',
+          // 'Analyst<br>First Approver<br>Date',
+          'Analyst',
+          'First Approver',
+          'Date Sent',
+          'Contract Dir',
+        ]
+
+        table
+          .select('thead')
+          .append('tr')
+          .selectAll('th')
+          .data(columns)
+          .enter()
+          .append('th')
+          .html(function (d) {
+            return d
+          })
+
+        table
+          .select('tbody')
+          .selectAll('tr')
+          .data(data)
+          .enter()
+          .append('tr')
+          .each(function (d) {
+            var tr = d3.select(this)
+            const { instrument, run, flowcell, contract_id } =
+              extract_info_from_folder(d.contract_dir)
+            const log_id = `${flowcell}_${contract_id}`
+            tr.append('td').text(log_id)
+            tr.append('td')
+              .style('display', 'none')
+              .html(
+                `
   ${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_human}`
-            )
-            .datum(d)
-            .classed('green', (data) => {
-              return data.summary.include.file_count < 1000
-            })
-
-          tr.append('td')
-            .html(
-              `
-  ${d.summary.exclude.file_count}&nbsp;files<br>${d.summary.exclude.file_size_human}`
-            )
-            .datum(d)
-            .classed('red', (data) => {
-              d3.select(this).attr(
-                'title',
-                "Warning: Exclusion rules applied, not an 'easy win'"
               )
-              return data.summary.exclude.file_count > 0
-            })
+              .datum(d)
+              .classed('green', (data) => {
+                return data.summary.include.file_count < 1000
+              })
 
-          tr.append('td')
-            .html(
-              `
-  ${d.summary.total.file_count}&nbsp;files<br>${d.summary.total.file_size_human}`
-            )
-            .datum(d)
-            .classed('green', (data) => {
-              return data.summary.total.file_count < 1000
-            })
-            .classed('red', (data) => {
-              d3.select(this).attr('title', 'Warning: Less than 200 MB of data')
-              return data.summary.total.file_size_bytes < 200000000
-            })
+            tr.append('td')
+              //           .html(
+              //             `
+              // ${d.summary.exclude.file_count}&nbsp;files<br>${d.summary.exclude.file_size_human}`
+              //           )
+              .text(d.summary.total.file_size_human)
+              .datum(d)
+              .classed('red', (data) => {
+                if (data.summary.exclude.file_count > 0) {
+                  tr.style('display', 'none')
+                  d3.select(this).attr(
+                    'title',
+                    "Warning: Exclusion rules applied, not an 'easy win'"
+                  )
+                  return true
+                } else {
+                  return false
+                }
+              })
 
-          // tr.append('td').text(instrument)
-          // tr.append('td').text(run)
-          // tr.append('td').text(flowcell)
+            tr.append('td')
+              //           .html(
+              //             `
+              // ${d.summary.total.file_count}&nbsp;files<br>${d.summary.total.file_size_human}`
+              //           )
+              .text(d.summary.total.file_count)
+              .datum(d)
+              // .classed('green', (data) => {
+              //   return data.summary.total.file_count < 1000
+              // })
+              .classed('red', (data) => {
+                if (data.summary.total.file_size_bytes < 200000000) {
+                  tr.style('display', 'none')
+                  d3.select(this).attr(
+                    'title',
+                    'Warning: Less than 200 MB of data'
+                  )
+                  return true
+                } else {
+                  return false
+                }
+              })
 
-          tr.append('td')
-            .datum(d)
-            .html((d) => {
-              const bams = d.files.filter((file) => file[0].endsWith('.bam'))
+            // tr.append('td').text(instrument)
+            // tr.append('td').text(run)
+            // tr.append('td').text(flowcell)
 
-              return bams.map((bam) => `${bam[2]} ${bam[0]}`).join('<br>')
-            })
-            .classed('red', (d) => {
-              return (
-                d.files.filter((file) => file[0].endsWith('.bam')).length > 0
-              )
-            })
+            tr.append('td')
+              .style('display', 'none')
+              .datum(d)
+              .html((d) => {
+                const bams = d.files.filter((file) => file[0].endsWith('.bam'))
 
-          const excel = excelData.find((d) => d.run_id === run)
-          var analyst = tr.append('td').html(
-            `${excel ? excel.secondary_analysis_analyst : ''}<br>
-${excel ? excel.first_approver : ''}<br>
-${excel ? excel.contract_sent : ''}            
-`
-          )
+                return bams.map((bam) => `${bam[2]} ${bam[0]}`).join('<br>')
+              })
+              .classed('red', (d) => {
+                if (
+                  d.files.filter((file) => file[0].endsWith('.bam')).length > 0
+                ) {
+                  tr.style('display', 'none')
+                  d3.select(this).attr('title', 'Warning: BAM files present')
+                  return true
+                } else {
+                  return false
+                }
+              })
 
-          tr.append('td').text(d.contract_dir)
+            const excel = excelData.find((d) => d.run_id === run)
+            //           var analyst = tr.append('td').html(
+            //             `${excel ? excel.secondary_analysis_analyst : ''}<br>
+            // ${excel ? excel.first_approver : ''}<br>
+            // ${excel ? excel.contract_sent : ''}
+            // `
+            //           )
 
-          // d3.select(this).append('td').text(d['Primary Key'])
-          // d3.select(this).append('td').text(d['Analysis Path'])
-          // d3.select(this).append('td').text(d['Contract Id'])
-          // d3.select(this).append('td').text(d['Run'])
-          // d3.select(this).append('td').text(d['Date Sent'])
-          // d3.select(this).append('td').text(d['Data Sender'])
-          // d3.select(this).append('td').text(d['Purge'])
-          // d3.select(this).append('td').text(d['Purge Approver'])
-          // d3.select(this).append('td').text(d['Purge Notes'])
-          // d3.select(this).append('td').text(d['Retention Notes'])
-          // d3.select(this).append('td').text(d['Retention Notes Author'])
-          // d3.select(this).append('td').text(d['Publish As Benchmarking Data'])
-          // d3.select(this).append('td').text(d['instrument_name'])
-          // d3.select(this).append('td').text(d['machine_model'])
-        })
-    })
-})
+            tr.append('td').text(excel.secondary_analysis_analyst)
+            tr.append('td').text(excel.first_approver)
+            tr.append('td').text(excel.contract_sent)
+
+            tr.append('td').text(d.contract_dir)
+
+            // d3.select(this).append('td').text(d['Primary Key'])
+            // d3.select(this).append('td').text(d['Analysis Path'])
+            // d3.select(this).append('td').text(d['Contract Id'])
+            // d3.select(this).append('td').text(d['Run'])
+            // d3.select(this).append('td').text(d['Date Sent'])
+            // d3.select(this).append('td').text(d['Data Sender'])
+            // d3.select(this).append('td').text(d['Purge'])
+            // d3.select(this).append('td').text(d['Purge Approver'])
+            // d3.select(this).append('td').text(d['Purge Notes'])
+            // d3.select(this).append('td').text(d['Retention Notes'])
+            // d3.select(this).append('td').text(d['Retention Notes Author'])
+            // d3.select(this).append('td').text(d['Publish As Benchmarking Data'])
+            // d3.select(this).append('td').text(d['instrument_name'])
+            // d3.select(this).append('td').text(d['machine_model'])
+          })
+      })
+  })
 
 // d3.json(`/AGRF/clinical_jsons/${log_id}.json`).then(
 // )
