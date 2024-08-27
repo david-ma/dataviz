@@ -57,6 +57,7 @@ let config = {
             fsPromise
                 .readdir(path_1.default.resolve(basePath))
                 .then((files) => files.filter((d) => d.indexOf('.json') > -1))
+                .then((files) => files.map((d) => d.replace('.json.gz', '.json')))
                 .then((files) => res.end(JSON.stringify(files)));
         },
         upload: function (res, req) {

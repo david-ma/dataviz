@@ -69,6 +69,7 @@ let config: Thalia.WebsiteConfig = {
         .readdir(path.resolve(basePath))
         .then((files) => files.filter((d) => d.indexOf('.json') > -1))
         // .then((files) => files.filter((d) => d.indexOf('CAGRF') == -1)) // Non-standard IDs
+        .then((files) => files.map((d) => d.replace('.json.gz', '.json')))
         .then((files) => res.end(JSON.stringify(files)))
     },
 
