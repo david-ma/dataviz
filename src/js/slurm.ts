@@ -21,6 +21,46 @@ type Job = {
   End: string
 }
 
+const color = d3
+  .scaleOrdinal()
+  .range([
+    '#a6cee3',
+    '#1f78b4',
+    '#b2df8a',
+    '#33a02c',
+    '#fb9a99',
+    '#e31a1c',
+    '#fdbf6f',
+    '#ff7f00',
+    '#cab2d6',
+    '#6a3d9a',
+    '#ffff99',
+    '#b15928',
+  ])
+  .domain([
+    'fastq',
+    'fastq.gz',
+    'txt',
+    'hist.txt',
+    'json',
+    'json.gz',
+    'bam',
+    'mate2',
+    'mate1',
+    'pairsam',
+    'sam',
+    'vcf',
+    'gvcf',
+    'tmp',
+    'bed',
+    'junction',
+    'log',
+    'pac',
+    'fa',
+    'bin',
+    'out',
+  ])
+
 const named_jobs = {}
 
 // ['Primary Key', 'Analysis Path', 'Contract Id', 'Run', 'Date Sent', 'Data Sender', 'Purge', 'Purge Approver', 'Purge Notes', 'Retention Notes', 'Retention Notes Author', 'Publish As Benchmarking Data', 'instrument_name', 'machine_model']
@@ -48,7 +88,7 @@ const contracts: {
 type FileInfoArray = [
   filename: string,
   directory: string,
-  filesize: number,
+  filesize: string,
   date_modified: string,
   status: string,
   level: string
@@ -281,9 +321,9 @@ d3.csv('/AGRF/clinical_2024_06_06.csv')
   })
 
 d3.json('/clinical')
-  .then(function (JSONs: string[]) {
-    return JSONs.filter((json) => easy_wins.includes(json.slice(0, -5)))
-  })
+  // .then(function (JSONs: string[]) {
+  //   return JSONs.filter((json) => easy_wins.includes(json.slice(0, -5)))
+  // })
   .then(function (JSONs: string[]) {
     console.log('Clinical Data', JSONs)
     Promise.all([
@@ -349,13 +389,29 @@ d3.json('/clinical')
           .enter()
           .append('tr')
           .each(function (d) {
-            var tr = d3.select(this)
             const { instrument, run, flowcell, contract_id } =
               extract_info_from_folder(d.contract_dir)
             const log_id = `${flowcell}_${contract_id}`
-            tr.append('td').text(log_id)
+
+            var row2 = d3
+              .select(this)
+              .attr('id', `clinical_row2-${log_id}`)
+              .classed('hidden', true)
+            var tr = table
+              .select('tbody')
+              .insert('tr', `#clinical_row2-${log_id}`)
+              .attr('id', `clinical_row-${log_id}`)
+
             tr.append('td')
-              .style('display', 'none')
+              .append('a')
+              .attr('href', `#x`)
+              .on('click', function () {
+                $(`#clinical_row2-${log_id}`).toggleClass('hidden')
+              })
+              .text(log_id)
+
+            tr.append('td')
+              // .style('display', 'none')
               .html(
                 `
   ${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_human}`
@@ -374,7 +430,7 @@ d3.json('/clinical')
               .datum(d)
               .classed('red', (data) => {
                 if (data.summary.exclude.file_count > 0) {
-                  tr.style('display', 'none')
+                  // tr.style('display', 'none')
                   d3.select(this).attr(
                     'title',
                     "Warning: Exclusion rules applied, not an 'easy win'"
@@ -397,7 +453,7 @@ d3.json('/clinical')
               // })
               .classed('red', (data) => {
                 if (data.summary.total.file_size_bytes < 200000000) {
-                  tr.style('display', 'none')
+                  // tr.style('display', 'none')
                   d3.select(this).attr(
                     'title',
                     'Warning: Less than 200 MB of data'
@@ -424,7 +480,7 @@ d3.json('/clinical')
                 if (
                   d.files.filter((file) => file[0].endsWith('.bam')).length > 0
                 ) {
-                  tr.style('display', 'none')
+                  // tr.style('display', 'none')
                   d3.select(this).attr('title', 'Warning: BAM files present')
                   return true
                 } else {
@@ -460,9 +516,74 @@ d3.json('/clinical')
             // d3.select(this).append('td').text(d['Publish As Benchmarking Data'])
             // d3.select(this).append('td').text(d['instrument_name'])
             // d3.select(this).append('td').text(d['machine_model'])
+
+
+            if(d.files.length > 10000) {
+              d3.select(`#clinical_row2-${log_id}`)
+              .append('td')
+              .attr('colspan', 7)
+              .text(`Too many files to display: ${d.files.length}`)
+
+              return
+            }
+
+            d3.select(`#clinical_row2-${log_id}`)
+              .append('td')
+              .attr('colspan', 3)
+            drawTreeMap(d, log_id, `#clinical_row2-${log_id} td`)
+
+            const inner_table = d3
+              .select(`#clinical_row2-${log_id}`)
+              .append('td')
+              .attr('colspan', 4)
+              .append('table')
+
+            inner_table
+              .append('thead')
+              .append('tr')
+              .selectAll('th')
+              .data(['', 'File', 'Size', 'Status', 'Level'])
+              .enter()
+              .append('th')
+              .text((d) => d)
+
+            inner_table
+              .append('tbody')
+              .selectAll('tr')
+              .data(d.files.filter((file) => file[4] !== 'included_folder'))
+              .enter()
+              .append('tr')
+              .html((file) => {
+                const file_relative_path = [
+                  file[1].split(contract_id).pop(),
+                  file[0],
+                ]
+                  .join('/')
+                  .slice(1)
+
+                const filetype = file[0].split('.').pop()
+                const size = human_readable_size(parseInt(file[2]))
+
+                return `<td style="background:${color(
+                  filetype
+                )}">x</td><td>${file_relative_path}</td><td>${size}</td><td>${
+                  file[4]
+                }</td><td>${file[5]}</td>`
+              })
           })
       })
   })
+
+function human_readable_size(bytes: number) {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+  let i = 0
+  while (bytes >= 1024) {
+    bytes /= 1024
+    i++
+  }
+  // return `${bytes.toFixed(2)} ${units[i]}`
+  return `${bytes.toFixed(2)} ${units[i]}`
+}
 
 // d3.json(`/AGRF/clinical_jsons/${log_id}.json`).then(
 // )
@@ -645,51 +766,17 @@ Promise.all([
     })
 })
 
-const color = d3
-  .scaleOrdinal()
-  .range([
-    '#a6cee3',
-    '#1f78b4',
-    '#b2df8a',
-    '#33a02c',
-    '#fb9a99',
-    '#e31a1c',
-    '#fdbf6f',
-    '#ff7f00',
-    '#cab2d6',
-    '#6a3d9a',
-    '#ffff99',
-    '#b15928',
-  ])
-  .domain([
-    'fastq',
-    'fastq.gz',
-    'txt',
-    'hist.txt',
-    'json',
-    'json.gz',
-    'bam',
-    'mate2',
-    'mate1',
-    'pairsam',
-    'sam',
-    'vcf',
-    'gvcf',
-    'tmp',
-    'bed',
-    'junction',
-    'log',
-    'pac',
-    'fa',
-    'bin',
-    'out',
-  ])
+function drawTreeMap(data, log_id, element_id) {
+  if(data.files.length === 0) {
+    return
+  }
 
-function drawTreeMap(data, log_id) {
-  d3.select(`#row2-${log_id} td`)
-    .html('')
-    .append('div')
-    .attr('id', `treemap-${log_id}`)
+  if(data.files.length > 10000) {
+    return
+  }
+
+  // d3.select(`#row2-${log_id} td`)
+  d3.select(element_id).html('').append('div').attr('id', `treemap-${log_id}`)
 
   console.log(data)
   const contract = data.contract_dir.split('/').pop()
@@ -718,7 +805,7 @@ function drawTreeMap(data, log_id) {
   const myChart = new Chart({
     element: `treemap-${log_id}`,
     margin: 5,
-    width: 2000,
+    width: 500,
     height: 500,
     nav: false,
   }).initTreemap({

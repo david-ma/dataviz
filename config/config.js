@@ -162,6 +162,8 @@ let config = {
                         catch (e) { }
                         const template = router.handlebars.compile(views.blog);
                         (0, thalia_1.setHandlebarsContent)(views[router.path[0]], router.handlebars).then(() => {
+                            router.handlebars.registerHelper('parseArray', (array, options) => array.split(',').map(options.fn).join(''));
+                            router.handlebars.registerHelper('capitalize', (str) => str.charAt(0).toUpperCase() + str.slice(1));
                             (0, thalia_1.loadViewsAsPartials)(views, router.handlebars);
                             router.res.end(template(data));
                         });

@@ -1,7 +1,3 @@
-{{> clean }}
-{{> require }}
-{{> tableCSS }}
-
 <style>
   input[type='radio'],
   label {
@@ -92,37 +88,36 @@
     td.green {
       background-color: hsl(120, 100%, 90%);
     }
+
     td.red {
       background-color: hsl(0, 100%, 90%);
     }
   }
 </style>
 
+
 <section>
   <div id="tabs">
-    <input type="radio" id="optionTab" name="tabs" value="optionTab" checked="true">
-    <label for="optionTab">Clinical</label>
 
-    <input type="radio" id="blogpostTab" name="tabs" value="blogpostTab">
-    <label for="blogpostTab">Internal Reference</label>
-  </div>
-  <div id="clinicalStuff" class="tabbedContent selected">
-    <table id="clinical">
-      <thead></thead>
-      <tbody>
-        
-      </tbody>
-    </table>
+    {{#parseArray tabs}}
+    <input type="radio" id="{{this}}Tab" name="tabs" value="{{this}}Tab">
+    <label for="{{this}}Tab">{{capitalize this}}</label>
+    {{/parseArray}}
 
   </div>
-  <div id="internalReferenceStuff" class="tabbedContent">
-    <table id="contracts">
-    </table>
+  {{#parseArray tabs}}
+
+  <div id="{{this}}Wrapper" class="tabbedContent">
+    {{> @partial-block }}
   </div>
+  {{/parseArray}}
 </section>
 
 <script>
   $('input[name="tabs"]').on('change', () => {
     $('.tabbedContent').toggleClass('selected')
   })
+
+  $('input[name="tabs"]:first').prop('checked', true)
+  $('.tabbedContent:first').toggleClass('selected')
 </script>
