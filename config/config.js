@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.config = void 0;
+const thalia_1 = require("thalia");
 const smugmug_1 = require("./smugmug");
 const utilities_1 = require("./utilities");
 const path_1 = __importDefault(require("path"));
 const http_1 = __importDefault(require("http"));
 const fs_1 = __importDefault(require("fs"));
-const mustache_1 = __importDefault(require("mustache"));
 const lodash_1 = __importDefault(require("lodash"));
 const fsPromise = fs_1.default.promises;
 const formidable_1 = __importDefault(require("formidable"));
@@ -118,7 +118,7 @@ let config = {
                 router.res.end('Database not connected');
             }
             else {
-                const promises = [(0, utilities_1.loadTemplates)('homepage.mustache')];
+                const promises = [new Promise(router.readAllViews)];
                 Promise.all(promises).then(function ([views]) {
                     const data = {
                         gitHash: utilities_1.gitHash,
@@ -130,8 +130,9 @@ let config = {
                         order: [['publish_date', 'DESC']],
                     }).then((results) => {
                         data.blogposts = results.map((d) => d.dataValues);
-                        const output = mustache_1.default.render(views.template, data, views);
-                        router.res.end(output);
+                        const template = router.handlebars.compile(views.homepage);
+                        (0, thalia_1.loadViewsAsPartials)(views, router.handlebars);
+                        router.res.end(template(data));
                     });
                 });
             }
@@ -141,7 +142,7 @@ let config = {
                 router.res.end('Database not connected');
             }
             else {
-                const promises = [(0, utilities_1.loadTemplates)('blog.mustache', router.path)];
+                const promises = [new Promise(router.readAllViews)];
                 Promise.all(promises).then(function ([views]) {
                     const data = {
                         gitHash: utilities_1.gitHash,
@@ -159,31 +160,14 @@ let config = {
                             data.typescript = `"/js/${shortname}.js"`;
                         }
                         catch (e) { }
-                        const output = mustache_1.default.render(views.template, data, views);
-                        router.res.end(output);
+                        const template = router.handlebars.compile(views.blog);
+                        (0, thalia_1.setHandlebarsContent)(views[router.path[0]], router.handlebars).then(() => {
+                            (0, thalia_1.loadViewsAsPartials)(views, router.handlebars);
+                            router.res.end(template(data));
+                        });
                     });
                 });
             }
-        },
-        experiment: function (router) {
-            const promises = [(0, utilities_1.loadTemplates)('upload_experiment.mustache')];
-            Promise.all(promises).then(function ([views]) {
-                const data = {
-                    gitHash: utilities_1.gitHash,
-                };
-                const output = mustache_1.default.render(views.template, data, views);
-                router.res.end(output);
-            });
-        },
-        stickers: function (router) {
-            const promises = [(0, utilities_1.loadTemplates)('stickers.mustache')];
-            Promise.all(promises).then(function ([views]) {
-                const data = {
-                    gitHash: utilities_1.gitHash,
-                };
-                const output = mustache_1.default.render(views.template, data, views);
-                router.res.end(output);
-            });
         },
     },
 };

@@ -1,12 +1,11 @@
-import { Thalia } from 'thalia'
+import { Thalia, loadViewsAsPartials, setHandlebarsContent } from 'thalia'
 import { config as smugmugConfig } from './smugmug'
-import { gitHash, loadTemplates } from './utilities'
+import { gitHash } from './utilities'
 
 import path from 'path'
 import http from 'http'
 import fs from 'fs'
 
-import mustache from 'mustache'
 import _ from 'lodash'
 const fsPromise = fs.promises
 import Formidable from 'formidable'
@@ -141,7 +140,7 @@ let config: Thalia.WebsiteConfig = {
       if (!router.db) {
         router.res.end('Database not connected')
       } else {
-        const promises = [loadTemplates('homepage.mustache')]
+        const promises = [new Promise(router.readAllViews)]
         Promise.all(promises).then(function ([views]: [any]) {
           const data: any = {
             gitHash: gitHash,
@@ -154,8 +153,9 @@ let config: Thalia.WebsiteConfig = {
           }).then((results) => {
             data.blogposts = results.map((d) => d.dataValues)
 
-            const output = mustache.render(views.template, data, views)
-            router.res.end(output)
+            const template = router.handlebars.compile(views.homepage)
+            loadViewsAsPartials(views, router.handlebars)
+            router.res.end(template(data))
           })
         })
       }
@@ -164,7 +164,8 @@ let config: Thalia.WebsiteConfig = {
       if (!router.db) {
         router.res.end('Database not connected')
       } else {
-        const promises = [loadTemplates('blog.mustache', router.path)]
+        // const promises = [loadTemplates('blog.mustache', router.path)]
+        const promises = [new Promise(router.readAllViews)]
         Promise.all(promises).then(function ([views]: [any]) {
           const data: any = {
             gitHash: gitHash,
@@ -185,34 +186,16 @@ let config: Thalia.WebsiteConfig = {
               data.typescript = `"/js/${shortname}.js"`
             } catch (e) {}
 
-            const output = mustache.render(views.template, data, views)
-            router.res.end(output)
+            const template = router.handlebars.compile(views.blog)
+            setHandlebarsContent(views[router.path[0]], router.handlebars).then(
+              () => {
+                loadViewsAsPartials(views, router.handlebars)
+                router.res.end(template(data))
+              }
+            )
           })
         })
       }
-    },
-    experiment: function (router) {
-      const promises = [loadTemplates('upload_experiment.mustache')]
-      Promise.all(promises).then(function ([views]: [any]) {
-        const data = {
-          gitHash: gitHash,
-        }
-
-        const output = mustache.render(views.template, data, views)
-        router.res.end(output)
-      })
-    },
-    stickers: function (router) {
-      const promises = [loadTemplates('stickers.mustache')]
-
-      Promise.all(promises).then(function ([views]: [any]) {
-        const data = {
-          gitHash: gitHash,
-        }
-
-        const output = mustache.render(views.template, data, views)
-        router.res.end(output)
-      })
     },
   },
 }
