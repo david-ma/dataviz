@@ -122,10 +122,14 @@ Promise.all([
         .select(this)
         .attr('id', `row2-${log_id}`)
         .classed('hidden', true)
-      var row = tbody
+      
+      var modal = row2.append('td')
+      modal.append('div').attr('id', `treemap-${log_id}`)
+
+        var row = tbody
         .insert('tr', `#row2-${log_id}`)
         .attr('id', `row-${log_id}`)
-      var row_id = row.append('td').append('a').attr('href', `#`).text(log_id)
+      var row_id = row.append('td').append('a').attr('href', `#x`).text(log_id)
 
       row2
         .append('td')
@@ -138,6 +142,7 @@ Promise.all([
       // d3.select(this).append('td').text(contract['Analysis Path'])
       // d3.select(this).append('td').text(contract['Date Sent'])
 
+      // d3.json(`/AGRF/clinical_jsons/${log_id}.json`).then(
       d3.json(`/AGRF/summary_jsons/${log_id}.json`).then(
         function (data: any) {
           row_id.on('click', function () {
@@ -148,7 +153,7 @@ Promise.all([
           row
             .append('td')
             .append('a')
-            .attr('href', `#`)
+            .attr('href', `#x`)
             .on('click', function () {
               $(`#row-${log_id} .files`).toggleClass('hidden')
             })
@@ -158,7 +163,7 @@ Promise.all([
           row
             .append('td')
             .append('a')
-            .attr('href', `#`)
+            .attr('href', `#x`)
             .on('click', function () {
               $(`#row-${log_id} .info`).toggleClass('hidden')
             })
@@ -176,9 +181,9 @@ Promise.all([
             warnings.append('li').text(warning)
           })
 
-          var fileBox = row
+          var fileBox = modal
             .append('td')
-            .classed('hidden files', true)
+            // .classed('hidden files', true)
             .append('ul')
           data.files.forEach((file) => {
             // console.log(file)
@@ -189,17 +194,30 @@ Promise.all([
             }
           })
 
-          var infoBox = row
+          var infoBox = modal
             .append('td')
-            .classed('hidden info', true)
+            // .classed('hidden info', true)
             .append('ul')
           data.info.forEach((info) => {
             infoBox.append('li').text(info)
           })
         },
         (error) => {
-          row.remove()
+          // row.remove()
+          row.append('td').text("Uploaded from VAST")
           row2.remove()
+
+          var summary = row.append('td').attr('colspan', 3).append('ul')
+          // named_jobs[log_id].forEach((jobGroup) => {
+          //   jobGroup.forEach((job) => {
+          //     summary.append('li').text(job.JobName)
+          //   })
+          // })
+          // summary.text(JSON.stringify(named_jobs[log_id]))
+
+      // d3.select(this).append('td').text(contract.Purge)
+      // d3.select(this).append('td').text(contract['Analysis Path'])
+      // d3.select(this).append('td').text(contract['Date Sent'])
         }
       )
     })
