@@ -185,6 +185,7 @@ d3.json('/clinical').then(function (JSONs: string[]) {
         'Included',
         'Excluded',
         'Total',
+        'BAMs',
         'Analyst<br>First Approver<br>Date',
         'Contract Dir',
       ]
@@ -229,8 +230,13 @@ d3.json('/clinical').then(function (JSONs: string[]) {
             )
             .datum(d)
             .classed('red', (data) => {
+              d3.select(this).attr(
+                'title',
+                "Warning: Exclusion rules applied, not an 'easy win'"
+              )
               return data.summary.exclude.file_count > 0
             })
+
           tr.append('td')
             .html(
               `
@@ -240,16 +246,33 @@ d3.json('/clinical').then(function (JSONs: string[]) {
             .classed('green', (data) => {
               return data.summary.total.file_count < 1000
             })
+            .classed('red', (data) => {
+              d3.select(this).attr('title', 'Warning: Less than 200 MB of data')
+              return data.summary.total.file_size_bytes < 200000000
+            })
 
           // tr.append('td').text(instrument)
           // tr.append('td').text(run)
           // tr.append('td').text(flowcell)
 
+          tr.append('td')
+            .datum(d)
+            .html((d) => {
+              const bams = d.files.filter((file) => file[0].endsWith('.bam'))
+
+              return bams.map((bam) => `${bam[2]} ${bam[0]}`).join('<br>')
+            })
+            .classed('red', (d) => {
+              return (
+                d.files.filter((file) => file[0].endsWith('.bam')).length > 0
+              )
+            })
+
           const excel = excelData.find((d) => d.run_id === run)
           var analyst = tr.append('td').html(
             `${excel ? excel.secondary_analysis_analyst : ''}<br>
 ${excel ? excel.first_approver : ''}<br>
-${excel ? excel.archive_file_retention_date_fastq : ''}            
+${excel ? excel.contract_sent : ''}            
 `
           )
 
