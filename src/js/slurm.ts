@@ -148,15 +148,35 @@ d3.csv('/AGRF/clinical_2024_06_06.csv')
 
 d3.json('/clinical').then(function (JSONs: string[]) {
   console.log('Clinical Data', JSONs)
-  Promise.all(JSONs.map((json) => d3.json(`/AGRF/clinical/${json}`)))
-    .then(function (data: ClinicalData[]) {
-      return data.sort((a, b) => {
-        return a.summary.total.file_size_bytes < b.summary.total.file_size_bytes
-          ? -1
-          : 1
+  Promise.all([
+    d3.csv('/AGRF/clinical_2024_06_06.csv').then((data) => {
+      console.log('clinical_2024_06_06.csv', data)
+      return data.map((d: Clinical_Excel_Data) => {
+        Object.entries(d).map(([key, value]) => {
+          d[key] = value.trim()
+        })
+        return d
       })
+    }),
+    ...JSONs.map((json) => d3.json(`/AGRF/clinical/${json}`)),
+  ])
+    .then(function ([excelData, ...data]: [
+      Clinical_Excel_Data[],
+      ClinicalData
+    ]) {
+      const result: [Clinical_Excel_Data[], ClinicalData[]] = [
+        excelData,
+        data.sort((a, b) => {
+          return a.summary.total.file_size_bytes <
+            b.summary.total.file_size_bytes
+            ? -1
+            : 1
+        }),
+      ]
+      return result
     })
-    .then(function (data) {
+    .then(function ([excelData, data]) {
+      console.log('Excel data', excelData)
       console.log('All Clinical JSON data', data)
 
       const table = d3.select('table#clinical')
@@ -165,6 +185,7 @@ d3.json('/clinical').then(function (JSONs: string[]) {
         'Included',
         'Excluded',
         'Total',
+        'Analyst<br>First Approver<br>Date',
         'Contract Dir',
       ]
 
@@ -175,7 +196,7 @@ d3.json('/clinical').then(function (JSONs: string[]) {
         .data(columns)
         .enter()
         .append('th')
-        .text(function (d) {
+        .html(function (d) {
           return d
         })
 
@@ -224,7 +245,14 @@ d3.json('/clinical').then(function (JSONs: string[]) {
           // tr.append('td').text(run)
           // tr.append('td').text(flowcell)
 
-          // var analyist = tr.append('td')
+          const excel = excelData.find((d) => d.run_id === run)
+          var analyst = tr.append('td').html(
+            `${excel ? excel.secondary_analysis_analyst : ''}<br>
+${excel ? excel.first_approver : ''}<br>
+${excel ? excel.archive_file_retention_date_fastq : ''}            
+`
+          )
+
           tr.append('td').text(d.contract_dir)
 
           // d3.select(this).append('td').text(d['Primary Key'])
