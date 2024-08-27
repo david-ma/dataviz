@@ -124,22 +124,32 @@ d3.json('/clinical').then(function (JSONs: string[]) {
             extract_info_from_folder(d.contract_dir)
           const log_id = `${flowcell}_${contract_id}`
           tr.append('td').text(log_id)
-          tr.append('td').html(`
-${d.summary.include.file_count} files<br>${d.summary.include.file_size_human}`)
           tr.append('td')
             .html(
               `
-${d.summary.exclude.file_count} files<br>${d.summary.exclude.file_size_human}`
+${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_human}`
             )
-            .classed('red', (data: any) => {
+            .datum(d)
+            .classed('green', (data) => {
+              return data.summary.include.file_count < 1000
+            })
+
+          tr.append('td')
+            .html(
+              `
+${d.summary.exclude.file_count}&nbsp;files<br>${d.summary.exclude.file_size_human}`
+            )
+            .datum(d)
+            .classed('red', (data) => {
               return data.summary.exclude.file_count > 0
             })
           tr.append('td')
             .html(
               `
-${d.summary.total.file_count} files<br>${d.summary.total.file_size_human}`
+${d.summary.total.file_count}&nbsp;files<br>${d.summary.total.file_size_human}`
             )
-            .classed('green', (data: any) => {
+            .datum(d)
+            .classed('green', (data) => {
               return data.summary.total.file_count < 1000
             })
 
