@@ -78,6 +78,73 @@ type ClinicalData = {
     }
   }
 }
+// clinical_2024_06_06.csv
+// run_id,additional_bioinformatics,approved_to_send_out,archive_file_retention_date_fastq,archive_file_retention_date_vcf,archive_file_retention_days_fastq,archive_file_retention_days_vcf,basecalls_count,basecalls_present,basecalls_size,client_emails,client_username,contract_expected_fastq_count,contract_folder_bam_count,contract_folder_bam_size,contract_folder_fastq_checksum_count,contract_folder_fastq_count,contract_folder_fastq_size,contract_folder_keep_file_count,contract_folder_path,contract_folder_storage,contract_folder_vcf_count,contract_folder_vcf_size,contract_id,contract_pk,contract_sent,contract_sent_days_ago,contract_status,first_approver,has_archive_files_retention_period_passed_fastq,has_archive_files_retention_period_passed_vcf,has_archive_keep_file,has_current_secondary_analysis,has_retain_file,instrument_name,is_clinical,is_clinical_internal_or_reference,is_internal,logical_location,matching_contract_folders,purged,reference_data,run_number,second_approver,secondary_analysis_analyst,secondary_analysis_folder_count,secondary_analysis_folder_path,secondary_analysis_folder_size
+
+type Clinical_Excel_Data = {
+  run_id: string
+  additional_bioinformatics: string
+  approved_to_send_out: string
+  archive_file_retention_date_fastq: string
+  archive_file_retention_date_vcf: string
+  archive_file_retention_days_fastq: string
+  archive_file_retention_days_vcf: string
+  basecalls_count: string
+  basecalls_present: string
+  basecalls_size: string
+  client_emails: string
+  client_username: string
+  contract_expected_fastq_count: string
+  contract_folder_bam_count: string
+  contract_folder_bam_size: string
+  contract_folder_fastq_checksum_count: string
+  contract_folder_fastq_count: string
+  contract_folder_fastq_size: string
+  contract_folder_keep_file_count: string
+  contract_folder_path: string
+  contract_folder_storage: string
+  contract_folder_vcf_count: string
+  contract_folder_vcf_size: string
+  contract_id: string
+  contract_pk: string
+  contract_sent: string
+  contract_sent_days_ago: string
+  contract_status: string
+  first_approver: string
+  has_archive_files_retention_period_passed_fastq: string
+  has_archive_files_retention_period_passed_vcf: string
+  has_archive_keep_file: string
+  has_current_secondary_analysis: string
+  has_retain_file: string
+  instrument_name: string
+  is_clinical: string
+  is_clinical_internal_or_reference: string
+  is_internal: string
+  logical_location: string
+  matching_contract_folders: string
+  purged: string
+  reference_data: string
+  run_number: string
+  second_approver: string
+  secondary_analysis_analyst: string
+  secondary_analysis_folder_count: string
+  secondary_analysis_folder_path: string
+  secondary_analysis_folder_size: string
+}
+
+d3.csv('/AGRF/clinical_2024_06_06.csv')
+  .then((data) => {
+    console.log('clinical_2024_06_06.csv', data)
+    return data.map((d: Clinical_Excel_Data) => {
+      Object.entries(d).map(([key, value]) => {
+        d[key] = value.trim()
+      })
+      return d
+    })
+  })
+  .then((data) => {
+    console.log('Clean-ish data from Excel', data)
+  })
 
 d3.json('/clinical').then(function (JSONs: string[]) {
   console.log('Clinical Data', JSONs)
@@ -127,7 +194,7 @@ d3.json('/clinical').then(function (JSONs: string[]) {
           tr.append('td')
             .html(
               `
-${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_human}`
+  ${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_human}`
             )
             .datum(d)
             .classed('green', (data) => {
@@ -137,7 +204,7 @@ ${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_huma
           tr.append('td')
             .html(
               `
-${d.summary.exclude.file_count}&nbsp;files<br>${d.summary.exclude.file_size_human}`
+  ${d.summary.exclude.file_count}&nbsp;files<br>${d.summary.exclude.file_size_human}`
             )
             .datum(d)
             .classed('red', (data) => {
@@ -146,7 +213,7 @@ ${d.summary.exclude.file_count}&nbsp;files<br>${d.summary.exclude.file_size_huma
           tr.append('td')
             .html(
               `
-${d.summary.total.file_count}&nbsp;files<br>${d.summary.total.file_size_human}`
+  ${d.summary.total.file_count}&nbsp;files<br>${d.summary.total.file_size_human}`
             )
             .datum(d)
             .classed('green', (data) => {
@@ -156,6 +223,8 @@ ${d.summary.total.file_count}&nbsp;files<br>${d.summary.total.file_size_human}`
           // tr.append('td').text(instrument)
           // tr.append('td').text(run)
           // tr.append('td').text(flowcell)
+
+          // var analyist = tr.append('td')
           tr.append('td').text(d.contract_dir)
 
           // d3.select(this).append('td').text(d['Primary Key'])
