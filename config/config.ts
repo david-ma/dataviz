@@ -57,6 +57,20 @@ let config: Thalia.WebsiteConfig = {
         res.end(JSON.stringify(images))
       })
     },
+    clinical: function (res, req) {
+      const basePath = path.resolve(__dirname, '..', 'data', 'AGRF', 'clinical')
+
+      if (!fs.existsSync(path.resolve(basePath))) {
+        res.end('No data')
+        return
+      }
+
+      fsPromise
+        .readdir(path.resolve(basePath))
+        .then((files) => files.filter((d) => d.indexOf('.json') > -1))
+        // .then((files) => files.filter((d) => d.indexOf('CAGRF') == -1)) // Non-standard IDs
+        .then((files) => res.end(JSON.stringify(files)))
+    },
 
     upload: function (res, req) {
       const uploadFolder = 'websites/dataviz/data/campjs/'

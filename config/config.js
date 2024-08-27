@@ -48,6 +48,17 @@ let config = {
                 res.end(JSON.stringify(images));
             });
         },
+        clinical: function (res, req) {
+            const basePath = path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'clinical');
+            if (!fs_1.default.existsSync(path_1.default.resolve(basePath))) {
+                res.end('No data');
+                return;
+            }
+            fsPromise
+                .readdir(path_1.default.resolve(basePath))
+                .then((files) => files.filter((d) => d.indexOf('.json') > -1))
+                .then((files) => res.end(JSON.stringify(files)));
+        },
         upload: function (res, req) {
             const uploadFolder = 'websites/dataviz/data/campjs/';
             const form = new formidable_1.default.IncomingForm();
