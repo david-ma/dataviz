@@ -62,6 +62,38 @@ const color = d3
   ])
 
 const named_jobs = {}
+const bad_pks = [
+  '6166',
+  '6167',
+  '8251',
+  '9263',
+  '9613',
+  '9669',
+  '9811',
+  '9884',
+  '10019',
+  '10050',
+  '10067',
+  '10149',
+  '10245',
+  '10331',
+  '10491',
+  '12198',
+  '12323',
+  '12783',
+  '12953',
+  '12954',
+  '13355',
+  '14597',
+  '15768',
+  '15769',
+  '17690',
+  '19335',
+  '19342',
+  '19452',
+  '19671',
+  '19897',
+]
 
 // ['Primary Key', 'Analysis Path', 'Contract Id', 'Run', 'Date Sent', 'Data Sender', 'Purge', 'Purge Approver', 'Purge Notes', 'Retention Notes', 'Retention Notes Author', 'Publish As Benchmarking Data', 'instrument_name', 'machine_model']
 type Contract = {
@@ -170,26 +202,29 @@ type Clinical_Excel_Data = {
   secondary_analysis_folder_size: string
 }
 
-d3.json('/clinical')
-  // .then(function (JSONs: string[]) {
-  //   // Filter out Contract Folders with duplicate log_ids
-  //   const counter: {
-  //     [key: string]: string[]
-  //   } = {}
+const pks = {}
 
-  //   JSONs.forEach((json) => {
-  //     const parts = json.split('_')
-  //     const log_id = `${parts[0]}_${parts[1]}`
-  //     if (counter[log_id]) {
-  //       counter[log_id].push(json)
-  //     } else {
-  //       counter[log_id] = [json]
-  //     }
-  //   })
-  //   return Object.values(counter)
-  //     .filter((jsons) => jsons.length == 1)
-  //     .map((jsons) => jsons[0])
-  // })
+d3.json('/clinical')
+  .then(function (JSONs: string[]) {
+    // Filter out Contract Folders with duplicate log_ids
+    const counter: {
+      [key: string]: string[]
+    } = {}
+
+    JSONs.forEach((json) => {
+      const parts = json.split('_')
+      const log_id = `${parts[0]}_${parts[1]}`
+      if (counter[log_id]) {
+        counter[log_id].push(json)
+      } else {
+        counter[log_id] = [json]
+      }
+    })
+    return Object.values(counter)
+      .filter((jsons) => jsons.length == 1)
+      .flat()
+    // .map((jsons) => jsons[0])
+  })
   // .then(function (JSONs: string[]) {
   //   return JSONs.slice(0, 50)
   // })
@@ -221,24 +256,24 @@ d3.json('/clinical')
         const result: [Clinical_Excel_Data[], ClinicalData[]] = [
           excelData,
           data
-            // .filter((folder) => {
-            //   if (folder === null) {
-            //     return false
-            //   } else if (folder.summary.exclude.file_count > 0) {
-            //     return false
-            //   } else if (folder.summary.total.file_size_bytes < 200_000_000) {
-            //     return false
-            //   } else if (folder.summary.total.file_count > 1_000) {
-            //     return false
-            //   } else if (
-            //     folder.files.filter((file) => file[0].endsWith('.bam')).length >
-            //     0
-            //   ) {
-            //     return false
-            //   } else {
-            //     return true
-            //   }
-            // })
+            .filter((folder) => {
+              if (folder === null) {
+                return false
+              } else if (folder.summary.exclude.file_count > 0) {
+                return false
+              } else if (folder.summary.total.file_size_bytes < 200_000_000) {
+                return false
+              } else if (folder.summary.total.file_count > 1_000) {
+                return false
+              } else if (
+                folder.files.filter((file) => file[0].endsWith('.bam')).length >
+                0
+              ) {
+                return false
+              } else {
+                return true
+              }
+            })
             .sort((a, b) => {
               return a.summary.total.file_size_bytes <
                 b.summary.total.file_size_bytes
@@ -295,6 +330,12 @@ d3.json('/clinical')
               console.error('No excel data for', d.contract_dir)
               return
             }
+            const contract_pk = excel.contract_pk.split('.')[0]
+            if (bad_pks.includes(contract_pk)) {
+              d3.select(this).remove()
+              return
+            }
+            // pks[contract_pk] ? pks[contract_pk]++ : (pks[contract_pk] = 1)
 
             const log_id = `${flowcell}_${contract_id}`
             // const row_id = `row-${excel.contract_pk}`
@@ -310,7 +351,6 @@ d3.json('/clinical')
               .attr('id', `clinical_row-${log_id}`)
 
             // Index
-            const contract_pk = excel.contract_pk.split('.')[0]
             tr.append('td')
               .append('a')
               .attr(
@@ -463,6 +503,12 @@ d3.json('/clinical')
             //   })
           })
       })
+    // .then(() => {
+    //   // Get the "Bad" PKs
+    //   console.log('PKs', pks)
+    //   var filtered = Object.entries(pks).filter(([pk, count]:any) => count > 1).map(([pk, count]:any) => pk)
+    //   console.log('Filtered', filtered)
+    // })
   })
 
 function human_readable_size(bytes: number) {
