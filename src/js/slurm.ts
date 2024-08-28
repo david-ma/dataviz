@@ -321,21 +321,28 @@ d3.csv('/AGRF/clinical_2024_06_06.csv')
   })
 
 d3.json('/clinical')
-  .then(function (JSONs: string[]) {
-    return JSONs.filter((json) => easy_wins.includes(json.slice(0, -5)))
-  })
+  // .then(function (JSONs: string[]) {
+  //   return JSONs.filter((json) => easy_wins.includes(json.slice(0, -5)))
+  // })
   .then(function (JSONs: string[]) {
     console.log('Clinical Data', JSONs)
     Promise.all([
-      d3.csv('/AGRF/clinical_2024_06_06.csv').then((data) => {
-        console.log('clinical_2024_06_06.csv', data)
-        return data.map((d: Clinical_Excel_Data) => {
-          Object.entries(d).map(([key, value]) => {
-            d[key] = value.trim()
+      // d3.csv('/AGRF/clinical_2024_06_06.csv').then((data) => {
+      // data/AGRF/contract_list_for_purging_is_clinical_2024_08_28.csv
+      d3
+        .csv('/AGRF/contract_list_for_purging_is_clinical_2024_08_28.csv')
+        .then((data) => {
+          console.log(
+            'contract_list_for_purging_is_clinical_2024_08_28.csv',
+            data
+          )
+          return data.map((d: Clinical_Excel_Data) => {
+            Object.entries(d).map(([key, value]) => {
+              d[key] = value.trim()
+            })
+            return d
           })
-          return d
-        })
-      }),
+        }),
       ...JSONs.map((json) => d3.json(`/AGRF/clinical/${json}`)),
     ])
       .then(function ([excelData, ...data]: [
@@ -344,12 +351,28 @@ d3.json('/clinical')
       ]) {
         const result: [Clinical_Excel_Data[], ClinicalData[]] = [
           excelData,
-          data.sort((a, b) => {
-            return a.summary.total.file_size_bytes <
-              b.summary.total.file_size_bytes
-              ? -1
-              : 1
-          }),
+          data
+            .filter((data) => {
+              if (data.summary.exclude.file_count > 0) {
+                return false
+              } else if (data.summary.total.file_size_bytes < 200_000_000) {
+                return false
+              } else if (data.summary.total.file_count > 1_000) {
+                return false
+              } else if (
+                data.files.filter((file) => file[0].endsWith('.bam')).length > 0
+              ) {
+                return false
+              } else {
+                return true
+              }
+            })
+            .sort((a, b) => {
+              return a.summary.total.file_size_bytes <
+                b.summary.total.file_size_bytes
+                ? -1
+                : 1
+            }),
         ]
         return result
       })
@@ -491,7 +514,18 @@ d3.json('/clinical')
                 }
               })
 
-            const excel = excelData.find((d) => d.run_id === run)
+            const excel = excelData.find(
+              (d) =>
+                d.run_id === run && d.contract_id === contract_id
+             // d.run_id === run && d.contract_id === contract_id.split('_')[0]
+            ) || {
+              client_username: '',
+              client_emails: '',
+              contract_folder_path: '',
+              secondary_analysis_analyst: '',
+              first_approver: '',
+              contract_sent: '',
+            }
             //           var analyst = tr.append('td').html(
             //             `${excel ? excel.secondary_analysis_analyst : ''}<br>
             // ${excel ? excel.first_approver : ''}<br>
@@ -501,6 +535,14 @@ d3.json('/clinical')
             tr.append('td').text(excel.client_username)
             tr.append('td').text(excel.client_emails)
             tr.append('td').text(excel.contract_folder_path)
+              .datum(d)
+              .classed('red', (d) => {
+                if(excel.contract_folder_path !== d.contract_dir) {
+                  return true
+                } else {
+                  return false
+                }
+              })
 
             tr.append('td').text(excel.secondary_analysis_analyst)
             tr.append('td').text(excel.first_approver)
@@ -822,9 +864,11 @@ function drawTreeMap(data, log_id, element_id) {
 
 function extract_info_from_folder(folder: string) {
   // BASH regex from s3_sbatch_archive.sh
-  // export regex_pattern="(/data/Analysis/)(.*)/(.*_.(.*))/contracts/(.*)"
+  // regex_pattern="(/data/Analysis/)(.*)/(.*_.(.*))/contracts/(.*)"
+  // regex_pattern="(.*)/(.*_.(.*))/contracts.*/([^_]*)(_.*)?"
+
   const regex_pattern =
-    /\/data\/Analysis\/(.*)\/(.*_.(.*))\/contracts(?:_\d+)?\/(.*)/
+    /\/data\/Analysis\/(.*)\/(.*_.(.*))\/contracts(?:_\d+)?\/([^_]*)(?:_.*)?/
 
   const match = folder.match(regex_pattern)
   if (!match) {
@@ -905,3 +949,8 @@ function log_id_from_contract(contract: Contract) {
 //   console.log('Fresh Stuff', fresh_stuff)
 //   console.log(JSON.stringify(fresh_stuff, null, 2))
 // })
+
+d3.csv('/AGRF/contract_list_for_purging_is_clinical_2024_08_28.csv')
+  .then((data) => data.map((d) => d.contract_folder_path))
+  .then(JSON.stringify)
+  .then(console.log)
