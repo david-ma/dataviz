@@ -413,17 +413,16 @@ d3.json('/clinical')
               // })
               .text(log_id)
 
-            tr.append('td')
-              .text(d.summary.include.file_size_human)
-              // .style('display', 'none')
-  //             .html(
-  //               `
-  // ${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_human}`
-  //             )
-              // .datum(d)
-              // .classed('green', (data) => {
-              //   return data.summary.include.file_count < 1000
-              // })
+            tr.append('td').text(d.summary.include.file_size_human)
+            // .style('display', 'none')
+            //             .html(
+            //               `
+            // ${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_human}`
+            //             )
+            // .datum(d)
+            // .classed('green', (data) => {
+            //   return data.summary.include.file_count < 1000
+            // })
 
             tr.append('td')
               //           .html(
@@ -431,19 +430,19 @@ d3.json('/clinical')
               // ${d.summary.exclude.file_count}&nbsp;files<br>${d.summary.exclude.file_size_human}`
               //           )
               .text(d.summary.total.file_count)
-              // .datum(d)
-              // .classed('red', (data) => {
-              //   if (data.summary.exclude.file_count > 0) {
-              //     // tr.style('display', 'none')
-              //     d3.select(this).attr(
-              //       'title',
-              //       "Warning: Exclusion rules applied, not an 'easy win'"
-              //     )
-              //     return true
-              //   } else {
-              //     return false
-              //   }
-              // })
+            // .datum(d)
+            // .classed('red', (data) => {
+            //   if (data.summary.exclude.file_count > 0) {
+            //     // tr.style('display', 'none')
+            //     d3.select(this).attr(
+            //       'title',
+            //       "Warning: Exclusion rules applied, not an 'easy win'"
+            //     )
+            //     return true
+            //   } else {
+            //     return false
+            //   }
+            // })
 
             // tr.append('td')
             //   //           .html(
@@ -502,7 +501,6 @@ d3.json('/clinical')
             tr.append('td').text(excel.client_username)
             tr.append('td').text(excel.client_emails)
             tr.append('td').text(excel.contract_folder_path)
-            
 
             tr.append('td').text(excel.secondary_analysis_analyst)
             tr.append('td').text(excel.first_approver)
@@ -525,12 +523,11 @@ d3.json('/clinical')
             // d3.select(this).append('td').text(d['instrument_name'])
             // d3.select(this).append('td').text(d['machine_model'])
 
-
-            if(d.files.length > 10000) {
+            if (d.files.length > 10000) {
               d3.select(`#clinical_row2-${log_id}`)
-              .append('td')
-              .attr('colspan', 7)
-              .text(`Too many files to display: ${d.files.length}`)
+                .append('td')
+                .attr('colspan', 7)
+                .text(`Too many files to display: ${d.files.length}`)
 
               return
             }
@@ -775,11 +772,11 @@ Promise.all([
 })
 
 function drawTreeMap(data, log_id, element_id) {
-  if(data.files.length === 0) {
+  if (data.files.length === 0) {
     return
   }
 
-  if(data.files.length > 10000) {
+  if (data.files.length > 10000) {
     return
   }
 
@@ -883,3 +880,28 @@ function log_id_from_contract(contract: Contract) {
     flowcell = run.split('_').pop().slice(1)
   return `${flowcell}_${contract_id}`
 }
+
+// Process the fresh list of clinical contracts. Remove the ones that have already been processed.
+//
+// Promise.all([
+//   d3
+//     .csv('/AGRF/contract_list_old.csv')
+//     .then((data) => data.map((d) => d.contract_folder_path)),
+//   d3
+//     .csv('/AGRF/contract_list_new.csv')
+//     .then((data) => data.map((d) => d.contract_folder_path)),
+// ]).then(([old_list, new_list]) => {
+//   console.log("Old List", old_list)
+//   console.log("New List", new_list)
+
+//   const fresh_stuff = []
+//   new_list.forEach((contract) => {
+//     if (old_list.indexOf(contract) === -1) {
+//       fresh_stuff.push(contract)
+//     }
+//   })
+//   return fresh_stuff
+// }).then((fresh_stuff) => {
+//   console.log('Fresh Stuff', fresh_stuff)
+//   console.log(JSON.stringify(fresh_stuff, null, 2))
+// })
