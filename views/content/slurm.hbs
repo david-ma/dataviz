@@ -2,8 +2,9 @@
 {{> require }}
 {{> tableCSS }}
 
-<div>
+<div style="margin-top:5px;">
   <button onclick="toggle_links()">Toggle Links</button>
+  <button onclick="enable_dark_mode()">Enable Dark Mode</button>
 </div>
 
 {{#> tabs tabs="clinical,contracts" }}
@@ -16,6 +17,11 @@
 <script>
   function toggle_links() {
     $(".log_id_td").toggleClass("hideLinks");
+  }
+
+   $("body").toggleClass("enableDarkMode");
+  function enable_dark_mode() {
+    $("body").toggleClass("enableDarkMode");
   }
 </script>
 

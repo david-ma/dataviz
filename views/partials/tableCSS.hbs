@@ -1,50 +1,52 @@
 <style>
   @media (prefers-color-scheme: dark) {
-
-    #dataviz_blog,
-    html {
+    body.enableDarkMode {
       background: #1f1f1f;
-    }
 
-    a {
-      color: #5cd5fb;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-
-      &:hover {
-        color: #5cfbf8;
+      #dataviz_blog {
+        background: #1f1f1f;
       }
 
-      &:visited {
+      a {
         color: #5cd5fb;
-      }
-    }
+        text-decoration: underline;
+        text-underline-offset: 3px;
 
-    table {
-      border-color: #444;
-      background-color: #444;
-      color: #fe8d59;
-
-      th,
-      td {
-        border: 1px solid #5cd5fb;
-
-        &.green {
-          background-color: hsl(120, 100%, 20%);
+        &:hover {
+          color: #5cfbf8;
         }
 
-        &.red {
-          background-color: hsl(0, 100%, 20%);
+        &:visited {
+          color: #5cd5fb;
+        }
+      }
+
+      table {
+        border-color: #444;
+        background-color: #444;
+        color: #fe8d59;
+
+        th,
+        td {
+          border: 1px solid #5cd5fb;
+
+          &.green {
+            background-color: hsl(120, 100%, 20%);
+          }
+
+          &.red {
+            background-color: hsl(0, 100%, 20%);
+          }
+
         }
 
-      }
+        th {
+          background-color: #333;
+        }
 
-      th {
-        background-color: #333;
-      }
-
-      tr:hover {
-        background-color: #555;
+        tr:hover {
+          background-color: #555;
+        }
       }
     }
   }

@@ -171,27 +171,27 @@ type Clinical_Excel_Data = {
 }
 
 d3.json('/clinical')
-  .then(function (JSONs: string[]) {
-    // Filter out Contract Folders with duplicate log_ids
-    const counter: {
-      [key: string]: string[]
-    } = {}
-
-    JSONs.forEach((json) => {
-      const parts = json.split('_')
-      const log_id = `${parts[0]}_${parts[1]}`
-      if (counter[log_id]) {
-        counter[log_id].push(json)
-      } else {
-        counter[log_id] = [json]
-      }
-    })
-    return Object.values(counter)
-      .filter((jsons) => jsons.length == 1)
-      .map((jsons) => jsons[0])
-  })
   // .then(function (JSONs: string[]) {
-  //   return JSONs.slice(0, 10)
+  //   // Filter out Contract Folders with duplicate log_ids
+  //   const counter: {
+  //     [key: string]: string[]
+  //   } = {}
+
+  //   JSONs.forEach((json) => {
+  //     const parts = json.split('_')
+  //     const log_id = `${parts[0]}_${parts[1]}`
+  //     if (counter[log_id]) {
+  //       counter[log_id].push(json)
+  //     } else {
+  //       counter[log_id] = [json]
+  //     }
+  //   })
+  //   return Object.values(counter)
+  //     .filter((jsons) => jsons.length == 1)
+  //     .map((jsons) => jsons[0])
+  // })
+  // .then(function (JSONs: string[]) {
+  //   return JSONs.slice(0, 50)
   // })
   .then(function (JSONs: string[]) {
     console.log('Clinical Data', JSONs)
@@ -221,24 +221,24 @@ d3.json('/clinical')
         const result: [Clinical_Excel_Data[], ClinicalData[]] = [
           excelData,
           data
-            .filter((folder) => {
-              if (folder === null) {
-                return false
-              } else if (folder.summary.exclude.file_count > 0) {
-                return false
-              } else if (folder.summary.total.file_size_bytes < 200_000_000) {
-                return false
-              } else if (folder.summary.total.file_count > 1_000) {
-                return false
-              } else if (
-                folder.files.filter((file) => file[0].endsWith('.bam')).length >
-                0
-              ) {
-                return false
-              } else {
-                return true
-              }
-            })
+            // .filter((folder) => {
+            //   if (folder === null) {
+            //     return false
+            //   } else if (folder.summary.exclude.file_count > 0) {
+            //     return false
+            //   } else if (folder.summary.total.file_size_bytes < 200_000_000) {
+            //     return false
+            //   } else if (folder.summary.total.file_count > 1_000) {
+            //     return false
+            //   } else if (
+            //     folder.files.filter((file) => file[0].endsWith('.bam')).length >
+            //     0
+            //   ) {
+            //     return false
+            //   } else {
+            //     return true
+            //   }
+            // })
             .sort((a, b) => {
               return a.summary.total.file_size_bytes <
                 b.summary.total.file_size_bytes
@@ -254,7 +254,7 @@ d3.json('/clinical')
 
         const table = d3.select('table#clinical')
         const columns = [
-          // 'Index',
+          'contract_pk',
           'Log ID',
           'Total File Size',
           'Total File Count',
@@ -264,7 +264,8 @@ d3.json('/clinical')
           'Analyst',
           'First Approver',
           'Date Sent',
-          'Contract Dir',
+          // 'Contract Dir',
+          // 'Secondary Analysis Folder Path',
         ]
 
         table
@@ -287,7 +288,16 @@ d3.json('/clinical')
           .each(function (d, i) {
             const { instrument, run, flowcell, contract_id } =
               extract_info_from_folder(d.contract_dir)
+            const excel = excelData.find(
+              (ex) => ex.contract_folder_path === d.contract_dir
+            )
+            if (!excel) {
+              console.error('No excel data for', d.contract_dir)
+              return
+            }
+
             const log_id = `${flowcell}_${contract_id}`
+            // const row_id = `row-${excel.contract_pk}`
 
             var row2 = d3
               .select(this)
@@ -300,7 +310,15 @@ d3.json('/clinical')
               .attr('id', `clinical_row-${log_id}`)
 
             // Index
-            // tr.append('td').text(i)
+            const contract_pk = excel.contract_pk.split('.')[0]
+            tr.append('td')
+              .append('a')
+              .attr(
+                'href',
+                `http://bioweb02.agrf.org.au/nextgenpipeline/admin/nextgenruns/contract/${contract_pk}/change/`
+              )
+              .attr('target', '_blank')
+              .text(contract_pk)
 
             var log_id_td = tr
               .append('td')
@@ -345,16 +363,6 @@ d3.json('/clinical')
                 }
               })
 
-            const excel = excelData.find(
-              (ex) => ex.contract_folder_path === d.contract_dir
-            ) || {
-              client_username: '',
-              client_emails: '',
-              contract_folder_path: '',
-              secondary_analysis_analyst: '',
-              first_approver: '',
-              contract_sent: '',
-            }
             //           var analyst = tr.append('td').html(
             //             `${excel ? excel.secondary_analysis_analyst : ''}<br>
             // ${excel ? excel.first_approver : ''}<br>
@@ -362,7 +370,7 @@ d3.json('/clinical')
             // `
             //           )
             tr.append('td').text(excel.client_username)
-            tr.append('td').text(excel.client_emails)
+            tr.append('td').text(excel.client_emails.split(',').join(', '))
             tr.append('td')
               .text(excel.contract_folder_path)
               .datum(d)
@@ -376,9 +384,12 @@ d3.json('/clinical')
 
             tr.append('td').text(excel.secondary_analysis_analyst)
             tr.append('td').text(excel.first_approver)
-            tr.append('td').text(excel.contract_sent)
+            tr.append('td')
+              .style('white-space', 'nowrap')
+              .text(excel.contract_sent)
 
-            tr.append('td').text(d.contract_dir)
+            // tr.append('td').text(d.contract_dir)
+            // tr.append('td').text(excel.secondary_analysis_folder_path)
 
             // d3.select(this).append('td').text(d['Primary Key'])
             // d3.select(this).append('td').text(d['Analysis Path'])
@@ -395,61 +406,61 @@ d3.json('/clinical')
             // d3.select(this).append('td').text(d['instrument_name'])
             // d3.select(this).append('td').text(d['machine_model'])
 
-            if (d.files.length > 10000) {
-              d3.select(`#clinical_row2-${log_id}`)
-                .append('td')
-                .attr('colspan', columns.length)
-                .text(`Too many files to display: ${d.files.length}`)
+            // if (d.files.length > 10000) {
+            //   d3.select(`#clinical_row2-${log_id}`)
+            //     .append('td')
+            //     .attr('colspan', columns.length)
+            //     .text(`Too many files to display: ${d.files.length}`)
 
-              return
-            }
+            //   return
+            // }
 
-            d3.select(`#clinical_row2-${log_id}`)
-              .append('td')
-              .attr('colspan', 4)
-              .append('div')
-              .classed('followScroll', true)
+            // d3.select(`#clinical_row2-${log_id}`)
+            //   .append('td')
+            //   .attr('colspan', 4)
+            //   .append('div')
+            //   .classed('followScroll', true)
 
-            drawTreeMap(d, log_id, `#clinical_row2-${log_id} td div`)
+            // drawTreeMap(d, log_id, `#clinical_row2-${log_id} td div`)
 
-            const inner_table = d3
-              .select(`#clinical_row2-${log_id}`)
-              .append('td')
-              .attr('colspan', columns.length - 4)
-              .append('table')
+            // const inner_table = d3
+            //   .select(`#clinical_row2-${log_id}`)
+            //   .append('td')
+            //   .attr('colspan', columns.length - 4)
+            //   .append('table')
 
-            inner_table
-              .append('thead')
-              .append('tr')
-              .selectAll('th')
-              .data(['Type', 'Filepath', 'Size', 'Status', 'Level'])
-              .enter()
-              .append('th')
-              .text((d) => d)
+            // inner_table
+            //   .append('thead')
+            //   .append('tr')
+            //   .selectAll('th')
+            //   .data(['Type', 'Filepath', 'Size', 'Status', 'Level'])
+            //   .enter()
+            //   .append('th')
+            //   .text((d) => d)
 
-            inner_table
-              .append('tbody')
-              .selectAll('tr')
-              .data(d.files.filter((file) => file[4] !== 'included_folder'))
-              .enter()
-              .append('tr')
-              .html((file) => {
-                const file_relative_path = [
-                  file[1].split(contract_id).pop(),
-                  file[0],
-                ]
-                  .join('/')
-                  .slice(1)
+            // inner_table
+            //   .append('tbody')
+            //   .selectAll('tr')
+            //   .data(d.files.filter((file) => file[4] !== 'included_folder'))
+            //   .enter()
+            //   .append('tr')
+            //   .html((file) => {
+            //     const file_relative_path = [
+            //       file[1].split(contract_id).pop(),
+            //       file[0],
+            //     ]
+            //       .join('/')
+            //       .slice(1)
 
-                const filetype = getFiletype(file[0])
-                const size = human_readable_size(parseInt(file[2]))
+            //     const filetype = getFiletype(file[0])
+            //     const size = human_readable_size(parseInt(file[2]))
 
-                return `<td style="color: black; background:${color(
-                  filetype
-                )}">${filetype}</td><td>${file_relative_path}</td><td>${size}</td><td>${
-                  file[4]
-                }</td><td>${file[5]}</td>`
-              })
+            //     return `<td style="color: black; background:${color(
+            //       filetype
+            //     )}">${filetype}</td><td>${file_relative_path}</td><td>${size}</td><td>${
+            //       file[4]
+            //     }</td><td>${file[5]}</td>`
+            //   })
           })
       })
   })
