@@ -32,7 +32,7 @@ if (false) {
         description: 'None',
     });
 }
-if (true) {
+if (false) {
     seq.sequelize
         .sync({
         alter: true,

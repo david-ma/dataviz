@@ -343,7 +343,13 @@ d3.json('/clinical')
             return d
           })
         }),
-      ...JSONs.map((json) => d3.json(`/AGRF/clinical/${json}`)),
+      ...JSONs.map((json) =>
+        d3.json(`/AGRF/clinical/${json}`).catch((err) => {
+          console.error(err)
+          console.error(json)
+          return null
+        })
+      ),
     ])
       .then(function ([excelData, ...data]: [
         Clinical_Excel_Data[],
@@ -353,7 +359,9 @@ d3.json('/clinical')
           excelData,
           data
             .filter((data) => {
-              if (data.summary.exclude.file_count > 0) {
+              if (data === null) {
+                return false
+              } else if (data.summary.exclude.file_count > 0) {
                 return false
               } else if (data.summary.total.file_size_bytes < 200_000_000) {
                 return false
@@ -429,6 +437,7 @@ d3.json('/clinical')
               .attr('id', `clinical_row-${log_id}`)
 
             tr.append('td')
+              .style('text-wrap', 'nowrap')
               // .append('a')
               // .attr('href', `#x`)
               // .on('click', function () {
@@ -515,9 +524,9 @@ d3.json('/clinical')
               })
 
             const excel = excelData.find(
-              (d) =>
-                d.run_id === run && d.contract_id === contract_id
-             // d.run_id === run && d.contract_id === contract_id.split('_')[0]
+              (ex) => ex.contract_folder_path === d.contract_dir
+              // (d) => d.run_id === run && d.contract_id === contract_id
+              // d.run_id === run && d.contract_id === contract_id.split('_')[0]
             ) || {
               client_username: '',
               client_emails: '',
@@ -534,10 +543,11 @@ d3.json('/clinical')
             //           )
             tr.append('td').text(excel.client_username)
             tr.append('td').text(excel.client_emails)
-            tr.append('td').text(excel.contract_folder_path)
+            tr.append('td')
+              .text(excel.contract_folder_path)
               .datum(d)
               .classed('red', (d) => {
-                if(excel.contract_folder_path !== d.contract_dir) {
+                if (excel.contract_folder_path !== d.contract_dir) {
                   return true
                 } else {
                   return false
@@ -568,7 +578,7 @@ d3.json('/clinical')
             if (d.files.length > 10000) {
               d3.select(`#clinical_row2-${log_id}`)
                 .append('td')
-                .attr('colspan', 7)
+                .attr('colspan', columns.length)
                 .text(`Too many files to display: ${d.files.length}`)
 
               return
@@ -576,20 +586,20 @@ d3.json('/clinical')
 
             d3.select(`#clinical_row2-${log_id}`)
               .append('td')
-              .attr('colspan', 3)
+              .attr('colspan', 4)
             drawTreeMap(d, log_id, `#clinical_row2-${log_id} td`)
 
             const inner_table = d3
               .select(`#clinical_row2-${log_id}`)
               .append('td')
-              .attr('colspan', 4)
+              .attr('colspan', columns.length - 4)
               .append('table')
 
             inner_table
               .append('thead')
               .append('tr')
               .selectAll('th')
-              .data(['', 'File', 'Size', 'Status', 'Level'])
+              .data(['Type', 'Filepath', 'Size', 'Status', 'Level'])
               .enter()
               .append('th')
               .text((d) => d)
@@ -608,12 +618,12 @@ d3.json('/clinical')
                   .join('/')
                   .slice(1)
 
-                const filetype = file[0].split('.').pop()
+                const filetype = getFiletype(file[0])
                 const size = human_readable_size(parseInt(file[2]))
 
-                return `<td style="background:${color(
+                return `<td style="color: black; background:${color(
                   filetype
-                )}">x</td><td>${file_relative_path}</td><td>${size}</td><td>${
+                )}">${filetype}</td><td>${file_relative_path}</td><td>${size}</td><td>${
                   file[4]
                 }</td><td>${file[5]}</td>`
               })
@@ -838,7 +848,7 @@ function drawTreeMap(data, log_id, element_id) {
         filename: file[0],
         directory: file[1],
         filesize: file[2],
-        filetype: file[0].split('.').pop(),
+        filetype: getFiletype(file[0]),
         date_modified: file[3],
         status: file[4],
         level: file[5],
@@ -954,3 +964,32 @@ d3.csv('/AGRF/contract_list_for_purging_is_clinical_2024_08_28.csv')
   .then((data) => data.map((d) => d.contract_folder_path))
   .then(JSON.stringify)
   .then(console.log)
+
+function getFiletype(filename) {
+  if (!filename) {
+    throw new Error('No filename provided')
+  }
+
+  const doubleExtensions = [
+    'tar',
+    'gz',
+    'zip',
+    'txt',
+    'bai',
+    'out',
+    'err',
+    'log',
+  ]
+  let filetype = 'unknown'
+
+  let parts = filename.split('.')
+  if (parts.length > 1) {
+    filetype = parts.pop()
+  }
+
+  if (doubleExtensions.includes(filetype) && parts.length > 1) {
+    filetype = parts.pop() + '.' + filetype
+  }
+
+  return filetype
+}

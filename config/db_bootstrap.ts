@@ -52,7 +52,7 @@ if (false) {
 }
 
 // rebuild entire database & reload data..?
-if (true) {
+if (false) {
   // console.log('sync true, force & alter')
 
   // eslint-disable-line
