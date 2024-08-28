@@ -171,24 +171,34 @@ type Clinical_Excel_Data = {
 }
 
 d3.json('/clinical')
+  .then(function (JSONs: string[]) {
+    // Filter out Contract Folders with duplicate log_ids
+    const counter: {
+      [key: string]: string[]
+    } = {}
+
+    JSONs.forEach((json) => {
+      const parts = json.split('_')
+      const log_id = `${parts[0]}_${parts[1]}`
+      if (counter[log_id]) {
+        counter[log_id].push(json)
+      } else {
+        counter[log_id] = [json]
+      }
+    })
+    return Object.values(counter)
+      .filter((jsons) => jsons.length == 1)
+      .map((jsons) => jsons[0])
+  })
   // .then(function (JSONs: string[]) {
   //   return JSONs.slice(0, 10)
-  // })
-  // .then(function (JSONs: string[]) {
-  //   return JSONs.filter((json) => easy_wins.includes(json.slice(0, -5)))
   // })
   .then(function (JSONs: string[]) {
     console.log('Clinical Data', JSONs)
     Promise.all([
-      // d3.csv('/AGRF/clinical_2024_06_06.csv').then((data) => {
-      // data/AGRF/contract_list_for_purging_is_clinical_2024_08_28.csv
       d3
         .csv('/AGRF/contract_list_for_purging_is_clinical_2024_08_28.csv')
         .then((data) => {
-          // console.log(
-          //   'contract_list_for_purging_is_clinical_2024_08_28.csv',
-          //   data
-          // )
           return data.map((d: Clinical_Excel_Data) => {
             Object.entries(d).map(([key, value]) => {
               d[key] = value.trim()
@@ -221,7 +231,8 @@ d3.json('/clinical')
               } else if (folder.summary.total.file_count > 1_000) {
                 return false
               } else if (
-                folder.files.filter((file) => file[0].endsWith('.bam')).length > 0
+                folder.files.filter((file) => file[0].endsWith('.bam')).length >
+                0
               ) {
                 return false
               } else {
@@ -243,6 +254,7 @@ d3.json('/clinical')
 
         const table = d3.select('table#clinical')
         const columns = [
+          // 'Index',
           'Log ID',
           'Total File Size',
           'Total File Count',
@@ -272,7 +284,7 @@ d3.json('/clinical')
           .data(data)
           .enter()
           .append('tr')
-          .each(function (d) {
+          .each(function (d, i) {
             const { instrument, run, flowcell, contract_id } =
               extract_info_from_folder(d.contract_dir)
             const log_id = `${flowcell}_${contract_id}`
@@ -281,13 +293,21 @@ d3.json('/clinical')
               .select(this)
               .attr('id', `clinical_row2-${log_id}`)
               .classed('hidden', true)
+
             var tr = table
               .select('tbody')
               .insert('tr', `#clinical_row2-${log_id}`)
               .attr('id', `clinical_row-${log_id}`)
 
-            tr.append('td')
+            // Index
+            // tr.append('td').text(i)
+
+            var log_id_td = tr
+              .append('td')
+              .classed('log_id_td', true)
               .style('text-wrap', 'nowrap')
+
+            log_id_td
               .append('a')
               .attr('href', `#x`)
               .on('click', function () {
@@ -295,10 +315,11 @@ d3.json('/clinical')
               })
               .text(log_id)
 
+            log_id_td.append('p').text(log_id)
+
             tr.append('td').text(d.summary.include.file_size_human)
 
-            tr.append('td')
-              .text(d.summary.total.file_count)
+            tr.append('td').text(d.summary.total.file_count)
 
             // tr.append('td').text(instrument)
             // tr.append('td').text(run)

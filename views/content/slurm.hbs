@@ -2,9 +2,33 @@
 {{> require }}
 {{> tableCSS }}
 
+<div>
+  <button onclick="toggle_links()">Toggle Links</button>
+</div>
+
 {{#> tabs tabs="clinical,contracts" }}
-  <table id="{{this}}">
-    <thead></thead>
-    <tbody></tbody>
-  </table>
+<table id="{{this}}">
+  <thead></thead>
+  <tbody></tbody>
+</table>
 {{/tabs}}
+
+<script>
+  function toggle_links() {
+    $(".log_id_td").toggleClass("hideLinks");
+  }
+</script>
+
+<style>
+  td.log_id_td p {
+    display: none;
+  }
+
+  td.log_id_td.hideLinks a {
+    display: none;
+  }
+
+  td.log_id_td.hideLinks p {
+    display: inline;
+  }
+</style>
