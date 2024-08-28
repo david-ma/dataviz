@@ -8,6 +8,9 @@ overrides:
   css-what: 5.0.1
 
 dependencies:
+  '@observablehq/stdlib':
+    specifier: ^5.8.8
+    version: 5.8.8
   '@types/jquery':
     specifier: ^3.5.29
     version: 3.5.29
@@ -1678,6 +1681,15 @@ packages:
       rimraf: 3.0.2
     dev: false
     optional: true
+
+  /@observablehq/stdlib@5.8.8:
+    resolution: {integrity: sha512-XxVfXX4N+8QYqg308+KT2cpXcsiL6yFphrYNOyCNReqezeoK0Zd9xOdSvo/0NX8NJ8HypIZdTQNwPeOvQWOm2Q==}
+    engines: {node: '>=14.5.0'}
+    dependencies:
+      d3-array: 3.2.4
+      d3-dsv: 3.0.1
+      d3-require: 1.3.0
+    dev: false
 
   /@puppeteer/browsers@2.2.2:
     resolution: {integrity: sha512-hZ/JhxPIceWaGSEzUZp83/8M49CoxlkuThfTR7t4AoCu5+ZvJ3vktLm60Otww2TXeROB5igiZ8D9oPQh6ckBVg==}
@@ -4156,6 +4168,10 @@ packages:
   /d3-random@3.0.1:
     resolution: {integrity: sha512-FXMe9GfxTxqd5D6jFsQ+DJ8BJS4E/fT5mqqdjovykEB2oFbTMDVdg1MGFxfQW+FBOGoB++k8swBrgwSHT1cUXQ==}
     engines: {node: '>=12'}
+    dev: false
+
+  /d3-require@1.3.0:
+    resolution: {integrity: sha512-XaNc2azaAwXhGjmCMtxlD+AowpMfLimVsAoTMpqrvb8CWoA4QqyV12mc4Ue6KSoDvfuS831tsumfhDYxGd4FGA==}
     dev: false
 
   /d3-sankey@0.12.3:

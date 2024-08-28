@@ -17,6 +17,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@observablehq/stdlib": "^5.8.8",
     "@types/jquery": "^3.5.29",
     "amdefine": "^1.0.1",
     "axios": "^1.6.8",
