@@ -193,10 +193,6 @@ let config: Thalia.WebsiteConfig = {
                   'parseArray',
                   (array, options) => array.split(',').map(options.fn).join('')
                 )
-                router.handlebars.registerHelper(
-                  'capitalize',
-                  (str) => str.charAt(0).toUpperCase() + str.slice(1)
-                )
 
                 loadViewsAsPartials(views, router.handlebars)
                 router.res.end(template(data))

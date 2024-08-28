@@ -242,7 +242,7 @@ d3.json('/clinical')
           })
         }),
       ...JSONs.map((json) =>
-        d3.json(`/AGRF/clinical/${json}`).catch((err) => {
+        d3.json(`/AGRF/clinical_5/${json}`).catch((err) => {
           console.error(err)
           console.error(json)
           return null
@@ -256,24 +256,24 @@ d3.json('/clinical')
         const result: [Clinical_Excel_Data[], ClinicalData[]] = [
           excelData,
           data
-            .filter((folder) => {
-              if (folder === null) {
-                return false
-              } else if (folder.summary.exclude.file_count > 0) {
-                return false
-              } else if (folder.summary.total.file_size_bytes < 200_000_000) {
-                return false
-              } else if (folder.summary.total.file_count > 1_000) {
-                return false
-              } else if (
-                folder.files.filter((file) => file[0].endsWith('.bam')).length >
-                0
-              ) {
-                return false
-              } else {
-                return true
-              }
-            })
+            // .filter((folder) => {
+            //   if (folder === null) {
+            //     return false
+            //   } else if (folder.summary.exclude.file_count > 0) {
+            //     return false
+            //   } else if (folder.summary.total.file_size_bytes < 200_000_000) {
+            //     return false
+            //   } else if (folder.summary.total.file_count > 1_000) {
+            //     return false
+            //   // } else if (
+            //   //   folder.files.filter((file) => file[0].endsWith('.bam')).length >
+            //   //   0
+            //   // ) {
+            //   //   return false
+            //   } else {
+            //     return true
+            //   }
+            // })
             .sort((a, b) => {
               return a.summary.total.file_size_bytes <
                 b.summary.total.file_size_bytes
@@ -293,12 +293,13 @@ d3.json('/clinical')
           'Log ID',
           'Total File Size',
           'Total File Count',
-          'Client Username',
-          'Client Emails',
-          'Contract Folder Path',
+          // 'Client Username',
+          // 'Client Emails',
           'Analyst',
           'First Approver',
+          'Contract Folder Path',
           'Date Sent',
+          'Command',
           // 'Contract Dir',
           // 'Secondary Analysis Folder Path',
         ]
@@ -383,25 +384,25 @@ d3.json('/clinical')
             // tr.append('td').text(run)
             // tr.append('td').text(flowcell)
 
-            tr.append('td')
-              .style('display', 'none')
-              .datum(d)
-              .html((d) => {
-                const bams = d.files.filter((file) => file[0].endsWith('.bam'))
+            // tr.append('td')
+            //   .style('display', 'none')
+            //   .datum(d)
+            //   .html((d) => {
+            //     const bams = d.files.filter((file) => file[0].endsWith('.bam'))
 
-                return bams.map((bam) => `${bam[2]} ${bam[0]}`).join('<br>')
-              })
-              .classed('red', (d) => {
-                if (
-                  d.files.filter((file) => file[0].endsWith('.bam')).length > 0
-                ) {
-                  // tr.style('display', 'none')
-                  d3.select(this).attr('title', 'Warning: BAM files present')
-                  return true
-                } else {
-                  return false
-                }
-              })
+            //     return bams.map((bam) => `${bam[2]} ${bam[0]}`).join('<br>')
+            //   })
+            //   .classed('red', (d) => {
+            //     if (
+            //       d.files.filter((file) => file[0].endsWith('.bam')).length > 0
+            //     ) {
+            //       // tr.style('display', 'none')
+            //       d3.select(this).attr('title', 'Warning: BAM files present')
+            //       return true
+            //     } else {
+            //       return false
+            //     }
+            //   })
 
             //           var analyst = tr.append('td').html(
             //             `${excel ? excel.secondary_analysis_analyst : ''}<br>
@@ -409,8 +410,12 @@ d3.json('/clinical')
             // ${excel ? excel.contract_sent : ''}
             // `
             //           )
-            tr.append('td').text(excel.client_username)
-            tr.append('td').text(excel.client_emails.split(',').join(', '))
+            // tr.append('td').text(excel.client_username)
+            // tr.append('td').text(excel.client_emails.split(',').join(', '))
+
+            tr.append('td').text(excel.secondary_analysis_analyst)
+            tr.append('td').text(excel.first_approver)
+
             tr.append('td')
               .text(excel.contract_folder_path)
               .datum(d)
@@ -422,11 +427,18 @@ d3.json('/clinical')
                 }
               })
 
-            tr.append('td').text(excel.secondary_analysis_analyst)
-            tr.append('td').text(excel.first_approver)
             tr.append('td')
               .style('white-space', 'nowrap')
               .text(excel.contract_sent)
+
+            tr.append('td')
+              .style('white-space', 'nowrap')
+              .append('code')
+              .text(
+                `cloudian_cache_workaround.sh ${
+                  d.contract_dir.split('/data/Analysis/')[1]
+                } clinical ${excel.contract_sent}`
+              )
 
             // tr.append('td').text(d.contract_dir)
             // tr.append('td').text(excel.secondary_analysis_folder_path)
@@ -571,7 +583,7 @@ Promise.all([
       return named_jobs
     }),
 ]).then(function ([contracts, named_jobs]) {
-  const table = d3.select('table#contracts')
+  const table = d3.select('table#internal-reference')
 
   const thead = table.append('thead')
   const tbody = table.append('tbody')

@@ -91,7 +91,7 @@
 
     {{#parseArray tabs}}
     <input type="radio" id="{{this}}Tab" name="tabs" value="{{this}}Tab">
-    <label for="{{this}}Tab">{{capitalize this}}</label>
+    <label style="text-transform: capitalize;" for="{{this}}Tab">{{this}}</label>
     {{/parseArray}}
 
   </div>
