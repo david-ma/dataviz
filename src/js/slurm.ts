@@ -885,3 +885,10 @@ function getFiletype(filename) {
 
   return filetype
 }
+
+import { sankey } from 'd3-sankey'
+
+console.log(sankey)
+
+// var sankey = d3.sankey();
+// console.log(sankey)

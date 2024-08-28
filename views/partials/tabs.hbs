@@ -31,11 +31,11 @@
         padding: 4px 8px;
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
-        background: hsl(0, 0%, 90%);
+        background: hsl(0, 0%, 50%);
         margin: 0 5px;
 
         &:hover {
-          background: hsl(0, 0%, 85%);
+          background: hsl(0, 0%, 65%);
         }
       }
 
@@ -90,7 +90,7 @@
   <div id="tabs">
 
     {{#parseArray tabs}}
-    <input type="radio" id="{{this}}Tab" name="tabs" value="{{this}}Tab">
+    <input type="radio" id="{{this}}Tab" name="tabs" value="{{this}}Tab" onchange="changeTab('{{this}}')">
     <label style="text-transform: capitalize;" for="{{this}}Tab">{{this}}</label>
     {{/parseArray}}
 
@@ -104,9 +104,10 @@
 </section>
 
 <script>
-  $('input[name="tabs"]').on('change', () => {
-    $('.tabbedContent').toggleClass('selected')
-  })
+  function changeTab(tab) {
+    $('.tabbedContent').removeClass('selected')
+    $(`#${tab}Wrapper`).addClass('selected')
+  }
 
   $('input[name="tabs"]:first').prop('checked', true)
   $('.tabbedContent:first').toggleClass('selected')
