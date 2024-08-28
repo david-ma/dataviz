@@ -321,9 +321,9 @@ d3.csv('/AGRF/clinical_2024_06_06.csv')
   })
 
 d3.json('/clinical')
-  // .then(function (JSONs: string[]) {
-  //   return JSONs.filter((json) => easy_wins.includes(json.slice(0, -5)))
-  // })
+  .then(function (JSONs: string[]) {
+    return JSONs.filter((json) => easy_wins.includes(json.slice(0, -5)))
+  })
   .then(function (JSONs: string[]) {
     console.log('Clinical Data', JSONs)
     Promise.all([
@@ -354,8 +354,8 @@ d3.json('/clinical')
         return result
       })
       .then(function ([excelData, data]) {
-        console.log('Excel data', excelData)
-        console.log('All Clinical JSON data', data)
+        // console.log('Excel data', excelData)
+        // console.log('All Clinical JSON data', data)
 
         const table = d3.select('table#clinical')
         const columns = [
@@ -365,6 +365,9 @@ d3.json('/clinical')
           'Total File Count',
           // 'BAMs',
           // 'Analyst<br>First Approver<br>Date',
+          'Client Username',
+          'Client Emails',
+          'Contract Folder Path',
           'Analyst',
           'First Approver',
           'Date Sent',
@@ -403,66 +406,67 @@ d3.json('/clinical')
               .attr('id', `clinical_row-${log_id}`)
 
             tr.append('td')
-              .append('a')
-              .attr('href', `#x`)
-              .on('click', function () {
-                $(`#clinical_row2-${log_id}`).toggleClass('hidden')
-              })
+              // .append('a')
+              // .attr('href', `#x`)
+              // .on('click', function () {
+              //   $(`#clinical_row2-${log_id}`).toggleClass('hidden')
+              // })
               .text(log_id)
 
             tr.append('td')
+              .text(d.summary.include.file_size_human)
               // .style('display', 'none')
-              .html(
-                `
-  ${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_human}`
-              )
-              .datum(d)
-              .classed('green', (data) => {
-                return data.summary.include.file_count < 1000
-              })
+  //             .html(
+  //               `
+  // ${d.summary.include.file_count}&nbsp;files<br>${d.summary.include.file_size_human}`
+  //             )
+              // .datum(d)
+              // .classed('green', (data) => {
+              //   return data.summary.include.file_count < 1000
+              // })
 
             tr.append('td')
               //           .html(
               //             `
               // ${d.summary.exclude.file_count}&nbsp;files<br>${d.summary.exclude.file_size_human}`
               //           )
-              .text(d.summary.total.file_size_human)
-              .datum(d)
-              .classed('red', (data) => {
-                if (data.summary.exclude.file_count > 0) {
-                  // tr.style('display', 'none')
-                  d3.select(this).attr(
-                    'title',
-                    "Warning: Exclusion rules applied, not an 'easy win'"
-                  )
-                  return true
-                } else {
-                  return false
-                }
-              })
-
-            tr.append('td')
-              //           .html(
-              //             `
-              // ${d.summary.total.file_count}&nbsp;files<br>${d.summary.total.file_size_human}`
-              //           )
               .text(d.summary.total.file_count)
-              .datum(d)
-              // .classed('green', (data) => {
-              //   return data.summary.total.file_count < 1000
+              // .datum(d)
+              // .classed('red', (data) => {
+              //   if (data.summary.exclude.file_count > 0) {
+              //     // tr.style('display', 'none')
+              //     d3.select(this).attr(
+              //       'title',
+              //       "Warning: Exclusion rules applied, not an 'easy win'"
+              //     )
+              //     return true
+              //   } else {
+              //     return false
+              //   }
               // })
-              .classed('red', (data) => {
-                if (data.summary.total.file_size_bytes < 200000000) {
-                  // tr.style('display', 'none')
-                  d3.select(this).attr(
-                    'title',
-                    'Warning: Less than 200 MB of data'
-                  )
-                  return true
-                } else {
-                  return false
-                }
-              })
+
+            // tr.append('td')
+            //   //           .html(
+            //   //             `
+            //   // ${d.summary.total.file_count}&nbsp;files<br>${d.summary.total.file_size_human}`
+            //   //           )
+            //   .text(d.summary.total.file_count)
+            //   .datum(d)
+            //   // .classed('green', (data) => {
+            //   //   return data.summary.total.file_count < 1000
+            //   // })
+            //   .classed('red', (data) => {
+            //     if (data.summary.total.file_size_bytes < 200000000) {
+            //       // tr.style('display', 'none')
+            //       d3.select(this).attr(
+            //         'title',
+            //         'Warning: Less than 200 MB of data'
+            //       )
+            //       return true
+            //     } else {
+            //       return false
+            //     }
+            //   })
 
             // tr.append('td').text(instrument)
             // tr.append('td').text(run)
@@ -495,6 +499,10 @@ d3.json('/clinical')
             // ${excel ? excel.contract_sent : ''}
             // `
             //           )
+            tr.append('td').text(excel.client_username)
+            tr.append('td').text(excel.client_emails)
+            tr.append('td').text(excel.contract_folder_path)
+            
 
             tr.append('td').text(excel.secondary_analysis_analyst)
             tr.append('td').text(excel.first_approver)
@@ -614,8 +622,8 @@ Promise.all([
       return jobs
     })
     .then(function (jobs) {
-      console.log('jobs', jobs)
-      console.log(`Number of jobs: ${Object.entries(jobs).length}`)
+      // console.log('jobs', jobs)
+      // console.log(`Number of jobs: ${Object.entries(jobs).length}`)
       Object.entries(jobs).forEach(function ([jobId, jobGroup]) {
         // console.log(jobId)
         const log_id = get_log_id(jobGroup)
@@ -628,9 +636,9 @@ Promise.all([
           }
         }
       })
-      console.log(named_jobs)
-      console.log(`Number of named jobs: ${Object.entries(named_jobs).length}`)
-      console.log(Object.keys(named_jobs))
+      // console.log(named_jobs)
+      // console.log(`Number of named jobs: ${Object.entries(named_jobs).length}`)
+      // console.log(Object.keys(named_jobs))
       return named_jobs
     }),
 ]).then(function ([contracts, named_jobs]) {
@@ -778,7 +786,7 @@ function drawTreeMap(data, log_id, element_id) {
   // d3.select(`#row2-${log_id} td`)
   d3.select(element_id).html('').append('div').attr('id', `treemap-${log_id}`)
 
-  console.log(data)
+  // console.log(data)
   const contract = data.contract_dir.split('/').pop()
   const omit_prefix = data.contract_dir
 
@@ -799,7 +807,7 @@ function drawTreeMap(data, log_id, element_id) {
     })
   const root = d3.stratify().path((d: any) => d.path)(files)
   root.sum((d: any) => (d ? d.filesize || 0 : 0))
-  console.log(root)
+  // console.log(root)
   // .then(d3.stratify<FileNode>().path((d) => d.path))
 
   const myChart = new Chart({

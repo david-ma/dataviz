@@ -1042,7 +1042,7 @@ class Chart {
     const color = d3.scaleOrdinal(d3.schemeCategory10.map(fader))
     const format = d3.format(',d')
 
-    console.log('this data is....', this.data)
+    // console.log('this data is....', this.data)
 
     const data = {
       name: 'cluster',
@@ -1075,7 +1075,7 @@ class Chart {
 
     treemap(root)
 
-    console.log('Root leaves are..?', root.leaves())
+    // console.log('Root leaves are..?', root.leaves())
 
     const cell = svg
       .selectAll('g')
@@ -1197,7 +1197,7 @@ class Chart {
     target: string
     color?: d3.ScaleOrdinal<string, any>
   }) {
-    console.log('initTreemap with TreemapData', this.data)
+    // console.log('initTreemap with TreemapData', this.data)
 
     const width = this.innerWidth,
       height = this.innerHeight,
@@ -1208,7 +1208,7 @@ class Chart {
     // const root = options.data.sum((d: any) => d[options.target])
     const root = options.hierarchy
 
-    console.log('Root', root)
+    // console.log('Root', root)
 
     // tree is of type d3.HierarchyRectangularNode<any>
     const treemap = d3
@@ -1251,10 +1251,10 @@ class Chart {
         }
       })
 
-    console.log('descendants', treemap.descendants())
+    // console.log('descendants', treemap.descendants())
     const folders = treemap.descendants().filter((d) => d.children)
     // .filter((d) => d.depth === 2)
-    console.log('Folders', folders)
+    // console.log('Folders', folders)
 
     svg
       .append('g')
