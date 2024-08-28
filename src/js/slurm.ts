@@ -386,7 +386,10 @@ d3.json('/clinical')
             d3.select(`#clinical_row2-${log_id}`)
               .append('td')
               .attr('colspan', 4)
-            drawTreeMap(d, log_id, `#clinical_row2-${log_id} td`)
+              .append('div')
+              .classed('followScroll', true)
+
+            drawTreeMap(d, log_id, `#clinical_row2-${log_id} td div`)
 
             const inner_table = d3
               .select(`#clinical_row2-${log_id}`)
