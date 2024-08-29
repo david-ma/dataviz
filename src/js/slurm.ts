@@ -224,16 +224,17 @@ function filter_duplicate_log_ids(JSONs: string[]) {
     .flat()
 }
 
-function areKeysUnique<T>(array: T[], keyFunction: (T) => string): boolean {
-  const seenKeys = new Set<string>()
+function findDuplicates<T>(array: T[], keyFunction: (T) => string): T[] {
+  const collection = new Map<string, T[]>()
   for (const item of array) {
     const key = keyFunction(item)
-    if (seenKeys.has(key)) {
-      return false
-    }
-    seenKeys.add(key)
+    collection.has(key)
+      ? collection.get(key).push(item)
+      : collection.set(key, [item])
   }
-  return true
+  return Array.from(collection.values())
+    .filter((items) => items.length > 1)
+    .flat()
 }
 
 d3.json('/clinical')
@@ -250,6 +251,7 @@ d3.json('/clinical')
             return d
           })
         }),
+      d3.tsv('/AGRF/easy_clinical.csv'),
       ...JSONs.map((json) =>
         d3.json(`/AGRF/clinical_5/${json}`).catch((err) => {
           console.error(err)
@@ -258,12 +260,14 @@ d3.json('/clinical')
         })
       ),
     ])
-      .then(function ([excelData, ...data]: [
+      .then(function ([excelData, easy_clinical, ...data]: [
         Clinical_Excel_Data[],
+        any,
         ClinicalData
       ]) {
-        const result: [Clinical_Excel_Data[], ClinicalData[]] = [
+        const result: [Clinical_Excel_Data[], any, ClinicalData[]] = [
           excelData,
+          easy_clinical,
           data
             // .filter((folder) => {
             //   if (folder === null) {
@@ -292,44 +296,101 @@ d3.json('/clinical')
         ]
         return result
       })
-      .then(function ([excelData, data]) {
+      .then(function ([excelData, easy_clinical, data]) {
         const combined: (ClinicalData & Clinical_Excel_Data)[] = []
         // console.log('Excel data', excelData)
         // console.log('All Clinical JSON data', data)
-        if (!areKeysUnique(excelData, (d) => d.contract_pk)) {
-          console.error('Duplicate contract_pks in excelData')
-        } else {
-          console.log('All contract_pks are unique')
-        }
-        if (!areKeysUnique(excelData, (d) => d.contract_folder_path)) {
-          console.error('Duplicate contract_folder_paths in excelData')
-        } else {
-          console.log('All contract_folder_paths are unique')
-        }
-        if (!areKeysUnique(excelData, (d) => d.contract_id)) {
-          console.error('Duplicate contract_ids in excelData')
-        } else {
-          console.log('All contract_ids are unique')
-        }
-        if (!areKeysUnique(excelData, (d) => {
-          return `${d.contract_pk}_${d.contract_folder_path}`
-        })) {
-          console.error('Duplicate contract_pk + contract_folder_path in excelData')
-        } else {
-          console.log('All contract_pk + contract_folder_path are unique')
-        }
 
-        console.log("Data from David's script:")
-        if (!areKeysUnique(data, (d) => d.contract_dir)) {
-          console.error('Duplicate contract_dirs in data')
-        } else {
-          console.log('All contract_dirs are unique')
-        }
-        if (!areKeysUnique(data, (d) => d.contract_dir.split('/').pop())) {
-          console.error('Duplicate log_ids in data')
-        } else {
-          console.log('All log_ids are unique')
-        }
+        const duplicate_pks = findDuplicates(
+          excelData,
+          (d) => d.contract_pk
+        ).map((d) => {
+          return {
+            run_id: d.run_id,
+            contract_id: d.contract_id,
+            contract_pk: d.contract_pk,
+            contract_folder_path: d.contract_folder_path,
+          }
+        })
+        console.log('Duplicate contract_pks', duplicate_pks)
+
+        const duplicate_folders = findDuplicates(
+          excelData,
+          (d) => d.contract_folder_path
+        ).map((d) => {
+          return {
+            run_id: d.run_id,
+            contract_id: d.contract_id,
+            contract_pk: d.contract_pk,
+            contract_folder_path: d.contract_folder_path,
+          }
+        })
+        console.log('Duplicate contract_folder_paths', duplicate_folders)
+
+        console.log('Easy Clinical', easy_clinical)
+        duplicate_folders.forEach((d) => {
+          if (
+            easy_clinical.find(
+              (e) => e['Contract Folder Path'] === d.contract_folder_path
+            )
+          ) {
+            console.error('Easy Clinical', d)
+          }
+        })
+
+        const duplicate_ids = findDuplicates(
+          excelData,
+          (d) => `${d.run_id}_${d.contract_id}`
+        ).map((d) => {
+          return {
+            run_id: d.run_id,
+            contract_id: d.contract_id,
+            contract_pk: d.contract_pk,
+            contract_folder_path: d.contract_folder_path,
+          }
+        })
+        console.log('Duplicate run + contract ids', duplicate_ids)
+
+        const pk_run_contract = findDuplicates(
+          excelData,
+          (d) => `${d.contract_pk}_${d.contract_folder_path}`
+        ).map((d) => {
+          return {
+            run_id: d.run_id,
+            contract_id: d.contract_id,
+            contract_pk: d.contract_pk,
+            contract_folder_path: d.contract_folder_path,
+          }
+        })
+        console.log('pk_run_contract:', pk_run_contract)
+
+        // .forEach((d) => console.log('Duplicate contract_pks', d))
+        // if (!findDuplicates(excelData, (d) => d.contract_pk)) {
+        //   console.error('Duplicate contract_pks in excelData')
+        // } else {
+        //   console.log('All contract_pks are unique')
+        // }
+        // if (!findDuplicates(excelData, (d) => d.contract_folder_path)) {
+        //   console.error('Duplicate contract_folder_paths in excelData')
+        // } else {
+        //   console.log('All contract_folder_paths are unique')
+        // }
+        // if (!areKeysUnique(excelData, (d) => d.contract_id)) {
+        //   console.error('Duplicate contract_ids in excelData')
+        // } else {
+        //   console.log('All contract_ids are unique')
+        // }
+        // if (
+        //   !areKeysUnique(excelData, (d) => {
+        //     return `${d.contract_pk}_${d.contract_folder_path}`
+        //   })
+        // ) {
+        //   console.error(
+        //     'Duplicate contract_pk + contract_folder_path in excelData'
+        //   )
+        // } else {
+        //   console.log('All contract_pk + contract_folder_path are unique')
+        // }
 
         const table = d3.select('table#clinical')
         const columns = [
@@ -947,6 +1008,7 @@ function getFiletype(filename) {
 import * as d3sankey from 'd3-sankey'
 
 import * as stdlib from '@observablehq/stdlib'
+import { run } from 'node:test'
 var library = new stdlib.Library()
 const DOM = library.DOM
 
