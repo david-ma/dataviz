@@ -7,7 +7,9 @@
   <button onclick="enable_dark_mode()">Enable Dark Mode</button>
 </div>
 
-{{#> tabs tabs="sankey,clinical,easy,duplicate_folders,duplicate_pks,internal-reference,DataTable,contract_list" }}
+<div id="sankey"></div>
+
+{{#> tabs tabs="clinical,easy,duplicate_folders,duplicate_pks,internal-reference,DataTable,contract_list" }}
 <table id="{{this}}">
   <thead></thead>
   <tbody></tbody>
@@ -36,5 +38,9 @@
 
   td.log_id_td.hideLinks p {
     display: inline;
+  }
+  #sankey {
+    background: lightgray;
+    padding: 15px;
   }
 </style>

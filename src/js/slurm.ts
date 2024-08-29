@@ -249,36 +249,68 @@ function findUnique<T>(array: T[], keyFunction: (T) => string): T[] {
     .flat()
 }
 
+/**
+ * Add list to Sankey Node
+ * Apply filter to list to split the list into 2 outcomes
+ * Add the 2 outcomes as Sankey Nodes, then add the links between the nodes
+ * Bind the lists to DataTables
+ * Return the positive list
+ */
+function filter_list<T>({
+  data,
+  sankeyData,
+  filter,
+  uniqueKeyFunction,
+  names,
+}: {
+  data: T[]
+  sankeyData: SankeyData
+  filter?: (d: T) => boolean
+  uniqueKeyFunction?: (T) => string
+  names: {
+    original: string
+    positive: string
+    negative: string
+  }
+}) {
+  let positive: T[]
+  let negative: T[]
+  if (filter) {
+    positive = data.filter(filter)
+    negative = data.filter((d) => !filter(d))
+  } else if (uniqueKeyFunction) {
+    positive = findUnique(data, uniqueKeyFunction)
+    negative = findDuplicates(data, uniqueKeyFunction)
+  } else {
+    throw new Error('Must provide either filter or uniqueKeyFunction')
+  }
+
+  sankeyData.nodes.find((d) => d.name === names.original) ||
+    sankeyData.nodes.push({ name: names.original, category: 'Start' })
+
+  sankeyData.nodes.push({ name: names.positive, category: 'Good' })
+  sankeyData.nodes.push({ name: names.negative, category: 'Reject' })
+
+  sankeyData.links.push({
+    source: names.original,
+    target: names.positive,
+    value: positive.length,
+  })
+
+  sankeyData.links.push({
+    source: names.original,
+    target: names.negative,
+    value: negative.length,
+  })
+
+  return positive
+}
+
 d3.json('/clinical')
   // .then(filter_duplicate_log_ids)
   .then(function (JSONs: string[]) {
     return Promise.all([
-      d3
-        .csv('/AGRF/contract_list_for_purging_is_clinical_2024_08_28.csv')
-        .then((data) => {
-          return data.map((d: Clinical_Excel_Data) => {
-            Object.entries(d).map(([key, value]) => {
-              d[key] = value.trim()
-            })
-            return d
-          })
-        }),
-      d3.tsv('/AGRF/easy_clinical.csv').then((data) => {
-        decorateTable(data, {
-          element: 'table#easy',
-        })
-        return data
-      }),
-      d3.csv('/AGRF/contract_list_base_2024_08_27.csv').then((data) => {
-        console.log('Contract List length', data.length)
-        // decorateTable(data, {
-        //   element: 'table#contract_list',
-        // })
-        if (findDuplicates(data, (d) => d.contract_folder_path).length > 0) {
-          console.log('Duplicate contract folder paths in contract_list')
-        }
-        return data
-      }),
+      d3.csv('/AGRF/contract_list_for_purging_is_clinical_2024_08_28.csv'),
       ...JSONs.map((json) =>
         d3.json(`/AGRF/clinical_5/${json}`).catch((err) => {
           console.error(err)
@@ -287,196 +319,90 @@ d3.json('/clinical')
         })
       ),
     ])
-      .then(function ([excelData, easy_clinical, contract_list, ...data]: [
-        Clinical_Excel_Data[],
-        any,
-        any,
-        ClinicalData
-      ]) {
-        const result: [Clinical_Excel_Data[], any, ClinicalData[]] = [
+      .then(function ([excelData, ...data]: [any, ClinicalData]) {
+        const result: [Clinical_Excel_Data[], ClinicalData[]] = [
           excelData,
-          easy_clinical,
-          data
-            // .filter((folder) => {
-            //   if (folder === null) {
-            //     return false
-            //   } else if (folder.summary.exclude.file_count > 0) {
-            //     return false
-            //   } else if (folder.summary.total.file_size_bytes < 200_000_000) {
-            //     return false
-            //   } else if (folder.summary.total.file_count > 1_000) {
-            //     return false
-            //   // } else if (
-            //   //   folder.files.filter((file) => file[0].endsWith('.bam')).length >
-            //   //   0
-            //   // ) {
-            //   //   return false
-            //   } else {
-            //     return true
-            //   }
-            // })
-            .sort((a, b) => {
-              return a.summary.total.file_size_bytes <
-                b.summary.total.file_size_bytes
-                ? -1
-                : 1
-            }),
+          data.sort((a, b) => {
+            return a.summary.total.file_size_bytes <
+              b.summary.total.file_size_bytes
+              ? -1
+              : 1
+          }),
         ]
         return result
       })
-      .then(function ([excelData, easy_clinical, data]) {
+      .then(function ([excelData, data]) {
         const combined: (ClinicalData & Clinical_Excel_Data)[] = []
-        // console.log('Excel data', excelData)
-        // console.log('All Clinical JSON data', data)
 
-        const duplicate_pks = findDuplicates(
-          excelData,
-          (d) => d.contract_pk
-        ).map((d) => {
-          return {
-            run_id: d.run_id,
-            contract_id: d.contract_id,
-            contract_pk: d.contract_pk,
-            contract_folder_path: d.contract_folder_path,
-          }
-        })
-        console.log('Duplicate contract_pks', duplicate_pks)
-        decorateTable(duplicate_pks, {
-          element: 'table#duplicate_pks',
+        const sankeyData: SankeyData = {
+          nodes: [],
+          links: [],
+        }
+
+        const unique_folders = filter_list({
+          data: excelData,
+          sankeyData,
+          uniqueKeyFunction: (d) => d.contract_folder_path,
+          names: {
+            original: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
+            positive: 'Unique Folder',
+            negative: 'Duplicate Folder',
+          },
         })
 
-        const duplicate_folders = findDuplicates(
-          excelData,
-          (d) => d.contract_folder_path
-        ).map((d) => {
-          return {
-            run_id: d.run_id,
-            contract_id: d.contract_id,
-            contract_pk: d.contract_pk,
-            contract_folder_path: d.contract_folder_path,
-          }
+        const unique_contract_pks = filter_list({
+          data: unique_folders,
+          sankeyData,
+          uniqueKeyFunction: (d) => d.contract_pk,
+          names: {
+            original: 'Unique Folder',
+            positive: 'Unique contract_pk',
+            negative: 'Duplicate contract_pk',
+          },
         })
-        console.log('Duplicate contract_folder_paths', duplicate_folders)
-        decorateTable(duplicate_folders, {
-          element: 'table#duplicate_folders',
-        })
-
-        console.log('Easy Clinical', easy_clinical)
-        duplicate_folders.forEach((d) => {
-          if (
-            easy_clinical.find(
-              (e) => e['Contract Folder Path'] === d.contract_folder_path
+          .map((d) => {
+            const clinical = data.find(
+              (c) => c.contract_dir === d.contract_folder_path
             )
-          ) {
-            console.error('Easy Clinical', d)
-          }
+            return {
+              ...d,
+              ...clinical,
+            }
+          })
+          .filter((d) => bad_pks.includes(d.contract_pk) === false)
+
+        const more_than_200mb = filter_list({
+          data: unique_contract_pks,
+          sankeyData,
+          filter: (d) => d.summary.total.file_size_bytes > 200_000_000,
+          names: {
+            original: 'Unique contract_pk',
+            positive: 'More than 200 mb total folder size',
+            negative: 'Less than 200 mb total folder size',
+          },
         })
 
-        const duplicate_ids = findDuplicates(
-          excelData,
-          (d) => `${d.run_id}_${d.contract_id}`
-        ).map((d) => {
-          return {
-            run_id: d.run_id,
-            contract_id: d.contract_id,
-            contract_pk: d.contract_pk,
-            contract_folder_path: d.contract_folder_path,
-          }
-        })
-        console.log('Duplicate run + contract ids', duplicate_ids)
-
-        const pk_run_contract = findDuplicates(
-          excelData,
-          (d) => `${d.contract_pk}_${d.contract_folder_path}`
-        ).map((d) => {
-          return {
-            run_id: d.run_id,
-            contract_id: d.contract_id,
-            contract_pk: d.contract_pk,
-            contract_folder_path: d.contract_folder_path,
-          }
-        })
-        console.log('pk_run_contract:', pk_run_contract)
-
-        // .filter((folder) => {
-        //   if (folder === null) {
-        //     return false
-        //   } else if (folder.summary.exclude.file_count > 0) {
-        //     return false
-        //   } else if (folder.summary.total.file_size_bytes < 200_000_000) {
-        //     return false
-        //   } else if (folder.summary.total.file_count > 1_000) {
-        //     return false
-        //   // } else if (
-        //   //   folder.files.filter((file) => file[0].endsWith('.bam')).length >
-        //   //   0
-        //   // ) {
-        //   //   return false
-        //   } else {
-        //     return true
-        //   }
-        // })
-
-        const unique_folders = findUnique(
-          excelData,
-          (d) => d.contract_folder_path
-        )
-
-        const unique_log_ids = findUnique(
-          excelData,
-          (d) => `${d.run_id}_${d.contract_id}`
-        )
-
-        const unique_contract_pks: (ClinicalData & Clinical_Excel_Data)[] =
-          findUnique(unique_log_ids, (d) => d.contract_pk)
-            .map((d) => {
-              const clinical = data.find(
-                (c) => c.contract_dir === d.contract_folder_path
-              )
-              return {
-                ...d,
-                ...clinical,
-              }
-            })
-            .filter((d) => bad_pks.includes(d.contract_pk) === false)
-
-        const more_than_200mb = unique_contract_pks.filter(
-          (d) => d.summary.total.file_size_bytes > 200_000_000
-        )
-
-        const less_than_1000_files = more_than_200mb.filter(
-          (d) => d.summary.total.file_count < 1_000
-        )
-
-        const clean_project_folder = less_than_1000_files.filter(
-          (d) => d.summary.exclude.file_count == 0
-        )
-
-        const deeper_filter = clean_project_folder.filter(function (folder) {
-          let result = true
-          if (folder === null) {
-            console.log("Folder doesn't exist")
-            result = false
-          } else if (folder.summary.exclude.file_count > 0) {
-            console.log('Has excluded files')
-            result = false
-          } else if (folder.summary.total.file_size_bytes < 200_000_000) {
-            console.log('Less than 200mb total folder size', folder)
-            result = false
-          } else if (folder.summary.total.file_count > 1_000) {
-            console.log('More than 1000 files')
-            result = false
-            // } else if (
-            //   folder.files.filter((file) => file[0].endsWith('.bam')).length > 0
-            // ) {
-            //   console.log('BAM files present')
-            //   result = false
-          }
-          return result
+        const less_than_1000_files = filter_list({
+          data: more_than_200mb,
+          sankeyData,
+          filter: (d) => d.summary.total.file_count < 1_000,
+          names: {
+            original: 'More than 200 mb total folder size',
+            positive: 'Less than 1000 files',
+            negative: 'More than 1000 files',
+          },
         })
 
-        console.log('clean_project_folder', clean_project_folder)
-        console.log('Deeper Filter', deeper_filter)
+        const clean_project_folder = filter_list({
+          data: less_than_1000_files,
+          sankeyData,
+          filter: (d) => d.summary.exclude.file_count == 0,
+          names: {
+            original: 'Less than 1000 files',
+            positive: 'Clean Project Folder',
+            negative: 'Dirty Project Folder',
+          },
+        })
 
         Promise.all(
           clean_project_folder.map((d) => {
@@ -486,121 +412,19 @@ d3.json('/clinical')
             )
           })
         ).then((fullClinicalData: ClinicalData[]) => {
-          console.log('Full Clinical Data', fullClinicalData)
-          const no_bams = fullClinicalData
-            .filter((d) => {
-              return !d.files.find((file) => file[0].endsWith('.bam'))
-            })
-            .filter(function (folder) {
-              let result = true
-              if (folder === null) {
-                console.log("Folder doesn't exist")
-                result = false
-              } else if (folder.summary.exclude.file_count > 0) {
-                console.log('Has excluded files')
-                result = false
-              } else if (folder.summary.total.file_size_bytes < 200_000_000) {
-                console.log('Less than 200mb total folder size', folder)
-                result = false
-              } else if (folder.summary.total.file_count > 1_000) {
-                console.log('More than 1000 files')
-                result = false
-              } else if (
-                folder.files.filter((file) => file[0].endsWith('.bam')).length >
-                0
-              ) {
-                console.log('BAM files present')
-                result = false
-              }
-              return result
-            })
-
-          drawSankey({
-            nodes: [
-              {
-                name: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
-                category: 'Start',
-              },
-              { name: 'Duplicate Folder', category: 'Reject' },
-              { name: 'Unique Folder', category: 'Good' },
-              { name: 'Duplicate contract_pk', category: 'Reject' },
-              { name: 'Unique contract_pk', category: 'Good' },
-              {
-                name: 'Less than 200 mb total folder size',
-                category: 'Reject',
-              },
-              { name: 'More than 200 mb total folder size', category: 'Good' },
-              { name: 'More than 1000 files', category: 'Reject' },
-              { name: 'Less than 1000 files', category: 'Good' },
-              { name: 'Clean Project Folder', category: 'Good' },
-              { name: 'Dirty Project Folder', category: 'Reject' },
-              { name: 'No BAM files', category: 'Good' },
-              { name: 'BAM files present', category: 'Reject' },
-            ],
-            links: [
-              {
-                source: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
-                target: 'Duplicate Folder',
-                value: duplicate_folders.length,
-              },
-              {
-                source: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
-                target: 'Unique Folder',
-                value: unique_folders.length,
-              },
-              {
-                source: 'Unique Folder',
-                target: 'Duplicate contract_pk',
-                value: unique_folders.length - unique_contract_pks.length,
-              },
-              {
-                source: 'Unique Folder',
-                target: 'Unique contract_pk',
-                value: unique_contract_pks.length,
-              },
-              {
-                source: 'Unique contract_pk',
-                target: 'Less than 200 mb total folder size',
-                value: unique_contract_pks.length - more_than_200mb.length,
-              },
-              {
-                source: 'Unique contract_pk',
-                target: 'More than 200 mb total folder size',
-                value: more_than_200mb.length,
-              },
-              {
-                source: 'More than 200 mb total folder size',
-                target: 'More than 1000 files',
-                value: more_than_200mb.length - less_than_1000_files.length,
-              },
-              {
-                source: 'More than 200 mb total folder size',
-                target: 'Less than 1000 files',
-                value: less_than_1000_files.length,
-              },
-              {
-                source: 'Less than 1000 files',
-                target: 'Dirty Project Folder',
-                value:
-                  less_than_1000_files.length - clean_project_folder.length,
-              },
-              {
-                source: 'Less than 1000 files',
-                target: 'Clean Project Folder',
-                value: clean_project_folder.length,
-              },
-              {
-                source: 'Clean Project Folder',
-                target: 'BAM files present',
-                value: clean_project_folder.length - no_bams.length,
-              },
-              {
-                source: 'Clean Project Folder',
-                target: 'No BAM files',
-                value: no_bams.length,
-              },
-            ],
+          const no_bams = filter_list({
+            data: fullClinicalData,
+            sankeyData,
+            filter: (d) =>
+              d.files.filter((file) => file[0].endsWith('.bam')).length == 0,
+            names: {
+              original: 'Clean Project Folder',
+              positive: 'No BAM files',
+              negative: 'BAM files present',
+            },
           })
+
+          drawSankey(sankeyData)
         })
 
         const table = d3.select('table#clinical')
@@ -1239,8 +1063,8 @@ type SankeyData = {
 
 function drawSankey(data: SankeyData) {
   // Specify the dimensions of the chart.
-  const width = 1200
-  const height = 800
+  const width = 1500
+  const height = 400
   const format = d3.format(',.0f')
 
   // Create a SVG container.
@@ -1248,10 +1072,10 @@ function drawSankey(data: SankeyData) {
     // .create('svg')
     .select('#sankey')
     .append('svg')
-    .attr('width', width)
-    .attr('height', height)
+    // .attr('width', width)
+    // .attr('height', height)
     .attr('viewBox', [0, 0, width, height])
-    .attr('style', 'max-width: 100%; height: auto; font: 20px sans-serif;')
+  // .attr('style', 'max-width: 100%; height: auto; font: 20px sans-serif;')
 
   // Constructs and configures a Sankey generator.
   const sankey = d3sankey
