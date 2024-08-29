@@ -224,8 +224,20 @@ function filter_duplicate_log_ids(JSONs: string[]) {
     .flat()
 }
 
+function areKeysUnique<T>(array: T[], keyFunction: (T) => string): boolean {
+  const seenKeys = new Set<string>()
+  for (const item of array) {
+    const key = keyFunction(item)
+    if (seenKeys.has(key)) {
+      return false
+    }
+    seenKeys.add(key)
+  }
+  return true
+}
+
 d3.json('/clinical')
-  .then(filter_duplicate_log_ids)
+  // .then(filter_duplicate_log_ids)
   .then(function (JSONs: string[]) {
     return Promise.all([
       d3
@@ -281,8 +293,43 @@ d3.json('/clinical')
         return result
       })
       .then(function ([excelData, data]) {
+        const combined: (ClinicalData & Clinical_Excel_Data)[] = []
         // console.log('Excel data', excelData)
         // console.log('All Clinical JSON data', data)
+        if (!areKeysUnique(excelData, (d) => d.contract_pk)) {
+          console.error('Duplicate contract_pks in excelData')
+        } else {
+          console.log('All contract_pks are unique')
+        }
+        if (!areKeysUnique(excelData, (d) => d.contract_folder_path)) {
+          console.error('Duplicate contract_folder_paths in excelData')
+        } else {
+          console.log('All contract_folder_paths are unique')
+        }
+        if (!areKeysUnique(excelData, (d) => d.contract_id)) {
+          console.error('Duplicate contract_ids in excelData')
+        } else {
+          console.log('All contract_ids are unique')
+        }
+        if (!areKeysUnique(excelData, (d) => {
+          return `${d.contract_pk}_${d.contract_folder_path}`
+        })) {
+          console.error('Duplicate contract_pk + contract_folder_path in excelData')
+        } else {
+          console.log('All contract_pk + contract_folder_path are unique')
+        }
+
+        console.log("Data from David's script:")
+        if (!areKeysUnique(data, (d) => d.contract_dir)) {
+          console.error('Duplicate contract_dirs in data')
+        } else {
+          console.log('All contract_dirs are unique')
+        }
+        if (!areKeysUnique(data, (d) => d.contract_dir.split('/').pop())) {
+          console.error('Duplicate log_ids in data')
+        } else {
+          console.log('All log_ids are unique')
+        }
 
         const table = d3.select('table#clinical')
         const columns = [
@@ -328,6 +375,8 @@ d3.json('/clinical')
               console.error('No excel data for', d.contract_dir)
               return
             }
+            combined.push({ ...d, ...excel })
+
             const contract_pk = excel.contract_pk.split('.')[0]
             if (bad_pks.includes(contract_pk)) {
               d3.select(this).remove()
@@ -512,7 +561,7 @@ d3.json('/clinical')
             //   })
           })
 
-        return [excelData, data]
+        return combined
       })
     // .then(() => {
     //   // Get the "Bad" PKs
@@ -521,13 +570,15 @@ d3.json('/clinical')
     //   console.log('Filtered', filtered)
     // })
   })
-  .then(function ([excelData, data]) {
+  .then(function (data) {
     console.log('clinical data', data)
     var options = {
       element: 'table#DataTable',
     }
 
-    decorateTable(excelData, options)
+    decorateTable(data, options)
+
+    data.forEach((d) => {})
   })
 
 function human_readable_size(bytes: number) {

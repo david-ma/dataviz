@@ -21,6 +21,10 @@
         }
       }
 
+      table.dataTable tbody tr {
+        background-color: #444;
+      }
+
       table {
         border-color: #444;
         background-color: #444;
@@ -62,6 +66,22 @@
   table {
     border-collapse: collapse;
     width: 100%;
+
+    &.dataTable {
+
+      th.dt-ordering-asc,
+      th.dt-ordering-desc {
+        border: 2px solid black;
+      }
+
+      th.dt-ordering-asc {
+        border-bottom-width: 5px;
+      }
+
+      th.dt-ordering-desc {
+        border-top-width: 5px;
+      }
+    }
   }
 
   th,
