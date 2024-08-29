@@ -422,26 +422,29 @@ d3.json('/clinical')
           (d) => d.contract_folder_path
         )
 
-        const duplicate_contract_pks = findDuplicates(
-          unique_folders,
-          (d) => d.contract_pk
+        const unique_log_ids = findUnique(
+          excelData,
+          (d) => `${d.run_id}_${d.contract_id}`
         )
+
         const unique_contract_pks: (ClinicalData & Clinical_Excel_Data)[] =
-          findUnique(unique_folders, (d) => d.contract_pk).map((d) => {
-            const clinical = data.find(
-              (c) => c.contract_dir === d.contract_folder_path
-            )
-            return {
-              ...d,
-              ...clinical,
-            }
-          })
+          findUnique(unique_log_ids, (d) => d.contract_pk)
+            .map((d) => {
+              const clinical = data.find(
+                (c) => c.contract_dir === d.contract_folder_path
+              )
+              return {
+                ...d,
+                ...clinical,
+              }
+            })
+            .filter((d) => bad_pks.includes(d.contract_pk) === false)
 
         const more_than_200mb = unique_contract_pks.filter(
           (d) => d.summary.total.file_size_bytes > 200_000_000
         )
 
-        const less_than_1000_files = unique_contract_pks.filter(
+        const less_than_1000_files = more_than_200mb.filter(
           (d) => d.summary.total.file_count < 1_000
         )
 
@@ -461,6 +464,31 @@ d3.json('/clinical')
           const no_bams = fullClinicalData.filter((d) => {
             return d.files.find((file) => file[0].endsWith('.bam'))
           })
+
+          const deeper_filter = no_bams.filter((folder) => {
+            if (folder === null) {
+              console.log("Folder doesn't exist")
+              return true
+            } else if (folder.summary.exclude.file_count > 0) {
+              console.log('Has excluded files')
+              return true
+            } else if (folder.summary.total.file_size_bytes < 200_000_000) {
+              console.log('Less than 200mb total folder size', folder)
+              return true
+            } else if (folder.summary.total.file_count > 1_000) {
+              console.log('More than 1000 files')
+              return true
+            } else if (
+              folder.files.filter((file) => file[0].endsWith('.bam')).length > 0
+            ) {
+              console.log('BAM files present')
+              return true
+            } else {
+              return false
+            }
+          })
+
+          console.log('Deeper Filter', deeper_filter)
 
           drawSankey({
             nodes: [
@@ -498,7 +526,7 @@ d3.json('/clinical')
               {
                 source: 'Unique Folder',
                 target: 'Duplicate contract_pk',
-                value: duplicate_contract_pks.length,
+                value: unique_folders.length - unique_contract_pks.length,
               },
               {
                 source: 'Unique Folder',
