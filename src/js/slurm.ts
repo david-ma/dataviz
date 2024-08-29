@@ -449,135 +449,105 @@ d3.json('/clinical')
           (d) => d.summary.exclude.file_count == 0
         )
 
-        drawSankey({
-          nodes: [
-            {
-              name: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
-              category: 'Start',
-            },
-            { name: 'Duplicate Folder', category: 'Reject' },
-            { name: 'Unique Folder', category: 'Good' },
-            { name: 'Duplicate contract_pk', category: 'Reject' },
-            { name: 'Unique contract_pk', category: 'Good' },
-            { name: 'Less than 200 mb total folder size', category: 'Reject' },
-            { name: 'More than 200 mb total folder size', category: 'Good' },
-            { name: 'More than 1000 files', category: 'Reject' },
-            { name: 'Less than 1000 files', category: 'Good' },
-            { name: 'Clean Project Folder', category: 'Good' },
-            { name: 'Dirty Project Folder', category: 'Reject' },
+        Promise.all(
+          clean_project_folder.map((d) => {
+            const info = extract_info_from_folder(d.contract_dir)
+            return d3.json(
+              `/AGRF/clinical/${info.flowcell}_${info.contract_id}.json`
+            )
+          })
+        ).then((fullClinicalData: ClinicalData[]) => {
+          console.log('Full Clinical Data', fullClinicalData)
+          const no_bams = fullClinicalData.filter((d) => {
+            return d.files.find((file) => file[0].endsWith('.bam'))
+          })
 
-            // {
-            //   name: ''
-            // }
-
-            // {
-            //   name: 'All Clinical Data',
-            //   category: 'Mid',
-            // },
-            // {
-            //   name: 'Easy Clinical',
-            //   category: 'Mid',
-            // },
-            // { name: 'Rejected', category: 'Reject' },
-            // { name: 'Duplicate PK', category: 'Reject' },
-            // { name: 'Has BAMs', category: 'Reject' },
-            // { name: 'More than 1000 files', category: 'Reject' },
-            // { name: 'Less than 200 mb', category: 'Reject' },
-            // { name: 'Success', category: 'Success' },
-            // { name: 'Failed', category: 'Fail' },
-          ],
-          links: [
-            {
-              source: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
-              target: 'Duplicate Folder',
-              value: duplicate_folders.length,
-            },
-            {
-              source: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
-              target: 'Unique Folder',
-              value: unique_folders.length,
-            },
-            {
-              source: 'Unique Folder',
-              target: 'Duplicate contract_pk',
-              value: duplicate_contract_pks.length,
-            },
-            {
-              source: 'Unique Folder',
-              target: 'Unique contract_pk',
-              value: unique_contract_pks.length,
-            },
-            {
-              source: 'Unique contract_pk',
-              target: 'Less than 200 mb total folder size',
-              value: unique_contract_pks.length - more_than_200mb.length,
-            },
-            {
-              source: 'Unique contract_pk',
-              target: 'More than 200 mb total folder size',
-              value: more_than_200mb.length,
-            },
-            {
-              source: 'More than 200 mb total folder size',
-              target: 'More than 1000 files',
-              value: more_than_200mb.length - less_than_1000_files.length,
-            },
-            {
-              source: 'More than 200 mb total folder size',
-              target: 'Less than 1000 files',
-              value: less_than_1000_files.length,
-            },
-            {
-              source: 'Less than 1000 files',
-              target: 'Dirty Project Folder',
-              value: less_than_1000_files.length - clean_project_folder.length,
-            },
-            {
-              source: 'Less than 1000 files',
-              target: 'Clean Project Folder',
-              value: clean_project_folder.length,
-            },
-            // {
-            //   source: 'All Clinical Data',
-            //   target: 'Easy Clinical',
-            //   value: easy_clinical.length,
-            // },
-            // {
-            //   source: 'All Clinical Data',
-            //   target: 'Rejected',
-            //   value: excelData.length - easy_clinical.length,
-            // },
-            // {
-            //   source: 'Rejected',
-            //   target: 'Duplicate PK',
-            //   value: duplicate_pks.length,
-            // },
-            // {
-            //   source: 'Rejected',
-            //   target: 'Duplicate Folder',
-            //   value: duplicate_folders.length,
-            // },
-            // {
-            //   source: 'Rejected',
-            //   target: 'Has BAMs',
-            //   value: 500,
-            // },
-            // {
-            //   source: 'Rejected',
-            //   target: 'More than 1000 files',
-            //   value: 50,
-            // },
-            // {
-            //   source: 'Easy Clinical',
-            //   target: 'Success',
-            //   value: 40,
-            // },
-            // {
-            //   source: 'Easy Clinical',
-            //   target: 'Failed',
-            //   value: 20,
-            // },
-          ],
+          drawSankey({
+            nodes: [
+              {
+                name: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
+                category: 'Start',
+              },
+              { name: 'Duplicate Folder', category: 'Reject' },
+              { name: 'Unique Folder', category: 'Good' },
+              { name: 'Duplicate contract_pk', category: 'Reject' },
+              { name: 'Unique contract_pk', category: 'Good' },
+              {
+                name: 'Less than 200 mb total folder size',
+                category: 'Reject',
+              },
+              { name: 'More than 200 mb total folder size', category: 'Good' },
+              { name: 'More than 1000 files', category: 'Reject' },
+              { name: 'Less than 1000 files', category: 'Good' },
+              { name: 'Clean Project Folder', category: 'Good' },
+              { name: 'Dirty Project Folder', category: 'Reject' },
+              { name: 'No BAM files', category: 'Good' },
+              { name: 'BAM files present', category: 'Reject' },
+            ],
+            links: [
+              {
+                source: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
+                target: 'Duplicate Folder',
+                value: duplicate_folders.length,
+              },
+              {
+                source: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
+                target: 'Unique Folder',
+                value: unique_folders.length,
+              },
+              {
+                source: 'Unique Folder',
+                target: 'Duplicate contract_pk',
+                value: duplicate_contract_pks.length,
+              },
+              {
+                source: 'Unique Folder',
+                target: 'Unique contract_pk',
+                value: unique_contract_pks.length,
+              },
+              {
+                source: 'Unique contract_pk',
+                target: 'Less than 200 mb total folder size',
+                value: unique_contract_pks.length - more_than_200mb.length,
+              },
+              {
+                source: 'Unique contract_pk',
+                target: 'More than 200 mb total folder size',
+                value: more_than_200mb.length,
+              },
+              {
+                source: 'More than 200 mb total folder size',
+                target: 'More than 1000 files',
+                value: more_than_200mb.length - less_than_1000_files.length,
+              },
+              {
+                source: 'More than 200 mb total folder size',
+                target: 'Less than 1000 files',
+                value: less_than_1000_files.length,
+              },
+              {
+                source: 'Less than 1000 files',
+                target: 'Dirty Project Folder',
+                value:
+                  less_than_1000_files.length - clean_project_folder.length,
+              },
+              {
+                source: 'Less than 1000 files',
+                target: 'Clean Project Folder',
+                value: clean_project_folder.length,
+              },
+              {
+                source: 'Clean Project Folder',
+                target: 'No BAM files',
+                value: clean_project_folder.length - no_bams.length,
+              },
+              {
+                source: 'Clean Project Folder',
+                target: 'BAM files present',
+                value: no_bams.length,
+              },
+            ],
+          })
         })
 
         const table = d3.select('table#clinical')
