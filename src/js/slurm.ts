@@ -236,6 +236,18 @@ function findDuplicates<T>(array: T[], keyFunction: (T) => string): T[] {
     .filter((items) => items.length > 1)
     .flat()
 }
+function findUnique<T>(array: T[], keyFunction: (T) => string): T[] {
+  const collection = new Map<string, T[]>()
+  for (const item of array) {
+    const key = keyFunction(item)
+    collection.has(key)
+      ? collection.get(key).push(item)
+      : collection.set(key, [item])
+  }
+  return Array.from(collection.values())
+    .filter((items) => items.length == 1)
+    .flat()
+}
 
 d3.json('/clinical')
   // .then(filter_duplicate_log_ids)
@@ -386,69 +398,185 @@ d3.json('/clinical')
         })
         console.log('pk_run_contract:', pk_run_contract)
 
-        // .forEach((d) => console.log('Duplicate contract_pks', d))
-        // if (!findDuplicates(excelData, (d) => d.contract_pk)) {
-        //   console.error('Duplicate contract_pks in excelData')
-        // } else {
-        //   console.log('All contract_pks are unique')
-        // }
-        // if (!findDuplicates(excelData, (d) => d.contract_folder_path)) {
-        //   console.error('Duplicate contract_folder_paths in excelData')
-        // } else {
-        //   console.log('All contract_folder_paths are unique')
-        // }
-        // if (!areKeysUnique(excelData, (d) => d.contract_id)) {
-        //   console.error('Duplicate contract_ids in excelData')
-        // } else {
-        //   console.log('All contract_ids are unique')
-        // }
-        // if (
-        //   !areKeysUnique(excelData, (d) => {
-        //     return `${d.contract_pk}_${d.contract_folder_path}`
-        //   })
-        // ) {
-        //   console.error(
-        //     'Duplicate contract_pk + contract_folder_path in excelData'
-        //   )
-        // } else {
-        //   console.log('All contract_pk + contract_folder_path are unique')
-        // }
+        // .filter((folder) => {
+        //   if (folder === null) {
+        //     return false
+        //   } else if (folder.summary.exclude.file_count > 0) {
+        //     return false
+        //   } else if (folder.summary.total.file_size_bytes < 200_000_000) {
+        //     return false
+        //   } else if (folder.summary.total.file_count > 1_000) {
+        //     return false
+        //   // } else if (
+        //   //   folder.files.filter((file) => file[0].endsWith('.bam')).length >
+        //   //   0
+        //   // ) {
+        //   //   return false
+        //   } else {
+        //     return true
+        //   }
+        // })
+
+        const unique_folders = findUnique(
+          excelData,
+          (d) => d.contract_folder_path
+        )
+
+        const duplicate_contract_pks = findDuplicates(
+          unique_folders,
+          (d) => d.contract_pk
+        )
+        const unique_contract_pks: (ClinicalData & Clinical_Excel_Data)[] =
+          findUnique(unique_folders, (d) => d.contract_pk).map((d) => {
+            const clinical = data.find(
+              (c) => c.contract_dir === d.contract_folder_path
+            )
+            return {
+              ...d,
+              ...clinical,
+            }
+          })
+
+        const more_than_200mb = unique_contract_pks.filter(
+          (d) => d.summary.total.file_size_bytes > 200_000_000
+        )
+
+        const less_than_1000_files = unique_contract_pks.filter(
+          (d) => d.summary.total.file_count < 1_000
+        )
+
+        const clean_project_folder = less_than_1000_files.filter(
+          (d) => d.summary.exclude.file_count == 0
+        )
 
         drawSankey({
           nodes: [
             {
-              name: 'All Clinical Data',
+              name: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
               category: 'Start',
             },
-            {
-              name: 'Easy Clinical',
-              category: 'Mid',
-            },
-            { name: 'Rejected', category: 'Reject' },
-            { name: 'Success', category: 'Success' },
-            { name: 'Failed', category: 'Fail' },
+            { name: 'Duplicate Folder', category: 'Reject' },
+            { name: 'Unique Folder', category: 'Good' },
+            { name: 'Duplicate contract_pk', category: 'Reject' },
+            { name: 'Unique contract_pk', category: 'Good' },
+            { name: 'Less than 200 mb total folder size', category: 'Reject' },
+            { name: 'More than 200 mb total folder size', category: 'Good' },
+            { name: 'More than 1000 files', category: 'Reject' },
+            { name: 'Less than 1000 files', category: 'Good' },
+            { name: 'Clean Project Folder', category: 'Good' },
+            { name: 'Dirty Project Folder', category: 'Reject' },
+
+            // {
+            //   name: ''
+            // }
+
+            // {
+            //   name: 'All Clinical Data',
+            //   category: 'Mid',
+            // },
+            // {
+            //   name: 'Easy Clinical',
+            //   category: 'Mid',
+            // },
+            // { name: 'Rejected', category: 'Reject' },
+            // { name: 'Duplicate PK', category: 'Reject' },
+            // { name: 'Has BAMs', category: 'Reject' },
+            // { name: 'More than 1000 files', category: 'Reject' },
+            // { name: 'Less than 200 mb', category: 'Reject' },
+            // { name: 'Success', category: 'Success' },
+            // { name: 'Failed', category: 'Fail' },
           ],
           links: [
             {
-              source: 'All Clinical Data',
-              target: 'Easy Clinical',
-              value: 120,
+              source: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
+              target: 'Duplicate Folder',
+              value: duplicate_folders.length,
             },
             {
-              source: 'All Clinical Data',
-              target: 'Rejected',
-              value: 400,
+              source: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
+              target: 'Unique Folder',
+              value: unique_folders.length,
             },
             {
-              source: 'Easy Clinical',
-              target: 'Success',
-              value: 40,
+              source: 'Unique Folder',
+              target: 'Duplicate contract_pk',
+              value: duplicate_contract_pks.length,
             },
             {
-              source: 'Easy Clinical',
-              target: 'Failed',
-              value: 20,
+              source: 'Unique Folder',
+              target: 'Unique contract_pk',
+              value: unique_contract_pks.length,
             },
+            {
+              source: 'Unique contract_pk',
+              target: 'Less than 200 mb total folder size',
+              value: unique_contract_pks.length - more_than_200mb.length,
+            },
+            {
+              source: 'Unique contract_pk',
+              target: 'More than 200 mb total folder size',
+              value: more_than_200mb.length,
+            },
+            {
+              source: 'More than 200 mb total folder size',
+              target: 'More than 1000 files',
+              value: more_than_200mb.length - less_than_1000_files.length,
+            },
+            {
+              source: 'More than 200 mb total folder size',
+              target: 'Less than 1000 files',
+              value: less_than_1000_files.length,
+            },
+            {
+              source: 'Less than 1000 files',
+              target: 'Dirty Project Folder',
+              value: less_than_1000_files.length - clean_project_folder.length,
+            },
+            {
+              source: 'Less than 1000 files',
+              target: 'Clean Project Folder',
+              value: clean_project_folder.length,
+            },
+            // {
+            //   source: 'All Clinical Data',
+            //   target: 'Easy Clinical',
+            //   value: easy_clinical.length,
+            // },
+            // {
+            //   source: 'All Clinical Data',
+            //   target: 'Rejected',
+            //   value: excelData.length - easy_clinical.length,
+            // },
+            // {
+            //   source: 'Rejected',
+            //   target: 'Duplicate PK',
+            //   value: duplicate_pks.length,
+            // },
+            // {
+            //   source: 'Rejected',
+            //   target: 'Duplicate Folder',
+            //   value: duplicate_folders.length,
+            // },
+            // {
+            //   source: 'Rejected',
+            //   target: 'Has BAMs',
+            //   value: 500,
+            // },
+            // {
+            //   source: 'Rejected',
+            //   target: 'More than 1000 files',
+            //   value: 50,
+            // },
+            // {
+            //   source: 'Easy Clinical',
+            //   target: 'Success',
+            //   value: 40,
+            // },
+            // {
+            //   source: 'Easy Clinical',
+            //   target: 'Failed',
+            //   value: 20,
+            // },
           ],
         })
 
@@ -1200,7 +1328,7 @@ function drawSankey(data: SankeyData) {
     .attr('y', (d) => (d.y1 + d.y0) / 2)
     .attr('dy', '0.35em')
     .attr('text-anchor', (d) => (d.x0 < width / 2 ? 'start' : 'end'))
-    .text((d: any) => d.name)
+    .text((d: any) => `${d.name} (${format(d.value)})`)
 
   return svg.node()
 }
