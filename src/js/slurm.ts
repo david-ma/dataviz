@@ -1,6 +1,6 @@
 console.log('Hello world')
 
-import { d3, Chart, classifyName } from './chart'
+import { d3, Chart, decorateTable, classifyName } from './chart'
 
 const jobs: {
   [key: string]: Job[]
@@ -204,33 +204,30 @@ type Clinical_Excel_Data = {
 
 const pks = {}
 
-d3.json('/clinical')
-  .then(function (JSONs: string[]) {
-    // Filter out Contract Folders with duplicate log_ids
-    const counter: {
-      [key: string]: string[]
-    } = {}
+function filter_duplicate_log_ids(JSONs: string[]) {
+  // Filter out Contract Folders with duplicate log_ids
+  const counter: {
+    [key: string]: string[]
+  } = {}
 
-    JSONs.forEach((json) => {
-      const parts = json.split('_')
-      const log_id = `${parts[0]}_${parts[1]}`
-      if (counter[log_id]) {
-        counter[log_id].push(json)
-      } else {
-        counter[log_id] = [json]
-      }
-    })
-    return Object.values(counter)
-      .filter((jsons) => jsons.length == 1)
-      .flat()
-    // .map((jsons) => jsons[0])
+  JSONs.forEach((json) => {
+    const parts = json.split('_')
+    const log_id = `${parts[0]}_${parts[1]}`
+    if (counter[log_id]) {
+      counter[log_id].push(json)
+    } else {
+      counter[log_id] = [json]
+    }
   })
-  // .then(function (JSONs: string[]) {
-  //   return JSONs.slice(0, 50)
-  // })
+  return Object.values(counter)
+    .filter((jsons) => jsons.length == 1)
+    .flat()
+}
+
+d3.json('/clinical')
+  .then(filter_duplicate_log_ids)
   .then(function (JSONs: string[]) {
-    console.log('Clinical Data', JSONs)
-    Promise.all([
+    return Promise.all([
       d3
         .csv('/AGRF/contract_list_for_purging_is_clinical_2024_08_28.csv')
         .then((data) => {
@@ -514,6 +511,8 @@ d3.json('/clinical')
             //     }</td><td>${file[5]}</td>`
             //   })
           })
+
+        return [excelData, data]
       })
     // .then(() => {
     //   // Get the "Bad" PKs
@@ -521,6 +520,14 @@ d3.json('/clinical')
     //   var filtered = Object.entries(pks).filter(([pk, count]:any) => count > 1).map(([pk, count]:any) => pk)
     //   console.log('Filtered', filtered)
     // })
+  })
+  .then(function ([excelData, data]) {
+    console.log('clinical data', data)
+    var options = {
+      element: 'table#DataTable',
+    }
+
+    decorateTable(excelData, options)
   })
 
 function human_readable_size(bytes: number) {
