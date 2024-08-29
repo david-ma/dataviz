@@ -270,7 +270,9 @@ function filter_list<T>({
   names: {
     original: string
     positive: string
+    positiveID: string
     negative: string
+    negativeID: string
   }
 }) {
   let positive: T[]
@@ -301,6 +303,13 @@ function filter_list<T>({
     source: names.original,
     target: names.negative,
     value: negative.length,
+  })
+
+  decorateTable(positive, {
+    element: `table#${names.positiveID}`,
+  })
+  decorateTable(negative, {
+    element: `table#${names.negativeID}`,
   })
 
   return positive
@@ -338,6 +347,16 @@ d3.json('/clinical')
           nodes: [],
           links: [],
         }
+        // PurgeList,UniqueFolders,DuplicateFolders,UniquePK,DuplicatePK,LessThan200mb,MoreThan200mb,LessThan1000Files,MoreThan1000Files,CleanProject,DirtyProject,NoBams,ContainsBams
+
+        decorateTable(excelData, {
+          element: 'table#PurgeList',
+          // columns: [{
+          //   title: 'run_id',
+          //   data: 'run_id',
+          // }
+          // ]
+        })
 
         const unique_folders = filter_list({
           data: excelData,
@@ -346,7 +365,9 @@ d3.json('/clinical')
           names: {
             original: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
             positive: 'Unique Folder',
+            positiveID: 'UniqueFolders',
             negative: 'Duplicate Folder',
+            negativeID: 'DuplicateFolders',
           },
         })
 
@@ -357,7 +378,9 @@ d3.json('/clinical')
           names: {
             original: 'Unique Folder',
             positive: 'Unique contract_pk',
+            positiveID: 'UniquePK',
             negative: 'Duplicate contract_pk',
+            negativeID: 'DuplicatePK',
           },
         })
           .map((d) => {
@@ -378,7 +401,9 @@ d3.json('/clinical')
           names: {
             original: 'Unique contract_pk',
             positive: 'More than 200 mb total folder size',
+            positiveID: 'MoreThan200mb',
             negative: 'Less than 200 mb total folder size',
+            negativeID: 'LessThan200mb',
           },
         })
 
@@ -389,7 +414,9 @@ d3.json('/clinical')
           names: {
             original: 'More than 200 mb total folder size',
             positive: 'Less than 1000 files',
+            positiveID: 'LessThan1000Files',
             negative: 'More than 1000 files',
+            negativeID: 'MoreThan1000Files',
           },
         })
 
@@ -400,7 +427,9 @@ d3.json('/clinical')
           names: {
             original: 'Less than 1000 files',
             positive: 'Clean Project Folder',
+            positiveID: 'CleanProject',
             negative: 'Dirty Project Folder',
+            negativeID: 'DirtyProject',
           },
         })
 
@@ -420,7 +449,9 @@ d3.json('/clinical')
             names: {
               original: 'Clean Project Folder',
               positive: 'No BAM files',
+              positiveID: 'NoBams',
               negative: 'BAM files present',
+              negativeID: 'ContainsBams',
             },
           })
 
