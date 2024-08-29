@@ -452,6 +452,33 @@ d3.json('/clinical')
           (d) => d.summary.exclude.file_count == 0
         )
 
+
+        const deeper_filter = clean_project_folder.filter(function (folder) {
+          let result = true
+          if (folder === null) {
+            console.log("Folder doesn't exist")
+            result = false
+          } else if (folder.summary.exclude.file_count > 0) {
+            console.log('Has excluded files')
+            result = false
+          } else if (folder.summary.total.file_size_bytes < 200_000_000) {
+            console.log('Less than 200mb total folder size', folder)
+            result = false
+          } else if (folder.summary.total.file_count > 1_000) {
+            console.log('More than 1000 files')
+            result = false
+          // } else if (
+          //   folder.files.filter((file) => file[0].endsWith('.bam')).length > 0
+          // ) {
+          //   console.log('BAM files present')
+          //   result = false
+          }
+          return result
+        })
+
+        console.log('clean_project_folder', clean_project_folder)
+        console.log('Deeper Filter', deeper_filter)
+
         Promise.all(
           clean_project_folder.map((d) => {
             const info = extract_info_from_folder(d.contract_dir)
@@ -465,30 +492,6 @@ d3.json('/clinical')
             return d.files.find((file) => file[0].endsWith('.bam'))
           })
 
-          const deeper_filter = no_bams.filter((folder) => {
-            if (folder === null) {
-              console.log("Folder doesn't exist")
-              return true
-            } else if (folder.summary.exclude.file_count > 0) {
-              console.log('Has excluded files')
-              return true
-            } else if (folder.summary.total.file_size_bytes < 200_000_000) {
-              console.log('Less than 200mb total folder size', folder)
-              return true
-            } else if (folder.summary.total.file_count > 1_000) {
-              console.log('More than 1000 files')
-              return true
-            } else if (
-              folder.files.filter((file) => file[0].endsWith('.bam')).length > 0
-            ) {
-              console.log('BAM files present')
-              return true
-            } else {
-              return false
-            }
-          })
-
-          console.log('Deeper Filter', deeper_filter)
 
           drawSankey({
             nodes: [
