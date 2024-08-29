@@ -4,7 +4,7 @@
 
 <div style="margin-top:5px;">
   <button onclick="toggle_links()">Toggle Links</button>
-  <button onclick="enable_dark_mode()">Enable Dark Mode</button>
+  <button onclick="disable_dark_mode()">Disable Dark Mode</button>
 </div>
 
 <div id="sankey"></div>
@@ -22,7 +22,7 @@
   }
 
   $("body").toggleClass("enableDarkMode");
-  function enable_dark_mode() {
+  function disable_dark_mode() {
     $("body").toggleClass("enableDarkMode");
   }
 </script>
