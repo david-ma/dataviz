@@ -251,7 +251,22 @@ d3.json('/clinical')
             return d
           })
         }),
-      d3.tsv('/AGRF/easy_clinical.csv'),
+      d3.tsv('/AGRF/easy_clinical.csv').then((data) => {
+        decorateTable(data, {
+          element: 'table#easy',
+        })
+        return data
+      }),
+      d3.csv('/AGRF/contract_list_base_2024_08_27.csv').then((data) => {
+        console.log('Contract List length', data.length)
+        // decorateTable(data, {
+        //   element: 'table#contract_list',
+        // })
+        if (findDuplicates(data, (d) => d.contract_folder_path).length > 0) {
+          console.log('Duplicate contract folder paths in contract_list')
+        }
+        return data
+      }),
       ...JSONs.map((json) =>
         d3.json(`/AGRF/clinical_5/${json}`).catch((err) => {
           console.error(err)
@@ -260,8 +275,9 @@ d3.json('/clinical')
         })
       ),
     ])
-      .then(function ([excelData, easy_clinical, ...data]: [
+      .then(function ([excelData, easy_clinical, contract_list, ...data]: [
         Clinical_Excel_Data[],
+        any,
         any,
         ClinicalData
       ]) {
@@ -313,6 +329,9 @@ d3.json('/clinical')
           }
         })
         console.log('Duplicate contract_pks', duplicate_pks)
+        decorateTable(duplicate_pks, {
+          element: 'table#duplicate_pks',
+        })
 
         const duplicate_folders = findDuplicates(
           excelData,
@@ -326,6 +345,9 @@ d3.json('/clinical')
           }
         })
         console.log('Duplicate contract_folder_paths', duplicate_folders)
+        decorateTable(duplicate_folders, {
+          element: 'table#duplicate_folders',
+        })
 
         console.log('Easy Clinical', easy_clinical)
         duplicate_folders.forEach((d) => {

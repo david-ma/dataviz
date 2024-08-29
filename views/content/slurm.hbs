@@ -7,7 +7,7 @@
   <button onclick="enable_dark_mode()">Enable Dark Mode</button>
 </div>
 
-{{#> tabs tabs="clinical,internal-reference,sankey,DataTable" }}
+{{#> tabs tabs="clinical,easy,duplicate_folders,duplicate_pks,internal-reference,sankey,DataTable,contract_list" }}
 <table id="{{this}}">
   <thead></thead>
   <tbody></tbody>
@@ -19,7 +19,7 @@
     $(".log_id_td").toggleClass("hideLinks");
   }
 
-   $("body").toggleClass("enableDarkMode");
+  $("body").toggleClass("enableDarkMode");
   function enable_dark_mode() {
     $("body").toggleClass("enableDarkMode");
   }
