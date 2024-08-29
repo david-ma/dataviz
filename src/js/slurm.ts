@@ -543,6 +543,7 @@ d3.json('/clinical')
               .append('a')
               .attr('href', `#x`)
               .on('click', function () {
+                drawSecondRow(log_id)
                 $(`#clinical_row2-${log_id}`).toggleClass('hidden')
               })
               .text(log_id)
@@ -631,61 +632,75 @@ d3.json('/clinical')
             // d3.select(this).append('td').text(d['instrument_name'])
             // d3.select(this).append('td').text(d['machine_model'])
 
-            // if (d.files.length > 10000) {
-            //   d3.select(`#clinical_row2-${log_id}`)
-            //     .append('td')
-            //     .attr('colspan', columns.length)
-            //     .text(`Too many files to display: ${d.files.length}`)
+            function drawSecondRow(log_id) {
+              d3.json(`/AGRF/clinical/${log_id}.json`).then(
+                (d: ClinicalData) => {
+                  // if row has already been drawn, skip
+                  if (d3.select(`#clinical_row2-${log_id} svg`).node()) {
+                    // console.log("Already done, skipping!")
+                    return
+                  }
 
-            //   return
-            // }
+                  if (d.files.length === 0 || d.files.length > 10000) {
+                    d3.select(`#clinical_row2-${log_id}`)
+                      .append('td')
+                      .attr('colspan', columns.length)
+                      .text(`Too many files to display: ${d.files.length}`)
 
-            // d3.select(`#clinical_row2-${log_id}`)
-            //   .append('td')
-            //   .attr('colspan', 4)
-            //   .append('div')
-            //   .classed('followScroll', true)
+                    return
+                  }
 
-            // drawTreeMap(d, log_id, `#clinical_row2-${log_id} td div`)
+                  d3.select(`#clinical_row2-${log_id}`)
+                    .append('td')
+                    .attr('colspan', 4)
+                    .append('div')
+                    .classed('followScroll', true)
 
-            // const inner_table = d3
-            //   .select(`#clinical_row2-${log_id}`)
-            //   .append('td')
-            //   .attr('colspan', columns.length - 4)
-            //   .append('table')
+                  drawTreeMap(d, log_id, `#clinical_row2-${log_id} td div`)
 
-            // inner_table
-            //   .append('thead')
-            //   .append('tr')
-            //   .selectAll('th')
-            //   .data(['Type', 'Filepath', 'Size', 'Status', 'Level'])
-            //   .enter()
-            //   .append('th')
-            //   .text((d) => d)
+                  const inner_table = d3
+                    .select(`#clinical_row2-${log_id}`)
+                    .append('td')
+                    .attr('colspan', columns.length - 4)
+                    .append('table')
 
-            // inner_table
-            //   .append('tbody')
-            //   .selectAll('tr')
-            //   .data(d.files.filter((file) => file[4] !== 'included_folder'))
-            //   .enter()
-            //   .append('tr')
-            //   .html((file) => {
-            //     const file_relative_path = [
-            //       file[1].split(contract_id).pop(),
-            //       file[0],
-            //     ]
-            //       .join('/')
-            //       .slice(1)
+                  inner_table
+                    .append('thead')
+                    .append('tr')
+                    .selectAll('th')
+                    .data(['Type', 'Filepath', 'Size', 'Status', 'Level'])
+                    .enter()
+                    .append('th')
+                    .text((d) => d)
 
-            //     const filetype = getFiletype(file[0])
-            //     const size = human_readable_size(parseInt(file[2]))
+                  inner_table
+                    .append('tbody')
+                    .selectAll('tr')
+                    .data(
+                      d.files.filter((file) => file[4] !== 'included_folder')
+                    )
+                    .enter()
+                    .append('tr')
+                    .html((file) => {
+                      const file_relative_path = [
+                        file[1].split(contract_id).pop(),
+                        file[0],
+                      ]
+                        .join('/')
+                        .slice(1)
 
-            //     return `<td style="color: black; background:${color(
-            //       filetype
-            //     )}">${filetype}</td><td>${file_relative_path}</td><td>${size}</td><td>${
-            //       file[4]
-            //     }</td><td>${file[5]}</td>`
-            //   })
+                      const filetype = getFiletype(file[0])
+                      const size = human_readable_size(parseInt(file[2]))
+
+                      return `<td style="color: black; background:${color(
+                        filetype
+                      )}">${filetype}</td><td>${file_relative_path}</td><td>${size}</td><td>${
+                        file[4]
+                      }</td><td>${file[5]}</td>`
+                    })
+                }
+              )
+            }
           })
 
         return combined
