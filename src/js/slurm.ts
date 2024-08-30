@@ -307,9 +307,61 @@ function filter_list<T>({
 
   decorateTable(positive, {
     element: `table#${names.positiveID}`,
+    titles: [
+      'contract_pk',
+      'run_id',
+      'total_file_size',
+      'total_file_count',
+      'secondary_analysis_analyst',
+      'first_approver',
+      'contract_folder_path',
+      'contract_sent',
+    ],
+    customRenderers: {
+      total_file_size: (j, i, d, k) => {
+        if (d && d.summary) {
+          return d.summary.total.file_size_human
+        } else {
+          return ''
+        }
+      },
+      total_file_count: (j, i, d, k) => {
+        if (d && d.summary) {
+          return d.summary.total.file_count
+        } else {
+          return ''
+        }
+      },
+    },
   })
   decorateTable(negative, {
     element: `table#${names.negativeID}`,
+    titles: [
+      'contract_pk',
+      'run_id',
+      'total_file_size',
+      'total_file_count',
+      'secondary_analysis_analyst',
+      'first_approver',
+      'contract_folder_path',
+      'contract_sent',
+    ],
+    customRenderers: {
+      total_file_size: (j, i, d, k) => {
+        if (d && d.summary) {
+          return d.summary.total.file_size_human
+        } else {
+          return ''
+        }
+      },
+      total_file_count: (j, i, d, k) => {
+        if (d && d.summary) {
+          return d.summary.total.file_count
+        } else {
+          return ''
+        }
+      },
+    },
   })
 
   return positive
@@ -341,7 +393,19 @@ d3.json('/clinical')
         return result
       })
       .then(function ([excelData, data]) {
-        const combined: (ClinicalData & Clinical_Excel_Data)[] = []
+        type CombinedData = Clinical_Excel_Data & Partial<ClinicalData>
+
+        const combined: CombinedData[] = excelData.map((exData) => {
+          const clinical = data.find(
+            (c) => c.contract_dir === exData.contract_folder_path
+          )
+          if (!clinical) {
+            console.info('No clinical data for', exData.contract_folder_path)
+            return exData
+          }
+
+          return Object.assign(exData, clinical)
+        })
 
         const sankeyData: SankeyData = {
           nodes: [],
@@ -349,13 +413,36 @@ d3.json('/clinical')
         }
         // PurgeList,UniqueFolders,DuplicateFolders,UniquePK,DuplicatePK,LessThan200mb,MoreThan200mb,LessThan1000Files,MoreThan1000Files,CleanProject,DirtyProject,NoBams,ContainsBams
 
+        // contract_pk,Log ID,Total File Size,Total File Count,Analyst,First Approver,Contract Folder Path,Date Sent,Command
+
         decorateTable(excelData, {
           element: 'table#PurgeList',
-          // columns: [{
-          //   title: 'run_id',
-          //   data: 'run_id',
-          // }
-          // ]
+          titles: [
+            'contract_pk',
+            'run_id',
+            'total_file_size',
+            'total_file_count',
+            'secondary_analysis_analyst',
+            'first_approver',
+            'contract_folder_path',
+            'contract_sent',
+          ],
+          customRenderers: {
+            total_file_size: (j, i, d, k) => {
+              if (d && d.summary) {
+                return d.summary.total.file_size_human
+              } else {
+                return ''
+              }
+            },
+            total_file_count: (j, i, d, k) => {
+              if (d && d.summary) {
+                return d.summary.total.file_count
+              } else {
+                return ''
+              }
+            },
+          },
         })
 
         const unique_folders = filter_list({
@@ -440,23 +527,40 @@ d3.json('/clinical')
               `/AGRF/clinical/${info.flowcell}_${info.contract_id}.json`
             )
           })
-        ).then((fullClinicalData: ClinicalData[]) => {
-          const no_bams = filter_list({
-            data: fullClinicalData,
-            sankeyData,
-            filter: (d) =>
-              d.files.filter((file) => file[0].endsWith('.bam')).length == 0,
-            names: {
-              original: 'Clean Project Folder',
-              positive: 'No BAM files',
-              positiveID: 'NoBams',
-              negative: 'BAM files present',
-              negativeID: 'ContainsBams',
-            },
-          })
+        )
+          .then((fullClinicalData: ClinicalData[]) => {
+            return clean_project_folder.map((exData) => {
+              const clinical = fullClinicalData.find(
+                (c) => c.contract_dir === exData.contract_folder_path
+              )
+              if (!clinical) {
+                console.info(
+                  'No full clinical data for',
+                  exData.contract_folder_path
+                )
+                return exData
+              }
 
-          drawSankey(sankeyData)
-        })
+              return Object.assign(exData, clinical)
+            })
+          })
+          .then((fullClinicalData: CombinedData[]) => {
+            const no_bams = filter_list({
+              data: fullClinicalData,
+              sankeyData,
+              filter: (d) =>
+                d.files.filter((file) => file[0].endsWith('.bam')).length == 0,
+              names: {
+                original: 'Clean Project Folder',
+                positive: 'No BAM files',
+                positiveID: 'NoBams',
+                negative: 'BAM files present',
+                negativeID: 'ContainsBams',
+              },
+            })
+
+            drawSankey(sankeyData)
+          })
 
         const table = d3.select('table#clinical')
         const columns = [

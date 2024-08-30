@@ -1841,6 +1841,10 @@ export type DataTableConfig = DataTables.Config & {
   element?: string
   titles?: string[]
   render?: any
+  customRenderers?: {
+    // [key: string]: (any) => string
+    [key: string]: any
+  }
   columns?: DataTables.ConfigColumns[]
 }
 
@@ -1856,7 +1860,9 @@ function decorateTable(
   const element = newOptions ? newOptions.element : '#dataset table'
 
   const columns = (
-    dataset.columns ? dataset.columns : Object.keys(dataset[0])
+    newOptions.titles ||
+    dataset.columns ||
+    Object.keys(dataset[0])
   ).map(function (d: any) {
     return {
       title: d,
@@ -1873,7 +1879,12 @@ function decorateTable(
     pageLength: 25,
     order: [[0, 'desc']],
     columns: columns,
-    // columnDefs: [],
+    columnDefs: [
+      {
+        targets: '_all',
+        defaultContent: '',
+      },
+    ],
   }
 
   // If we have new options, update the defaults
@@ -1889,6 +1900,12 @@ function decorateTable(
     if (newOptions.render) {
       options.columns.forEach((d) => {
         d.render = newOptions.render
+      })
+    }
+    if (newOptions.customRenderers) {
+      Object.keys(newOptions.customRenderers).forEach((key) => {
+        const index = options.columns.findIndex((d) => d.data === key)
+        options.columns[index].render = newOptions.customRenderers[key]
       })
     }
   }

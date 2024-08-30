@@ -130,6 +130,9 @@ export type DataTableConfig = DataTables.Config & {
     element?: string;
     titles?: string[];
     render?: any;
+    customRenderers?: {
+        [key: string]: any;
+    };
     columns?: DataTables.ConfigColumns[];
 };
 export type DataTableDataset = Array<any> & {
