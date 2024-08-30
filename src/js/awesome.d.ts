@@ -1,4 +1,3 @@
-/// <reference types="showdown" />
 declare var md: showdown.Converter;
 declare const socket: any;
 declare let initialData: {};

@@ -1,4 +1,3 @@
-/// <reference types="showdown" />
 declare const sd: showdown.Converter;
 type Issue = {
     number: number;
