@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import $ from 'jquery';
 import 'datatables.net';
+import * as DataTables from 'datatables.net';
 import _ from 'lodash';
 type chartOptions = {
     element?: string;
@@ -125,12 +126,17 @@ declare class Chart {
     }): void;
     venn(options: any): void;
 }
-type chartDataTableSettings = any & {
+export type DataTableConfig = DataTables.Config & {
     element?: string;
-    titles?: any;
+    titles?: string[];
     render?: any;
+    columns?: DataTables.ConfigColumns[];
 };
-declare function decorateTable(dataset: any, newOptions?: chartDataTableSettings): any;
+export type DataTableDataset = Array<any> & {
+    columns?: Array<string>;
+    [key: string]: any;
+};
+declare function decorateTable(dataset: DataTableDataset, newOptions?: DataTableConfig): DataTables.Api;
 interface LoadingAnimation {
     animate: () => void;
     stop: (options?: {

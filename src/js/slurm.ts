@@ -718,7 +718,8 @@ d3.json('/clinical')
       element: 'table#DataTable',
     }
 
-    decorateTable(data, options)
+    const output = decorateTable(data, options)
+    console.log('Datatables Output', output)
 
     data.forEach((d) => {})
   })

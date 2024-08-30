@@ -6,6 +6,7 @@ import * as d3 from 'd3'
 
 import $ from 'jquery'
 import 'datatables.net'
+import * as DataTables from 'datatables.net'
 
 import _ from 'lodash'
 
@@ -1246,8 +1247,8 @@ class Chart {
       })
       .each((d) => {
         // console.log('Hey, drawing a leaf', d)
-        if(d.data.filetype === 'folder') {
-          console.log("This is a folder!", d)
+        if (d.data.filetype === 'folder') {
+          console.log('This is a folder!', d)
         }
       })
 
@@ -1836,30 +1837,34 @@ function log(message: string) {
   console.info(`${formatTime(date)}${message}`)
 }
 
-type chartDataTableSettings = any & {
+export type DataTableConfig = DataTables.Config & {
   element?: string
-  titles?: any
+  titles?: string[]
   render?: any
+  columns?: DataTables.ConfigColumns[]
 }
 
-function decorateTable(dataset: any, newOptions?: chartDataTableSettings): any {
+export type DataTableDataset = Array<any> & {
+  columns?: Array<string>
+  [key: string]: any
+}
+
+function decorateTable(
+  dataset: DataTableDataset,
+  newOptions?: DataTableConfig
+): DataTables.Api {
   const element = newOptions ? newOptions.element : '#dataset table'
 
-  const columns = dataset.columns
-    ? dataset.columns.map(function (d: any) {
-        return {
-          title: d,
-          data: d,
-        }
-      })
-    : Object.keys(dataset[0]).map(function (d: any) {
-        return {
-          title: d,
-          data: d,
-        }
-      })
+  const columns = (
+    dataset.columns ? dataset.columns : Object.keys(dataset[0])
+  ).map(function (d: any) {
+    return {
+      title: d,
+      data: d,
+    }
+  })
 
-  const options: any = {
+  const options: DataTableConfig = {
     info: false,
     paging: false,
     search: false,
@@ -1868,14 +1873,16 @@ function decorateTable(dataset: any, newOptions?: chartDataTableSettings): any {
     pageLength: 25,
     order: [[0, 'desc']],
     columns: columns,
-    columnDefs: newOptions.columnDefs || [],
+    // columnDefs: [],
   }
+
+  // If we have new options, update the defaults
   if (newOptions) {
     Object.keys(newOptions).forEach(function (key) {
       options[key] = newOptions[key]
     })
     if (newOptions.titles) {
-      newOptions.titles.forEach((d: any, i: number) => {
+      newOptions.titles.forEach((d: string, i: number) => {
         options.columns[i].title = d
       })
     }
