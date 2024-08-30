@@ -10,10 +10,13 @@
 <div id="sankey"></div>
 {{!-- clinical,easy,duplicate_folders,duplicate_pks,internal-reference,DataTable,contract_list --}}
 {{#> tabs tabs="PurgeList,UniqueFolders,DuplicateFolders,UniquePK,DuplicatePK,LessThan200mb,MoreThan200mb,LessThan1000Files,MoreThan1000Files,CleanProject,DirtyProject,NoBams,ContainsBams,clinical,DataTable,internal-reference" }}
-<table id="{{this}}">
-  <thead></thead>
-  <tbody></tbody>
-</table>
+<div id="{{this}}_wrapper">
+  <button onclick="download_csv('{{this}}')">Download CSV</button>
+  <table id="{{this}}">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+</div>
 {{/tabs}}
 
 <script>
@@ -24,6 +27,28 @@
   $("body").toggleClass("enableDarkMode");
   function disable_dark_mode() {
     $("body").toggleClass("enableDarkMode");
+  }
+  function download_csv(table_id) {
+    var csv = [];
+    var rows = $("#" + table_id + " tr");
+    for (var i = 0; i < rows.length; i++) {
+      var row = [],
+        cols = $(rows[i]).find("td, th");
+      for (var j = 0; j < cols.length; j++) row.push(cols[j].innerText);
+      csv.push(row.join(","));
+    }
+    download_csv_file(csv.join("\n"), table_id + ".csv");
+  }
+  function download_csv_file(csv, filename) {
+    var csvFile;
+    var downloadLink;
+    csvFile = new Blob([csv], { type: "text/csv" });
+    downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
   }
 </script>
 
