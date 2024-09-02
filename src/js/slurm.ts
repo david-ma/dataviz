@@ -1,6 +1,12 @@
 console.log('Hello world')
 
-import { d3, Chart, decorateTable, classifyName } from './chart'
+import {
+  d3,
+  Chart,
+  decorateTable,
+  classifyName,
+  DataTableConfig,
+} from './chart'
 
 const jobs: {
   [key: string]: Job[]
@@ -249,6 +255,35 @@ function findUnique<T>(array: T[], keyFunction: (T) => string): T[] {
     .flat()
 }
 
+const tableOptions: DataTableConfig = {
+  titles: [
+    'contract_pk',
+    'run_id',
+    'total_file_size',
+    'total_file_count',
+    'secondary_analysis_analyst',
+    'first_approver',
+    'contract_folder_path',
+    'contract_sent',
+  ],
+  customRenderers: {
+    total_file_size: (j, i, d, k) => {
+      if (d && d.summary) {
+        return d.summary.total.file_size_human
+      } else {
+        return ''
+      }
+    },
+    total_file_count: (j, i, d, k) => {
+      if (d && d.summary) {
+        return d.summary.total.file_count
+      } else {
+        return ''
+      }
+    },
+  },
+}
+
 /**
  * Add list to Sankey Node
  * Apply filter to list to split the list into 2 outcomes
@@ -306,62 +341,12 @@ function filter_list<T>({
   })
 
   decorateTable(positive, {
+    ...tableOptions,
     element: `table#${names.positiveID}`,
-    titles: [
-      'contract_pk',
-      'run_id',
-      'total_file_size',
-      'total_file_count',
-      'secondary_analysis_analyst',
-      'first_approver',
-      'contract_folder_path',
-      'contract_sent',
-    ],
-    customRenderers: {
-      total_file_size: (j, i, d, k) => {
-        if (d && d.summary) {
-          return d.summary.total.file_size_human
-        } else {
-          return ''
-        }
-      },
-      total_file_count: (j, i, d, k) => {
-        if (d && d.summary) {
-          return d.summary.total.file_count
-        } else {
-          return ''
-        }
-      },
-    },
   })
   decorateTable(negative, {
+    ...tableOptions,
     element: `table#${names.negativeID}`,
-    titles: [
-      'contract_pk',
-      'run_id',
-      'total_file_size',
-      'total_file_count',
-      'secondary_analysis_analyst',
-      'first_approver',
-      'contract_folder_path',
-      'contract_sent',
-    ],
-    customRenderers: {
-      total_file_size: (j, i, d, k) => {
-        if (d && d.summary) {
-          return d.summary.total.file_size_human
-        } else {
-          return ''
-        }
-      },
-      total_file_count: (j, i, d, k) => {
-        if (d && d.summary) {
-          return d.summary.total.file_count
-        } else {
-          return ''
-        }
-      },
-    },
   })
 
   return positive
@@ -416,33 +401,8 @@ d3.json('/clinical')
         // contract_pk,Log ID,Total File Size,Total File Count,Analyst,First Approver,Contract Folder Path,Date Sent,Command
 
         decorateTable(excelData, {
+          ...tableOptions,
           element: 'table#PurgeList',
-          titles: [
-            'contract_pk',
-            'run_id',
-            'total_file_size',
-            'total_file_count',
-            'secondary_analysis_analyst',
-            'first_approver',
-            'contract_folder_path',
-            'contract_sent',
-          ],
-          customRenderers: {
-            total_file_size: (j, i, d, k) => {
-              if (d && d.summary) {
-                return d.summary.total.file_size_human
-              } else {
-                return ''
-              }
-            },
-            total_file_count: (j, i, d, k) => {
-              if (d && d.summary) {
-                return d.summary.total.file_count
-              } else {
-                return ''
-              }
-            },
-          },
         })
 
         const unique_folders = filter_list({
