@@ -450,7 +450,7 @@ d3.json('/clinical')
           sankeyData,
           uniqueKeyFunction: (d) => d.contract_folder_path,
           names: {
-            original: 'contract_list_for_purging_is_clinical_2024_08_28.csv',
+            original: '"Clinical" Bioweb cases',
             positive: 'Unique Folder',
             positiveID: 'UniqueFolders',
             negative: 'Duplicate Folder',
@@ -557,6 +557,50 @@ d3.json('/clinical')
                 negative: 'BAM files present',
                 negativeID: 'ContainsBams',
               },
+            })
+
+            sankeyData.nodes.push({ name: 'Upload Stage 1', category: 'End' })
+
+            sankeyData.links.push({
+              source: 'No BAM files',
+              target: 'Upload Stage 1',
+              value: no_bams.length,
+            })
+
+            sankeyData.nodes.push({ name: 'Upload Stage 2', category: 'End' })
+            sankeyData.links.push({
+              source: 'BAM files present',
+              target: 'Upload Stage 2',
+              value: fullClinicalData.length - no_bams.length,
+            })
+
+            sankeyData.nodes.push({ name: 'Upload Stage 3', category: 'End' })
+            sankeyData.links.push({
+              source: 'Dirty Project Folder',
+              target: 'Upload Stage 3',
+              value: less_than_1000_files.length - clean_project_folder.length,
+            })
+            sankeyData.links.push({
+              source: 'More than 1000 files',
+              target: 'Upload Stage 3',
+              value: more_than_200mb.length - less_than_1000_files.length,
+            })
+            sankeyData.links.push({
+              source: 'Less than 200 mb total folder size',
+              target: 'Upload Stage 3',
+              value: unique_contract_pks.length - more_than_200mb.length,
+            })
+
+            sankeyData.nodes.push({ name: 'Upload Stage 4', category: 'End' })
+            sankeyData.links.push({
+              source: 'Duplicate contract_pk',
+              target: 'Upload Stage 4',
+              value: unique_folders.length - unique_contract_pks.length,
+            })
+            sankeyData.links.push({
+              source: 'Duplicate Folder',
+              target: 'Upload Stage 4',
+              value: excelData.length - unique_folders.length,
             })
 
             drawSankey(sankeyData)
@@ -1248,7 +1292,9 @@ function drawSankey(data: SankeyData) {
   })
 
   // Defines a color scale.
-  const color = d3.scaleOrdinal(d3.schemeCategory10)
+  const color = d3
+    .scaleOrdinal(d3.schemeCategory10)
+    .domain(['Start', 'End', 'Good', 'Reject'])
 
   // Creates the rects that represent the nodes.
   const rect = svg
