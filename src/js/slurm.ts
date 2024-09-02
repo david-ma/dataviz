@@ -5,6 +5,7 @@ import {
   Chart,
   decorateTable,
   classifyName,
+  DataTableDataset,
   DataTableConfig,
 } from './chart'
 
@@ -255,33 +256,41 @@ function findUnique<T>(array: T[], keyFunction: (T) => string): T[] {
     .flat()
 }
 
-const tableOptions: DataTableConfig = {
-  titles: [
-    'contract_pk',
-    'run_id',
-    'total_file_size',
-    'total_file_count',
-    'secondary_analysis_analyst',
-    'first_approver',
-    'contract_folder_path',
-    'contract_sent',
-  ],
-  customRenderers: {
-    total_file_size: (j, i, d, k) => {
-      if (d && d.summary) {
-        return d.summary.total.file_size_human
-      } else {
-        return ''
-      }
+function decorateContractTable(dataset: DataTableDataset, element: string) {
+  dataset.forEach((row) => {
+    if (row.summary) {
+      row.total_file_count = parseInt(row.summary.total.file_count)
+      row.total_file_size_bytes = parseInt(row.summary.total.file_size_bytes)
+      row.total_file_size_display = row.summary.total.file_size_human
+    }
+  })
+
+  decorateTable(dataset, {
+    element,
+    titles: [
+      'contract_pk',
+      'run_id',
+      'total_file_size',
+      'total_file_count',
+      'secondary_analysis_analyst',
+      'first_approver',
+      'contract_folder_path',
+      'contract_sent',
+    ],
+    customData: {
+      total_file_size: {
+        sort: 'total_file_size_bytes',
+        display: 'total_file_size_display',
+      },
     },
-    total_file_count: (j, i, d, k) => {
-      if (d && d.summary) {
-        return d.summary.total.file_count
-      } else {
-        return ''
-      }
+    customRenderers: {
+      contract_pk: (j, i, d, k) => {
+        return `<a href="http://bioweb02.agrf.org.au/nextgenpipeline/admin/nextgenruns/contract/${
+          d.contract_pk.split('.')[0]
+        }/change/" target="_blank">${d.contract_pk}</a>`
+      },
     },
-  },
+  })
 }
 
 /**
@@ -340,14 +349,8 @@ function filter_list<T>({
     value: negative.length,
   })
 
-  decorateTable(positive, {
-    ...tableOptions,
-    element: `table#${names.positiveID}`,
-  })
-  decorateTable(negative, {
-    ...tableOptions,
-    element: `table#${names.negativeID}`,
-  })
+  decorateContractTable(positive, `table#${names.positiveID}`)
+  decorateContractTable(negative, `table#${names.negativeID}`)
 
   return positive
 }
@@ -400,10 +403,7 @@ d3.json('/clinical')
 
         // contract_pk,Log ID,Total File Size,Total File Count,Analyst,First Approver,Contract Folder Path,Date Sent,Command
 
-        decorateTable(excelData, {
-          ...tableOptions,
-          element: 'table#PurgeList',
-        })
+        decorateContractTable(excelData, 'table#PurgeList')
 
         const unique_folders = filter_list({
           data: excelData,

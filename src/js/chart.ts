@@ -1841,6 +1841,9 @@ export type DataTableConfig = DataTables.Config & {
   element?: string
   titles?: string[]
   render?: any
+  customData?: {
+    [key: string]: any
+  }
   customRenderers?: {
     // [key: string]: (any) => string
     [key: string]: any
@@ -1908,7 +1911,20 @@ function decorateTable(
         options.columns[index].render = newOptions.customRenderers[key]
       })
     }
+    if (newOptions.customData) {
+      Object.keys(newOptions.customData).forEach((key) => {
+        const index = options.columns.findIndex((d) => d.data === key)
+
+        console.log("Index is", index)
+        console.log(options.columns[index])
+
+        options.columns[index].data  = newOptions.customData[key]
+      })
+    }
   }
+
+  console.log('DataTable Options are', options)
+
   return $(element).DataTable(options)
 }
 

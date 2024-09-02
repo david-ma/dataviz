@@ -130,6 +130,9 @@ export type DataTableConfig = DataTables.Config & {
     element?: string;
     titles?: string[];
     render?: any;
+    customData?: {
+        [key: string]: any;
+    };
     customRenderers?: {
         [key: string]: any;
     };
