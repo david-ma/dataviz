@@ -743,6 +743,149 @@ if (hash === '#rsync') {
     })
 }
 
+// rsync -na --out-format='%l,%i,%M,%n' / /dev/null
+// rsync -naL --out-format='%l,%i,%M,%n' / /dev/null
+// rsync -na --exclude-from=exclude.txt --out-format='%l,%i,%M,%n' / /tmp > pi4_audit.txt
+//
+
+var filtered_files: {
+  [filter: string]: {
+    name: string
+    total_filesize: number
+    files: FileNode[]
+  }
+} = {}
+
+var filters: string[] = [
+  'node_modules',
+  'bower_components',
+  'AppData',
+  'Media/Games',
+  'Cache',
+  'Frameworks',
+  'Contents',
+  '/lib/',
+  'plugins/',
+  '.lrdata/',
+  '/.git/',
+  '/.metadata/',
+  '/common/',
+  '/.retroarch/',
+  '/iPhoto Library/Masters/',
+  '/.meteor/',
+  '/src/',
+  '/iPhoto Library/Database',
+  '/.',
+]
+
+filters.forEach((filter) => {
+  filtered_files[filter] = {
+    name: filter,
+    total_filesize: 0,
+    files: [],
+  }
+})
+
+if (hash === '#pi4') {
+  console.log('#pi4 selected, trying to process pi4_audit.txt')
+  d3.text(`/AGRF/pi4_audit.txt`)
+    .then((fileBody: string): FileNode[] =>
+      d3
+        .csvParseRows(fileBody)
+        .map(([bytes, rsync, timestamp, path]) => {
+          const data: FileNode = {
+            filesize: parseInt(bytes),
+            rsync,
+            timestamp,
+            path,
+            name: path.split('/').pop(),
+            filetype: path.split('.').pop().toLowerCase(),
+            filestatus: 'keep',
+          }
+
+          const filter = filters.find((filter) => path.indexOf(filter) !== -1)
+          if (filter) {
+            filtered_files[filter].total_filesize += data.filesize
+            filtered_files[filter].files.push(data)
+            return null
+          } else {
+            // return recordFile(data)
+            return data
+          }
+        })
+        .filter((d) => d !== null)
+    )
+    .then(d3.stratify<FileNode>().path((d) => d.path))
+    .then((root: d3.HierarchyNode<FileNode>) => {
+      // console.log('Here are the filtered files', filtered_files)
+      console.log('Here is the hierarchy', root)
+
+      // Object.entries(filtered_files).forEach(([filter, group]) => {
+      //   console.log('Filter', filter, human_readable_size(group.total_filesize))
+      // })
+
+      // var git_files: {
+      //   [folder: string]: {
+      //     total_filesize: number
+      //     files: FileNode[]
+      //   }
+      // } = {}
+
+      // filtered_files['/.git/'].files.forEach((file) => {
+      //   const parts = file.path.split('/')
+      //   const git_folder = parts[parts.indexOf('.git') - 1]
+      //   git_files[git_folder] = git_files[git_folder] || {
+      //     total_filesize: 0,
+      //     files: [],
+      //   }
+      //   git_files[git_folder].total_filesize += file.filesize
+      //   git_files[git_folder].files.push(file)
+      // })
+      // console.log('Git files', git_files)
+      // Object.entries(git_files).forEach(([folder, group]) => {
+      //   console.log(
+      //     'Git folder',
+      //     folder,
+      //     human_readable_size(group.total_filesize)
+      //   )
+      // })
+
+      // console.log(
+      //   'There are this many filetypes:',
+      //   Object.entries(filetypes).length
+      // )
+
+      console.log('Filetypes', filetypes)
+
+      root.sum((d: any) => {
+        return d ? d.filesize : 0
+      })
+
+      const box = d3.select('#filestructure')
+
+      // let shallow = getShallowHierarchy(root, 3)
+
+      // console.log("Here's the shallow hierarchy", shallow)
+
+      // drawDirs(shallow, box)
+      // drawDirs(box.datum(root))
+
+      // console.log('Test hierarchy', d3.hierarchy(hierarchy).depth)
+
+      const myChart = new Chart({
+        element: 'treemap',
+        margin: 10,
+      }).initTreemap({
+        hierarchy: root,
+        target: 'filesize',
+        color,
+      })
+
+      // Draw legend
+      // drawLegend(filetypes, d3.scaleOrdinal(d3.schemeCategory10))
+    })
+}
+
 if (hash === '#home') {
   console.log('#home selected, trying to process file_audit_full.csv')
   d3.text(`/AGRF/file_audit_full.csv`)
@@ -951,4 +1094,14 @@ function getFileStatus(node: d3.HierarchyNode<FileNode>) {
   }
 
   return data.filestatus
+}
+
+function human_readable_size(bytes) {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+  let i = 0
+  while (bytes >= 1024) {
+    bytes /= 1024
+    i++
+  }
+  return `${bytes.toFixed(2)} ${units[i]}`
 }

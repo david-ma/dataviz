@@ -113,6 +113,7 @@ declare class Chart {
         hierarchy: d3.HierarchyNode<any>;
         target: string;
         color?: d3.ScaleOrdinal<string, any>;
+        maxDepth?: number;
     }): this;
     initMap(): Promise<unknown>;
     drawMap(options: {

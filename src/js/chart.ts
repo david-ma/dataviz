@@ -1197,12 +1197,14 @@ class Chart {
     hierarchy: d3.HierarchyNode<any>
     target: string
     color?: d3.ScaleOrdinal<string, any>
+    maxDepth?: number
   }) {
     // console.log('initTreemap with TreemapData', this.data)
 
     const width = this.innerWidth,
       height = this.innerHeight,
-      svg = this.plot
+      svg = this.plot,
+      maxDepth = options.maxDepth || 8
 
     // svg.append('text').text(this.title)
 
@@ -1232,7 +1234,7 @@ class Chart {
     // use this information to add rectangles:
     svg
       .selectAll('rect.leaf')
-      .data(treemap.leaves())
+      .data(treemap.leaves().filter((d) => d.depth < maxDepth))
       .enter()
       .append('rect')
       .classed('leaf', true)
@@ -1253,7 +1255,10 @@ class Chart {
       })
 
     // console.log('descendants', treemap.descendants())
-    const folders = treemap.descendants().filter((d) => d.children)
+    const folders = treemap
+      .descendants()
+      .filter((d) => d.children)
+      .filter((d) => d.depth < maxDepth)
     // .filter((d) => d.depth === 2)
     // console.log('Folders', folders)
 
@@ -1915,10 +1920,10 @@ function decorateTable(
       Object.keys(newOptions.customData).forEach((key) => {
         const index = options.columns.findIndex((d) => d.data === key)
 
-        console.log("Index is", index)
+        console.log('Index is', index)
         console.log(options.columns[index])
 
-        options.columns[index].data  = newOptions.customData[key]
+        options.columns[index].data = newOptions.customData[key]
       })
     }
   }
