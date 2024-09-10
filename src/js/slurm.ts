@@ -289,8 +289,71 @@ function decorateContractTable(dataset: DataTableDataset, element: string) {
           d.contract_pk.split('.')[0]
         }/change/" target="_blank">${d.contract_pk}</a>`
       },
+      run_id: (data, type, row, meta) => {
+        var info = extract_info_from_folder(row.contract_folder_path),
+            log_id = `${info.flowcell}_${info.contract_id}`
+        return `<a href="#${data}" onclick="click_me('${log_id}')">${data}</a>`
+      },
     },
   })
+}
+
+globalThis.click_me = function (log_id : string) {
+  // @ts-ignore
+  toggleSlider("open")
+  d3.select(`#slideOutFooter div.content`).html('')
+
+  displayData(log_id)
+}
+
+function displayData(log_id: string) {
+  d3.select(`#slideOutFooter div.content`).append("div")
+  d3.json(`/AGRF/clinical/${log_id}.json`).then((d: ClinicalData) => {
+    drawTreeMap(d, log_id, `#slideOutFooter div.content div`)
+  })
+
+
+//   const inner_table = d3
+//   .select(`#clinical_row2-${log_id}`)
+//   .append('td')
+//   .attr('colspan', columns.length - 4)
+//   .append('table')
+
+// inner_table
+//   .append('thead')
+//   .append('tr')
+//   .selectAll('th')
+//   .data(['Type', 'Filepath', 'Size', 'Status', 'Level'])
+//   .enter()
+//   .append('th')
+//   .text((d) => d)
+
+// inner_table
+//   .append('tbody')
+//   .selectAll('tr')
+//   .data(
+//     d.files.filter((file) => file[4] !== 'included_folder')
+//   )
+//   .enter()
+//   .append('tr')
+//   .html((file) => {
+//     const file_relative_path = [
+//       file[1].split(contract_id).pop(),
+//       file[0],
+//     ]
+//       .join('/')
+//       .slice(1)
+
+//     const filetype = getFiletype(file[0])
+//     const size = human_readable_size(parseInt(file[2]))
+
+//     return `<td style="color: black; background:${color(
+//       filetype
+//     )}">${filetype}</td><td>${file_relative_path}</td><td>${size}</td><td>${
+//       file[4]
+//     }</td><td>${file[5]}</td>`
+//   })
+
 }
 
 /**

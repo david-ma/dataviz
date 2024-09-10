@@ -1,0 +1,54 @@
+<style>
+  #slideOutFooter {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 500px;
+    background-color: white;
+    color: black;
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.5s;
+    transform: translateY(100%);
+
+    #toggleButton {
+      position: absolute;
+      top: -40px;
+      height: 40px;
+      left: 20px;
+      width: 50px;
+      background-color: lightgray;
+      cursor: pointer;
+    }
+  }
+
+  #slideOutFooter.open {
+    transform: translateY(0);
+  }
+</style>
+
+<div id="slideOutFooter">
+  <div id="toggleButton"><button onclick="toggleSlider()">~</button></div>
+  <div class="content"></div>
+</div>
+
+
+<script>
+  // Bind ` key to toggleSlider()
+  $(document).keypress(function (e) {
+    if (e.which == 96) {
+      toggleSlider();
+    }
+  });
+
+  function toggleSlider(force = null) {
+    if (force == "open") {
+      $("#slideOutFooter").addClass("open");
+    } else if (force == "close") {
+      $("#slideOutFooter").removeClass("open");
+    } else {
+      $("#slideOutFooter").toggleClass("open");
+    }
+  }
+</script>
