@@ -9,6 +9,8 @@ import {
   DataTableConfig,
 } from './chart'
 
+import { drawDirs } from './files'
+
 const jobs: {
   [key: string]: Job[]
 } = {}
@@ -316,40 +318,19 @@ function displayData(log_id: string) {
       .append('div')
       .classed('col-xs-6', true)
       .attr('id', `footer-treemap-${log_id}`)
-    drawTreeMap(
-      d,
-      log_id,
-      `#slideOutFooter div.content div#footer-treemap-${log_id}`
-    )
 
-    let legend = row
+    row
       .append('div')
       .classed('col-xs-6', true)
+      .classed('filestructure', true)
       .attr('id', `footer-legend-${log_id}`)
-      .append('table')
 
-    legend.append('thead')
-      .append('tr')
-      .selectAll('th')
-      .data(['Type', 'Color'])
-      .enter()
-      .append('th')
-      .text((d) => d)
-
-    legend.append('tbody')
-      .selectAll('tr')
-      .data(d.files.map((file) => file[0]))
-      .enter()
-      .append('tr')
-      .html((d) => {
-        return `<td>${d}</td><td style="background:${color(d)}"></td>`
-      })
-
-      console.log("Data", d)
-    
-
-
-
+    drawTreeMap({
+      data: d,
+      log_id,
+      element_id: `#slideOutFooter div.content div#footer-treemap-${log_id}`,
+      legend_id: `#slideOutFooter div.content div#footer-legend-${log_id}`,
+    })
   })
 
   //   const inner_table = d3
@@ -865,7 +846,12 @@ d3.json('/clinical')
                     .append('div')
                     .classed('followScroll', true)
 
-                  drawTreeMap(d, log_id, `#clinical_row2-${log_id} td div`)
+                  drawTreeMap({
+                    data: d,
+                    log_id,
+                    element_id: `#clinical_row2-${log_id} td div`,
+                    legend_id: null,
+                  })
 
                   const inner_table = d3
                     .select(`#clinical_row2-${log_id}`)
@@ -1125,7 +1111,7 @@ Promise.all([
     })
 })
 
-function drawTreeMap(data, log_id, element_id) {
+function drawTreeMap({ data, log_id, element_id, legend_id }) {
   if (data.files.length === 0) {
     return
   }
@@ -1172,6 +1158,13 @@ function drawTreeMap(data, log_id, element_id) {
     target: 'filesize',
     color,
   })
+
+  if (legend_id) {
+    const legend = d3.select(legend_id).datum(root)
+
+    // @ts-ignore
+    drawDirs(legend)
+  }
 }
 
 function extract_info_from_folder(folder: string) {

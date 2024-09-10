@@ -66,8 +66,112 @@
   td.log_id_td.hideLinks p {
     display: inline;
   }
+
   #sankey {
     background: lightgray;
     padding: 15px;
+  }
+
+  .filestructure {
+    float: left;
+
+    p,
+    li {
+      margin: 0;
+    }
+
+    ul {
+      padding-left: 1 0px;
+      margin: 0;
+    }
+
+    summary.folder,
+    li.folder {
+      font-weight: bold;
+
+      span.foldername {
+        flex: auto;
+        flex-grow: 1;
+      }
+    }
+
+    li.file,
+    summary.folder,
+    li.folder {
+      display: flex;
+      justify-content: end;
+
+      span.filename,
+      span.foldername {
+        flex-grow: 1;
+      }
+
+      span.filename {
+        font-size: 0.8em;
+
+        overflow: scroll;
+        white-space: nowrap;
+      }
+
+      span.filesize,
+      span.fileStatus {
+        text-align: right;
+        margin-right: auto;
+      }
+
+      span.filesize {
+        min-width: 100px;
+        padding-left: 5px;
+      }
+
+      span.status {
+        display: inline-block;
+        width: 50px;
+        text-align: center;
+        padding: 2px;
+        font-size: 12px;
+        text-transform: capitalize;
+        font-weight: normal;
+        border-radius: 5px;
+
+        &.green {
+          color: white;
+          background-color: green;
+        }
+
+        &.yellow {
+          color: black;
+          background-color: yellow;
+        }
+
+        &.red {
+          color: white;
+          background-color: red;
+        }
+      }
+    }
+
+    summary {
+      cursor: pointer;
+    }
+
+    details {
+      margin: 0;
+      padding: 0;
+
+      li {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        padding-left: 5px;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        margin-bottom: 2px;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.2);
+        }
+      }
+    }
   }
 </style>

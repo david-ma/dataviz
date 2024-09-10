@@ -284,7 +284,7 @@ type ElementWithDatum<Datum> = d3.Selection<
   any
 >
 
-function drawDirs(selection: ElementWithDatum<d3.HierarchyNode<FileNode>>) {
+export function drawDirs(selection: ElementWithDatum<d3.HierarchyNode<FileNode>>) {
   const hierarchy = selection.datum()
   if (!hierarchy.data) {
     console.log('Error, no data on this node, creating one', hierarchy)
