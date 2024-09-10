@@ -291,69 +291,107 @@ function decorateContractTable(dataset: DataTableDataset, element: string) {
       },
       run_id: (data, type, row, meta) => {
         var info = extract_info_from_folder(row.contract_folder_path),
-            log_id = `${info.flowcell}_${info.contract_id}`
+          log_id = `${info.flowcell}_${info.contract_id}`
         return `<a href="#${data}" onclick="click_me('${log_id}')">${data}</a>`
       },
     },
   })
 }
 
-globalThis.click_me = function (log_id : string) {
+globalThis.click_me = function (log_id: string) {
   // @ts-ignore
-  toggleSlider("open")
+  toggleSlider('open')
   d3.select(`#slideOutFooter div.content`).html('')
 
   displayData(log_id)
 }
 
 function displayData(log_id: string) {
-  d3.select(`#slideOutFooter div.content`).append("div")
-  d3.json(`/AGRF/clinical/${log_id}.json`).then((d: ClinicalData) => {
-    drawTreeMap(d, log_id, `#slideOutFooter div.content div`)
+  const box = d3.select(`#slideOutFooter div.content`)
+  d3.json(`/AGRF/clinical/${log_id}.json`).then(function (d: ClinicalData) {
+    box.append('h2').text(log_id)
+    const row = box.append('div').classed('row', true)
+
+    row
+      .append('div')
+      .classed('col-xs-6', true)
+      .attr('id', `footer-treemap-${log_id}`)
+    drawTreeMap(
+      d,
+      log_id,
+      `#slideOutFooter div.content div#footer-treemap-${log_id}`
+    )
+
+    let legend = row
+      .append('div')
+      .classed('col-xs-6', true)
+      .attr('id', `footer-legend-${log_id}`)
+      .append('table')
+
+    legend.append('thead')
+      .append('tr')
+      .selectAll('th')
+      .data(['Type', 'Color'])
+      .enter()
+      .append('th')
+      .text((d) => d)
+
+    legend.append('tbody')
+      .selectAll('tr')
+      .data(d.files.map((file) => file[0]))
+      .enter()
+      .append('tr')
+      .html((d) => {
+        return `<td>${d}</td><td style="background:${color(d)}"></td>`
+      })
+
+      console.log("Data", d)
+    
+
+
+
   })
 
+  //   const inner_table = d3
+  //   .select(`#clinical_row2-${log_id}`)
+  //   .append('td')
+  //   .attr('colspan', columns.length - 4)
+  //   .append('table')
 
-//   const inner_table = d3
-//   .select(`#clinical_row2-${log_id}`)
-//   .append('td')
-//   .attr('colspan', columns.length - 4)
-//   .append('table')
+  // inner_table
+  //   .append('thead')
+  //   .append('tr')
+  //   .selectAll('th')
+  //   .data(['Type', 'Filepath', 'Size', 'Status', 'Level'])
+  //   .enter()
+  //   .append('th')
+  //   .text((d) => d)
 
-// inner_table
-//   .append('thead')
-//   .append('tr')
-//   .selectAll('th')
-//   .data(['Type', 'Filepath', 'Size', 'Status', 'Level'])
-//   .enter()
-//   .append('th')
-//   .text((d) => d)
+  // inner_table
+  //   .append('tbody')
+  //   .selectAll('tr')
+  //   .data(
+  //     d.files.filter((file) => file[4] !== 'included_folder')
+  //   )
+  //   .enter()
+  //   .append('tr')
+  //   .html((file) => {
+  //     const file_relative_path = [
+  //       file[1].split(contract_id).pop(),
+  //       file[0],
+  //     ]
+  //       .join('/')
+  //       .slice(1)
 
-// inner_table
-//   .append('tbody')
-//   .selectAll('tr')
-//   .data(
-//     d.files.filter((file) => file[4] !== 'included_folder')
-//   )
-//   .enter()
-//   .append('tr')
-//   .html((file) => {
-//     const file_relative_path = [
-//       file[1].split(contract_id).pop(),
-//       file[0],
-//     ]
-//       .join('/')
-//       .slice(1)
+  //     const filetype = getFiletype(file[0])
+  //     const size = human_readable_size(parseInt(file[2]))
 
-//     const filetype = getFiletype(file[0])
-//     const size = human_readable_size(parseInt(file[2]))
-
-//     return `<td style="color: black; background:${color(
-//       filetype
-//     )}">${filetype}</td><td>${file_relative_path}</td><td>${size}</td><td>${
-//       file[4]
-//     }</td><td>${file[5]}</td>`
-//   })
-
+  //     return `<td style="color: black; background:${color(
+  //       filetype
+  //     )}">${filetype}</td><td>${file_relative_path}</td><td>${size}</td><td>${
+  //       file[4]
+  //     }</td><td>${file[5]}</td>`
+  //   })
 }
 
 /**

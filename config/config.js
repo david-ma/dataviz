@@ -48,6 +48,18 @@ let config = {
                 res.end(JSON.stringify(images));
             });
         },
+        summary_jsons: function (res, req, db) {
+            const basePath = path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'summary_jsons');
+            if (!fs_1.default.existsSync(path_1.default.resolve(basePath))) {
+                res.end('No data');
+                return;
+            }
+            fsPromise
+                .readdir(path_1.default.resolve(basePath))
+                .then((files) => files.filter((d) => d.indexOf('.json') > -1))
+                .then((files) => files.map((d) => d.replace('.json.gz', '.json')))
+                .then((files) => res.end(JSON.stringify(files)));
+        },
         clinical: function (res, req) {
             const basePath = path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'clinical');
             if (!fs_1.default.existsSync(path_1.default.resolve(basePath))) {

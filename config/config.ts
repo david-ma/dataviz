@@ -56,6 +56,21 @@ let config: Thalia.WebsiteConfig = {
         res.end(JSON.stringify(images))
       })
     },
+    summary_jsons: function (res, req, db) {
+      const basePath = path.resolve(__dirname, '..', 'data', 'AGRF', 'summary_jsons')
+
+      if (!fs.existsSync(path.resolve(basePath))) {
+        res.end('No data')
+        return
+      }
+
+      fsPromise
+        .readdir(path.resolve(basePath))
+        .then((files) => files.filter((d) => d.indexOf('.json') > -1))
+        // .then((files) => files.filter((d) => d.indexOf('CAGRF') == -1)) // Non-standard IDs
+        .then((files) => files.map((d) => d.replace('.json.gz', '.json')))
+        .then((files) => res.end(JSON.stringify(files)))
+    },
     clinical: function (res, req) {
       const basePath = path.resolve(__dirname, '..', 'data', 'AGRF', 'clinical')
 
