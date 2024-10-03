@@ -137,13 +137,54 @@ function drawDashboard(data: PreflightData) {
   drawDataviz(dataviz, data)
 }
 
+const color = d3.scaleOrdinal(d3.schemeCategory10)
+
 function drawDataviz(
   dataviz: d3.Selection<HTMLDivElement, unknown, HTMLElement, any>,
   data: PreflightData
 ) {
-  var files = data.list.include.files
+  var contract = data.contract_dir.split('/').pop()
+  console.log('Contract: ', contract)
 
-  var svg = dataviz.append('svg').attr('width', 800).attr('height', 600)
+  var files = data.list.include.files.map((file) => {
+    var directory = file[1]
+    var filename = file[0]
 
-  
+    if (directory === '.') {
+      directory = contract
+    } else {
+      directory = contract + '/' + directory
+    }
+    var path = directory + '/' + filename
+
+    var filetype = filename.split('.').pop()
+
+    return {
+      name,
+      directory,
+      path,
+      filesize: file[2],
+      date_modified: file[3],
+      agrf_data_type: file[4],
+      agrf_data_level: file[5],
+      filetype,
+    }
+  })
+
+  dataviz.append('div').attr('id', 'treemap')
+
+  const root = d3.stratify().path((d: any) => d.path)(files)
+  root.sum((d: any) => (d ? d.filesize || 0 : 0))
+
+  const myChart = new Chart({
+    element: 'treemap',
+    margin: 5,
+    width: 600,
+    height: 400,
+    nav: false,
+  }).initTreemap({
+    hierarchy: root,
+    target: 'filesize',
+    color,
+  })
 }

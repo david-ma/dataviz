@@ -1280,8 +1280,8 @@ class Chart {
       .style('opacity', 0.5)
       .on('mouseover', function (event, d) {
         d3.select(this).classed('mouseover', true)
-        console.log('hey, mousing over folder', d)
-        console.log(d.data.name)
+        // console.log('hey, mousing over folder', d)
+        // console.log(d.data.name)
         // d3.select(`#rect-${d.data.id}`).attr('fill', 'red')
       })
       .on('mouseout', function (event, d) {
