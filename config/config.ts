@@ -57,7 +57,13 @@ let config: Thalia.WebsiteConfig = {
       })
     },
     summary_jsons: function (res, req, db) {
-      const basePath = path.resolve(__dirname, '..', 'data', 'AGRF', 'summary_jsons')
+      const basePath = path.resolve(
+        __dirname,
+        '..',
+        'data',
+        'AGRF',
+        'summary_jsons'
+      )
 
       if (!fs.existsSync(path.resolve(basePath))) {
         res.end('No data')
@@ -209,8 +215,19 @@ let config: Thalia.WebsiteConfig = {
                   (array, options) => array.split(',').map(options.fn).join('')
                 )
 
-                loadViewsAsPartials(views, router.handlebars)
-                router.res.end(template(data))
+                try {
+                  loadViewsAsPartials(views, router.handlebars)
+                  router.res.end(template(data))
+                } catch (error) {
+                  console.log('Error in dataviz/blog')
+                  console.log(error)
+                  router.res.end('Error loading content:<br>' + error.message)
+                }
+              },
+              (error) => {
+                console.log('Error in dataviz/blog')
+                console.log(error)
+                router.res.end('Error loading content')
               }
             )
           })

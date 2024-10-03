@@ -1,0 +1,98 @@
+{{> fontAwesome }}
+
+<style>
+  :root {
+    --dark: #17050e;
+    --light: #fff2da;
+
+    --yellow: #f9c836;
+    --pink: #e63b7a;
+    --blue: #596be1;
+    --navy: #181369;
+    --grey: #f9e6c3;
+
+    --bgCol: var(--light);
+    --textCol: var(--dark);
+
+    --frameBg: var(--pink);
+    --frameText: var(--dark);
+
+    --highlight: var(--yellow);
+
+    font-size: clamp(1.2rem, 2vw, 24px);
+  }
+
+  :root[data-theme='dark'] {
+    --bgCol: var(--dark);
+    --textCol: var(--light);
+
+    --highlight: var(--blue);
+
+    --grey: #2e0a1d;
+  }
+
+
+body {
+	background-color: var(--bgCol);
+	background-image:  linear-gradient(var(--grey) 1px, transparent 1px), linear-gradient(to right, var(--grey) 1px, var(--bgCol) 1px);
+	background-size: 20px 20px;
+
+	color: var(--textCol);
+
+	display: flex;
+	flex-flow: column;
+	justify-content: space-between;
+
+	width: 100%; height: 100vh;
+	margin: 0;
+	padding: 1em;
+
+	font-family: "Argent Pixel CF", serif;
+}
+
+
+</style>
+
+<button id="lightToggle" title="Toggle Light/Dark Mode">
+  <i id="lightIcon" class="fa-solid fa-sun" aria-hidden="true"></i>
+</button>
+
+<script>
+  if (typeof (theme) === 'undefined') { let theme = null; }
+  theme = localStorage.getItem('theme') || 'system';
+  document.documentElement.dataset.theme = theme;
+
+  // THEME TOGGLE
+  const buttonLight = document.getElementById('lightToggle');
+  const lightIcon = document.getElementById('lightIcon');
+  const emblem = document.getElementById('emblem');
+
+  if (theme == 'system') {
+    theme = (window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+  }
+
+  document.documentElement.dataset.theme = theme;
+  setTheme(theme);
+
+  function setTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    // Update Icons/Emblems
+    if (theme == 'light') {
+      lightIcon.classList.remove("fa-sun");
+      lightIcon.classList.add("fa-moon");
+    } else {
+      lightIcon.classList.remove("fa-moon");
+      lightIcon.classList.add("fa-sun");
+    }
+  }
+
+  buttonLight.addEventListener('click', () => {
+    theme = (theme == 'light') ? 'dark' : 'light';
+    localStorage.setItem('theme', theme);
+    setTheme(theme);
+  });
+
+
+  //TWEMOJI
+  // twemoji.parse(document.body)
+</script>

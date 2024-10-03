@@ -601,47 +601,47 @@ d3.json('/clinical')
               },
             })
 
-            sankeyData.nodes.push({ name: 'Upload Stage 1', category: 'End' })
+            sankeyData.nodes.push({ name: 'Upload Phase 1', category: 'End' })
 
             sankeyData.links.push({
               source: 'No BAM files',
-              target: 'Upload Stage 1',
+              target: 'Upload Phase 1',
               value: no_bams.length,
             })
 
-            sankeyData.nodes.push({ name: 'Upload Stage 2', category: 'End' })
+            sankeyData.nodes.push({ name: 'Upload Phase 2', category: 'End' })
             sankeyData.links.push({
               source: 'BAM files present',
-              target: 'Upload Stage 2',
+              target: 'Upload Phase 2',
               value: fullClinicalData.length - no_bams.length,
             })
 
-            sankeyData.nodes.push({ name: 'Upload Stage 3', category: 'End' })
+            sankeyData.nodes.push({ name: 'Upload Phase 3', category: 'End' })
             sankeyData.links.push({
               source: 'Dirty Project Folder',
-              target: 'Upload Stage 3',
+              target: 'Upload Phase 3',
               value: less_than_1000_files.length - clean_project_folder.length,
             })
             sankeyData.links.push({
               source: 'More than 1000 files',
-              target: 'Upload Stage 3',
+              target: 'Upload Phase 3',
               value: more_than_200mb.length - less_than_1000_files.length,
             })
             sankeyData.links.push({
               source: 'Less than 200 mb total folder size',
-              target: 'Upload Stage 3',
+              target: 'Upload Phase 3',
               value: unique_contract_pks.length - more_than_200mb.length,
             })
 
-            sankeyData.nodes.push({ name: 'Upload Stage 4', category: 'End' })
+            sankeyData.nodes.push({ name: 'Upload Phase 4', category: 'End' })
             sankeyData.links.push({
               source: 'Duplicate contract_pk',
-              target: 'Upload Stage 4',
+              target: 'Upload Phase 4',
               value: unique_folders.length - unique_contract_pks.length,
             })
             sankeyData.links.push({
               source: 'Duplicate Folder',
-              target: 'Upload Stage 4',
+              target: 'Upload Phase 4',
               value: excelData.length - unique_folders.length,
             })
 

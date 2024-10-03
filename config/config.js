@@ -175,8 +175,19 @@ let config = {
                         const template = router.handlebars.compile(views.blog);
                         (0, thalia_1.setHandlebarsContent)(views[router.path[0]], router.handlebars).then(() => {
                             router.handlebars.registerHelper('parseArray', (array, options) => array.split(',').map(options.fn).join(''));
-                            (0, thalia_1.loadViewsAsPartials)(views, router.handlebars);
-                            router.res.end(template(data));
+                            try {
+                                (0, thalia_1.loadViewsAsPartials)(views, router.handlebars);
+                                router.res.end(template(data));
+                            }
+                            catch (error) {
+                                console.log('Error in dataviz/blog');
+                                console.log(error);
+                                router.res.end('Error loading content:<br>' + error.message);
+                            }
+                        }, (error) => {
+                            console.log('Error in dataviz/blog');
+                            console.log(error);
+                            router.res.end('Error loading content');
                         });
                     });
                 });
