@@ -1,6 +1,6 @@
 console.log('hey, preflight.ts')
 
-import { d3 } from './chart'
+import { d3, Chart } from './chart'
 
 type FileInfo = [
   name: string,
@@ -81,13 +81,69 @@ var phases = d3
           .text((d) => d)
           .on('click', (event, file) => {
             d3.json(`/AGRF/preflight/preflight_${phase}/oct/${file}`).then(
-              (data: PreflightData) => {
-                console.log(data)
-                d3.select('#content_preview').html(
-                  `<pre>${JSON.stringify(data, null, 2)}</pre>`
-                )
-              }
+              drawDashboard
             )
           })
       })
   })
+
+d3.json(
+  `/AGRF/preflight/preflight_phase3.1/oct/22KMGGLT3_CAGRF24010125.json`
+).then(drawDashboard)
+
+function drawDashboard(data: PreflightData) {
+  d3.select('#preview').html(
+    `<h3>Preview</h3><pre>${JSON.stringify(data, null, 2)}</pre>`
+  )
+
+  var dashboard = d3.select('#dashboard').html('')
+  var summary = dashboard.append('div').attr('id', 'summary')
+  summary.append('h1').text('Summary')
+
+  var summaryTable = summary.append('table')
+  summaryTable
+    .append('thead')
+    .append('tr')
+    .selectAll('th')
+    .data(['', 'Size', 'File Count', 'Hidden Files', 'Symlinks'])
+    .enter()
+    .append('th')
+    .text((d) => d)
+
+  summaryTable
+    .append('tbody')
+    .selectAll('tr')
+    .data(Object.entries(data.summary))
+    .enter()
+    .append('tr')
+    .html(([name, data]) => {
+      if (Array.isArray(data)) {
+        return `
+          <td colspan="5">${data.join(' ')}</td>
+        `
+      }
+
+      return `
+        <td style="text-transform:capitalize">${name}</td>
+        <td>${data.file_size_human}</td>
+        <td>${data.file_count}</td>
+        <td>${data.hidden_count}</td>
+        <td>${data.symlink_count}</td>
+      `
+    })
+
+  var dataviz = dashboard.append('div').attr('id', 'dataviz')
+
+  drawDataviz(dataviz, data)
+}
+
+function drawDataviz(
+  dataviz: d3.Selection<HTMLDivElement, unknown, HTMLElement, any>,
+  data: PreflightData
+) {
+  var files = data.list.include.files
+
+  var svg = dataviz.append('svg').attr('width', 800).attr('height', 600)
+
+  
+}
