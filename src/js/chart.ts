@@ -1864,7 +1864,7 @@ export type DataTableDataset = Array<any> & {
 function decorateTable(
   dataset: DataTableDataset,
   newOptions?: DataTableConfig
-): DataTables.Api {
+): DataTables.Api<any> {
   const element = newOptions ? newOptions.element : '#dataset table'
 
   const columns = (

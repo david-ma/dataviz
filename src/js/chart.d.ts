@@ -143,7 +143,7 @@ export type DataTableDataset = Array<any> & {
     columns?: Array<string>;
     [key: string]: any;
 };
-declare function decorateTable(dataset: DataTableDataset, newOptions?: DataTableConfig): DataTables.Api;
+declare function decorateTable(dataset: DataTableDataset, newOptions?: DataTableConfig): DataTables.Api<any>;
 interface LoadingAnimation {
     animate: () => void;
     stop: (options?: {

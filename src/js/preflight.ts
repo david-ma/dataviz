@@ -1,6 +1,6 @@
 console.log('hey, preflight.ts')
 
-import { d3, Chart } from './chart'
+import { d3, Chart, decorateTable } from './chart'
 
 type FileInfo = [
   name: string,
@@ -69,27 +69,105 @@ var phases = d3
       .append('button')
       .text((d) => d)
       .on('click', (event, phase) => {
+        d3.select('#phaseTable').html('<table></table>')
+
         var files = phases[phase]
 
-        d3.select('#moreButtons').selectAll('button').remove()
+        var table = decorateTable(
+          files.map((file) => {
+            return {
+              file: file,
+            }
+          }),
+          {
+            element: '#phaseTable table',
+            paging: true,
+            pageLength: 10,
+            columns: [
+              {
+                data: 'file',
+                title: 'Summary File',
+                render: (data, type, row, meta) => {
+                  if (type === 'display') {
+                    return `<a href="#info" onclick="d3.json('/AGRF/preflight/preflight_${phase}/oct/${data}').then(drawDashboard)">${data}</a>`
+                  }
+                  return data
+                },
+              },
+              // {
+              //   data: 'contract_dir',
+              //   title: 'Contract',
+              // },
+              {
+                data: 'included',
+                title: 'Included Files',
+                render: (data, type, row, meta) => {
+                  if (row.summary) {
+                    return `${row.summary.include.file_count} files<br>${row.summary.include.file_size_human}`
+                  }
+                  return data
+                },
+              },
+              {
+                data: 'excluded',
+                title: 'Excluded Files',
+                render: (data, type, row, meta) => {
+                  if (row.summary) {
+                    return `${row.summary.exclude.file_count} files<br>${row.summary.exclude.file_size_human}`
+                  }
+                  return data
+                },
+              },
+              {
+                data: 'total',
+                title: 'Total Files',
+                render: (data, type, row, meta) => {
+                  if (row.summary) {
+                    return `${row.summary.total.file_count} files<br>${row.summary.total.file_size_human}`
+                  }
+                  return data
+                },
+              },
+              {
+                data: 'warnings',
+                title: 'Warnings',
+                render: (data, type, row, meta) => {
+                  if (row.summary) {
+                    return row.summary.warnings.join('<br>')
+                  }
+                  return data
+                },
+              },
+            ],
+          }
+        )
 
-        d3.select('#moreButtons')
-          .selectAll('button')
-          .data(files)
-          .enter()
-          .append('button')
-          .text((d) => d)
-          .on('click', (event, file) => {
-            d3.json(`/AGRF/preflight/preflight_${phase}/oct/${file}`).then(
-              drawDashboard
-            )
+        Promise.all(
+          files.map((file) =>
+            d3.json(`/AGRF/preflight/preflight_${phase}/oct/${file}`)
+          )
+        ).then((data) => {
+          console.log(data)
+          data.map((d: any) => {
+            return {
+              Files: d.contract_dir,
+            }
           })
+
+          data.forEach((d: any, i) => {
+            table.row(i).data({
+              ...d,
+              file: files[i],
+            })
+          })
+
+          table.draw()
+        })
       })
+      $('#buttons button').first().click()
   })
 
-d3.json(
-  `/AGRF/preflight/preflight_phase3.1/oct/22KMGGLT3_CAGRF24010125.json`
-).then(drawDashboard)
+globalThis.drawDashboard = drawDashboard
 
 function drawDashboard(data: PreflightData) {
   d3.select('#preview').html(
@@ -132,7 +210,10 @@ function drawDashboard(data: PreflightData) {
       `
     })
 
-  var dataviz = dashboard.append('div').attr('id', 'dataviz')
+  var dataviz = dashboard
+    .append('div')
+    .attr('id', 'dataviz')
+    .html('<h1>Data Viz</h1>')
 
   drawDataviz(dataviz, data)
 }
@@ -179,8 +260,8 @@ function drawDataviz(
   const myChart = new Chart({
     element: 'treemap',
     margin: 5,
-    width: 600,
-    height: 400,
+    width: 1000,
+    height: 2000,
     nav: false,
   }).initTreemap({
     hierarchy: root,
