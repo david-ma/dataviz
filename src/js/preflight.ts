@@ -148,35 +148,82 @@ var phases = d3
                   }
                   return data
                 },
-              }
-              
+              },
+              {
+                data: 'postflight',
+                title: 'Postflight Summary',
+                render: (data, type, row, meta) => {
+                  if (row.postflight) {
+                    return `${row.postflight.summary.include.object_count} files<br>${row.postflight.summary.include.file_size_human}`
+                  }
+                  return data
+                },
+              },
+              {
+                data: 'postflight',
+                title: 'Postflight Errors',
+                render: (data, type, row, meta) => {
+                  if (row.postflight) {
+                    return row.postflight.errors
+                  }
+                  return data
+                },
+              },
             ],
           }
         )
 
-        Promise.all(
-          files.map((file) =>
-            d3.json(`/AGRF/preflight/preflight_${phase}/oct/${file}`)
-          )
-        ).then((data) => {
-          console.log(data)
-          data.map((d: any) => {
+        Promise.all([
+          Promise.all(
+            files.map((file) =>
+              d3.json(`/AGRF/preflight/preflight_${phase}/oct/${file}`)
+            )
+          ),
+          Promise.all(
+            files.map((file) =>
+              d3
+                .json(
+                  `/AGRF/preflight/preflight_${phase}/postflight/${
+                    file.split('.')[0]
+                  }_aws.json`
+                )
+                .catch((error) => {
+                  // console.log("Error fetching postflight data", error)
+                  return {
+                    summary: {
+                      include: {
+                        object_count: 0,
+                        file_size_human: '0 bytes',
+                      },
+                    },
+                    error: file,
+                  }
+                })
+            )
+          ),
+        ]).then(([preflight_data, postflight_data]) => {
+          console.log('Preflight data', preflight_data)
+          console.log('Postflight data', postflight_data)
+
+          preflight_data.map((d: any, i) => {
             return {
               Files: d.contract_dir,
+              postflight: postflight_data[i],
             }
           })
 
-          data.forEach((d: any, i) => {
+          preflight_data.forEach((d: any, i) => {
             table.row(i).data({
               ...d,
               file: files[i],
+              postflight: postflight_data[i],
             })
           })
 
           table.draw()
         })
       })
-      $('#buttons button').first().click()
+    $('#buttons button').first().click()
   })
 
 globalThis.drawDashboard = drawDashboard
