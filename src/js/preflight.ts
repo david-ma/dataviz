@@ -69,7 +69,7 @@ var phases = d3
       .append('button')
       .text((d) => d)
       .on('click', (event, phase) => {
-        d3.select('#phaseTable').html('<table></table>')
+        d3.select('#phaseTable').html(`<h3>${phase}</h3><table></table>`)
 
         var files = phases[phase]
 
@@ -82,7 +82,8 @@ var phases = d3
           {
             element: '#phaseTable table',
             paging: true,
-            pageLength: 10,
+            pageLength: 100,
+            order: [[7, 'desc']],
             columns: [
               {
                 data: 'file',
@@ -102,8 +103,13 @@ var phases = d3
                 data: 'included',
                 title: 'Included Files',
                 render: (data, type, row, meta) => {
-                  if (row.summary) {
-                    return `${row.summary.include.file_count} files<br>${row.summary.include.file_size_human}`
+                  if (type === 'sort') {
+                    return row.summary.include.file_count
+                  }
+                  if (type === 'display') {
+                    if (row.summary) {
+                      return `${row.summary.include.file_count} files<br>${row.summary.include.file_size_human}`
+                    }
                   }
                   return data
                 },
@@ -112,8 +118,13 @@ var phases = d3
                 data: 'excluded',
                 title: 'Excluded Files',
                 render: (data, type, row, meta) => {
-                  if (row.summary) {
-                    return `${row.summary.exclude.file_count} files<br>${row.summary.exclude.file_size_human}`
+                  if (type === 'sort') {
+                    return row.summary.exclude.file_count
+                  }
+                  if (type === 'display') {
+                    if (row.summary) {
+                      return `${row.summary.exclude.file_count} files<br>${row.summary.exclude.file_size_human}`
+                    }
                   }
                   return data
                 },
@@ -122,8 +133,13 @@ var phases = d3
                 data: 'total',
                 title: 'Total Files',
                 render: (data, type, row, meta) => {
-                  if (row.summary) {
-                    return `${row.summary.total.file_count} files<br>${row.summary.total.file_size_human}`
+                  if (type === 'sort') {
+                    return row.summary.total.file_count
+                  }
+                  if (type === 'display') {
+                    if (row.summary) {
+                      return `${row.summary.total.file_count} files<br>${row.summary.total.file_size_human}`
+                    }
                   }
                   return data
                 },
@@ -132,8 +148,13 @@ var phases = d3
                 data: 'warnings',
                 title: 'Warnings',
                 render: (data, type, row, meta) => {
-                  if (row.summary) {
-                    return row.summary.warnings.join('<br>')
+                  if (type === 'sort') {
+                    return row.summary.warnings.length
+                  }
+                  if (type === 'display') {
+                    if (row.summary) {
+                      return row.summary.warnings.join('<br>')
+                    }
                   }
                   return data
                 },
@@ -153,8 +174,38 @@ var phases = d3
                 data: 'postflight',
                 title: 'Postflight Summary',
                 render: (data, type, row, meta) => {
-                  if (row.postflight) {
-                    return `${row.postflight.summary.include.object_count} files<br>${row.postflight.summary.include.file_size_human}`
+                  if (type === 'sort') {
+                    return row.postflight.summary.include.object_count
+                  }
+                  if (type === 'display') {
+                    if (row.postflight) {
+                      return `${row.postflight.summary.include.object_count} files<br>${row.postflight.summary.include.file_size_human}`
+                    }
+                  }
+                  return data
+                },
+              },
+              {
+                data: 'differences',
+                title: 'Differences',
+                render: (data, type, row, meta) => {
+                  var differences = 0
+                  if (row.summary) {
+                    differences =
+                      row.summary.include.file_count -
+                      row.postflight.summary.include.object_count
+                  }
+                  if (type === 'sort') {
+                    return Math.abs(differences)
+                  }
+                  if (type === 'display') {
+                    if (differences > 0) {
+                      return `+${differences} files`
+                    } else if (differences < 0) {
+                      return `${differences} files`
+                    } else {
+                      return 'No differences'
+                    }
                   }
                   return data
                 },
@@ -163,8 +214,13 @@ var phases = d3
                 data: 'postflight',
                 title: 'Postflight Errors',
                 render: (data, type, row, meta) => {
-                  if (row.postflight) {
-                    return row.postflight.errors
+                  if (type === 'sort') {
+                    return row.postflight.errors.length
+                  }
+                  if (type === 'display') {
+                    if (row.postflight) {
+                      return row.postflight.errors.join('<br>')
+                    }
                   }
                   return data
                 },
