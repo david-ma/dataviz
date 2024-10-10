@@ -48,6 +48,7 @@
     --textCol: var(--light);
 
     --highlight: var(--blue);
+    --frameText: var(--light);
 
     --grey: #2e0a1d;
   }
@@ -79,6 +80,8 @@
       padding: 1em;
       margin-top: 3em;
 
+      max-width: 80vw;
+
       table {
         th {
           background-color: var(--olive);
@@ -87,6 +90,16 @@
 
         background-color: var(--olivine);
         color: var(--frameText);
+
+        a {
+          color: var(--dark-moss-green);
+          font-weight: bold;
+          text-decoration: underline;
+        }
+
+        tr {
+          background-color: var(--grey);
+        }
 
         th {
           text-transform: capitalize;

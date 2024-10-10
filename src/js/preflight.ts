@@ -138,6 +138,18 @@ var phases = d3
                   return data
                 },
               },
+              {
+                data: 'file',
+                title: 'Postflight',
+                render: (data, type, row, meta) => {
+                  if (type === 'display') {
+                    var [log_id] = data.split('.')
+                    return `<a href="#info" onclick="d3.json('/AGRF/preflight/preflight_${phase}/postflight/${log_id}_aws.json').then(drawDashboard)">${log_id}_aws.json</a>`
+                  }
+                  return data
+                },
+              }
+              
             ],
           }
         )
