@@ -159,6 +159,22 @@ var phases = d3
                   return data
                 },
               },
+              // {
+              //   data: 'file',
+              //   title: 'Small Files',
+              //   render: (data, type, row, meta) => {
+              //     if (row && row.summary && type === 'display') {
+              //       if (row.summary) {  
+              //       return row.summary.include.files.reduce((acc, file) => {
+              //         if (file[2] < 32000) {
+              //           acc++
+              //         }
+              //         return acc
+              //       }, 0)
+              //     }
+              //     return data
+              //   },
+              // },
               {
                 data: 'file',
                 title: 'Postflight',
@@ -333,7 +349,15 @@ function drawDashboard(data: PreflightData) {
   drawDataviz(dataviz, data)
 }
 
-const color = d3.scaleOrdinal(d3.schemeCategory10)
+// const color = d3.scaleOrdinal(d3.schemeCategory10)
+const color = d3.scaleOrdinal([
+  '#FFFFFF', // white
+  '#0100F5', // blue
+  '#FE0000', // red
+  '#F8D400', // yellow
+  '#D3D3D3', // grey
+  '#000', // black
+])
 
 function drawDataviz(
   dataviz: d3.Selection<HTMLDivElement, unknown, HTMLElement, any>,
@@ -375,8 +399,8 @@ function drawDataviz(
   const myChart = new Chart({
     element: 'treemap',
     margin: 5,
-    width: 1000,
-    height: 2000,
+    width: 500,
+    height: 1000,
     nav: false,
   }).initTreemap({
     hierarchy: root,
