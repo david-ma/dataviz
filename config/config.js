@@ -48,6 +48,19 @@ let config = {
                 res.end(JSON.stringify(images));
             });
         },
+        lims_logs: function (res, req, db) {
+            const basePath = path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'IISLogs');
+            if (!fs_1.default.existsSync(path_1.default.resolve(basePath))) {
+                res.end('No data');
+                return;
+            }
+            fsPromise
+                .readdir(path_1.default.resolve(basePath))
+                .then((files) => files.filter((d) => d.indexOf('.log.gz') > -1))
+                .then((files) => files.map((d) => d.replace('.log.gz', '.log')))
+                .then((files) => files.slice(1103, 2000))
+                .then((files) => res.end(JSON.stringify(files)));
+        },
         summary_jsons: function (res, req, db) {
             const basePath = path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'summary_jsons');
             if (!fs_1.default.existsSync(path_1.default.resolve(basePath))) {
