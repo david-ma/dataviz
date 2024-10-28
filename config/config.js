@@ -48,6 +48,28 @@ let config = {
                 res.end(JSON.stringify(images));
             });
         },
+        dashboard_data: function (res, req, db) {
+            const phases = [
+                'phase0',
+                'phase1',
+                'phase2',
+                'phase3',
+                'phase4',
+                'phase5',
+                'phase6',
+            ];
+            Promise.all(phases.map((phase) => {
+                return fsPromise
+                    .readdir(path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'dashboard', phase, 'preflight_light'))
+                    .then((files) => {
+                    return files
+                        .filter((d) => d.indexOf('.json') > -1)
+                        .map((d) => d.replace('.json.gz', '.json'));
+                });
+            })).then((results) => {
+                res.end(JSON.stringify(results));
+            });
+        },
         lims_logs: function (res, req, db) {
             const basePath = path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'IISLogs');
             if (!fs_1.default.existsSync(path_1.default.resolve(basePath))) {

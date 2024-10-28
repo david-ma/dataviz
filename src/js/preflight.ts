@@ -90,7 +90,14 @@ var phases = d3
                 title: 'Summary File',
                 render: (data, type, row, meta) => {
                   if (type === 'display') {
-                    return `<a href="#info" onclick="d3.json('/AGRF/preflight/preflight_${phase}/oct/${data}').then(drawDashboard)">${data}</a>`
+                    var output = `<a href="#info" onclick="d3.json('/AGRF/preflight/preflight_${phase}/oct/${data}').then(drawDashboard)">${data}</a>`
+
+                    if (row.postflight) {
+                      output += `<br>
+                    <a href="https://ap-southeast-2.console.aws.amazon.com/s3/buckets/agrf-prod-ngs-archive-analysis-c7c686d?region=ap-southeast-2&bucketType=general&prefix=${row.postflight.prefix}/&showversions=false" target="_blank">AWS S3 Folder</a>`
+                    }
+
+                    return output
                   }
                   return data
                 },

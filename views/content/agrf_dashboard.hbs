@@ -1,0 +1,29 @@
+{{> clean }}
+{{> require }}
+{{> tableCSS }}
+
+
+<style>
+  span.green {
+    color: green;
+  }
+  span.red {
+    color: red;
+  }
+</style>
+
+<div style="margin-top:5px;">
+  <button onclick="toggle_links()">Toggle Links</button>
+  <button onclick="disable_dark_mode()">Disable Dark Mode</button>
+</div>
+
+<div id="sankey"></div>
+
+<div id="my_table_wrapper">
+  <table id="my_table">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+
