@@ -51,12 +51,6 @@ let config = {
         dashboard_data: function (res, req, db) {
             const phases = [
                 'phase0',
-                'phase1',
-                'phase2',
-                'phase3',
-                'phase4',
-                'phase5',
-                'phase6',
             ];
             Promise.all(phases.map((phase) => {
                 return fsPromise

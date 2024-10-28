@@ -59,12 +59,12 @@ let config: Thalia.WebsiteConfig = {
     dashboard_data: function (res, req, db) {
       const phases = [
         'phase0',
-        'phase1',
-        'phase2',
-        'phase3',
-        'phase4',
-        'phase5',
-        'phase6',
+        // 'phase1',
+        // 'phase2',
+        // 'phase3',
+        // 'phase4',
+        // 'phase5',
+        // 'phase6',
       ]
 
       Promise.all(

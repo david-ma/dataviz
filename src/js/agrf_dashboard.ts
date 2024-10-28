@@ -11,6 +11,9 @@ import {
   _,
 } from './chart'
 
+var globalData = []
+var summary_data = []
+
 d3.json('/dashboard_data').then((phases: string[][]) => {
   Promise.all(
     phases.map((phase, i) => {
@@ -50,32 +53,100 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
 
       data.forEach(function (folder, i) {
         d3.json(folder.aws).then((aws_data) => {
-          table.row(i).data({
-            ...folder,
-            aws_files: aws_data,
-          })
+          folder.aws_files = aws_data
+          table.row(i).data(folder)
           _.debounce(table.draw, 500)()
+
+          globalData = data
+          _.debounce(summarise, 500)()
         })
       })
-      return data
-    }).then((data) => {
-      const counter = {}
-      data.forEach((folder) => {
-        counter[folder.phase] = counter[folder.phase] || {
-          include_files: 0,
-          include_size: 0,
-          aws_objects: 0,
-          aws_size: 0,
-        }
-        counter[folder.phase].include_files += folder.include_file_count
-        counter[folder.phase].include_size += folder.include_file_size_bytes
-        // counter[folder.phase].aws_objects += folder.aws_files.summary.total.object_count
-        // counter[folder.phase].aws_size += folder.aws_files.summary.total.file_size_bytes
-      })
+      // return data
+      // Promise.all(
+      //   data.map(function (folder, i) {
+      //     return d3.json(folder.aws).then(function (aws_data) {
+      //       table.row(i).data({
+      //         ...folder,
+      //         aws_files: aws_data,
+      //       })
+      //       _.debounce(table.draw, 500)()
+      //     }).then((aws_data) => {
+      //       return {
+      //         ...folder,
+      //         aws_files: aws_data,
+      //       }
+      //     })
+      //   })
+      // ).then(function (data) {
 
-      console.log(counter)
+      //   const counter = {}
+      //   data.forEach((folder) => {
+      //     counter[folder.phase] = counter[folder.phase] || {
+      //       include_files: 0,
+      //       include_size: 0,
+      //       aws_objects: 0,
+      //       aws_size: 0,
+      //     }
+      //     counter[folder.phase].include_files += folder.include_file_count
+      //     counter[folder.phase].include_size += folder.include_file_size_bytes
+      //     counter[folder.phase].aws_objects += folder.aws_files.summary.total.object_count
+      //     counter[folder.phase].aws_size += folder.aws_files.summary.total.file_size_bytes
+      //   })
+
+      //   console.log(counter)
+      // })
     })
 })
+
+const summaryTable = decorateTable(summary_data, {
+  element: 'table#summary_table',
+  titles: [
+    'phase',
+    'total_files',
+    'include_files',
+    'aws_files',
+    'include_files_size',
+    'aws_size',
+  ],
+})
+
+// var summary = drawSummary(data)
+
+function summarise() {
+  globalData.forEach((folder) => {
+    var phase = folder.phase.slice(-1)
+    summary_data[phase] = summary_data[phase] || {
+      phase: `phase${phase}`,
+      total_files: 0,
+      include_files: 0,
+      aws_files: 0,
+    }
+
+    summary_data[phase].total_files += folder.total_file_count
+    summary_data[phase].include_files += folder.include_file_count
+    summary_data[phase].include_files_size = folder.include_file_size_bytes
+    if (folder.aws_files) {
+      summary_data[phase].aws_files += folder.aws_files.summary.total.object_count
+      summary_data[phase].aws_size = folder.aws_files.summary.total.file_size_bytes
+    }
+  })
+
+  summaryTable.clear()
+  summaryTable.rows.add(summary_data)
+
+  console.log("Drawing summary")
+  summaryTable.draw()
+
+  // return decorateTable(summary_data, {
+  //   element: 'table#summary_table',
+  //   titles: [
+  //     'phase',
+  //     'total_files',
+  //     'include_files',
+  //     'aws_files',
+  //   ],
+  // })
+}
 
 function drawTable(dataset: DataTableDataset) {
   dataset.forEach((row) => {
@@ -108,12 +179,35 @@ function drawTable(dataset: DataTableDataset) {
     }
   })
 
-  var table = decorateTable(dataset, {
+  return decorateTable(dataset, {
     element: 'table#my_table',
-    titles: ['phase', 'log_id', 'total_files', 'include_files', 'aws_files', 'difference'],
+    titles: [
+      'phase',
+      'log_id',
+      'total_files',
+      'include_files',
+      'aws_files',
+      'difference',
+    ],
     info: true,
     search: true,
     searching: true,
+    // footerCallback: function (row, data, start, end, display) {
+    //   console.log('hey')
+    //   if (display === undefined) {
+    //     return
+    //   }
+    //   console.log("Displaying", display)
+    //   console.log("Data", data)
+    //   console.log("Row", row)
+    //   console.log("Start", start)
+    //   console.log("End", end)
+    //   var api = this.api()
+    //   console.log(api)
+    //   var total = api.column(2).data().reduce(function (a, b) {
+    //     return a + b
+    //   }, 0)
+    // },
     paging: true,
     pageLength: 10,
     customData: {
@@ -124,7 +218,7 @@ function drawTable(dataset: DataTableDataset) {
       include_files: {
         sort: 'include_file_size_bytes',
         display: 'include_file_size_display',
-      }
+      },
     },
     customRenderers: {
       total_files: (data, type, row, meta) => {
@@ -143,19 +237,22 @@ function drawTable(dataset: DataTableDataset) {
         if (row.aws_files === undefined) {
           return 'Loading...'
         }
-        const match = row.aws_files.summary.total.object_count == row.include_file_count ? 'green' : 'red'
+        const match =
+          row.aws_files.summary.total.object_count == row.include_file_count
+            ? 'green'
+            : 'red'
         return `<span class="${match}">${row.aws_files.summary.total.object_count}<br>${row.aws_files.summary.total.file_size_human}</span>`
       },
       difference: (data, type, row, meta) => {
         if (row.aws_files === undefined) {
           return 'Loading...'
         }
-        const diff = row.include_file_count - row.aws_files.summary.total.object_count
+        const diff =
+          row.include_file_count - row.aws_files.summary.total.object_count
         return diff
-      }
+      },
     },
   })
-  return table
 }
 
 // import { drawDirs } from './files'
