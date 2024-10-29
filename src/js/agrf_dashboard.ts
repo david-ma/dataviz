@@ -49,16 +49,17 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
     )
     .then((data) => {
       var table = drawTable(data)
+      const debouncedDraw = _.debounce(table.draw, 200)
       console.log(data)
 
       data.forEach(function (folder, i) {
         d3.json(folder.aws).then((aws_data) => {
           folder.aws_files = aws_data
           table.row(i).data(folder)
-          _.debounce(table.draw, 500)()
+          debouncedDraw()
 
           globalData = data
-          _.debounce(summarise, 500)()
+          debouncedSummarise()
         })
       })
       // return data
@@ -112,6 +113,7 @@ const summaryTable = decorateTable(summary_data, {
 
 // var summary = drawSummary(data)
 
+const debouncedSummarise = _.debounce(summarise, 200)
 function summarise() {
   globalData.forEach((folder) => {
     var phase = folder.phase.slice(-1)
@@ -126,26 +128,17 @@ function summarise() {
     summary_data[phase].include_files += folder.include_file_count
     summary_data[phase].include_files_size = folder.include_file_size_bytes
     if (folder.aws_files) {
-      summary_data[phase].aws_files += folder.aws_files.summary.total.object_count
-      summary_data[phase].aws_size = folder.aws_files.summary.total.file_size_bytes
+      summary_data[phase].aws_files +=
+        folder.aws_files.summary.total.object_count
+      summary_data[phase].aws_size =
+        folder.aws_files.summary.total.file_size_bytes
     }
   })
 
   summaryTable.clear()
   summaryTable.rows.add(summary_data)
 
-  console.log("Drawing summary")
   summaryTable.draw()
-
-  // return decorateTable(summary_data, {
-  //   element: 'table#summary_table',
-  //   titles: [
-  //     'phase',
-  //     'total_files',
-  //     'include_files',
-  //     'aws_files',
-  //   ],
-  // })
 }
 
 function drawTable(dataset: DataTableDataset) {
@@ -164,18 +157,6 @@ function drawTable(dataset: DataTableDataset) {
       var matches = row.contract_dir.match(regex)
 
       row.log_id = `${matches[3]}_${matches[4]}`
-
-      // row.aws_files = loadAwsData(row.log_id, row.aws).then((data) => {
-      // waitForData(row.log_id, row.aws).then((data) => {
-      //   row.aws_files = data
-      // })
-      // row.aws_files = waitForData(row.log_id, row.aws).then((data) => {
-      //   console.log('Got some data')
-      //   row.aws_data = data
-      //   // return "LOL"
-      // })
-
-      // row.log_id = row.contract_dir.split('/').pop()
     }
   })
 
@@ -192,22 +173,6 @@ function drawTable(dataset: DataTableDataset) {
     info: true,
     search: true,
     searching: true,
-    // footerCallback: function (row, data, start, end, display) {
-    //   console.log('hey')
-    //   if (display === undefined) {
-    //     return
-    //   }
-    //   console.log("Displaying", display)
-    //   console.log("Data", data)
-    //   console.log("Row", row)
-    //   console.log("Start", start)
-    //   console.log("End", end)
-    //   var api = this.api()
-    //   console.log(api)
-    //   var total = api.column(2).data().reduce(function (a, b) {
-    //     return a + b
-    //   }, 0)
-    // },
     paging: true,
     pageLength: 10,
     customData: {
@@ -221,6 +186,9 @@ function drawTable(dataset: DataTableDataset) {
       },
     },
     customRenderers: {
+      log_id: (data, type, row, meta) => {
+        return `${row.log_id}<br>${row.contract_dir}`
+      },
       total_files: (data, type, row, meta) => {
         if (row.total_file_count === undefined) {
           return 'Loading...'
