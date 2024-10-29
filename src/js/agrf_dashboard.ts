@@ -11,9 +11,6 @@ import {
   _,
 } from './chart'
 
-var globalData = []
-var summary_data = []
-
 d3.json('/dashboard_data').then((phases: string[][]) => {
   Promise.all(
     phases.map((phase, i) => {
@@ -40,7 +37,10 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
     .then((data) =>
       data.reduce((acc, phase) => {
         phase
-          .filter((d) => d.contract_dir)
+          // Data must have a contract_dir folder
+          .filter((folder) => folder.contract_dir)
+          // If one of the warnings says that it's a symlink, we should exclude it
+          .filter((folder) => !folder.summary.warnings.includes('Contract directory is a symlink'))
           .forEach((folder) => {
             acc.push(folder)
           })
@@ -52,14 +52,72 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
       const debouncedDraw = _.debounce(table.draw, 200)
       console.log(data)
 
+      var summary_data = []
+
+      const summaryTable = decorateTable(summary_data, {
+        element: 'table#summary_table',
+        titles: [
+          'phase',
+          'total_files',
+          'include_files',
+          'aws_files',
+          'include_files_size',
+          'aws_size',
+        ],
+        customRenderers: {
+          include_files_size: (data, type, row, meta) => {
+            return `${row.include_files_size} bytes<br>${human_readable_size(
+              row.include_files_size
+            )}`
+          },
+          aws_size: (data, type, row, meta) => {
+            return `${row.aws_size} bytes<br>${human_readable_size(
+              row.aws_size
+            )}`
+          },
+        },
+      })
+
+      // var summary = drawSummary(data)
+
+      const summarise = _.debounce(function (data) {
+        console.log('Summarising')
+        console.log(data)
+        const summary_data = []
+        data.forEach((folder) => {
+          var phase = folder.phase.slice(-1)
+          summary_data[phase] = summary_data[phase] || {
+            phase: `phase${phase}`,
+            total_files: 0,
+            include_files: 0,
+            aws_files: 0,
+          }
+
+          summary_data[phase].total_files += folder.total_file_count
+          summary_data[phase].include_files += folder.include_file_count
+          summary_data[phase].include_files_size =
+            folder.include_file_size_bytes
+          if (folder.aws_files) {
+            summary_data[phase].aws_files +=
+              folder.aws_files.summary.total.object_count
+            summary_data[phase].aws_size =
+              folder.aws_files.summary.total.file_size_bytes
+          }
+        })
+
+        summaryTable.clear()
+        summaryTable.rows.add(summary_data)
+
+        summaryTable.draw()
+      }, 200)
+
       data.forEach(function (folder, i) {
         d3.json(folder.aws).then((aws_data) => {
           folder.aws_files = aws_data
           table.row(i).data(folder)
           debouncedDraw()
 
-          globalData = data
-          debouncedSummarise()
+          summarise(data)
         })
       })
       // return data
@@ -98,48 +156,6 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
       // })
     })
 })
-
-const summaryTable = decorateTable(summary_data, {
-  element: 'table#summary_table',
-  titles: [
-    'phase',
-    'total_files',
-    'include_files',
-    'aws_files',
-    'include_files_size',
-    'aws_size',
-  ],
-})
-
-// var summary = drawSummary(data)
-
-const debouncedSummarise = _.debounce(summarise, 200)
-function summarise() {
-  globalData.forEach((folder) => {
-    var phase = folder.phase.slice(-1)
-    summary_data[phase] = summary_data[phase] || {
-      phase: `phase${phase}`,
-      total_files: 0,
-      include_files: 0,
-      aws_files: 0,
-    }
-
-    summary_data[phase].total_files += folder.total_file_count
-    summary_data[phase].include_files += folder.include_file_count
-    summary_data[phase].include_files_size = folder.include_file_size_bytes
-    if (folder.aws_files) {
-      summary_data[phase].aws_files +=
-        folder.aws_files.summary.total.object_count
-      summary_data[phase].aws_size =
-        folder.aws_files.summary.total.file_size_bytes
-    }
-  })
-
-  summaryTable.clear()
-  summaryTable.rows.add(summary_data)
-
-  summaryTable.draw()
-}
 
 function drawTable(dataset: DataTableDataset) {
   dataset.forEach((row) => {
@@ -1091,16 +1107,16 @@ function drawTable(dataset: DataTableDataset) {
 //     data.forEach((d) => {})
 //   })
 
-// function human_readable_size(bytes: number) {
-//   const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
-//   let i = 0
-//   while (bytes >= 1024) {
-//     bytes /= 1024
-//     i++
-//   }
-//   // return `${bytes.toFixed(2)} ${units[i]}`
-//   return `${bytes.toFixed(2)} ${units[i]}`
-// }
+function human_readable_size(bytes: number) {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+  let i = 0
+  while (bytes >= 1024) {
+    bytes /= 1024
+    i++
+  }
+  // return `${bytes.toFixed(2)} ${units[i]}`
+  return `${bytes.toFixed(2)} ${units[i]}`
+}
 
 // // d3.json(`/AGRF/clinical_jsons/${log_id}.json`).then(
 // // )
