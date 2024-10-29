@@ -1,15 +1,6 @@
 console.log('Hello world')
 
-import { difference } from 'lodash'
-import {
-  d3,
-  Chart,
-  decorateTable,
-  classifyName,
-  DataTableDataset,
-  DataTableConfig,
-  _,
-} from './chart'
+import { d3, decorateTable, DataTableDataset, _ } from './chart'
 
 d3.json('/dashboard_data').then((phases: string[][]) => {
   Promise.all(
@@ -40,7 +31,12 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
           // Data must have a contract_dir folder
           .filter((folder) => folder.contract_dir)
           // If one of the warnings says that it's a symlink, we should exclude it
-          .filter((folder) => !folder.summary.warnings.includes('Contract directory is a symlink'))
+          .filter(
+            (folder) =>
+              !folder.summary.warnings.includes(
+                'Contract directory is a symlink'
+              )
+          )
           .forEach((folder) => {
             acc.push(folder)
           })
@@ -115,8 +111,9 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
         d3.json(folder.aws).then((aws_data) => {
           folder.aws_files = aws_data
           table.row(i).data(folder)
-          debouncedDraw()
 
+          globalData[folder.log_id] = folder
+          debouncedDraw()
           summarise(data)
         })
       })
@@ -156,6 +153,8 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
       // })
     })
 })
+
+const globalData = {}
 
 function drawTable(dataset: DataTableDataset) {
   dataset.forEach((row) => {
@@ -203,7 +202,7 @@ function drawTable(dataset: DataTableDataset) {
     },
     customRenderers: {
       log_id: (data, type, row, meta) => {
-        return `${row.log_id}<br>${row.contract_dir}`
+        return `<a href="#none" onclick="displayFiles('${row.log_id}')">${row.log_id}</a><br>${row.contract_dir}`
       },
       total_files: (data, type, row, meta) => {
         if (row.total_file_count === undefined) {
@@ -237,6 +236,68 @@ function drawTable(dataset: DataTableDataset) {
       },
     },
   })
+}
+
+globalThis.displayFiles = function displayFiles(log_id) {
+  console.log('Displaying files for', log_id)
+
+  const tableBody = d3.select('#files_table tbody').html('')
+
+  let original_files = []
+  let intersection = []
+  let aws_files = []
+
+  d3.json(globalData[log_id].full)
+    .then((full) => {
+      globalData[log_id].full_data = full
+      const data = globalData[log_id]
+      console.log(data)
+
+      // Remove /data/Analysis/ from the path
+      const base_dir = data.contract_dir.replace('/data/Analysis/', '')
+      // Normalise path so that /./ is removed
+      original_files = data.full_data.list.include.files
+        .map(([filename, relative_path, ...rest]) =>
+          `${base_dir}/${relative_path}/${filename}`.replace('/./', '/')
+        )
+        .sort()
+
+      // Symlinks?
+      // data.full_data.list.include.symlink
+
+      // original_files = data.full_data.list.include.files.map(([filename, relative_path, ...rest]) => `${base_dir}/${relative_path}/${filename}`).sort()
+      aws_files = data.aws_files.list.include
+        .map((s3_object) => s3_object.Key)
+        .sort()
+
+      // Get the union of both files
+      intersection = _.intersection(original_files, aws_files)
+
+      const aws_only = _.difference(aws_files, original_files)
+      const original_only = _.difference(original_files, aws_files)
+
+      return {
+        original_only,
+        aws_only,
+        intersection,
+      }
+    })
+    .then(({ original_only, aws_only, intersection }) => {
+      console.log('Displaying files', { original_only, aws_only, intersection })
+
+      const max_length = Math.max(
+        original_only.length,
+        aws_only.length,
+        intersection.length
+      )
+
+      for (let i = 0; i < max_length; i++) {
+        const row = tableBody.append('tr')
+        row.append('td').text(original_only[i] || '')
+        row.append('td').text(intersection[i] || '')
+        row.append('td').text(aws_only[i] || '')
+      }
+    })
 }
 
 // import { drawDirs } from './files'
