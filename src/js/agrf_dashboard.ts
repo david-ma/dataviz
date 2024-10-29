@@ -256,14 +256,16 @@ globalThis.displayFiles = function displayFiles(log_id) {
       // Remove /data/Analysis/ from the path
       const base_dir = data.contract_dir.replace('/data/Analysis/', '')
       // Normalise path so that /./ is removed
-      original_files = data.full_data.list.include.files
+      original_files = _.concat(
+        data.full_data.list.include.files,
+        data.full_data.list.include.symlinks
+      )
         .map(([filename, relative_path, ...rest]) =>
           `${base_dir}/${relative_path}/${filename}`.replace('/./', '/')
         )
         .sort()
 
       // Symlinks?
-      // data.full_data.list.include.symlink
 
       // original_files = data.full_data.list.include.files.map(([filename, relative_path, ...rest]) => `${base_dir}/${relative_path}/${filename}`).sort()
       aws_files = data.aws_files.list.include
