@@ -162,7 +162,7 @@ function drawTable(dataset: DataTableDataset) {
       row.total_file_count = parseInt(row.summary.total.file_count)
       row.total_file_size_bytes = parseInt(row.summary.total.file_size_bytes)
       row.total_file_size_display = row.summary.total.file_size_human
-      row.include_file_count = parseInt(row.summary.include.file_count)
+      row.include_file_count = parseInt(row.summary.include.file_count) + parseInt(row.summary.include.symlink_count)
       row.include_file_size_bytes = parseInt(
         row.summary.include.file_size_bytes
       )
