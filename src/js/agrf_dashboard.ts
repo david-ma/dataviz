@@ -1,5 +1,6 @@
 console.log('Hello world')
 
+import { sort } from 'd3'
 import { d3, decorateTable, DataTableDataset, _ } from './chart'
 
 d3.json('/dashboard_data').then((phases: string[][]) => {
@@ -79,27 +80,38 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
       const summarise = _.debounce(function (data) {
         console.log('Summarising')
         console.log(data)
-        const summary_data = []
-        data.forEach((folder) => {
-          var phase = folder.phase.slice(-1)
-          summary_data[phase] = summary_data[phase] || {
+        const summary_data = [0,1,2,3,4,5,6].map((phase) => {
+          return {
             phase: `phase${phase}`,
             total_files: 0,
             include_files: 0,
+            include_files_size: 0,
             aws_files: 0,
+            aws_size: 0,
           }
+        })
+        data.forEach((folder) => {
+          // console.log("looking at a folder", folder.contract_dir)
+          var phase = folder.phase.slice(-1)
+          // summary_data[phase] = summary_data[phase] || {
+          //   phase: `phase${phase}`,
+          //   total_files: 0,
+          //   include_files: 0,
+          //   aws_files: 0,
+          // }
 
           summary_data[phase].total_files += folder.total_file_count
           summary_data[phase].include_files += folder.include_file_count
-          summary_data[phase].include_files_size =
+          summary_data[phase].include_files_size +=
             folder.include_file_size_bytes
           if (folder.aws_files) {
             summary_data[phase].aws_files +=
               folder.aws_files.summary.total.object_count
-            summary_data[phase].aws_size =
+            summary_data[phase].aws_size +=
               folder.aws_files.summary.total.file_size_bytes
           }
         })
+        // console.log("summary_data", summary_data)
 
         summaryTable.clear()
         summaryTable.rows.add(summary_data)
@@ -162,7 +174,9 @@ function drawTable(dataset: DataTableDataset) {
       row.total_file_count = parseInt(row.summary.total.file_count)
       row.total_file_size_bytes = parseInt(row.summary.total.file_size_bytes)
       row.total_file_size_display = row.summary.total.file_size_human
-      row.include_file_count = parseInt(row.summary.include.file_count) + parseInt(row.summary.include.symlink_count)
+      row.include_file_count =
+        parseInt(row.summary.include.file_count) +
+        parseInt(row.summary.include.symlink_count)
       row.include_file_size_bytes = parseInt(
         row.summary.include.file_size_bytes
       )
@@ -200,6 +214,12 @@ function drawTable(dataset: DataTableDataset) {
         display: 'include_file_size_display',
       },
     },
+    columnDefs: [
+      {
+        targets: [2, 3, 4, 5],
+        type: 'num',
+      },
+    ],
     customRenderers: {
       log_id: (data, type, row, meta) => {
         return `<a href="#none" onclick="displayFiles('${row.log_id}')">${row.log_id}</a><br>${row.contract_dir}`
@@ -208,17 +228,26 @@ function drawTable(dataset: DataTableDataset) {
         if (row.total_file_count === undefined) {
           return 'Loading...'
         }
+        if (type === 'sort') {
+          return row.total_file_count
+        }
         return `${row.total_file_count}<br>${row.total_file_size_display}`
       },
       include_files: (data, type, row, meta) => {
         if (row.include_file_count === undefined) {
           return 'Loading...'
         }
+        if (type === 'sort') {
+          return row.include_file_count
+        }
         return `${row.include_file_count}<br>${row.include_file_size_display}`
       },
       aws_files: (data, type, row, meta) => {
         if (row.aws_files === undefined) {
           return 'Loading...'
+        }
+        if (type === 'sort') {
+          return row.aws_files.summary.total.object_count
         }
         const match =
           row.aws_files.summary.total.object_count == row.include_file_count
