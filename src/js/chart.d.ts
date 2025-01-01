@@ -19,6 +19,7 @@ type chartOptions = {
     };
     colours?: string[];
     nav?: boolean;
+    renderer?: 'canvas' | 'svg';
 };
 export type Coordinates = {
     latitude: number;
@@ -72,10 +73,13 @@ declare class Chart {
     innerHeight: number;
     innerWidth: number;
     fullscreen: boolean;
+    renderer?: 'canvas' | 'svg';
     projection?: any;
     calculate?: Function;
     loadingAnimation?: LoadingAnimation;
     svg: any;
+    canvas: any;
+    context: any;
     plot: any;
     xScale: d3.ScaleLinear<number, number>;
     yBand: d3.ScaleBand<string>;

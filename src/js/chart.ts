@@ -24,6 +24,7 @@ type chartOptions = {
   margin?: number | { top: number; right: number; bottom: number; left: number }
   colours?: string[]
   nav?: boolean
+  renderer?: 'canvas' | 'svg'
 }
 
 type commit = {
@@ -99,6 +100,7 @@ class Chart {
   innerHeight: number
   innerWidth: number
   fullscreen: boolean
+  renderer?: 'canvas' | 'svg'
 
   // drawMap stuff
   projection?: any
@@ -107,6 +109,8 @@ class Chart {
 
   // svg: Selection<SVGSVGElement, any, HTMLElement, any>
   svg: any
+  canvas: any
+  context: any
   plot: any
   // @ts-ignore
   xScale: d3.ScaleLinear<number, number>
@@ -118,6 +122,7 @@ class Chart {
     // Set variables...
     this.opts = opts
     this.element = opts.element || 'chart'
+    this.renderer = opts.renderer || 'svg'
     this.data = opts.data || []
     this.title = opts.title || ''
     this.xLabel = opts.xLabel || ''
@@ -154,6 +159,18 @@ class Chart {
 
     this.innerHeight = this.height - (this.margin.top + this.margin.bottom)
     this.innerWidth = this.width - (this.margin.right + this.margin.left)
+
+    if (this.renderer === 'canvas') {
+      this.canvas = d3
+        .select(`#${opts.element}`)
+        .classed('chart', true)
+        .append('canvas')
+        .attr('width', this.width)
+        .attr('height', this.height)
+        .style('background', 'rgba(0,0,0,0.05)')
+
+      this.context = this.canvas.node().getContext('2d')
+    }
 
     this.svg = d3
       .select(`#${opts.element}`)
