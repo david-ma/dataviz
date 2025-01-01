@@ -7,8 +7,21 @@
   </div>
 </section>
 
-{{> require}}
+<style>
+  #exampleDiv {
+    canvas {
+      image-rendering: pixelated;
+    }
+    input {
+      width: 2em;
+      text-align: center;
+    }
 
+  }
+</style>
+
+
+{{> require}}
 
 
 <script>
@@ -16,6 +29,15 @@
 
   $("#exampleDiv").html(md.makeHtml(`#Genuary 2025
 
-[Day 1](https://genuary.art/prompts#jan1) prompt: "Vertical or horizontal lines only."`));
+[Day 1](https://genuary.art/prompts#jan1) prompt: "Vertical or horizontal lines only."
+
+I've programmed [d3js](https://d3js.org/) to randomly draw <input id="number_of_lines" value="20"> lines each second.
+
+Each line grows for <input id="line_birth" value="5"> seconds, stays for <input id="line_life" value="20"> seconds, then disappears over <input id="line_death" value="5"> seconds.
+
+The colours <select id="colourMode"><option value="rainbow">rotate through the rainbow</option><option value="random">are random</option></select>
+
+`));
+
 
 </script>
