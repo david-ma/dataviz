@@ -13,6 +13,8 @@ echo "Creating '/blog/${BLOGPOST}'"
 # - ask if you want to overwrite it
 # - Add to the database? Publish?
 
+touch dist/js/${BLOGPOST}.js
+
 cp -r src/js/example.ts src/js/${BLOGPOST}.ts
 cp -r views/content/example.mustache views/content/${BLOGPOST}.mustache
 

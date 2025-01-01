@@ -1180,8 +1180,8 @@ class Chart {
     }
   }
 
-  scratchpad(callback: (chart: Chart) => void) {
-    callback(this)
+  scratchpad(callback: (chart: Chart) => Chart | void) : Chart {
+    return callback(this) || this
   }
 
   updateTreemap(data: any) {

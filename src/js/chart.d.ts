@@ -107,7 +107,7 @@ declare class Chart {
     circle(): this;
     squares(): this;
     treemap(): void;
-    scratchpad(callback: (chart: Chart) => void): void;
+    scratchpad(callback: (chart: Chart) => Chart | void): Chart;
     updateTreemap(data: any): this;
     initTreemap(options: {
         hierarchy: d3.HierarchyNode<any>;
