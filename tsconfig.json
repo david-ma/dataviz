@@ -4,7 +4,7 @@
     "baseUrl": "src",
     // "outDir": "public",
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "skipDefaultLibCheck": true,
     // "types": ["node"],
     // "typeRoots": ["../../node_modules/@types/d3-selection-multi/index.d.ts"],
