@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AwesomeProjectFactory = exports.AwesomePhotoFactory = exports.AwesomeMetadataFactory = void 0;
+exports.AwesomeProjectFactory = exports.AwesomeProject = exports.AwesomePhotoFactory = exports.AwesomePhoto = exports.AwesomeMetadataFactory = exports.AwesomeMetadata = void 0;
 const sequelize_1 = require("sequelize");
-const _1 = require(".");
+class AwesomeMetadata extends sequelize_1.Model {
+}
+exports.AwesomeMetadata = AwesomeMetadata;
 function AwesomeMetadataFactory(sequelize) {
     return sequelize.define('AwesomeMetadata', {
         awesome_project_id: {
@@ -13,6 +15,9 @@ function AwesomeMetadataFactory(sequelize) {
     });
 }
 exports.AwesomeMetadataFactory = AwesomeMetadataFactory;
+class AwesomePhoto extends sequelize_1.Model {
+}
+exports.AwesomePhoto = AwesomePhoto;
 function AwesomePhotoFactory(sequelize) {
     return sequelize.define('AwesomePhoto', {
         url: {
@@ -23,9 +28,9 @@ function AwesomePhotoFactory(sequelize) {
         awesome_project_id: {
             type: sequelize_1.DataTypes.INTEGER,
             references: {
-                model: _1.AwesomeProject,
+                model: AwesomeProject,
                 key: 'id',
-            }
+            },
         },
         caption: sequelize_1.DataTypes.STRING,
         smugmug_album: sequelize_1.DataTypes.STRING,
@@ -34,6 +39,9 @@ function AwesomePhotoFactory(sequelize) {
     });
 }
 exports.AwesomePhotoFactory = AwesomePhotoFactory;
+class AwesomeProject extends sequelize_1.Model {
+}
+exports.AwesomeProject = AwesomeProject;
 function AwesomeProjectFactory(sequelize) {
     return sequelize.define('AwesomeProject', {
         name: sequelize_1.DataTypes.STRING,
