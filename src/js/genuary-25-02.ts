@@ -1,112 +1,117 @@
 import { Chart, d3 } from './chart'
-// import * as d3 from 'd3'
-// import $ from 'jquery'
-// import 'datatables.net'
-
-console.log('Running genuary-25-02.ts')
 
 const width = 1080,
-  height = 800
+  height = 800,
+  card_height = 186,
+  card_width = 138,
+  gravity = 0.1
 
-const card_height = 200,
-  card_width = 70
-
-type Vector = {
+interface Vector {
   x: number
   y: number
 }
 
+interface Card {
+  x: number
+  y: number
+  vector: Vector
+  image: HTMLImageElement
+  isAnimating: boolean
+}
+
+class CardAnimation {
+  private cards: Card[] = []
+  private chart: Chart
+  private animationId: number | null = null
+
+  constructor(chart: Chart) {
+    this.chart = chart
+    this.animate = this.animate.bind(this)
+  }
+
+  addCard(x: number, y: number, image: HTMLImageElement) {
+    const card: Card = {
+      x,
+      y,
+      vector: { x: 5, y: 10 },
+      image,
+      isAnimating: true,
+    }
+    this.cards.push(card)
+
+    if (!this.animationId) {
+      this.animationId = requestAnimationFrame(this.animate)
+    }
+  }
+
+  private animate() {
+    // Clear canvas
+    this.chart.context.fillStyle = '#213'
+    this.chart.context.fillRect(0, 0, width, height)
+
+    // Update and draw cards
+    this.cards = this.cards.filter((card) => card.isAnimating)
+    this.cards.forEach((card) => {
+      // Update position
+      card.x += card.vector.x
+      card.y += card.vector.y
+      card.vector.y += gravity
+
+      // Handle bounce
+      if (card.y > height - card_height) {
+        card.y = height - card_height
+        if (Math.abs(card.vector.y) > 0.1) {
+          card.vector.y *= -0.4
+        } else {
+          card.isAnimating = false
+        }
+      }
+
+      // Draw card
+      this.chart.context.drawImage(card.image, card.x, card.y)
+    })
+
+    // Continue animation if cards are still moving
+    if (this.cards.some((card) => card.isAnimating)) {
+      this.animationId = requestAnimationFrame(this.animate)
+    } else {
+      this.animationId = null
+    }
+  }
+}
+
 $.when($.ready).then(function () {
   const chart = new Chart({
-    // eslint-disable-line
     element: 'day2viz',
     margin: 20,
     width,
     height,
     nav: false,
     renderer: 'canvas',
-  })
-    .scratchpad(reset_chart)
-    .scratchpad((chart) => {
-      // public/images/Balatro-red_deck.png
-      // Draw this image
-      const image = new Image()
-      image.src = '/images/Balatro-red_deck.png'
-      let vector: Vector = { x: 5, y: 10 }
+  }).scratchpad(reset_chart)
 
-      // Draw the image on the svg
-      chart.svg
-        .append('image')
-        .attr('href', '/images/Balatro-red_deck.png')
-        .attr('x', 20)
-        .attr('y', 20)
-        // Allow it to be dragged
-        .call(
-          d3
-            .drag()
-            .on('start', function () {
-              console.log('dragstart')
-              // Randomise vector
-              // vector = {
-              //   x: (Math.random() -0.5) * 10,
-              //   y: Math.random() * 10 + 10,
-              // }
-            })
-            .on('drag', function (event) {
-              // d3.select(this).attr('x', event.x).attr('y', event.y)
-              const cardPosX = event.x - 1,
-                cardPosY = event.y - 1
-              d3.select(this).attr('x', cardPosX).attr('y', cardPosY)
+  const cardAnimation = new CardAnimation(chart)
+  const image = new Image()
+  image.src = '/images/Balatro-red_deck.png'
 
-              dropCard(cardPosX, cardPosY, chart, image, vector)
-            })
-        )
-    })
+  // Setup drag handlers
+  chart.svg
+    .append('image')
+    .attr('href', '/images/Balatro-red_deck.png')
+    .attr('x', 20)
+    .attr('y', 20)
+    .call(
+      d3.drag().on('drag', function (event) {
+        const cardPosX = event.x - card_width / 2
+        const cardPosY = event.y - card_height / 2
+        d3.select(this).attr('x', cardPosX).attr('y', cardPosY)
+        cardAnimation.addCard(cardPosX, cardPosY, image)
+      })
+    )
 })
-
-function dropCard(
-  x: number,
-  y: number,
-  chart: Chart,
-  image: HTMLImageElement,
-  vector: Vector
-) {
-  // console.log('Dropped a card at', x, y)
-  chart.context.drawImage(image, x, y)
-
-  const new_x = x + vector.x,
-    new_y = y + vector.y,
-    new_vector = { x: vector.x, y: vector.y + 0.1 }
-  if (new_y < height - card_height) {
-    setTimeout(() => {
-      dropCard(new_x, new_y, chart, image, new_vector)
-    }, 1000 / 60)
-  } else {
-    // console.log('Card has landed')
-    // Make it bounce
-    if (vector.y > 0.1) {
-      // console.log('Bouncing')
-      // Bounce
-      const new_vector = { x: vector.x, y: -vector.y * 0.4 }
-      setTimeout(() => {
-        dropCard(new_x, new_y, chart, image, new_vector)
-      }, 1000 / 60)
-    }
-  }
-}
 
 function reset_chart(chart: Chart) {
   chart.context.fillStyle = '#213'
   chart.context.fillRect(0, 0, width, height)
   chart.svg.selectAll('*').remove()
 }
-
-// full_size_modal()
-// function full_size_modal() {
-//   // Make the #day2viz element take up the whole webpage
-//   const elem = document.getElementById('day2viz')
-//   elem.style.width = 'vw'
-//   elem.style.position = 'fixed'
-//   elem.style.left = '0'
-//   elem.style.top = '0'
-// }
