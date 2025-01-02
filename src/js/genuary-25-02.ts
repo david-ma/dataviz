@@ -6,7 +6,12 @@ import { Chart, d3 } from './chart'
 console.log('Running genuary-25-02.ts')
 
 const width = 1080,
-  height = 1920
+  height = 800
+
+type Vector = {
+  x: number
+  y: number
+}
 
 $.when($.ready).then(function () {
   const chart = new Chart({
@@ -24,9 +29,7 @@ $.when($.ready).then(function () {
       // Draw this image
       const image = new Image()
       image.src = '/images/Balatro-red_deck.png'
-      // image.onload = function () {
-      //   chart.context.drawImage(image, 0, 0)
-      // }
+      let vector : Vector = { x: 5, y: 10 }
 
       // Draw the image on the svg
       chart.svg
@@ -36,25 +39,64 @@ $.when($.ready).then(function () {
         .attr('y', 20)
         // Allow it to be dragged
         .call(
-          d3.drag().on('drag', function (event) {
+          d3.drag()
+          .on('start', function () {
+            console.log('dragstart')
+            // Randomise vector
+            // vector = {
+            //   x: (Math.random() -0.5) * 10,
+            //   y: Math.random() * 10 + 10,
+            // }
+          })
+          .on('drag', function (event) {
             // d3.select(this).attr('x', event.x).attr('y', event.y)
-            const cardPosX = event.x - 100,
-              cardPosY = event.y - 100
+            const cardPosX = event.x - 1,
+              cardPosY = event.y - 1
             d3.select(this).attr('x', cardPosX).attr('y', cardPosY)
 
-            dropCard(cardPosX, cardPosY, chart, image)
+            dropCard(cardPosX, cardPosY, chart, image, vector)
           })
         )
     })
 })
 
-function dropCard(x: number, y: number, chart: Chart, image: HTMLImageElement) {
+function dropCard(x: number, y: number, chart: Chart, image: HTMLImageElement, vector: Vector) {
   console.log('Dropped a card at', x, y)
   chart.context.drawImage(image, x, y)
+  
+  const new_x = x + vector.x,
+    new_y = y + vector.y,
+    new_vector = { x: vector.x, y: vector.y + 0.1 }
+  if (new_y < height) {
+    setTimeout(() => {
+      dropCard(new_x, new_y, chart, image, new_vector)
+    }, 1000 / 60)
+  } else {
+    console.log('Card has landed')
+  }
+
+    // dropCard(x+vector.x, y+vector.y, chart, image, vector)
+  // Make the card fall
+  // Make the card bounce
 }
 
 function reset_chart(chart: Chart) {
   chart.context.fillStyle = '#213'
   chart.context.fillRect(0, 0, width, height)
   chart.svg.selectAll('*').remove()
+}
+
+
+
+
+
+
+full_size_modal()
+function full_size_modal() {
+  // Make the #day2viz element take up the whole webpage
+  const elem = document.getElementById('day2viz')
+  elem.style.width = 'vw'
+  elem.style.position = 'fixed'
+  elem.style.left = '0'
+  elem.style.top = '0'
 }
