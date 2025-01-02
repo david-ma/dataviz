@@ -1,0 +1,73 @@
+<section id="example" class="blogpost">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-md-6">
+      <br>
+      <div id="exampleDiv"></div>
+      <div id="day2viz" class="chart"><canvas width="1080" height="1920"
+          style="background: rgba(0, 0, 0, 0.05);"></canvas><svg viewBox="0 0 1080 1920"
+          style="background: rgba(0, 0, 0, 0.05);">
+          <g class="plot" transform="translate(20,20)">
+            <rect fill="white" x="0" y="0" height="1880" width="1040"></rect>
+          </g><text transform="translate(540,10)" class="chart-title" font-size="24px" font-weight="700"
+            text-anchor="middle" x="0" y="0"></text>
+        </svg></div>
+    </div>
+  </div>
+</section>
+
+{{!-- Get the canvas and svg to be overlaid on top of each other --}}
+{{!-- #day2viz {
+canvas {
+image-rendering: pixelated;
+width: 100%;
+}
+
+svg {
+image-rendering: pixelated;
+position: absolute;
+top: 0;
+left: 0;
+
+
+} --}}
+<style>
+  #day2viz {
+    position: relative;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1080/1920;
+
+    canvas,
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+  }
+</style>
+
+
+{{> require}}
+
+
+<script>
+  var md = new showdown.Converter({ openLinksInNewWindow: true });
+
+  $("#exampleDiv").html(md.makeHtml(`#Genuary 2025
+
+[Day 1](https://genuary.art/prompts#jan1) prompt: "Vertical or horizontal lines only."
+
+I've programmed [d3js](https://d3js.org/) to randomly draw <input id="number_of_lines" value="20"> lines each second.
+
+Each line grows for <input id="line_birth" value="5"> seconds, stays for <input id="line_life" value="20"> seconds, then disappears over <input id="line_death" value="5"> seconds.
+
+The colours <select id="color_mode"><option value="rainbow">rotate through the rainbow</option><option value="random">are random</option></select>
+
+<button id="refresh">REFRESH</button>
+`));
+
+
+</script>
