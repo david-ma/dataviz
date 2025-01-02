@@ -24,11 +24,34 @@ $.when($.ready).then(function () {
       // Draw this image
       const image = new Image()
       image.src = '/images/Balatro-red_deck.png'
-      image.onload = function () {
-        chart.context.drawImage(image, 0, 0)
-      }
+      // image.onload = function () {
+      //   chart.context.drawImage(image, 0, 0)
+      // }
+
+      // Draw the image on the svg
+      chart.svg
+        .append('image')
+        .attr('href', '/images/Balatro-red_deck.png')
+        .attr('x', 20)
+        .attr('y', 20)
+        // Allow it to be dragged
+        .call(
+          d3.drag().on('drag', function (event) {
+            // d3.select(this).attr('x', event.x).attr('y', event.y)
+            const cardPosX = event.x - 100,
+              cardPosY = event.y - 100
+            d3.select(this).attr('x', cardPosX).attr('y', cardPosY)
+
+            dropCard(cardPosX, cardPosY, chart, image)
+          })
+        )
     })
 })
+
+function dropCard(x: number, y: number, chart: Chart, image: HTMLImageElement) {
+  console.log('Dropped a card at', x, y)
+  chart.context.drawImage(image, x, y)
+}
 
 function reset_chart(chart: Chart) {
   chart.context.fillStyle = '#213'
