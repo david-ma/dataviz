@@ -6,7 +6,7 @@ import { Chart, d3 } from './chart'
 console.log('Running genuary-25-02.ts')
 
 const width = 1080,
-  height = 1920
+  height = 800
 
 const card_height = 200,
   card_width = 70
