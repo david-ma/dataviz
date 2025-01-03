@@ -74,14 +74,12 @@ A <strike>love letter</strike> <i>note passed at the back of a classroom</i> to 
 
   hljs.initLineNumbersOnLoad();
 
-  fetch({{{ typescript }}})
+  fetch("/js/genuary-25-03.ts")
     .then(response => response.text())
     .then(code => {
       document.getElementById('codeDisplay').textContent = code;
       hljs.highlightElement(document.getElementById('codeDisplay'));
       hljs.lineNumbersBlock(document.getElementById('codeDisplay'));
-
-      //      hljs.highlightAll();
     });
 
 </script>
