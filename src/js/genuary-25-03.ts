@@ -1,162 +1,138 @@
-import { Chart, decorateTable } from './chart'
-// import * as d3 from 'd3'
-// import $ from 'jquery'
-// import 'datatables.net'
-
-console.log('Running example.ts')
+import { Chart, d3 } from './chart'
 
 const width = 1080,
-      height = 1920
+  height = 800,
+  card_height = 186,
+  card_width = 138,
+  gravity = 0.1
+
+interface Vector {
+  x: number
+  y: number
+}
+
+interface Card {
+  x: number
+  y: number
+  vector: Vector
+  image: HTMLImageElement
+  isAnimating: boolean
+}
+
+class CardAnimation {
+  private cards: Card[] = []
+  private chart: Chart
+  private animationId: number | null = null
+
+  constructor(chart: Chart) {
+    this.chart = chart
+    this.animate = this.animate.bind(this)
+  }
+
+  addCard(x: number, y: number, image: HTMLImageElement) {
+    const card: Card = {
+      x,
+      y,
+      vector: { x: 5, y: 10 },
+      image,
+      isAnimating: true,
+    }
+    this.cards.push(card)
+
+    if (!this.animationId) {
+      this.animationId = requestAnimationFrame(this.animate)
+    }
+  }
+
+  private animate() {
+    // Clear canvas
+    this.chart.context.fillStyle = '#213'
+    this.chart.context.fillRect(0, 0, width, height)
+
+    // Update and draw cards
+    this.cards = this.cards.filter((card) => card.isAnimating)
+    this.cards.forEach((card) => {
+      // Update position
+      card.x += card.vector.x
+      card.y += card.vector.y
+      card.vector.y += gravity
+
+      // Handle bounce
+      if (card.y > height - card_height) {
+        card.y = height - card_height
+        if (Math.abs(card.vector.y) > 0.1) {
+          card.vector.y *= -0.4
+        } else {
+          card.isAnimating = false
+        }
+      }
+
+      // Draw card
+      this.chart.context.drawImage(card.image, card.x, card.y)
+    })
+
+    // Continue animation if cards are still moving
+    if (this.cards.some((card) => card.isAnimating)) {
+      this.animationId = requestAnimationFrame(this.animate)
+    } else {
+      this.animationId = null
+    }
+  }
+}
 
 $.when($.ready).then(function () {
   const chart = new Chart({
-    // eslint-disable-line
-    element: 'exampleDiv',
+    element: 'day2viz',
     margin: 20,
     width,
     height,
     nav: false,
-    renderer: 'canvas'
-  })
-    .scratchpad(function background(chart: Chart) {
-      // chart.svg
-      //   .append('rect')
-      //   .attr('x', 0)
-      //   .attr('y', 0)
-      //   .attr('width', width)
-      //   .attr('height', height)
-      //   .attr('fill', '#222')
-      chart.context.fillStyle = '#222'
-      chart.context.fillRect(0, 0, width, height)
-      animate(chart)
+    renderer: 'canvas',
+  }).scratchpad(reset_chart)
 
-    
-    })
-    // .scratchpad(function drawLines(chart: Chart) {
-    //   window.setInterval(() => {
-    //     const color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
-    //     for (let i = 0; i < 100; i++) {
-    //       drawLine(chart, color)
-    //     }
-    //   }, 1000)
-    // })
+  const cardAnimation = new CardAnimation(chart)
+  const image = new Image()
+  image.src = '/images/Balatro-red_deck.png'
+
+  const text = chart.svg
+    .append('text')
+    .text('Click and Drag me around the screen')
+    .attr('x', 180)
+    .attr('y', 135)
+    .attr('fill', 'white')
+    .attr('font-family', 'm6x11')
+    .attr('font-size', '60px')
+
+  let i = 0
+  const text_interval = setInterval(() => {
+    text.text('Click and Drag me around the screen'.slice(0, i))
+    i = (i + 1) % 36
+  }, 100)
+
+  // Setup drag handlers
+  chart.svg
+    .append('image')
+    .attr('href', '/images/Balatro-red_deck.png')
+    .attr('x', 20)
+    .attr('y', 20)
+    .call(
+      d3
+        .drag()
+        .on('start', function () {
+          clearInterval(text_interval)
+          text.remove()
+        })
+        .on('drag', function (event) {
+          const cardPosX = event.x - card_width / 2
+          const cardPosY = event.y - card_height / 2
+          d3.select(this).attr('x', cardPosX).attr('y', cardPosY)
+          cardAnimation.addCard(cardPosX, cardPosY, image)
+        })
+    )
 })
 
-let frame = 0
-let lastTime = performance.now()
-
-function fpsCounter() {
-  const now = performance.now()
-  if (frame % 60 === 0) {
-    const time_since_last_frame = now - lastTime
-    const fps = 1000 / time_since_last_frame
-    $("#frame_counter").text(`FPS: ${fps.toFixed(2)}`)
-    lastTime = now
-  }
-}
-
-function animate(chart: Chart) {
-  fpsCounter()
-  // Clear previous frame
-  chart.context.clearRect(0, 0, width, height)
-  
-  // Draw background
-  chart.context.fillStyle = '#222'
+function reset_chart(chart: Chart) {
+  chart.context.fillStyle = '#213'
   chart.context.fillRect(0, 0, width, height)
-  
-  // Update animation
-  frame++
-  
-  // Draw animated elements
-  chart.context.fillStyle = '#fff'
-  chart.context.fillRect(
-    Math.sin(frame * 0.05) * 100 + width/2, // x position
-    Math.cos(frame * 0.05) * 100 + height/2, // y position
-    20, // width 
-    20  // height
-  )
-  
-  // Continue animation loop
-  // requestAnimationFrame(() => animate(chart))
-
-  setupCanvas(chart)
-  requestAnimationFrame((time) => animate2(chart, time))
-}
-
-// Start animation
-const frameRate = 1000/60  // Target 60fps
-const dpr = window.devicePixelRatio || 1
-function setupCanvas(chart: Chart) {
-  const canvas = chart.canvas
-  canvas.width = width * dpr
-  canvas.height = height * dpr
-  canvas.style.width = width + 'px'
-  canvas.style.height = height + 'px'
-  chart.context.scale(dpr, dpr)
-}
-
-function animate2(chart: Chart, currentTime = 0) {
-  // Skip frame if too early
-  const elapsed = currentTime - lastTime
-  if (elapsed < frameRate) {
-    requestAnimationFrame((time) => animate2(chart, time))
-    return
-  }
-  
-  lastTime = currentTime
-  fpsCounter()
-  
-  // Clear and draw
-  const ctx = chart.context
-  ctx.clearRect(0, 0, width, height)
-  
-  ctx.fillStyle = '#222'
-  ctx.fillRect(0, 0, width, height)
-  
-  // Cache calculations
-  const centerX = width/4
-  const centerY = height/4
-  const position = frame * 0.05
-  
-  ctx.fillStyle = '#fff'
-  ctx.fillRect(
-    Math.sin(position) * 100 + centerX,
-    Math.cos(position) * 100 + centerY,
-    20,
-    20
-  )
-  
-  frame++
-  requestAnimationFrame((time) => animate2(chart, time))
-}
-
-function drawLine(chart: Chart, color = 'white') {
-  // chart.context.fillStyle = '#222'
-  // chart.context.fillRect(0, 0, width, height)
-  // chart.context.beginPath()
-  // const randomX = Math.random() * width
-  // const randomY = Math.random() * height
-  // const randomDistance = Math.random() * 1000
-  // chart.context.moveTo(randomX, randomY)
-  // chart.context.lineTo(randomX, randomY + randomDistance)
-  // chart.context.strokeStyle = color
-  // chart.context.stroke()
-  // chart.context.closePath()
-  // chart.context.stroke()
-  // chart.context.fill()
-
-  // const line = chart.svg.append('line')
-  // const randomX = Math.random() * width
-  // const randomY = Math.random() * height
-  // const randomDistance = Math.random() * 1000
-
-  // line
-  //   .attr('x1', randomX)
-  //   .attr('y1', randomY)
-  //   .attr('x2', randomX)
-  //   .attr('y2', randomY)
-  //   .transition()
-  //   .duration(5000)
-  //   .attr('y2', randomY + randomDistance)
-  //   .attr('stroke', color)
+  chart.svg.selectAll('*').remove()
 }

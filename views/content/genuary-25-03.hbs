@@ -1,0 +1,87 @@
+<section id="example" class="blogpost">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-md-8">
+      <br>
+      <div id="exampleDiv"></div>
+      <div id="day2viz" class="chart"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @font-face {
+    font-family: "m6x11";
+    src: url("/fonts/genuary25/m6x11.ttf") format("truetype");
+  }
+
+  pre#codeDisplay {
+    background: #282c34;
+    padding: 1em;
+    border-radius: 5px;
+    overflow-x: auto;
+
+  }
+
+  /* for block of numbers */
+  .hljs-ln-numbers {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    text-align: center;
+    color: #ccc;
+    border-right: 1px solid #CCC;
+    vertical-align: top;
+    padding-right: 15px;
+
+    /* your custom style here */
+  }
+
+  table.hljs-ln tr {
+    td.hljs-ln-numbers {
+      padding-right: 0.5em;
+      text-align: right;
+    }
+
+    td.hljs-ln-code {
+      padding-left: 0.5em;
+    }
+</style>
+
+<pre id="codeDisplay" class="language-typescript">
+  {{{typescript}}}
+</pre>
+
+
+
+{{> require}}
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js/dist/highlightjs-line-numbers.min.js"></script>
+
+<script>
+  var md = new showdown.Converter({ openLinksInNewWindow: true });
+
+  $("#exampleDiv").html(md.makeHtml(`#Genuary 2025
+
+[Day 2](https://genuary.art/prompts#jan2) prompt: "Layers upon layers upon layers."
+
+A <strike>love letter</strike> <i>note passed at the back of a classroom</i> to Solitaire and Balatro.`));
+
+  hljs.initLineNumbersOnLoad();
+
+  fetch({{{ typescript }}})
+    .then(response => response.text())
+    .then(code => {
+      document.getElementById('codeDisplay').textContent = code;
+      hljs.highlightElement(document.getElementById('codeDisplay'));
+      hljs.lineNumbersBlock(document.getElementById('codeDisplay'));
+
+      //      hljs.highlightAll();
+    });
+
+</script>
