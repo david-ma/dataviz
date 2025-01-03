@@ -19,7 +19,7 @@ type chartOptions = {
     };
     colours?: string[];
     nav?: boolean;
-    renderer?: 'canvas' | 'svg';
+    renderer?: 'canvas' | 'svg' | 'canvas-webgl2';
 };
 export type Coordinates = {
     latitude: number;
@@ -73,7 +73,7 @@ declare class Chart {
     innerHeight: number;
     innerWidth: number;
     fullscreen: boolean;
-    renderer?: 'canvas' | 'svg';
+    renderer?: 'canvas' | 'svg' | 'canvas-webgl2';
     projection?: any;
     calculate?: Function;
     loadingAnimation?: LoadingAnimation;

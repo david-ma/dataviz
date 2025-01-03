@@ -24,7 +24,7 @@ type chartOptions = {
   margin?: number | { top: number; right: number; bottom: number; left: number }
   colours?: string[]
   nav?: boolean
-  renderer?: 'canvas' | 'svg'
+  renderer?: 'canvas' | 'svg' | 'canvas-webgl2'
 }
 
 type commit = {
@@ -100,7 +100,7 @@ class Chart {
   innerHeight: number
   innerWidth: number
   fullscreen: boolean
-  renderer?: 'canvas' | 'svg'
+  renderer?: 'canvas' | 'svg' | 'canvas-webgl2'
 
   // drawMap stuff
   projection?: any
@@ -172,6 +172,18 @@ class Chart {
         .style('background', 'rgba(0,0,0,0.05)')
 
       this.context = this.canvas.node().getContext('2d')
+    } else if (this.renderer === 'canvas-webgl2') {
+      this.canvas = d3
+        .select(`#${opts.element}`)
+        .style('aspect-ratio', `${this.width}/${this.height}`)
+        .classed('stacked-canvas', true)
+        .classed('chart', true)
+        .append('canvas')
+        .attr('width', this.width)
+        .attr('height', this.height)
+        .style('background', 'rgba(0,0,0,0.05)')
+
+      this.context = this.canvas.node().getContext('webgl2')
     }
 
     this.svg = d3
@@ -1200,8 +1212,14 @@ class Chart {
   }
 
   clear_canvas() {
-    this.context.fillStyle = '#213'
-    this.context.fillRect(0, 0, this.width, this.height)
+    // if 2d context
+    if (this.canvas.node().getContext("2d")) {
+      this.context.fillStyle = '#213'
+      this.context.fillRect(0, 0, this.width, this.height)
+    } else if (this.canvas.node().getContext("webgl2")) {
+      this.context.clear(this.context.COLOR_BUFFER_BIT)
+      this.context.clearColor(0.129, 0.129, 0.129, 1.0)
+    }
     this.svg.selectAll('*').remove()
     return this
   }
