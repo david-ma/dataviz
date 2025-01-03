@@ -1,5 +1,6 @@
 const webpack = require('webpack')
 const fs = require('fs')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const files = fs
   .readdirSync('./src/js')
   .filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts'))
@@ -16,7 +17,7 @@ var config = {
   devtool: 'source-map',
   entry: {
     ...files,
-    chart: './src/js/chart.ts',
+    chart: ['./src/js/chart.ts', './src/css/chart.scss'],
   },
   output: {
     path: __dirname + '/dist/js',
@@ -30,6 +31,9 @@ var config = {
       'datatables.net': 'datatables.net',
       d3: 'd3',
       showdown: 'showdown',
+    }),
+    new MiniCssExtractPlugin({
+      filename: '../css/[name].css',
     }),
   ],
   resolve: {
@@ -53,6 +57,14 @@ var config = {
         options: {
           configFile: 'tsconfig.json',
         },
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader'
+        ]
       },
     ],
   },

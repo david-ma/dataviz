@@ -3,14 +3,7 @@
     <div class="col-xs-12 col-md-8">
       <br>
       <div id="exampleDiv"></div>
-      <div id="day2viz" class="chart"><canvas width="1080" height="1920"
-          style="background: rgba(0, 0, 0, 0.05);"></canvas><svg viewBox="0 0 1080 1920"
-          style="background: rgba(0, 0, 0, 0.05);">
-          <g class="plot" transform="translate(20,20)">
-            <rect fill="white" x="0" y="0" height="1880" width="1040"></rect>
-          </g><text transform="translate(540,10)" class="chart-title" font-size="24px" font-weight="700"
-            text-anchor="middle" x="0" y="0"></text>
-        </svg></div>
+      <div id="day2viz" class="chart"></div>
     </div>
   </div>
 </section>
@@ -19,23 +12,6 @@
   @font-face {
     font-family: "m6x11";
     src: url("/fonts/genuary25/m6x11.ttf") format("truetype");
-  }
-
-  #day2viz {
-    position: relative;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1080/800;
-
-    canvas,
-    svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      image-rendering: pixelated;
-    }
   }
 </style>
 

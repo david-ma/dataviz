@@ -21,6 +21,22 @@
 .chart {
   font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
+  &.stacked-canvas {
+    position: relative;
+    width: 100%;
+    height: auto;
+
+    canvas,
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+  }
+
   .map {
     .loading {
       path {

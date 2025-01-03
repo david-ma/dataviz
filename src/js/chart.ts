@@ -163,6 +163,8 @@ class Chart {
     if (this.renderer === 'canvas') {
       this.canvas = d3
         .select(`#${opts.element}`)
+        .style('aspect-ratio', `${this.width}/${this.height}`)
+        .classed('stacked-canvas', true)
         .classed('chart', true)
         .append('canvas')
         .attr('width', this.width)
