@@ -1,28 +1,42 @@
 import { Chart, d3 } from './chart'
+import RAPIER from '@dimforge/rapier2d'
 
 const chart = new Chart({
   element: 'datavizChart',
   nav: false,
   renderer: 'canvas',
 }).scratchpad((chart) => {
-  const message = [
-    'I guess this is what 42 lines of code gets you.',
-    'I hope you like it.',
-    "Oh right, I'm supposed to be drawing something.",
-    'I guess I should start now.',
-    'Oops.',
-  ]
+  chart.context.fillStyle = '#213'
+  chart.context.fillRect(0, 0, chart.width, chart.height)
+  chart.svg.selectAll('*').remove()
 
-  const text = chart.svg
-    .append('g')
-    .classed('message', true)
-    .selectAll('text')
-    .data(message)
-    .enter()
-    .append('text')
-    .text((d) => d)
-    .attr('x', 80)
-    .attr('y', (d, i) => 120 + i * 80)
-    .attr('font-family', 'm6x11')
-    .attr('font-size', '42px')
+  const gravity = new RAPIER.Vector2(0.0, -9.81)
+  let world = new RAPIER.World(gravity);
+
+  // Create the ground
+  let groundColliderDesc = RAPIER.ColliderDesc.cuboid(10.0, 0.1);
+  world.createCollider(groundColliderDesc);
+
+  // Create a dynamic rigid-body.
+  let rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
+      .setTranslation(0.0, 1.0);
+  let rigidBody = world.createRigidBody(rigidBodyDesc);
+
+  // Create a cuboid collider attached to the dynamic rigidBody.
+  let colliderDesc = RAPIER.ColliderDesc.cuboid(0.5, 0.5);
+  let collider = world.createCollider(colliderDesc, rigidBody);
+
+  // Game loop. Replace by your own game loop system.
+  let gameLoop = () => {
+      // Step the simulation forward.  
+      world.step();
+
+      // Get and print the rigid-body's position.
+      let position = rigidBody.translation();
+      // console.log("Rigid-body position: ", position.x, position.y);
+
+      setTimeout(gameLoop, 16);
+  };
+
+  gameLoop();
 })

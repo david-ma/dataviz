@@ -48,6 +48,9 @@ var config = {
       '.mjs': ['.mjs', '.mts'],
     },
   },
+  experiments: {
+    asyncWebAssembly: true,
+  },
   module: {
     rules: [
       // all files with a `.ts`, `.cts`, `.mts` or `.tsx` extension will be handled by `ts-loader`
@@ -60,11 +63,11 @@ var config = {
       },
       {
         test: /\.scss$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          'sass-loader'
-        ]
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+      },
+      {
+        test: /\.wasm$/,
+        type: 'webassembly/async',
       },
     ],
   },

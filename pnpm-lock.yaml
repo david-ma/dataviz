@@ -8,6 +8,9 @@ overrides:
   css-what: 5.0.1
 
 dependencies:
+  '@dimforge/rapier2d':
+    specifier: ^0.14.0
+    version: 0.14.0
   '@observablehq/stdlib':
     specifier: ^5.8.8
     version: 5.8.8
@@ -1375,6 +1378,10 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
+
+  /@dimforge/rapier2d@0.14.0:
+    resolution: {integrity: sha512-gqFHPytBONq4/fhQGECa9fr7LnWFg+9fX+YTONrK1zt20y+P3P6qarcq2+vpb0L36dR7W0uyCGI2Lyf5dRko+g==}
+    dev: false
 
   /@discoveryjs/json-ext@0.5.7:
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
