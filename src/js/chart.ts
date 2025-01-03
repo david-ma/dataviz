@@ -1199,6 +1199,13 @@ class Chart {
     }
   }
 
+  clear_canvas() {
+    this.context.fillStyle = '#213'
+    this.context.fillRect(0, 0, this.width, this.height)
+    this.svg.selectAll('*').remove()
+    return this
+  }
+
   scratchpad(callback: (chart: Chart) => Chart | void) : Chart {
     return callback(this) || this
   }

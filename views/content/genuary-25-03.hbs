@@ -4,7 +4,7 @@
   <div class="row" id="contentBox">
     <div class="col-xs-12 col-lg-8">
       <br>
-      <div id="exampleDiv"></div>
+      <div id="description"></div>
       <div id="datavizChart" class="chart"></div>
       <br>
       <h3>Code:</h3>
@@ -66,9 +66,11 @@
 <script>
   var md = new showdown.Converter({ openLinksInNewWindow: true });
 
-  $("#exampleDiv").html(md.makeHtml(`#Genuary 2025
+  $("#description").html(md.makeHtml(`#Genuary 2025
 
-[Day 3](https://genuary.art/prompts#jan2) prompt: "Exactly 42 lines of code."`));
+[Day 3](https://genuary.art/prompts#jan2) prompt: "Exactly 42 lines of code."
+
+This isn't really much to look at, but today's challenge got me to upgrade my tooling quite a bit. I added a code renderer with syntax highlighting, and added [Rapier](https://rapier.rs/) which is a 2D physics engine written in Rust. It compiles to WebAssembly which we can use in the browser. I'm excited to see what I can do with this in the future.`));
 
   hljs.initLineNumbersOnLoad();
 

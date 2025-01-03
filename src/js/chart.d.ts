@@ -111,6 +111,7 @@ declare class Chart {
     circle(): this;
     squares(): this;
     treemap(): void;
+    clear_canvas(): this;
     scratchpad(callback: (chart: Chart) => Chart | void): Chart;
     updateTreemap(data: any): this;
     initTreemap(options: {
