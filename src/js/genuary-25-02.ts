@@ -94,6 +94,21 @@ $.when($.ready).then(function () {
   const image = new Image()
   image.src = '/images/Balatro-red_deck.png'
 
+  const text = chart.svg
+    .append('text')
+    .text('Click and Drag me around the screen')
+    .attr('x', 180)
+    .attr('y', 135)
+    .attr('fill', 'white')
+    .attr('font-family', 'm6x11')
+    .attr('font-size', '60px')
+
+  let i = 0
+  const text_interval = setInterval(() => {
+    text.text('Click and Drag me around the screen'.slice(0, i))
+    i = (i + 1) % 36
+  }, 100)
+
   // Setup drag handlers
   chart.svg
     .append('image')
@@ -101,12 +116,18 @@ $.when($.ready).then(function () {
     .attr('x', 20)
     .attr('y', 20)
     .call(
-      d3.drag().on('drag', function (event) {
-        const cardPosX = event.x - card_width / 2
-        const cardPosY = event.y - card_height / 2
-        d3.select(this).attr('x', cardPosX).attr('y', cardPosY)
-        cardAnimation.addCard(cardPosX, cardPosY, image)
-      })
+      d3
+        .drag()
+        .on('start', function () {
+          clearInterval(text_interval)
+          text.remove()
+        })
+        .on('drag', function (event) {
+          const cardPosX = event.x - card_width / 2
+          const cardPosY = event.y - card_height / 2
+          d3.select(this).attr('x', cardPosX).attr('y', cardPosY)
+          cardAnimation.addCard(cardPosX, cardPosY, image)
+        })
     )
 })
 
