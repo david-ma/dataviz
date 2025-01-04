@@ -9,23 +9,44 @@ function initWebGL(chart: Chart) {
   const vertexShader = gl.createShader(gl.VERTEX_SHADER)
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER)
 
-  const vertexCode = `
-    attribute vec2 position;
+  const vertexCode = `#version 300 es
+    in vec2 position;
     uniform vec2 translate;
     uniform float scale;
+    out vec2 vUv;
+    
     void main() {
+      vUv = position + 0.5; // Convert [-0.5,0.5] to [0,1]
       vec2 pos = (position * scale + translate);
       gl_Position = vec4(pos * 2.0 - 1.0, 0.0, 1.0);
     }
   `
-
-  const fragmentCode = `
+  const fragmentCode = `#version 300 es
     precision mediump float;
     uniform vec3 lightDir;
+    in vec2 vUv;
+    out vec4 fragColor;
+    
     void main() {
-      vec3 normal = normalize(vec3(0.5, 0.5, 1.0));
-      float diffuse = max(dot(normal, lightDir), 0.0);
-      gl_FragColor = vec4(0.1 + 0.2 * diffuse);
+      // Edge detection using UV coordinates
+      vec2 uv = vUv;
+      float distFromEdge = min(
+        min(uv.x, 1.0 - uv.x),
+        min(uv.y, 1.0 - uv.y)
+      );
+      
+      // Sharper edge falloff
+      float isEdge = 1.0 - smoothstep(0.0, 0.1, distFromEdge);
+      
+      // Light calculation
+      vec3 normal = normalize(vec3(0.0, 0.0, 1.0));
+      vec3 light = normalize(lightDir);
+      float diffuse = max(dot(normal, light), 0.0);
+      
+      // Grey base (0.2) with white edge highlight
+      float baseColor = 0.2;
+      float highlight = isEdge * diffuse * 0.5;
+      fragColor = vec4(vec3(baseColor + highlight), 1.0);
     }
   `
 
@@ -76,19 +97,15 @@ new Chart({
 
     const scale = 50
     const blocks = []
-    const gravity = new RAPIER.Vector2(0.0, -9.81)
+    const gravity = new RAPIER.Vector2(0.0, 9.81)
     const world = new RAPIER.World(gravity)
-
+  
     // Create ground
-    const groundCollider = RAPIER.ColliderDesc.cuboid(
-      chart.width / scale / 2,
-      0.1
-    )
-    world
-      .createCollider(groundCollider)
+    const groundCollider = RAPIER.ColliderDesc.cuboid(chart.width/scale/2, 0.1)
+    world.createCollider(groundCollider)
       .setTranslation({
         x: 0,
-        y: -chart.height / scale / 2,
+        y: chart.height / scale / 2,
       })
 
     function spawnBlock() {
@@ -96,7 +113,7 @@ new Chart({
       const rigidBody = world.createRigidBody(
         RAPIER.RigidBodyDesc.dynamic().setTranslation(
           randX,
-          chart.height / scale / 2
+          -chart.height / scale / 2
         )
       )
       world.createCollider(RAPIER.ColliderDesc.cuboid(0.5, 0.5), rigidBody)
