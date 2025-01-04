@@ -95,42 +95,70 @@ new Chart({
       y: number,
       block: Block
     ) {
+      const angle = block.body.rotation()
+      const lightDir = { x: 1, y: 1 }  // Top-right light source
+      
+      // Draw fill
       ctx.beginPath()
       ctx.fillStyle = d3.schemeCategory10[blocks.indexOf(block) % 10]
-      ctx.strokeStyle = 'white'
-      ctx.lineWidth = 2
-    
-      const angle = block.body.rotation()
-    
+      
       switch (block.shape) {
         case ShapeType.Circle:
+          // Fill circle
           ctx.arc(x, y, block.radius, 0, Math.PI * 2)
+          ctx.fill()
+          
+          // Draw only top-right half of circle stroke
+          ctx.beginPath()
+          ctx.strokeStyle = 'white'
+          ctx.lineWidth = 2
+          ctx.arc(x, y, block.radius, -Math.PI * 0.75, Math.PI * 0.25)
+          ctx.stroke()
           break
+          
         case ShapeType.Square:
           ctx.save()
           ctx.translate(x, y)
           ctx.rotate(angle)
-          ctx.rect(
-            -block.radius,
-            -block.radius,
-            block.radius * 2,
-            block.radius * 2
-          )
+          
+          // Fill square
+          ctx.rect(-block.radius, -block.radius, block.radius * 2, block.radius * 2)
+          ctx.fill()
+          
+          // Draw only top and right edges
+          ctx.beginPath()
+          ctx.strokeStyle = 'white'
+          ctx.lineWidth = 2
+          ctx.moveTo(-block.radius, -block.radius)
+          ctx.lineTo(block.radius, -block.radius)  // Top edge
+          ctx.lineTo(block.radius, block.radius)   // Right edge
+          ctx.stroke()
           ctx.restore()
           break
+          
         case ShapeType.Triangle:
           ctx.save()
           ctx.translate(x, y)
           ctx.rotate(angle)
+          
+          // Fill triangle
+          ctx.beginPath()
           ctx.moveTo(0, -block.radius)
           ctx.lineTo(block.radius * 0.8, block.radius * 0.6)
           ctx.lineTo(-block.radius * 0.8, block.radius * 0.6)
           ctx.closePath()
+          ctx.fill()
+          
+          // Draw only edges facing light
+          ctx.beginPath()
+          ctx.strokeStyle = 'white'
+          ctx.lineWidth = 2
+          ctx.moveTo(0, -block.radius)
+          ctx.lineTo(block.radius * 0.8, block.radius * 0.6)  // Right edge
+          ctx.stroke()
           ctx.restore()
           break
       }
-      ctx.fill()
-      ctx.stroke()
     }
 
     function render() {
