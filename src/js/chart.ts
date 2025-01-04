@@ -24,7 +24,7 @@ type chartOptions = {
   margin?: number | { top: number; right: number; bottom: number; left: number }
   colours?: string[]
   nav?: boolean
-  renderer?: 'canvas' | 'svg' | 'canvas-webgl2'
+  renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu'
 }
 
 type commit = {
@@ -100,7 +100,7 @@ class Chart {
   innerHeight: number
   innerWidth: number
   fullscreen: boolean
-  renderer?: 'canvas' | 'svg' | 'canvas-webgl2'
+  renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu'
 
   // drawMap stuff
   projection?: any
@@ -184,6 +184,18 @@ class Chart {
         .style('background', 'rgba(0,0,0,0.05)')
 
       this.context = this.canvas.node().getContext('webgl2')
+    } else if (this.renderer === 'webgpu') {
+      this.canvas = d3
+        .select(`#${opts.element}`)
+        .style('aspect-ratio', `${this.width}/${this.height}`)
+        .classed('stacked-canvas', true)
+        .classed('chart', true)
+        .append('canvas')
+        .attr('width', this.width)
+        .attr('height', this.height)
+        .style('background', 'rgba(0,0,0,0.05)')
+
+      this.context = this.canvas.node().getContext('webgpu')
     }
 
     this.svg = d3
@@ -1213,18 +1225,28 @@ class Chart {
 
   clear_canvas() {
     // if 2d context
-    if (this.canvas.node().getContext("2d")) {
+    if (this.canvas.node().getContext('2d')) {
       this.context.fillStyle = '#213'
       this.context.fillRect(0, 0, this.width, this.height)
-    } else if (this.canvas.node().getContext("webgl2")) {
+    } else if (this.canvas.node().getContext('webgl2')) {
       this.context.clear(this.context.COLOR_BUFFER_BIT)
       this.context.clearColor(0.129, 0.129, 0.129, 1.0)
+    } else if (this.canvas.node().getContext('webgpu')) {
+      // this.context.clearColor(0.129, 0.129, 0.129, 1.0)
+      // this.context.clear(this.context.COLOR_BUFFER_BIT)
     }
     this.svg.selectAll('*').remove()
     return this
   }
 
-  scratchpad(callback: (chart: Chart) => Chart | void) : Chart {
+  asyncScratchpad(
+    callback: (chart: Chart) => Promise<void> | Promise<Chart>
+  ): Promise<Chart> {
+    const that = this
+    return callback(this).then(() => this || that)
+  }
+
+  scratchpad(callback: (chart: Chart) => Chart | void): Chart {
     return callback(this) || this
   }
 

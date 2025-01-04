@@ -94,6 +94,9 @@ devDependencies:
   '@types/node':
     specifier: ^18.19.31
     version: 18.19.31
+  '@webgpu/types':
+    specifier: ^0.1.52
+    version: 0.1.52
   babel-cli:
     specifier: ^6.26.0
     version: 6.26.0
@@ -2256,6 +2259,10 @@ packages:
     dependencies:
       '@webassemblyjs/ast': 1.12.1
       '@xtuc/long': 4.2.2
+    dev: true
+
+  /@webgpu/types@0.1.52:
+    resolution: {integrity: sha512-eI883Nlag2hGIkhXxAnq8s4APpqXWuPL3Gbn2ghiU12UjLvfCbVqHK4XfXl3eLRTatqcMmeK7jws7IwWsGfbzw==}
     dev: true
 
   /@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4)(webpack@5.91.0):

@@ -6,10 +6,10 @@
     "declaration": true,
     "declarationMap": false,
     "skipDefaultLibCheck": true,
-    // "types": ["node"],
+    "types": ["@webgpu/types"],
     // "typeRoots": ["../../node_modules/@types/d3-selection-multi/index.d.ts"],
     // "target": "ES2015",
-    "target": "ES2020",
+    "target": "ES2021",
     "module": "ESNext",
     "moduleResolution": "Node",
     "paths": {
@@ -27,7 +27,7 @@
     "noUnusedLocals": false,
     "assumeChangesOnlyAffectDirectDependencies": true,
     "incremental": true,
-    "lib": [ "esnext", "dom.iterable", "dom"]
+    "lib": [ "ES2021", "DOM", "DOM.Iterable"]
   },
   "include": [
     "src/**/*"

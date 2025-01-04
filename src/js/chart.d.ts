@@ -19,7 +19,7 @@ type chartOptions = {
     };
     colours?: string[];
     nav?: boolean;
-    renderer?: 'canvas' | 'svg' | 'canvas-webgl2';
+    renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu';
 };
 export type Coordinates = {
     latitude: number;
@@ -73,7 +73,7 @@ declare class Chart {
     innerHeight: number;
     innerWidth: number;
     fullscreen: boolean;
-    renderer?: 'canvas' | 'svg' | 'canvas-webgl2';
+    renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu';
     projection?: any;
     calculate?: Function;
     loadingAnimation?: LoadingAnimation;
@@ -112,6 +112,7 @@ declare class Chart {
     squares(): this;
     treemap(): void;
     clear_canvas(): this;
+    asyncScratchpad(callback: (chart: Chart) => Promise<void> | Promise<Chart>): Promise<Chart>;
     scratchpad(callback: (chart: Chart) => Chart | void): Chart;
     updateTreemap(data: any): this;
     initTreemap(options: {
