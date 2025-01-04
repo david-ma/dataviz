@@ -97,9 +97,11 @@ new Chart({
     ) {
       ctx.beginPath()
       ctx.fillStyle = d3.schemeCategory10[blocks.indexOf(block) % 10]
-
+      ctx.strokeStyle = 'white'
+      ctx.lineWidth = 2
+    
       const angle = block.body.rotation()
-
+    
       switch (block.shape) {
         case ShapeType.Circle:
           ctx.arc(x, y, block.radius, 0, Math.PI * 2)
@@ -120,7 +122,6 @@ new Chart({
           ctx.save()
           ctx.translate(x, y)
           ctx.rotate(angle)
-          // Draw isosceles triangle
           ctx.moveTo(0, -block.radius)
           ctx.lineTo(block.radius * 0.8, block.radius * 0.6)
           ctx.lineTo(-block.radius * 0.8, block.radius * 0.6)
@@ -129,6 +130,7 @@ new Chart({
           break
       }
       ctx.fill()
+      ctx.stroke()
     }
 
     function render() {
