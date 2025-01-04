@@ -1225,16 +1225,19 @@ class Chart {
 
   clear_canvas() {
     // if 2d context
-    if (this.canvas.node().getContext('2d')) {
-      this.context.fillStyle = '#213'
-      this.context.fillRect(0, 0, this.width, this.height)
-    } else if (this.canvas.node().getContext('webgl2')) {
-      this.context.clear(this.context.COLOR_BUFFER_BIT)
-      this.context.clearColor(0.129, 0.129, 0.129, 1.0)
-    } else if (this.canvas.node().getContext('webgpu')) {
-      // this.context.clearColor(0.129, 0.129, 0.129, 1.0)
-      // this.context.clear(this.context.COLOR_BUFFER_BIT)
+    if (this.canvas) {
+      if (this.canvas.node().getContext('2d')) {
+        this.context.fillStyle = '#213'
+        this.context.fillRect(0, 0, this.width, this.height)
+      } else if (this.canvas.node().getContext('webgl2')) {
+        this.context.clear(this.context.COLOR_BUFFER_BIT)
+        this.context.clearColor(0.129, 0.129, 0.129, 1.0)
+      } else if (this.canvas.node().getContext('webgpu')) {
+        // this.context.clearColor(0.129, 0.129, 0.129, 1.0)
+        // this.context.clear(this.context.COLOR_BUFFER_BIT)
+      }
     }
+
     this.svg.selectAll('*').remove()
     return this
   }
