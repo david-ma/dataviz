@@ -212,26 +212,37 @@ new Chart({
 
   function spawnBlock() {
     console.log("Spawning block")
-    const randX = (Math.random() - 0.5) * (chart.width / scale)
-    const randRadius = 15 + Math.random() * 20
-    const shape = Math.floor(Math.random() * 3)
-
+    // const randX = (Math.random() - 0.5) * (chart.width / scale)
+    // const randRadius = 15 + Math.random() * 20
+    // const shape = Math.floor(Math.random() * 3)
+    const randX = 0
+    const randRadius = 25  // Fixed size for testing
+    const shape = ShapeType.Square // Fixed shape for testing
+    
     const color: [number, number, number] = [
       0.2 + Math.random() * 0.6,  // r
       0.2 + Math.random() * 0.6,  // g
       0.2 + Math.random() * 0.6   // b
     ]
 
+    // const rigidBody = world.createRigidBody(
+    //   RAPIER.RigidBodyDesc.dynamic()
+    //     .setTranslation(randX, chart.height / scale / 2)
+    //     .setRotation(Math.random() * Math.PI * 2)
+    // )
+
     const rigidBody = world.createRigidBody(
       RAPIER.RigidBodyDesc.dynamic()
-        .setTranslation(randX, chart.height / scale / 2)
-        .setRotation(Math.random() * Math.PI * 2)
+        .setTranslation(randX, -chart.height/scale/4)  // Quarter height up
+        .setRotation(0)  // No rotation for testing
     )
+
+    console.log(`Spawning block at: ${randX}, ${-chart.height/scale/4}`)
 
     // Scale physics colliders to match visual size
     const physicsRadius = randRadius / scale
 
-    if (shape === ShapeType.Triangle) {
+    if (shape === ShapeType.Triangle) { 
       const vertices = new Float32Array([
         0,
         physicsRadius, // top
@@ -281,14 +292,22 @@ new Chart({
       const angle = block.body.rotation()
 
       // Update uniforms
-      const transform = new Float32Array(16)
-      transform[0] = Math.cos(angle) * block.radius
-      transform[1] = Math.sin(angle) * block.radius
-      transform[4] = -Math.sin(angle) * block.radius
-      transform[5] = Math.cos(angle) * block.radius
-      transform[12] = pos.x * scale + chart.width / 2
-      transform[13] = chart.height - (pos.y * scale + chart.height / 2)
+      // const transform = new Float32Array(16)
+      // transform[0] = Math.cos(angle) * block.radius
+      // transform[1] = Math.sin(angle) * block.radius
+      // transform[4] = -Math.sin(angle) * block.radius
+      // transform[5] = Math.cos(angle) * block.radius
+      // transform[12] = pos.x * scale + chart.width / 2
+      // transform[13] = chart.height - (pos.y * scale + chart.height / 2)
+      // transform[15] = 1
+
+      const transform = new Float32Array(16).fill(0)
+      transform[0] = block.radius  // Scale X
+      transform[5] = block.radius  // Scale Y
+      transform[12] = pos.x * scale + chart.width/2   // Translate X
+      transform[13] = pos.y * scale + chart.height/2  // Translate Y
       transform[15] = 1
+      
 
       device.queue.writeBuffer(uniformBuffer, 0, transform)
       device.queue.writeBuffer(uniformBuffer, 64, new Float32Array([1, 1]))
