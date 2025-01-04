@@ -45,6 +45,7 @@ new Chart({
     world
       .createCollider(groundColliderDesc)
       .setTranslation({ x: 0, y: -chart.height / scale / 2 })
+
     function spawnBlock() {
       const randX = (Math.random() - 0.5) * (chart.width / scale)
       const randRadius = 15 + Math.random() * 20
@@ -56,23 +57,29 @@ new Chart({
           .setRotation(Math.random() * Math.PI * 2)
       )
 
-      // Create shape-specific collider
+      // Scale physics colliders to match visual size
+      const physicsRadius = randRadius / scale
+
       if (shape === ShapeType.Triangle) {
-        // Triangle vertices for isosceles triangle
         const vertices = new Float32Array([
           0,
-          randRadius, // top
-          -randRadius * 0.8,
-          -randRadius * 0.6, // bottom left
-          randRadius * 0.8,
-          -randRadius * 0.6, // bottom right
+          physicsRadius, // top
+          -physicsRadius * 0.8,
+          -physicsRadius * 0.6, // bottom left
+          physicsRadius * 0.8,
+          -physicsRadius * 0.6, // bottom right
         ])
         world.createCollider(
           RAPIER.ColliderDesc.convexHull(vertices),
           rigidBody
         )
+      } else if (shape === ShapeType.Square) {
+        world.createCollider(
+          RAPIER.ColliderDesc.cuboid(physicsRadius, physicsRadius),
+          rigidBody
+        )
       } else {
-        world.createCollider(RAPIER.ColliderDesc.ball(0.5), rigidBody)
+        world.createCollider(RAPIER.ColliderDesc.ball(physicsRadius), rigidBody)
       }
 
       blocks.push({
