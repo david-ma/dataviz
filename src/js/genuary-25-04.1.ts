@@ -217,7 +217,7 @@ new Chart({
     // const shape = Math.floor(Math.random() * 3)
     const randX = 0
     const randRadius = 25  // Fixed size for testing
-    const shape = ShapeType.Square // Fixed shape for testing
+    const shape :any = ShapeType.Square // Fixed shape for testing
     
     const color: [number, number, number] = [
       0.2 + Math.random() * 0.6,  // r
