@@ -100,23 +100,39 @@ new Chart({
       const lightAngle = Math.atan2(lightDir.y, lightDir.x)
 
       ctx.beginPath()
-      ctx.fillStyle = "black"
+      ctx.fillStyle = '#000'
 
       switch (block.shape) {
         case ShapeType.Circle:
           ctx.beginPath()
+          // Black fill
+          ctx.beginPath()
           ctx.arc(x, y, block.radius, 0, Math.PI * 2)
-          ctx.fillStyle = "black"
           ctx.fill()
 
-          // Calculate visible arc based on light direction
+          // Grey back edge
+          ctx.beginPath()
+          ctx.strokeStyle = '#333'
+          ctx.lineWidth = 2
+          ctx.arc(
+            x,
+            y,
+            block.radius,
+            lightAngle + Math.PI * 0.25,
+            lightAngle - Math.PI * 0.75
+          )
+          ctx.stroke()
+
+          // White highlight
           ctx.beginPath()
           ctx.strokeStyle = 'white'
-          ctx.lineWidth = 2
-          const lightAngle = Math.atan2(lightDir.y, lightDir.x)
-          const visibleArcStart = lightAngle - Math.PI * 0.75
-          const visibleArcEnd = lightAngle + Math.PI * 0.25
-          ctx.arc(x, y, block.radius, visibleArcStart, visibleArcEnd)
+          ctx.arc(
+            x,
+            y,
+            block.radius,
+            lightAngle - Math.PI * 0.75,
+            lightAngle + Math.PI * 0.25
+          )
           ctx.stroke()
           break
 
@@ -133,13 +149,7 @@ new Chart({
             block.radius * 2,
             block.radius * 2
           )
-          ctx.fillStyle = "black"
           ctx.fill()
-
-          // Edge highlighting
-          ctx.beginPath()
-          ctx.strokeStyle = 'white'
-          ctx.lineWidth = 2
 
           const edges = [
             { start: [-1, -1], end: [1, -1], normal: [0, -1] }, // top
@@ -148,6 +158,35 @@ new Chart({
             { start: [-1, 1], end: [-1, -1], normal: [-1, 0] }, // left
           ]
 
+          // Draw back edges (grey)
+          ctx.beginPath()
+          ctx.strokeStyle = '#333'
+          ctx.lineWidth = 2
+          edges.forEach((edge) => {
+            const rotatedNormal = {
+              x:
+                edge.normal[0] * Math.cos(-angle) -
+                edge.normal[1] * Math.sin(-angle),
+              y:
+                edge.normal[0] * Math.sin(-angle) +
+                edge.normal[1] * Math.cos(-angle),
+            }
+            const dotProduct =
+              rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
+
+            if (dotProduct >= 0) {
+              ctx.moveTo(
+                edge.start[0] * block.radius,
+                edge.start[1] * block.radius
+              )
+              ctx.lineTo(edge.end[0] * block.radius, edge.end[1] * block.radius)
+            }
+          })
+          ctx.stroke()
+
+          // Draw front edges (white)
+          ctx.beginPath()
+          ctx.strokeStyle = 'white'
           edges.forEach((edge) => {
             const rotatedNormal = {
               x:
@@ -183,13 +222,7 @@ new Chart({
           ctx.lineTo(block.radius * 0.8, block.radius * 0.6)
           ctx.lineTo(-block.radius * 0.8, block.radius * 0.6)
           ctx.closePath()
-          ctx.fillStyle = "black"
           ctx.fill()
-
-          // Draw visible edges
-          ctx.beginPath()
-          ctx.strokeStyle = 'white'
-          ctx.lineWidth = 2
 
           const triangleEdges = [
             {
@@ -209,6 +242,10 @@ new Chart({
             },
           ]
 
+          // Draw back edges (grey)
+          ctx.beginPath()
+          ctx.strokeStyle = '#333'
+          ctx.lineWidth = 2
           triangleEdges.forEach((edge) => {
             const rotatedNormal = {
               x:
@@ -218,7 +255,28 @@ new Chart({
                 edge.normal[0] * Math.sin(-angle) +
                 edge.normal[1] * Math.cos(-angle),
             }
+            const dotProduct =
+              rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
 
+            if (dotProduct >= 0) {
+              ctx.moveTo(edge.start[0], edge.start[1])
+              ctx.lineTo(edge.end[0], edge.end[1])
+            }
+          })
+          ctx.stroke()
+
+          // Draw front edges (white)
+          ctx.beginPath()
+          ctx.strokeStyle = 'white'
+          triangleEdges.forEach((edge) => {
+            const rotatedNormal = {
+              x:
+                edge.normal[0] * Math.cos(-angle) -
+                edge.normal[1] * Math.sin(-angle),
+              y:
+                edge.normal[0] * Math.sin(-angle) +
+                edge.normal[1] * Math.cos(-angle),
+            }
             const dotProduct =
               rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
 
@@ -227,7 +285,6 @@ new Chart({
               ctx.lineTo(edge.end[0], edge.end[1])
             }
           })
-
           ctx.stroke()
           ctx.restore()
           break
