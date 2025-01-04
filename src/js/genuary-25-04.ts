@@ -102,6 +102,14 @@ async function initWebGPU(chart: Chart) {
   })
 
   const shader = `
+  struct Material {
+    baseColor: vec3f,
+    shininess: f32,
+    ambient: f32,
+    specular: f32,
+    padding: vec2f,
+  }
+
   struct Uniforms {
     translate: vec2f,
     scale: f32,
@@ -109,12 +117,13 @@ async function initWebGPU(chart: Chart) {
   }
   
   struct Light {
-    direction: vec3f,
-    padding: f32,  // Add padding to maintain 16-byte alignment
+    position: vec3f,  // Point light position
+    intensity: f32,   // Light strength
   }
   
   @group(0) @binding(0) var<uniform> uniforms: Uniforms;
   @group(0) @binding(1) var<uniform> light: Light;
+  @group(0) @binding(2) var<uniform> material: Material;
 
   struct VertexOutput {
     @builtin(position) position: vec4f,
@@ -137,14 +146,46 @@ async function initWebGPU(chart: Chart) {
       min(uv.y, 1.0 - uv.y)
     );
     
+    // Calculate fragment position in world space
+    let fragPos = vec3f((uv - 0.5) * 2.0, 0.0);
+    
+    // Vector from fragment to light
+    
     let isEdge = 1.0 - smoothstep(0.0, 0.1, distFromEdge);
     let normal = normalize(vec3f(0.0, 0.0, 1.0));
-    let lightDir = normalize(light.direction);
-    let diffuse = max(dot(normal, lightDir), 0.0);
+
+    let lightDir = normalize(light.position - fragPos);
+    let viewDir = normalize(vec3f(0.0, 0.0, 1.0) - fragPos);
+    let reflectDir = reflect(-lightDir, normal);
+    
+    // Ambient
+    let ambient = material.ambient * material.baseColor;
+    
+    // Diffuse
+    let diff = max(dot(normal, lightDir), 0.0);
+    let diffuse = diff * material.baseColor;
+    
+    // Specular
+    let spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    let specular = material.specular * spec * vec3f(1.0);
+    
+
+
+
+    // Distance attenuation
+    let dist = length(light.position - fragPos);
+    let attenuation = 1.0 / (1.0 + 0.1 * dist * dist);
+    
+    // let diffuse = max(dot(normal, lightDir), 0.0) * attenuation * light.intensity;
     
     let baseColor = 0.2;
     let highlight = isEdge * diffuse * 0.5;
-    return vec4f(vec3f(baseColor + highlight), 1.0);
+    // return vec4f(vec3f(baseColor + highlight), 1.0);
+
+    let result = ambient + diffuse + specular;
+    return vec4f(result * isEdge, 1.0);    
+
+
   }`
 
   const pipeline = device.createRenderPipeline({
@@ -207,11 +248,17 @@ new Chart({
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     })
 
+    const materialBuffer = device.createBuffer({
+      size: 32, // vec3 + float + float + float + vec2 padding
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    })
+
     const bindGroup = device.createBindGroup({
       layout: pipeline.getBindGroupLayout(0),
       entries: [
         { binding: 0, resource: { buffer: uniformBuffer } },
         { binding: 1, resource: { buffer: lightBuffer } },
+        { binding: 2, resource: { buffer: materialBuffer } },
       ],
     })
 
@@ -264,7 +311,12 @@ new Chart({
       device.queue.writeBuffer(
         lightBuffer,
         0,
-        new Float32Array([1.0, 1.0, -1.0, 0.0]) // Add padding value
+        new Float32Array([
+          1.0, // x: right side
+          1.0, // y: top
+          -0.5, // z: slightly in front
+          2.0, // intensity
+        ])
       )
 
       blocks.forEach((block) => {
