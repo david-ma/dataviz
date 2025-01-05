@@ -13,6 +13,120 @@ interface Block {
   radius: number
 }
 
+type Position = { x: number; y: number }
+
+class Block {
+  body: RAPIER.RigidBody
+  shape: ShapeType
+  radius: number
+  physicsRadius: number
+
+  constructor(body: RAPIER.RigidBody, shape: ShapeType, radius: number) {
+    this.body = body
+    this.shape = shape
+    this.radius = radius
+    const scale = 50
+
+    // Scale physics colliders to match visual size
+    this.physicsRadius = this.radius / scale
+  }
+
+  physicsVertices(): Float32Array {
+    throw new Error('Method not implemented.')
+  }
+
+  initPhysics(world: RAPIER.World) {
+    world.createCollider(
+      RAPIER.ColliderDesc.convexHull(this.physicsVertices()),
+      this.body
+    )
+  }
+
+  draw(ctx: CanvasRenderingContext2D, position: Position) {
+    throw new Error('Method not implemented.')
+  }
+}
+
+class TriangleBlock extends Block {
+  constructor(body: RAPIER.RigidBody, radius: number) {
+    super(body, ShapeType.Triangle, radius)
+  }
+
+  physicsVertices() {
+    const h = (this.radius * Math.sqrt(3)) / 2
+    return new Float32Array([
+      0,
+      this.radius, // top
+      (-this.radius * Math.sqrt(3)) / 2,
+      -h / 2, // bottom left
+      (this.radius * Math.sqrt(3)) / 2,
+      -h / 2, // bottom right
+    ])
+  }
+
+  draw(ctx: CanvasRenderingContext2D, position: Position) {
+    const angle = this.body.rotation()
+    const h = (this.radius * Math.sqrt(3)) / 2
+    ctx.save()
+    ctx.translate(position.x, position.y)
+    ctx.rotate(angle)
+    ctx.beginPath()
+    ctx.moveTo(0, -this.radius)
+    ctx.lineTo(h, this.radius / 2)
+    ctx.lineTo(-h, this.radius / 2)
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+  }
+}
+
+class SquareBlock extends Block {
+  constructor(body: RAPIER.RigidBody, radius: number) {
+    super(body, ShapeType.Square, radius)
+  }
+
+  physicsVertices() {
+    return new Float32Array([
+      -this.physicsRadius,
+      -this.physicsRadius,
+      this.physicsRadius,
+      -this.physicsRadius,
+      this.physicsRadius,
+      this.physicsRadius,
+      -this.physicsRadius,
+      this.physicsRadius,
+    ])
+  }
+
+  draw(ctx: CanvasRenderingContext2D, position: Position) {
+    const angle = this.body.rotation()
+    ctx.save()
+    ctx.translate(position.x, position.y)
+    ctx.rotate(angle)
+    ctx.fillRect(-this.radius, -this.radius, this.radius * 2, this.radius * 2)
+    ctx.restore()
+  }
+}
+
+class CircleBlock extends Block {
+  constructor(body: RAPIER.RigidBody, radius: number) {
+    super(body, ShapeType.Circle, radius)
+  }
+
+  initPhysics(world: RAPIER.World) {
+    world.createCollider(
+      RAPIER.ColliderDesc.ball(this.physicsRadius),
+      this.body
+    )
+  }
+
+  draw(ctx: CanvasRenderingContext2D, position: Position) {
+    ctx.beginPath()
+    ctx.arc(position.x, position.y, this.radius, 0, Math.PI * 2)
+    ctx.fill()
+  }
+}
+
 new Chart({
   element: 'datavizChart',
   nav: false,
@@ -49,7 +163,6 @@ new Chart({
     function spawnBlock() {
       const randX = (Math.random() - 0.5) * (chart.width / scale)
       const randRadius = 15 + Math.random() * 20
-      const shape = Math.floor(Math.random() * 3)
 
       const rigidBody = world.createRigidBody(
         RAPIER.RigidBodyDesc.dynamic()
@@ -57,38 +170,21 @@ new Chart({
           .setRotation(Math.random() * Math.PI * 2)
       )
 
-      // Scale physics colliders to match visual size
-      const physicsRadius = randRadius / scale
+      // Random shape
+      const shape = Math.floor(Math.random() * 3)
+      const block = (() => {
+        switch (shape) {
+          case ShapeType.Circle:
+            return new CircleBlock(rigidBody, randRadius)
+          case ShapeType.Square:
+            return new SquareBlock(rigidBody, randRadius)
+          case ShapeType.Triangle:
+            return new TriangleBlock(rigidBody, randRadius)
+        }
+      })()
 
-      if (shape === ShapeType.Triangle) {
-        // Equilateral triangle
-        const h = (physicsRadius * Math.sqrt(3)) / 2 // height
-        const vertices = new Float32Array([
-          0,
-          physicsRadius, // top
-          (-physicsRadius * Math.sqrt(3)) / 2,
-          -h / 2, // bottom left
-          (physicsRadius * Math.sqrt(3)) / 2,
-          -h / 2, // bottom right
-        ])
-        world.createCollider(
-          RAPIER.ColliderDesc.convexHull(vertices),
-          rigidBody
-        )
-      } else if (shape === ShapeType.Square) {
-        world.createCollider(
-          RAPIER.ColliderDesc.cuboid(physicsRadius, physicsRadius),
-          rigidBody
-        )
-      } else {
-        world.createCollider(RAPIER.ColliderDesc.ball(physicsRadius), rigidBody)
-      }
-
-      blocks.push({
-        body: rigidBody,
-        shape: shape as ShapeType,
-        radius: randRadius,
-      })
+      block.initPhysics(world)
+      blocks.push(block)
     }
 
     function drawShape(
@@ -104,194 +200,196 @@ new Chart({
       ctx.beginPath()
       ctx.fillStyle = '#000'
 
-      switch (block.shape) {
-        case ShapeType.Circle:
-          ctx.beginPath()
-          // Black fill
-          ctx.beginPath()
-          ctx.arc(x, y, block.radius, 0, Math.PI * 2)
-          ctx.fill()
+      block.draw(ctx, { x, y })
 
-          // Grey back edge
-          ctx.beginPath()
-          ctx.strokeStyle = '#333'
-          ctx.lineWidth = 2
-          ctx.arc(
-            x,
-            y,
-            block.radius,
-            lightAngle + Math.PI * 0.25,
-            lightAngle - Math.PI * 0.75
-          )
-          ctx.stroke()
+      // switch (block.shape) {
+      //   case ShapeType.Circle:
+      //     ctx.beginPath()
+      //     // Black fill
+      //     ctx.beginPath()
+      //     ctx.arc(x, y, block.radius, 0, Math.PI * 2)
+      //     ctx.fill()
 
-          // White highlight
-          ctx.beginPath()
-          ctx.strokeStyle = 'white'
-          ctx.arc(
-            x,
-            y,
-            block.radius,
-            lightAngle - Math.PI * 0.75,
-            lightAngle + Math.PI * 0.25
-          )
-          ctx.stroke()
-          break
+      //     // Grey back edge
+      //     ctx.beginPath()
+      //     ctx.strokeStyle = '#333'
+      //     ctx.lineWidth = 2
+      //     ctx.arc(
+      //       x,
+      //       y,
+      //       block.radius,
+      //       lightAngle + Math.PI * 0.25,
+      //       lightAngle - Math.PI * 0.75
+      //     )
+      //     ctx.stroke()
 
-        case ShapeType.Square:
-          ctx.save()
-          ctx.translate(x, y)
-          ctx.rotate(angle)
+      //     // White highlight
+      //     ctx.beginPath()
+      //     ctx.strokeStyle = 'white'
+      //     ctx.arc(
+      //       x,
+      //       y,
+      //       block.radius,
+      //       lightAngle - Math.PI * 0.75,
+      //       lightAngle + Math.PI * 0.25
+      //     )
+      //     ctx.stroke()
+      //     break
 
-          // Fill square
-          ctx.beginPath()
-          ctx.rect(
-            -block.radius,
-            -block.radius,
-            block.radius * 2,
-            block.radius * 2
-          )
-          ctx.fill()
+      //   case ShapeType.Square:
+      //     ctx.save()
+      //     ctx.translate(x, y)
+      //     ctx.rotate(angle)
 
-          const edges = [
-            { start: [-1, -1], end: [1, -1], normal: [0, -1] }, // top
-            { start: [1, -1], end: [1, 1], normal: [1, 0] }, // right
-            { start: [1, 1], end: [-1, 1], normal: [0, 1] }, // bottom
-            { start: [-1, 1], end: [-1, -1], normal: [-1, 0] }, // left
-          ]
+      //     // Fill square
+      //     ctx.beginPath()
+      //     ctx.rect(
+      //       -block.radius,
+      //       -block.radius,
+      //       block.radius * 2,
+      //       block.radius * 2
+      //     )
+      //     ctx.fill()
 
-          // Draw back edges (grey)
-          ctx.beginPath()
-          ctx.strokeStyle = '#333'
-          ctx.lineWidth = 2
-          edges.forEach((edge) => {
-            const rotatedNormal = {
-              x:
-                edge.normal[0] * Math.cos(-angle) -
-                edge.normal[1] * Math.sin(-angle),
-              y:
-                edge.normal[0] * Math.sin(-angle) +
-                edge.normal[1] * Math.cos(-angle),
-            }
-            const dotProduct =
-              rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
+      //     const edges = [
+      //       { start: [-1, -1], end: [1, -1], normal: [0, -1] }, // top
+      //       { start: [1, -1], end: [1, 1], normal: [1, 0] }, // right
+      //       { start: [1, 1], end: [-1, 1], normal: [0, 1] }, // bottom
+      //       { start: [-1, 1], end: [-1, -1], normal: [-1, 0] }, // left
+      //     ]
 
-            if (dotProduct >= 0) {
-              ctx.moveTo(
-                edge.start[0] * block.radius,
-                edge.start[1] * block.radius
-              )
-              ctx.lineTo(edge.end[0] * block.radius, edge.end[1] * block.radius)
-            }
-          })
-          ctx.stroke()
+      //     // Draw back edges (grey)
+      //     ctx.beginPath()
+      //     ctx.strokeStyle = '#333'
+      //     ctx.lineWidth = 2
+      //     edges.forEach((edge) => {
+      //       const rotatedNormal = {
+      //         x:
+      //           edge.normal[0] * Math.cos(-angle) -
+      //           edge.normal[1] * Math.sin(-angle),
+      //         y:
+      //           edge.normal[0] * Math.sin(-angle) +
+      //           edge.normal[1] * Math.cos(-angle),
+      //       }
+      //       const dotProduct =
+      //         rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
 
-          // Draw front edges (white)
-          ctx.beginPath()
-          ctx.strokeStyle = 'white'
-          edges.forEach((edge) => {
-            const rotatedNormal = {
-              x:
-                edge.normal[0] * Math.cos(-angle) -
-                edge.normal[1] * Math.sin(-angle),
-              y:
-                edge.normal[0] * Math.sin(-angle) +
-                edge.normal[1] * Math.cos(-angle),
-            }
-            const dotProduct =
-              rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
+      //       if (dotProduct >= 0) {
+      //         ctx.moveTo(
+      //           edge.start[0] * block.radius,
+      //           edge.start[1] * block.radius
+      //         )
+      //         ctx.lineTo(edge.end[0] * block.radius, edge.end[1] * block.radius)
+      //       }
+      //     })
+      //     ctx.stroke()
 
-            if (dotProduct < 0) {
-              ctx.moveTo(
-                edge.start[0] * block.radius,
-                edge.start[1] * block.radius
-              )
-              ctx.lineTo(edge.end[0] * block.radius, edge.end[1] * block.radius)
-            }
-          })
-          ctx.stroke()
-          ctx.restore()
-          break
+      //     // Draw front edges (white)
+      //     ctx.beginPath()
+      //     ctx.strokeStyle = 'white'
+      //     edges.forEach((edge) => {
+      //       const rotatedNormal = {
+      //         x:
+      //           edge.normal[0] * Math.cos(-angle) -
+      //           edge.normal[1] * Math.sin(-angle),
+      //         y:
+      //           edge.normal[0] * Math.sin(-angle) +
+      //           edge.normal[1] * Math.cos(-angle),
+      //       }
+      //       const dotProduct =
+      //         rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
 
-        case ShapeType.Triangle:
-          ctx.save()
-          ctx.translate(x, y)
-          ctx.rotate(angle)
+      //       if (dotProduct < 0) {
+      //         ctx.moveTo(
+      //           edge.start[0] * block.radius,
+      //           edge.start[1] * block.radius
+      //         )
+      //         ctx.lineTo(edge.end[0] * block.radius, edge.end[1] * block.radius)
+      //       }
+      //     })
+      //     ctx.stroke()
+      //     ctx.restore()
+      //     break
 
-          // Fill equilateral triangle
-          ctx.beginPath()
-          const h = (block.radius * Math.sqrt(3)) / 2
-          ctx.moveTo(0, -block.radius)
-          ctx.lineTo(h, block.radius / 2)
-          ctx.lineTo(-h, block.radius / 2)
-          ctx.closePath()
-          ctx.fill()
+      //   case ShapeType.Triangle:
+      //     ctx.save()
+      //     ctx.translate(x, y)
+      //     ctx.rotate(angle)
 
-          const triangleEdges = [
-            {
-              start: [0, -block.radius],
-              end: [h, block.radius / 2],
-              normal: [-0.866, -0.5], // right edge normal (60° rotated)
-            },
-            {
-              start: [h, block.radius / 2],
-              end: [-h, block.radius / 2],
-              normal: [0, 1], // bottom edge normal
-            },
-            {
-              start: [-h, block.radius / 2],
-              end: [0, -block.radius],
-              normal: [0.866, -0.5], // left edge normal (60° rotated)
-            },
-          ]
+      //     // Fill equilateral triangle
+      //     ctx.beginPath()
+      //     const h = (block.radius * Math.sqrt(3)) / 2
+      //     ctx.moveTo(0, -block.radius)
+      //     ctx.lineTo(h, block.radius / 2)
+      //     ctx.lineTo(-h, block.radius / 2)
+      //     ctx.closePath()
+      //     ctx.fill()
 
-          // Draw back edges (grey)
-          ctx.beginPath()
-          ctx.strokeStyle = '#333'
-          ctx.lineWidth = 2
-          triangleEdges.forEach((edge) => {
-            const rotatedNormal = {
-              x:
-                edge.normal[0] * Math.cos(-angle) -
-                edge.normal[1] * Math.sin(-angle),
-              y:
-                edge.normal[0] * Math.sin(-angle) +
-                edge.normal[1] * Math.cos(-angle),
-            }
-            const dotProduct =
-              rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
+      //     const triangleEdges = [
+      //       {
+      //         start: [0, -block.radius],
+      //         end: [h, block.radius / 2],
+      //         normal: [-0.866, -0.5], // right edge normal (60° rotated)
+      //       },
+      //       {
+      //         start: [h, block.radius / 2],
+      //         end: [-h, block.radius / 2],
+      //         normal: [0, 1], // bottom edge normal
+      //       },
+      //       {
+      //         start: [-h, block.radius / 2],
+      //         end: [0, -block.radius],
+      //         normal: [0.866, -0.5], // left edge normal (60° rotated)
+      //       },
+      //     ]
 
-            if (dotProduct >= 0) {
-              ctx.moveTo(edge.start[0], edge.start[1])
-              ctx.lineTo(edge.end[0], edge.end[1])
-            }
-          })
-          ctx.stroke()
+      //     // Draw back edges (grey)
+      //     ctx.beginPath()
+      //     ctx.strokeStyle = '#333'
+      //     ctx.lineWidth = 2
+      //     triangleEdges.forEach((edge) => {
+      //       const rotatedNormal = {
+      //         x:
+      //           edge.normal[0] * Math.cos(-angle) -
+      //           edge.normal[1] * Math.sin(-angle),
+      //         y:
+      //           edge.normal[0] * Math.sin(-angle) +
+      //           edge.normal[1] * Math.cos(-angle),
+      //       }
+      //       const dotProduct =
+      //         rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
 
-          // Draw front edges (white)
-          ctx.beginPath()
-          ctx.strokeStyle = 'white'
-          triangleEdges.forEach((edge) => {
-            const rotatedNormal = {
-              x:
-                edge.normal[0] * Math.cos(-angle) -
-                edge.normal[1] * Math.sin(-angle),
-              y:
-                edge.normal[0] * Math.sin(-angle) +
-                edge.normal[1] * Math.cos(-angle),
-            }
-            const dotProduct =
-              rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
+      //       if (dotProduct >= 0) {
+      //         ctx.moveTo(edge.start[0], edge.start[1])
+      //         ctx.lineTo(edge.end[0], edge.end[1])
+      //       }
+      //     })
+      //     ctx.stroke()
 
-            if (dotProduct < 0) {
-              ctx.moveTo(edge.start[0], edge.start[1])
-              ctx.lineTo(edge.end[0], edge.end[1])
-            }
-          })
-          ctx.stroke()
-          ctx.restore()
-          break
-      }
+      //     // Draw front edges (white)
+      //     ctx.beginPath()
+      //     ctx.strokeStyle = 'white'
+      //     triangleEdges.forEach((edge) => {
+      //       const rotatedNormal = {
+      //         x:
+      //           edge.normal[0] * Math.cos(-angle) -
+      //           edge.normal[1] * Math.sin(-angle),
+      //         y:
+      //           edge.normal[0] * Math.sin(-angle) +
+      //           edge.normal[1] * Math.cos(-angle),
+      //       }
+      //       const dotProduct =
+      //         rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
+
+      //       if (dotProduct < 0) {
+      //         ctx.moveTo(edge.start[0], edge.start[1])
+      //         ctx.lineTo(edge.end[0], edge.end[1])
+      //       }
+      //     })
+      //     ctx.stroke()
+      //     ctx.restore()
+      //     break
+      // }
     }
 
     function render() {
