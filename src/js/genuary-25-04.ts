@@ -209,9 +209,9 @@ class SquareBlock extends Block {
       { start: [-1, 1], end: [-1, -1], normal: [-1, 0] }, // left
     ]
 
-    // Draw back edges (grey)
+    // Draw front edges (white)
     ctx.beginPath()
-    ctx.strokeStyle = '#333'
+    ctx.strokeStyle = 'white'
     ctx.lineWidth = 2
     edges.forEach((edge) => {
       const rotatedNormal = {
@@ -230,9 +230,9 @@ class SquareBlock extends Block {
     })
     ctx.stroke()
 
-    // Draw front edges (white)
+    // Draw back edges (grey)
     ctx.beginPath()
-    ctx.strokeStyle = 'white'
+    ctx.strokeStyle = '#333'
     edges.forEach((edge) => {
       const rotatedNormal = {
         x:
@@ -380,8 +380,8 @@ new Chart({
 
     function drawShape(
       ctx: CanvasRenderingContext2D,
-      x: number,
-      y: number,
+      position: Position,
+      lightPosition: Position,
       block: Block
     ) {
       const angle = block.body.rotation()
@@ -391,206 +391,22 @@ new Chart({
       ctx.beginPath()
       ctx.fillStyle = '#000'
 
-      block.draw(ctx, { x, y }, { x: 0, y: 0 })
-
-      // switch (block.shape) {
-      //   case ShapeType.Circle:
-      //     ctx.beginPath()
-      //     // Black fill
-      //     ctx.beginPath()
-      //     ctx.arc(x, y, block.radius, 0, Math.PI * 2)
-      //     ctx.fill()
-
-      //     // Grey back edge
-      //     ctx.beginPath()
-      //     ctx.strokeStyle = '#333'
-      //     ctx.lineWidth = 2
-      //     ctx.arc(
-      //       x,
-      //       y,
-      //       block.radius,
-      //       lightAngle + Math.PI * 0.25,
-      //       lightAngle - Math.PI * 0.75
-      //     )
-      //     ctx.stroke()
-
-      //     // White highlight
-      //     ctx.beginPath()
-      //     ctx.strokeStyle = 'white'
-      //     ctx.arc(
-      //       x,
-      //       y,
-      //       block.radius,
-      //       lightAngle - Math.PI * 0.75,
-      //       lightAngle + Math.PI * 0.25
-      //     )
-      //     ctx.stroke()
-      //     break
-
-      //   case ShapeType.Square:
-      //     ctx.save()
-      //     ctx.translate(x, y)
-      //     ctx.rotate(angle)
-
-      //     // Fill square
-      //     ctx.beginPath()
-      //     ctx.rect(
-      //       -block.radius,
-      //       -block.radius,
-      //       block.radius * 2,
-      //       block.radius * 2
-      //     )
-      //     ctx.fill()
-
-      //     const edges = [
-      //       { start: [-1, -1], end: [1, -1], normal: [0, -1] }, // top
-      //       { start: [1, -1], end: [1, 1], normal: [1, 0] }, // right
-      //       { start: [1, 1], end: [-1, 1], normal: [0, 1] }, // bottom
-      //       { start: [-1, 1], end: [-1, -1], normal: [-1, 0] }, // left
-      //     ]
-
-      //     // Draw back edges (grey)
-      //     ctx.beginPath()
-      //     ctx.strokeStyle = '#333'
-      //     ctx.lineWidth = 2
-      //     edges.forEach((edge) => {
-      //       const rotatedNormal = {
-      //         x:
-      //           edge.normal[0] * Math.cos(-angle) -
-      //           edge.normal[1] * Math.sin(-angle),
-      //         y:
-      //           edge.normal[0] * Math.sin(-angle) +
-      //           edge.normal[1] * Math.cos(-angle),
-      //       }
-      //       const dotProduct =
-      //         rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
-
-      //       if (dotProduct >= 0) {
-      //         ctx.moveTo(
-      //           edge.start[0] * block.radius,
-      //           edge.start[1] * block.radius
-      //         )
-      //         ctx.lineTo(edge.end[0] * block.radius, edge.end[1] * block.radius)
-      //       }
-      //     })
-      //     ctx.stroke()
-
-      //     // Draw front edges (white)
-      //     ctx.beginPath()
-      //     ctx.strokeStyle = 'white'
-      //     edges.forEach((edge) => {
-      //       const rotatedNormal = {
-      //         x:
-      //           edge.normal[0] * Math.cos(-angle) -
-      //           edge.normal[1] * Math.sin(-angle),
-      //         y:
-      //           edge.normal[0] * Math.sin(-angle) +
-      //           edge.normal[1] * Math.cos(-angle),
-      //       }
-      //       const dotProduct =
-      //         rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
-
-      //       if (dotProduct < 0) {
-      //         ctx.moveTo(
-      //           edge.start[0] * block.radius,
-      //           edge.start[1] * block.radius
-      //         )
-      //         ctx.lineTo(edge.end[0] * block.radius, edge.end[1] * block.radius)
-      //       }
-      //     })
-      //     ctx.stroke()
-      //     ctx.restore()
-      //     break
-
-      //   case ShapeType.Triangle:
-      //     ctx.save()
-      //     ctx.translate(x, y)
-      //     ctx.rotate(angle)
-
-      //     // Fill equilateral triangle
-      //     ctx.beginPath()
-      //     const h = (block.radius * Math.sqrt(3)) / 2
-      //     ctx.moveTo(0, -block.radius)
-      //     ctx.lineTo(h, block.radius / 2)
-      //     ctx.lineTo(-h, block.radius / 2)
-      //     ctx.closePath()
-      //     ctx.fill()
-
-      //     const triangleEdges = [
-      //       {
-      //         start: [0, -block.radius],
-      //         end: [h, block.radius / 2],
-      //         normal: [-0.866, -0.5], // right edge normal (60° rotated)
-      //       },
-      //       {
-      //         start: [h, block.radius / 2],
-      //         end: [-h, block.radius / 2],
-      //         normal: [0, 1], // bottom edge normal
-      //       },
-      //       {
-      //         start: [-h, block.radius / 2],
-      //         end: [0, -block.radius],
-      //         normal: [0.866, -0.5], // left edge normal (60° rotated)
-      //       },
-      //     ]
-
-      //     // Draw back edges (grey)
-      //     ctx.beginPath()
-      //     ctx.strokeStyle = '#333'
-      //     ctx.lineWidth = 2
-      //     triangleEdges.forEach((edge) => {
-      //       const rotatedNormal = {
-      //         x:
-      //           edge.normal[0] * Math.cos(-angle) -
-      //           edge.normal[1] * Math.sin(-angle),
-      //         y:
-      //           edge.normal[0] * Math.sin(-angle) +
-      //           edge.normal[1] * Math.cos(-angle),
-      //       }
-      //       const dotProduct =
-      //         rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
-
-      //       if (dotProduct >= 0) {
-      //         ctx.moveTo(edge.start[0], edge.start[1])
-      //         ctx.lineTo(edge.end[0], edge.end[1])
-      //       }
-      //     })
-      //     ctx.stroke()
-
-      //     // Draw front edges (white)
-      //     ctx.beginPath()
-      //     ctx.strokeStyle = 'white'
-      //     triangleEdges.forEach((edge) => {
-      //       const rotatedNormal = {
-      //         x:
-      //           edge.normal[0] * Math.cos(-angle) -
-      //           edge.normal[1] * Math.sin(-angle),
-      //         y:
-      //           edge.normal[0] * Math.sin(-angle) +
-      //           edge.normal[1] * Math.cos(-angle),
-      //       }
-      //       const dotProduct =
-      //         rotatedNormal.x * lightDir.x + rotatedNormal.y * lightDir.y
-
-      //       if (dotProduct < 0) {
-      //         ctx.moveTo(edge.start[0], edge.start[1])
-      //         ctx.lineTo(edge.end[0], edge.end[1])
-      //       }
-      //     })
-      //     ctx.stroke()
-      //     ctx.restore()
-      //     break
-      // }
+      block.draw(ctx, position, lightPosition)
     }
 
     function render() {
       chart.clear_canvas()
       world.step()
+
+      // Get the mouse position and use it as lightPosition
+      const lightPosition = chart.mouse_position
       blocks.forEach((block) => {
         const position = block.body.translation()
-        const screenX = position.x * scale + chart.width / 2
-        const screenY = chart.height - (position.y * scale + chart.height / 2)
-        drawShape(chart.context, screenX, screenY, block)
+        const screenPosition = {
+          x: position.x * scale + chart.width / 2,
+          y: chart.height - (position.y * scale + chart.height / 2),
+        }
+        drawShape(chart.context, screenPosition, lightPosition, block)
       })
       requestAnimationFrame(render)
     }

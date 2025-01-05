@@ -38,6 +38,11 @@ type commit = {
   x: Date
 }
 
+type Position = {
+  x: number
+  y: number
+}
+
 export type Coordinates = {
   latitude: number
   longitude: number
@@ -101,6 +106,7 @@ class Chart {
   innerWidth: number
   fullscreen: boolean
   renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu'
+  mouse_position: Position
 
   // drawMap stuff
   projection?: any
@@ -202,6 +208,10 @@ class Chart {
       .select(`#${opts.element}`)
       .classed('chart', true)
       .append('svg')
+      .on('mousemove', (event) => {
+        const [x,y] = d3.pointer(event)
+        this.mouse_position = { x, y }
+      })
       .attr('viewBox', `0 0 ${this.width} ${this.height}`)
       .style('background', 'rgba(0,0,0,0.05)')
 

@@ -21,6 +21,10 @@ type chartOptions = {
     nav?: boolean;
     renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu';
 };
+type Position = {
+    x: number;
+    y: number;
+};
 export type Coordinates = {
     latitude: number;
     longitude: number;
@@ -74,6 +78,7 @@ declare class Chart {
     innerWidth: number;
     fullscreen: boolean;
     renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu';
+    mouse_position: Position;
     projection?: any;
     calculate?: Function;
     loadingAnimation?: LoadingAnimation;
