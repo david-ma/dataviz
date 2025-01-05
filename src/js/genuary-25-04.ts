@@ -61,13 +61,15 @@ new Chart({
       const physicsRadius = randRadius / scale
 
       if (shape === ShapeType.Triangle) {
+        // Equilateral triangle
+        const h = (physicsRadius * Math.sqrt(3)) / 2 // height
         const vertices = new Float32Array([
           0,
           physicsRadius, // top
-          -physicsRadius * 0.8,
-          -physicsRadius * 0.6, // bottom left
-          physicsRadius * 0.8,
-          -physicsRadius * 0.6, // bottom right
+          (-physicsRadius * Math.sqrt(3)) / 2,
+          -h / 2, // bottom left
+          (physicsRadius * Math.sqrt(3)) / 2,
+          -h / 2, // bottom right
         ])
         world.createCollider(
           RAPIER.ColliderDesc.convexHull(vertices),
@@ -216,29 +218,30 @@ new Chart({
           ctx.translate(x, y)
           ctx.rotate(angle)
 
-          // Fill triangle
+          // Fill equilateral triangle
           ctx.beginPath()
+          const h = (block.radius * Math.sqrt(3)) / 2
           ctx.moveTo(0, -block.radius)
-          ctx.lineTo(block.radius * 0.8, block.radius * 0.6)
-          ctx.lineTo(-block.radius * 0.8, block.radius * 0.6)
+          ctx.lineTo(h, block.radius / 2)
+          ctx.lineTo(-h, block.radius / 2)
           ctx.closePath()
           ctx.fill()
 
           const triangleEdges = [
             {
               start: [0, -block.radius],
-              end: [block.radius * 0.8, block.radius * 0.6],
-              normal: [-0.6, -0.8], // right edge normal
+              end: [h, block.radius / 2],
+              normal: [-0.866, -0.5], // right edge normal (60° rotated)
             },
             {
-              start: [block.radius * 0.8, block.radius * 0.6],
-              end: [-block.radius * 0.8, block.radius * 0.6],
+              start: [h, block.radius / 2],
+              end: [-h, block.radius / 2],
               normal: [0, 1], // bottom edge normal
             },
             {
-              start: [-block.radius * 0.8, block.radius * 0.6],
+              start: [-h, block.radius / 2],
               end: [0, -block.radius],
-              normal: [0.6, -0.8], // left edge normal
+              normal: [0.866, -0.5], // left edge normal (60° rotated)
             },
           ]
 
