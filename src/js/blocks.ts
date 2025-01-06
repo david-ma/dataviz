@@ -82,6 +82,18 @@ export class RapierChart extends Chart {
       this.context.restore()
     })
   }
+
+  draw_blocks(blocks: Block[]) {
+    const lightPosition = this.mouse_position
+    blocks.forEach((block) => {
+      const position = block.body.translation()
+      const screenPosition = {
+        x: position.x * this.scale + this.width / 2,
+        y: this.height - (position.y * this.scale + this.height / 2),
+      }
+      block.draw(this.context, screenPosition, lightPosition)
+    })
+  }
 }
 
 export enum ShapeType {

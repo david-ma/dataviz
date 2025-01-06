@@ -53,22 +53,6 @@ new RapierChart({
       ctx.restore()
     }
 
-    function drawShape(
-      ctx: CanvasRenderingContext2D,
-      position: Position,
-      lightPosition: Position,
-      block: Block
-    ) {
-      const angle = block.body.rotation()
-      const lightDir = { x: 1, y: 1 } // Top-right light source
-      const lightAngle = Math.atan2(lightDir.y, lightDir.x)
-
-      ctx.beginPath()
-      ctx.fillStyle = '#000'
-
-      block.draw(ctx, position, lightPosition)
-    }
-
     function render() {
       chart.clear_canvas()
       chart.world.step()
@@ -80,14 +64,8 @@ new RapierChart({
       // Draw light source
       drawLightSource(chart.context, lightPosition)
 
-      blocks.forEach((block) => {
-        const position = block.body.translation()
-        const screenPosition = {
-          x: position.x * chart.scale + chart.width / 2,
-          y: chart.height - (position.y * chart.scale + chart.height / 2),
-        }
-        drawShape(chart.context, screenPosition, lightPosition, block)
-      })
+      chart.draw_blocks(blocks)
+
       requestAnimationFrame(render)
     }
 

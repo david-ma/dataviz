@@ -6,6 +6,7 @@ export declare class RapierChart extends Chart {
     colliders: RAPIER.Collider[];
     constructor(options: any);
     draw_colliders(): void;
+    draw_blocks(blocks: Block[]): void;
 }
 export declare enum ShapeType {
     Circle = 0,
