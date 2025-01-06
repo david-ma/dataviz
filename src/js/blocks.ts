@@ -31,13 +31,12 @@ export class RapierChart extends Chart {
     this.colliders[0].setTranslation({ x: 0, y: -this.height / scale / 2 })
     this.colliders[1].setTranslation({ x: -this.width / scale / 2, y: 0 })
     this.colliders[2].setTranslation({ x: this.width / scale / 2, y: 0 })
-    // this.colliders[2].setTranslation({ x: this.width / scale / 2, y: 0 })
   }
 
   draw_colliders() {
     this.colliders.forEach((collider, i) => {
       this.context.save()
-      this.context.lineWidth = 2
+      this.context.lineWidth = 4
       this.context.strokeStyle = d3.schemeCategory10[i % 10]
       this.context.fillStyle = d3.schemeCategory10[i % 10]
 
@@ -98,6 +97,33 @@ export interface Block {
 }
 
 export type Position = { x: number; y: number }
+
+export type BlockOptions = {
+  world: RAPIER.World
+  position?: Position
+  radius?: number
+  rotation?: number
+  shape?: ShapeType
+}
+
+export function blockFactory(options: BlockOptions): Block {
+  const body = options.world.createRigidBody(
+    RAPIER.RigidBodyDesc.dynamic().setTranslation(
+      options.position.x,
+      options.position.y
+    )
+  )
+  switch (options.shape) {
+    case ShapeType.Circle:
+      return new CircleBlock(body, options.radius || 1)
+    case ShapeType.Square:
+      return new SquareBlock(body, options.radius || 1)
+    case ShapeType.Triangle:
+      return new TriangleBlock(body, options.radius || 1)
+    default:
+      return new CircleBlock(body, options.radius || 1)
+  }
+}
 
 export class Block {
   body: RAPIER.RigidBody

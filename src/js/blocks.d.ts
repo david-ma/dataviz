@@ -21,6 +21,14 @@ export type Position = {
     x: number;
     y: number;
 };
+export type BlockOptions = {
+    world: RAPIER.World;
+    position?: Position;
+    radius?: number;
+    rotation?: number;
+    shape?: ShapeType;
+};
+export declare function blockFactory(options: BlockOptions): Block;
 export declare class Block {
     body: RAPIER.RigidBody;
     shape: ShapeType;

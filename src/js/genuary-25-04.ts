@@ -3,12 +3,10 @@ import RAPIER from '@dimforge/rapier2d'
 
 import {
   Block,
-  CircleBlock,
-  SquareBlock,
-  TriangleBlock,
-  ShapeType,
   Position,
   RapierChart,
+  BlockOptions,
+  blockFactory,
 } from './blocks'
 
 new RapierChart({
@@ -17,32 +15,26 @@ new RapierChart({
   renderer: 'canvas',
 })
   .clear_canvas()
-  .scratchpad((chart : RapierChart) => {
+  .scratchpad((chart: RapierChart) => {
     const blocks: Block[] = []
     // const world = this.world
 
     function spawnBlock() {
       const randX = (Math.random() - 0.5) * (chart.width / chart.scale)
+      const top_of_chart = chart.height / chart.scale / 2
       const randRadius = 15 + Math.random() * 20
-
-      const rigidBody = chart.world.createRigidBody(
-        RAPIER.RigidBodyDesc.dynamic()
-          .setTranslation(randX, chart.height / chart.scale / 2)
-          .setRotation(Math.random() * Math.PI * 2)
-      )
 
       // Random shape
       const shape = Math.floor(Math.random() * 3)
-      const block = (() => {
-        switch (shape) {
-          case ShapeType.Circle:
-            return new CircleBlock(rigidBody, randRadius)
-          case ShapeType.Square:
-            return new SquareBlock(rigidBody, randRadius)
-          case ShapeType.Triangle:
-            return new TriangleBlock(rigidBody, randRadius)
-        }
-      })()
+      const block_options: BlockOptions = {
+        world: chart.world,
+        position: { x: randX, y: top_of_chart },
+        radius: randRadius,
+        rotation: Math.random() * Math.PI * 2,
+        shape: shape,
+      }
+
+      const block = blockFactory(block_options)
 
       block.initPhysics(chart.world)
       blocks.push(block)
@@ -103,6 +95,6 @@ new RapierChart({
     requestAnimationFrame(render)
   })
 
-  window.setTimeout(() => {
+window.setTimeout(() => {
   clearInterval(globalThis.blockSpawner)
 }, 1000)
