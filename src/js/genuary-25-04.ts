@@ -8,48 +8,26 @@ import {
   TriangleBlock,
   ShapeType,
   Position,
+  RapierChart,
 } from './blocks'
 
-new Chart({
+new RapierChart({
   element: 'datavizChart',
   nav: false,
   renderer: 'canvas',
 })
   .clear_canvas()
-  .scratchpad((chart) => {
-    const scale = 50
+  .scratchpad((chart : RapierChart) => {
     const blocks: Block[] = []
-    const gravity = new RAPIER.Vector2(0.0, -9.81)
-    let world = new RAPIER.World(gravity)
-    let groundColliderDesc = RAPIER.ColliderDesc.cuboid(
-      chart.width / scale / 2, // half width
-      0.1 // height
-    )
-    let leftWallColliderDesc = RAPIER.ColliderDesc.cuboid(
-      0.1, // width
-      chart.height / scale / 2 // half height
-    )
-    let rightWallColliderDesc = RAPIER.ColliderDesc.cuboid(
-      0.1, // width
-      chart.height / scale / 2 // half height
-    )
-    world
-      .createCollider(leftWallColliderDesc)
-      .setTranslation({ x: -chart.width / scale / 2, y: 0 })
-    world
-      .createCollider(rightWallColliderDesc)
-      .setTranslation({ x: chart.width / scale / 2, y: 0 })
-    world
-      .createCollider(groundColliderDesc)
-      .setTranslation({ x: 0, y: -chart.height / scale / 2 })
+    // const world = this.world
 
     function spawnBlock() {
-      const randX = (Math.random() - 0.5) * (chart.width / scale)
+      const randX = (Math.random() - 0.5) * (chart.width / chart.scale)
       const randRadius = 15 + Math.random() * 20
 
-      const rigidBody = world.createRigidBody(
+      const rigidBody = chart.world.createRigidBody(
         RAPIER.RigidBodyDesc.dynamic()
-          .setTranslation(randX, chart.height / scale / 2)
+          .setTranslation(randX, chart.height / chart.scale / 2)
           .setRotation(Math.random() * Math.PI * 2)
       )
 
@@ -66,7 +44,7 @@ new Chart({
         }
       })()
 
-      block.initPhysics(world)
+      block.initPhysics(chart.world)
       blocks.push(block)
     }
 
@@ -101,7 +79,8 @@ new Chart({
 
     function render() {
       chart.clear_canvas()
-      world.step()
+      chart.world.step()
+      chart.draw_colliders()
 
       // Get the mouse position and use it as lightPosition
       const lightPosition = chart.mouse_position
@@ -112,14 +91,18 @@ new Chart({
       blocks.forEach((block) => {
         const position = block.body.translation()
         const screenPosition = {
-          x: position.x * scale + chart.width / 2,
-          y: chart.height - (position.y * scale + chart.height / 2),
+          x: position.x * chart.scale + chart.width / 2,
+          y: chart.height - (position.y * chart.scale + chart.height / 2),
         }
         drawShape(chart.context, screenPosition, lightPosition, block)
       })
       requestAnimationFrame(render)
     }
 
-    setInterval(spawnBlock, 1000)
+    globalThis.blockSpawner = setInterval(spawnBlock, 1)
     requestAnimationFrame(render)
   })
+
+  window.setTimeout(() => {
+  clearInterval(globalThis.blockSpawner)
+}, 1000)

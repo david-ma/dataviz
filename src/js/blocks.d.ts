@@ -1,4 +1,12 @@
 import RAPIER from '@dimforge/rapier2d';
+import { Chart } from './chart';
+export declare class RapierChart extends Chart {
+    world: RAPIER.World;
+    scale: number;
+    colliders: RAPIER.Collider[];
+    constructor(options: any);
+    draw_colliders(): void;
+}
 export declare enum ShapeType {
     Circle = 0,
     Square = 1,

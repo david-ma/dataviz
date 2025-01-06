@@ -1,4 +1,89 @@
 import RAPIER from '@dimforge/rapier2d'
+import { Chart, d3 } from './chart'
+
+export class RapierChart extends Chart {
+  world: RAPIER.World
+  scale: number
+  colliders: RAPIER.Collider[] = []
+
+  constructor(options) {
+    super(options)
+    console.log('RapierChart constructor, with gravity and ground')
+
+    const scale = (this.scale = 50)
+    const gravity = new RAPIER.Vector2(0.0, -9.81)
+    this.world = new RAPIER.World(gravity)
+
+    let groundColliderDesc = RAPIER.ColliderDesc.cuboid(
+      this.width / scale / 2, // half width
+      0.1 // height
+    )
+    let wallColliderDesc = RAPIER.ColliderDesc.cuboid(
+      0.1, // width
+      this.height / scale / 2 // half height
+    )
+
+    this.colliders.push(
+      this.world.createCollider(groundColliderDesc),
+      this.world.createCollider(wallColliderDesc),
+      this.world.createCollider(wallColliderDesc)
+    )
+    this.colliders[0].setTranslation({ x: 0, y: -this.height / scale / 2 })
+    this.colliders[1].setTranslation({ x: -this.width / scale / 2, y: 0 })
+    this.colliders[2].setTranslation({ x: this.width / scale / 2, y: 0 })
+    // this.colliders[2].setTranslation({ x: this.width / scale / 2, y: 0 })
+  }
+
+  draw_colliders() {
+    this.colliders.forEach((collider, i) => {
+      this.context.save()
+      this.context.lineWidth = 2
+      this.context.strokeStyle = d3.schemeCategory10[i % 10]
+      this.context.fillStyle = d3.schemeCategory10[i % 10]
+
+      const shape: RAPIER.Shape = collider.shape
+      const position = collider.translation()
+      const angle = collider.rotation()
+      this.context.translate(
+        position.x * this.scale + this.width / 2,
+        this.height - (position.y * this.scale + this.height / 2)
+      )
+      this.context.rotate(angle)
+      this.context.beginPath()
+      try {
+        if (shape instanceof RAPIER.Ball) {
+          const radius = shape.radius * this.scale
+          this.context.arc(0, 0, radius, 0, Math.PI * 2)
+        } else if (shape instanceof RAPIER.Cuboid) {
+          const half_width = shape.halfExtents.x * this.scale
+          const half_height = shape.halfExtents.y * this.scale
+          this.context.rect(
+            -half_width,
+            -half_height,
+            half_width * 2,
+            half_height * 2
+          )
+        } else if (shape instanceof RAPIER.ConvexPolygon) {
+          const vertices: Float32Array = shape.vertices
+          if (vertices.length < 2 || vertices.length % 2 !== 0) {
+            console.error('Invalid vertices:', vertices)
+          }
+          for (let i = 0; i < vertices.length; i += 2) {
+            this.context.lineTo(
+              vertices[i] * this.scale,
+              vertices[i + 1] * this.scale
+            )
+          }
+          this.context.closePath()
+        }
+      } catch (e) {
+        console.error('Error drawing shape:', e)
+      }
+      this.context.stroke()
+      this.context.restore()
+    })
+  }
+}
 
 export enum ShapeType {
   Circle,
@@ -139,7 +224,9 @@ export class TriangleBlock extends Block {
         y:
           edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
       }
-      const dotProduct = Math.cos(lightAngle) * rotatedNormal.x + Math.sin(lightAngle) * rotatedNormal.y
+      const dotProduct =
+        Math.cos(lightAngle) * rotatedNormal.x +
+        Math.sin(lightAngle) * rotatedNormal.y
 
       if (dotProduct >= 0) {
         ctx.moveTo(edge.start[0], edge.start[1])
@@ -158,7 +245,9 @@ export class TriangleBlock extends Block {
         y:
           edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
       }
-      const dotProduct = Math.cos(lightAngle) * rotatedNormal.x + Math.sin(lightAngle) * rotatedNormal.y
+      const dotProduct =
+        Math.cos(lightAngle) * rotatedNormal.x +
+        Math.sin(lightAngle) * rotatedNormal.y
 
       if (dotProduct < 0) {
         ctx.moveTo(edge.start[0], edge.start[1])
@@ -220,7 +309,6 @@ export class SquareBlock extends Block {
       { start: [-1, -1], end: [-1, 1], normal: [-1, 0] }, // left
     ]
 
-
     // Draw edges, in their correct colours
     ctx.beginPath()
     ctx.lineWidth = 2
@@ -232,11 +320,13 @@ export class SquareBlock extends Block {
           edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
       }
       const normal_direction = Math.atan2(rotatedNormal.y, rotatedNormal.x)
-      const dotProduct = Math.cos(light_direction) * rotatedNormal.x + Math.sin(light_direction) * rotatedNormal.y
-    
+      const dotProduct =
+        Math.cos(light_direction) * rotatedNormal.x +
+        Math.sin(light_direction) * rotatedNormal.y
+
       // Set color based on whether edge faces light
       ctx.strokeStyle = dotProduct < 0 ? 'white' : '#333'
-    
+
       // Draw edge scaled by radius
       ctx.moveTo(edge.start[0] * this.radius, edge.start[1] * this.radius)
       ctx.lineTo(edge.end[0] * this.radius, edge.end[1] * this.radius)
