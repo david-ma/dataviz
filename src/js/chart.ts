@@ -136,6 +136,7 @@ class Chart {
 
     this.width = opts.width || 960
     this.height = opts.height || 600
+    this.mouse_position = { x: 0, y: 0 }
 
     if (opts.margin && typeof opts.margin !== 'number') {
       this.margin = opts.margin
