@@ -116,13 +116,15 @@ export type BlockOptions = {
   radius?: number
   rotation?: number
   shape?: ShapeType
+  colour?: string
 }
 
 export function blockFactory(options: BlockOptions): Block {
   const position = options.position || { x: 0, y: 0 },
     rotation = options.rotation || 0,
     shape = options.shape || ShapeType.Circle,
-    radius = options.radius || 1
+    radius = options.radius || 1,
+    colour = options.colour || 'black'
 
   const body = options.world.createRigidBody(
     RAPIER.RigidBodyDesc.dynamic()
@@ -131,13 +133,13 @@ export function blockFactory(options: BlockOptions): Block {
   )
   switch (shape) {
     case ShapeType.Circle:
-      return new CircleBlock(body, radius)
+      return new CircleBlock(body, ShapeType.Circle, radius, colour)
     case ShapeType.Square:
-      return new SquareBlock(body, radius)
+      return new SquareBlock(body, ShapeType.Square, radius, colour)
     case ShapeType.Triangle:
-      return new TriangleBlock(body, radius)
+      return new TriangleBlock(body, ShapeType.Triangle, radius, colour)
     default:
-      return new CircleBlock(body, radius)
+      return new CircleBlock(body, ShapeType.Circle, radius, colour)
   }
 }
 
@@ -146,11 +148,18 @@ export class Block {
   shape: ShapeType
   radius: number
   physicsRadius: number
+  colour: string
 
-  constructor(body: RAPIER.RigidBody, shape: ShapeType, radius: number) {
+  constructor(
+    body: RAPIER.RigidBody,
+    shape: ShapeType,
+    radius: number,
+    colour?: string
+  ) {
     this.body = body
     this.shape = shape
     this.radius = radius
+    this.colour = colour || 'black'
     const scale = 50
 
     // Scale physics colliders to match visual size
@@ -200,10 +209,6 @@ export class Block {
 }
 
 export class TriangleBlock extends Block {
-  constructor(body: RAPIER.RigidBody, radius: number) {
-    super(body, ShapeType.Triangle, radius)
-  }
-
   physicsVertices() {
     const h = (this.physicsRadius * Math.sqrt(3)) / 2
     return new Float32Array([
@@ -303,10 +308,6 @@ export class TriangleBlock extends Block {
 }
 
 export class SquareBlock extends Block {
-  constructor(body: RAPIER.RigidBody, radius: number) {
-    super(body, ShapeType.Square, radius)
-  }
-
   physicsVertices() {
     return new Float32Array([
       -this.physicsRadius,
@@ -401,10 +402,6 @@ export class SquareBlock extends Block {
 }
 
 export class CircleBlock extends Block {
-  constructor(body: RAPIER.RigidBody, radius: number) {
-    super(body, ShapeType.Circle, radius)
-  }
-
   initPhysics(world: RAPIER.World) {
     world.createCollider(
       RAPIER.ColliderDesc.ball(this.physicsRadius),

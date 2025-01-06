@@ -28,6 +28,7 @@ export type BlockOptions = {
     radius?: number;
     rotation?: number;
     shape?: ShapeType;
+    colour?: string;
 };
 export declare function blockFactory(options: BlockOptions): Block;
 export declare class Block {
@@ -35,7 +36,8 @@ export declare class Block {
     shape: ShapeType;
     radius: number;
     physicsRadius: number;
-    constructor(body: RAPIER.RigidBody, shape: ShapeType, radius: number);
+    colour: string;
+    constructor(body: RAPIER.RigidBody, shape: ShapeType, radius: number, colour?: string);
     physicsVertices(): Float32Array;
     initPhysics(world: RAPIER.World): void;
     draw(ctx: CanvasRenderingContext2D, position: Position, lightPoint: Position): void;
@@ -43,17 +45,14 @@ export declare class Block {
     lightAngle(lightPoint: Position): number;
 }
 export declare class TriangleBlock extends Block {
-    constructor(body: RAPIER.RigidBody, radius: number);
     physicsVertices(): Float32Array;
     draw(ctx: CanvasRenderingContext2D, position: Position, lightPoint: Position): void;
 }
 export declare class SquareBlock extends Block {
-    constructor(body: RAPIER.RigidBody, radius: number);
     physicsVertices(): Float32Array;
     draw(ctx: CanvasRenderingContext2D, position: Position, lightPoint: Position): void;
 }
 export declare class CircleBlock extends Block {
-    constructor(body: RAPIER.RigidBody, radius: number);
     initPhysics(world: RAPIER.World): void;
     draw(ctx: CanvasRenderingContext2D, position: Position, lightPoint: Position): void;
 }
