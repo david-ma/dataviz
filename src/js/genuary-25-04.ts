@@ -1,6 +1,3 @@
-import { Chart, d3 } from './chart'
-import RAPIER from '@dimforge/rapier2d'
-
 import {
   Block,
   Position,
@@ -17,7 +14,6 @@ new RapierChart({
   .clear_canvas()
   .scratchpad((chart: RapierChart) => {
     const blocks: Block[] = []
-    // const world = this.world
 
     function spawnBlock() {
       const randX = (Math.random() - 0.5) * (chart.width / chart.scale)

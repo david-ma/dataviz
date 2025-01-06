@@ -119,21 +119,25 @@ export type BlockOptions = {
 }
 
 export function blockFactory(options: BlockOptions): Block {
+  const position = options.position || { x: 0, y: 0 },
+    rotation = options.rotation || 0,
+    shape = options.shape || ShapeType.Circle,
+    radius = options.radius || 1
+
   const body = options.world.createRigidBody(
-    RAPIER.RigidBodyDesc.dynamic().setTranslation(
-      options.position.x,
-      options.position.y
-    )
+    RAPIER.RigidBodyDesc.dynamic()
+      .setTranslation(position.x, position.y)
+      .setRotation(rotation)
   )
-  switch (options.shape) {
+  switch (shape) {
     case ShapeType.Circle:
-      return new CircleBlock(body, options.radius || 1)
+      return new CircleBlock(body, radius)
     case ShapeType.Square:
-      return new SquareBlock(body, options.radius || 1)
+      return new SquareBlock(body, radius)
     case ShapeType.Triangle:
-      return new TriangleBlock(body, options.radius || 1)
+      return new TriangleBlock(body, radius)
     default:
-      return new CircleBlock(body, options.radius || 1)
+      return new CircleBlock(body, radius)
   }
 }
 
