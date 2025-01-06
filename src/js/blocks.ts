@@ -71,12 +71,15 @@ export class RapierChart extends Chart {
       const shape: RAPIER.Shape = collider.shape
       const position = collider.translation()
       const angle = collider.rotation()
+
+      // Transform context
       this.context.translate(
         position.x * this.scale + this.width / 2,
         this.height - (position.y * this.scale + this.height / 2)
       )
       this.context.rotate(angle)
       this.context.beginPath()
+
       try {
         if (shape instanceof RAPIER.Ball) {
           const radius = shape.radius * this.scale
@@ -91,22 +94,35 @@ export class RapierChart extends Chart {
             half_height * 2
           )
         } else if (shape instanceof RAPIER.ConvexPolygon) {
-          const vertices: Float32Array = shape.vertices
-          if (vertices.length < 2 || vertices.length % 2 !== 0) {
-            console.error('Invalid vertices:', vertices)
+          const vertices = shape.vertices
+          if (vertices.length % 2 !== 0) {
+            console.error('Invalid vertex count', shape)
+            throw new Error('Invalid vertex count')
           }
-          for (let i = 0; i < vertices.length; i += 2) {
-            this.context.lineTo(
-              vertices[i] * this.scale,
-              vertices[i + 1] * this.scale
+          if (vertices.length > 0) {
+            this.context.moveTo(
+              vertices[0] * this.scale,
+              vertices[1] * this.scale
             )
+            for (let i = 2; i < vertices.length; i += 2) {
+              this.context.lineTo(
+                vertices[i] * this.scale,
+                vertices[i + 1] * this.scale
+              )
+            }
+            this.context.closePath()
           }
-          this.context.closePath()
+        } else {
+          console.warn('Unknown shape type:', shape)
         }
+
+        // Fill and stroke the path
+        this.context.fill()
+        this.context.stroke()
       } catch (e) {
         console.error('Error drawing shape:', e)
       }
-      this.context.stroke()
+
       this.context.restore()
     })
   }
