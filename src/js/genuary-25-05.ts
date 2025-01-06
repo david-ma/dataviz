@@ -1,44 +1,53 @@
-import { Chart, d3 } from './chart'
-import { Position, ShapeType, Block, SquareBlock } from './blocks'
+import {
+  Block,
+  Position,
+  RapierChart,
+  BlockOptions,
+  blockFactory,
+  ShapeType,
+} from './blocks'
 
-const blocks : Block[] = []
-const scale = 50
-
-new Chart({
+new RapierChart({
   element: 'datavizChart',
   nav: false,
   renderer: 'canvas',
 })
   .clear_canvas()
-  .scratchpad((chart) => {
+  .scratchpad((chart: RapierChart) => {
+    const blocks: Block[] = []
 
-    blocks.push(new SquareBlock(null, 2))
+    function spawnBlock() {
+      const block_options: BlockOptions = {
+        world: chart.world,
+        radius: 60,
+        // rotation: Math.random() * Math.PI * 2,
+        shape: ShapeType.Square,
+        colour: 'red',
+      }
 
-    function drawLightSource(ctx: CanvasRenderingContext2D, position: Position) {
+      const block = blockFactory(block_options)
+
+      block.initPhysics(chart.world)
+      blocks.push(block)
+    }
+
+    function drawLightSource(
+      ctx: CanvasRenderingContext2D,
+      position: Position
+    ) {
       ctx.save()
       ctx.beginPath()
       ctx.arc(position.x, position.y, 10, 0, Math.PI * 2)
       ctx.fillStyle = 'white'
-      
+
       ctx.fill()
       ctx.restore()
     }
 
-    function drawShape(
-      ctx: CanvasRenderingContext2D,
-      position: Position,
-      lightPosition: Position,
-      block: Block
-    ) {
-
-      ctx.beginPath()
-      ctx.fillStyle = 'green'
-
-      block.draw(ctx, position, lightPosition)
-    }
-
     function render() {
       chart.clear_canvas()
+      chart.world.step()
+      chart.draw_colliders()
 
       // Get the mouse position and use it as lightPosition
       const lightPosition = chart.mouse_position
@@ -46,17 +55,15 @@ new Chart({
       // Draw light source
       drawLightSource(chart.context, lightPosition)
 
-      blocks.forEach((block) => {
-        // const position = block.body.translation()
-        const position = { x: chart.width / 2, y: chart.height / 2 }
-        const screenPosition = {
-          x: position.x * scale + chart.width / 2,
-          y: chart.height - (position.y * scale + chart.height / 2),
-        }
-        drawShape(chart.context, screenPosition, lightPosition, block)
-      })
+      chart.draw_blocks(blocks)
+
       requestAnimationFrame(render)
     }
 
+    globalThis.blockSpawner = setInterval(spawnBlock, 1)
     requestAnimationFrame(render)
   })
+
+window.setTimeout(() => {
+  clearInterval(globalThis.blockSpawner)
+}, 1)

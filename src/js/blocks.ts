@@ -10,16 +10,20 @@ export class RapierChart extends Chart {
   colliders: RAPIER.Collider[] = []
 
   constructor(options) {
+    options.renderer = 'canvas'
     super(options)
     if (!this.context) throw new Error('Canvas context required')
 
     this.scale = RapierChart.PHYSICS_SCALE
-    this.initPhysicsWorld()
+    if (options.gravity) {
+      this.initPhysicsWorld(options.gravity)
+    } else {
+      this.world = new RAPIER.World(new RAPIER.Vector2(0, 0))
+    }
   }
 
-  private initPhysicsWorld() {
-    const gravity = new RAPIER.Vector2(0.0, -9.81)
-    this.world = new RAPIER.World(gravity)
+  private initPhysicsWorld(gravity) {
+    this.world = new RAPIER.World(new RAPIER.Vector2(gravity.x, gravity.y))
     this.createBoundaries()
   }
 

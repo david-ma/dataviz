@@ -11,6 +11,7 @@ new RapierChart({
   element: 'datavizChart',
   nav: false,
   renderer: 'canvas',
+  gravity: { x: 0, y: -9.81 },
 })
   .clear_canvas()
   .scratchpad((chart: RapierChart) => {
