@@ -1,5 +1,5 @@
 import { Chart, d3 } from './chart'
-import { Position, ShapeType, Block, SquareBlock } from './genuary-25-04'
+import { Position, ShapeType, Block, SquareBlock } from './blocks'
 
 const blocks : Block[] = []
 const scale = 50
