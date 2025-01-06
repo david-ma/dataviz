@@ -2,35 +2,63 @@ import RAPIER from '@dimforge/rapier2d'
 import { Chart, d3 } from './chart'
 
 export class RapierChart extends Chart {
+  private static readonly PHYSICS_SCALE = 50
+  private static readonly WALL_THICKNESS = 0.1
+
   world: RAPIER.World
   scale: number
   colliders: RAPIER.Collider[] = []
 
   constructor(options) {
     super(options)
-    console.log('RapierChart constructor, with gravity and ground')
+    if (!this.context) throw new Error('Canvas context required')
 
-    const scale = (this.scale = 50)
+    this.scale = RapierChart.PHYSICS_SCALE
+    this.initPhysicsWorld()
+  }
+
+  private initPhysicsWorld() {
     const gravity = new RAPIER.Vector2(0.0, -9.81)
     this.world = new RAPIER.World(gravity)
+    this.createBoundaries()
+  }
 
-    let groundColliderDesc = RAPIER.ColliderDesc.cuboid(
-      this.width / scale / 2, // half width
-      0.1 // height
+  private createBoundaries() {
+    const groundCollider = RAPIER.ColliderDesc.cuboid(
+      this.width / this.scale / 2,
+      RapierChart.WALL_THICKNESS
     )
-    let wallColliderDesc = RAPIER.ColliderDesc.cuboid(
-      0.1, // width
-      this.height / scale / 2 // half height
+    const wallCollider = RAPIER.ColliderDesc.cuboid(
+      RapierChart.WALL_THICKNESS,
+      this.height / this.scale / 2
     )
 
-    this.colliders.push(
-      this.world.createCollider(groundColliderDesc),
-      this.world.createCollider(wallColliderDesc),
-      this.world.createCollider(wallColliderDesc)
+    // Create and position boundaries
+    this.colliders = [
+      this.world.createCollider(groundCollider),
+      this.world.createCollider(wallCollider),
+      this.world.createCollider(wallCollider),
+    ]
+
+    // Position colliders
+    this.positionBoundaries()
+  }
+
+  private positionBoundaries() {
+    const positions = [
+      { x: 0, y: -this.height / this.scale / 2 }, // ground
+      { x: -this.width / this.scale / 2, y: 0 }, // left wall
+      { x: this.width / this.scale / 2, y: 0 }, // right wall
+    ]
+
+    this.colliders.forEach((collider, i) =>
+      collider.setTranslation(positions[i])
     )
-    this.colliders[0].setTranslation({ x: 0, y: -this.height / scale / 2 })
-    this.colliders[1].setTranslation({ x: -this.width / scale / 2, y: 0 })
-    this.colliders[2].setTranslation({ x: this.width / scale / 2, y: 0 })
+  }
+
+  dispose() {
+    this.world.free()
+    this.colliders = []
   }
 
   draw_colliders() {

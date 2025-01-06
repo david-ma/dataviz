@@ -4,6 +4,7 @@ import {
   RapierChart,
   BlockOptions,
   blockFactory,
+  ShapeType,
 } from './blocks'
 
 new RapierChart({
@@ -21,7 +22,7 @@ new RapierChart({
       const randRadius = 15 + Math.random() * 20
 
       // Random shape
-      const shape = Math.floor(Math.random() * 3)
+      const shape: ShapeType = Math.floor(Math.random() * 3)
       const block_options: BlockOptions = {
         world: chart.world,
         position: { x: randX, y: top_of_chart },

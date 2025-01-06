@@ -1,10 +1,16 @@
 import RAPIER from '@dimforge/rapier2d';
 import { Chart } from './chart';
 export declare class RapierChart extends Chart {
+    private static readonly PHYSICS_SCALE;
+    private static readonly WALL_THICKNESS;
     world: RAPIER.World;
     scale: number;
     colliders: RAPIER.Collider[];
     constructor(options: any);
+    private initPhysicsWorld;
+    private createBoundaries;
+    private positionBoundaries;
+    dispose(): void;
     draw_colliders(): void;
     draw_blocks(blocks: Block[]): void;
 }
