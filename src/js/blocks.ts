@@ -191,6 +191,8 @@ export function blockFactory(options: BlockOptions): Block {
   }
 }
 
+type Line = { start: Position; end: Position }
+
 export class Block {
   body: RAPIER.RigidBody
   shape: ShapeType
@@ -253,6 +255,39 @@ export class Block {
     // This is the angle between the light vector and the body's normal vector
 
     return naiveLightAngle
+  }
+
+  drawHighlightedLine(ctx: CanvasRenderingContext2D, line: Line, lightPoint: Position) {
+    ctx.save()
+    ctx.beginPath()
+    ctx.lineWidth = 2
+    ctx.moveTo(line.start.x, line.start.y)
+    ctx.lineTo(line.end.x, line.end.y)
+    ctx.strokeStyle = 'white'
+
+    if (
+      Math.sign(
+        (line.end.x - line.start.x) * (lightPoint.y - line.start.y) -
+          (line.end.y - line.start.y) * (lightPoint.x - line.start.x)
+      ) === 1
+    ) {
+      ctx.strokeStyle = '#333'
+    }
+    ctx.stroke()
+    // Draw arrow at end for debugging
+    // ctx.beginPath()
+    // ctx.translate(line.end.x, line.end.y)
+    // ctx.rotate(
+    //   Math.atan2(line.end.y - line.start.y, line.end.x - line.start.x)
+    // )
+    // ctx.moveTo(0, 0)
+    // ctx.lineTo(-10, -5)
+    // ctx.lineTo(-10, 5)
+    // ctx.lineTo(0, 0)
+    // ctx.fillStyle = 'white'
+    // ctx.fill()
+
+    ctx.restore()
   }
 }
 
@@ -373,7 +408,7 @@ export class SquareBlock extends Block {
     position: Position,
     lightPoint: Position
   ) {
-    const angle = this.rotation()
+    // const angle = this.rotation()
 
     // Calculate vector from square to light
     const lightVector = {
@@ -382,48 +417,88 @@ export class SquareBlock extends Block {
     }
     const light_direction = Math.atan2(lightVector.y, lightVector.x)
 
-    ctx.save()
-    ctx.translate(position.x, position.y)
-    ctx.rotate(angle)
+    // ctx.save()
+    // ctx.translate(position.x, position.y)
+    // ctx.rotate(angle)
 
-    // Base square
-    ctx.beginPath()
-    ctx.rect(-this.radius, -this.radius, this.radius * 2, this.radius * 2)
-    ctx.fillStyle = this.colour
-    ctx.fill()
+    // // Base square
+    // ctx.beginPath()
+    // ctx.rect(-this.radius, -this.radius, this.radius * 2, this.radius * 2)
+    // ctx.fillStyle = this.colour
+    // ctx.fill()
 
     // Define edges with normals
     const edges = [
       { start: [-1, -1], end: [1, -1], normal: [0, -1] }, // top
       { start: [1, -1], end: [1, 1], normal: [1, 0] }, // right
-      { start: [-1, 1], end: [1, 1], normal: [0, 1] }, // bottom
-      { start: [-1, -1], end: [-1, 1], normal: [-1, 0] }, // left
+      { start: [1, 1], end: [-1, 1], normal: [0, 1] }, // bottom
+      { start: [-1, 1], end: [-1, -1], normal: [-1, 0] }, // left
     ]
 
-    // Draw edges, in their correct colours
-    ctx.beginPath()
-    ctx.lineWidth = 2
-    edges.forEach((edge) => {
-      const rotatedNormal = {
-        x:
-          edge.normal[0] * Math.cos(-angle) - edge.normal[1] * Math.sin(-angle),
-        y:
-          edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
+    const angle = this.body.rotation()
+    for (const edge of edges) {
+      const rotatedEdge = {
+        start: {
+          x: edge.start[0] * Math.cos(angle) - edge.start[1] * Math.sin(angle),
+          y: edge.start[0] * Math.sin(angle) + edge.start[1] * Math.cos(angle),
+        },
+        end: {
+          x: edge.end[0] * Math.cos(angle) - edge.end[1] * Math.sin(angle),
+          y: edge.end[0] * Math.sin(angle) + edge.end[1] * Math.cos(angle),
+        },
       }
-      const normal_direction = Math.atan2(rotatedNormal.y, rotatedNormal.x)
 
-      const dotProduct = light_direction * normal_direction * Math.cos(angle)
+      const scaledEdge = {
+        start: {
+          x: rotatedEdge.start.x * this.radius,
+          y: rotatedEdge.start.y * this.radius,
+        },
+        end: {
+          x: rotatedEdge.end.x * this.radius,
+          y: rotatedEdge.end.y * this.radius,
+        },
+      }
 
-      // Set color based on whether edge faces light
-      ctx.strokeStyle = dotProduct < 0 ? 'white' : '#333'
+      const translatedEdge = {
+        start: {
+          x: position.x + scaledEdge.start.x,
+          y: position.y + scaledEdge.start.y,
+        },
+        end: {
+          x: position.x + scaledEdge.end.x,
+          y: position.y + scaledEdge.end.y,
+        },
+      }
 
-      // Draw edge scaled by radius
-      ctx.moveTo(edge.start[0] * this.radius, edge.start[1] * this.radius)
-      ctx.lineTo(edge.end[0] * this.radius, edge.end[1] * this.radius)
-    })
 
-    ctx.stroke()
-    ctx.restore()
+      this.drawHighlightedLine(ctx, translatedEdge, lightPoint)
+    }
+    // ctx.fillStyle = this.colour
+
+    // Draw edges, in their correct colours
+    // ctx.beginPath()
+    // ctx.lineWidth = 2
+    // edges.forEach((edge) => {
+    //   const rotatedNormal = {
+    //     x:
+    //       edge.normal[0] * Math.cos(-angle) - edge.normal[1] * Math.sin(-angle),
+    //     y:
+    //       edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
+    //   }
+    //   const normal_direction = Math.atan2(rotatedNormal.y, rotatedNormal.x)
+
+    //   const dotProduct = light_direction * normal_direction * Math.cos(angle)
+
+    //   // Set color based on whether edge faces light
+    //   ctx.strokeStyle = dotProduct < 0 ? 'white' : '#333'
+
+    //   // Draw edge scaled by radius
+    //   ctx.moveTo(edge.start[0] * this.radius, edge.start[1] * this.radius)
+    //   ctx.lineTo(edge.end[0] * this.radius, edge.end[1] * this.radius)
+    // })
+
+    // ctx.stroke()
+    // ctx.restore()
 
     // // Draw back edges (grey)
     // ctx.beginPath()

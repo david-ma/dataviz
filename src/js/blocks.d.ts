@@ -37,6 +37,10 @@ export type BlockOptions = {
     colour?: string;
 };
 export declare function blockFactory(options: BlockOptions): Block;
+type Line = {
+    start: Position;
+    end: Position;
+};
 export declare class Block {
     body: RAPIER.RigidBody;
     shape: ShapeType;
@@ -49,6 +53,7 @@ export declare class Block {
     draw(ctx: CanvasRenderingContext2D, position: Position, lightPoint: Position): void;
     rotation(): number;
     lightAngle(lightPoint: Position): number;
+    drawHighlightedLine(ctx: CanvasRenderingContext2D, line: Line, lightPoint: Position): void;
 }
 export declare class TriangleBlock extends Block {
     physicsVertices(): Float32Array;
@@ -62,3 +67,4 @@ export declare class CircleBlock extends Block {
     initPhysics(world: RAPIER.World): void;
     draw(ctx: CanvasRenderingContext2D, position: Position, lightPoint: Position): void;
 }
+export {};

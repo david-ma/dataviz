@@ -54,7 +54,6 @@ new RapierChart({
       }
       ctx.stroke()
       // Draw arrow at end
-      ctx.save()
       ctx.beginPath()
       ctx.translate(line.end.x, line.end.y)
       ctx.rotate(
