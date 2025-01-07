@@ -389,7 +389,7 @@ export class SquareBlock extends Block {
     // Base square
     ctx.beginPath()
     ctx.rect(-this.radius, -this.radius, this.radius * 2, this.radius * 2)
-    ctx.fillStyle = '#000'
+    ctx.fillStyle = this.colour
     ctx.fill()
 
     // Define edges with normals
@@ -411,9 +411,8 @@ export class SquareBlock extends Block {
           edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
       }
       const normal_direction = Math.atan2(rotatedNormal.y, rotatedNormal.x)
-      const dotProduct =
-        Math.cos(light_direction) * rotatedNormal.x +
-        Math.sin(light_direction) * rotatedNormal.y
+
+      const dotProduct = light_direction * normal_direction * Math.cos(angle)
 
       // Set color based on whether edge faces light
       ctx.strokeStyle = dotProduct < 0 ? 'white' : '#333'
@@ -422,6 +421,7 @@ export class SquareBlock extends Block {
       ctx.moveTo(edge.start[0] * this.radius, edge.start[1] * this.radius)
       ctx.lineTo(edge.end[0] * this.radius, edge.end[1] * this.radius)
     })
+
     ctx.stroke()
     ctx.restore()
 
