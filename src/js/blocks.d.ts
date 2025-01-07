@@ -66,11 +66,9 @@ export declare abstract class Block {
 }
 export declare class TriangleBlock extends Block {
     vertices: ShapeDefinition;
-    physicsVertices(): Float32Array;
 }
 export declare class SquareBlock extends Block {
     vertices: ShapeDefinition;
-    physicsVertices(): Float32Array;
 }
 export declare class CircleBlock extends Block {
     initPhysics(world: RAPIER.World): void;

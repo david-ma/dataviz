@@ -54,7 +54,8 @@ new RapierChart({
     function render() {
       chart.clear_canvas()
       chart.world.step()
-      chart.draw_colliders()
+      // Debug colliders
+      // chart.draw_colliders()
 
       // Get the mouse position and use it as lightPosition
       const lightPosition = chart.mouse_position

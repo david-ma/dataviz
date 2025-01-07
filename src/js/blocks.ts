@@ -227,7 +227,8 @@ export abstract class Block {
   }
 
   physicsVertices(): Float32Array {
-    throw new Error('Method not implemented.')
+    const vertices = this.vertices ? this.vertices.vertices : []
+    return new Float32Array(vertices.flat().map((v) => v * this.physicsRadius))
   }
 
   initPhysics(world: RAPIER.World) {
@@ -381,18 +382,6 @@ export class TriangleBlock extends Block {
       { start: [-0.866, 0.5], end: [0, -1], normal: [-0.866, -0.5] },
     ],
   }
-
-  physicsVertices() {
-    const h = (this.physicsRadius * Math.sqrt(3)) / 2
-    return new Float32Array([
-      0,
-      this.physicsRadius, // top
-      (-this.physicsRadius * Math.sqrt(3)) / 2,
-      -h / 2, // bottom left
-      (this.physicsRadius * Math.sqrt(3)) / 2,
-      -h / 2, // bottom right
-    ])
-  }
 }
 
 export class SquareBlock extends Block {
@@ -409,19 +398,6 @@ export class SquareBlock extends Block {
       { start: [1, 1], end: [-1, 1], normal: [0, 1] },
       { start: [-1, 1], end: [-1, -1], normal: [-1, 0] },
     ],
-  }
-
-  physicsVertices() {
-    return new Float32Array([
-      -this.physicsRadius,
-      -this.physicsRadius,
-      this.physicsRadius,
-      -this.physicsRadius,
-      this.physicsRadius,
-      this.physicsRadius,
-      -this.physicsRadius,
-      this.physicsRadius,
-    ])
   }
 }
 
