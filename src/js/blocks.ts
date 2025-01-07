@@ -278,19 +278,6 @@ export class Block {
       ctx.strokeStyle = '#333'
     }
     ctx.stroke()
-    // Draw arrow at end for debugging
-    // ctx.beginPath()
-    // ctx.translate(line.end.x, line.end.y)
-    // ctx.rotate(
-    //   Math.atan2(line.end.y - line.start.y, line.end.x - line.start.x)
-    // )
-    // ctx.moveTo(0, 0)
-    // ctx.lineTo(-10, -5)
-    // ctx.lineTo(-10, 5)
-    // ctx.lineTo(0, 0)
-    // ctx.fillStyle = 'white'
-    // ctx.fill()
-
     ctx.restore()
   }
 }
@@ -313,84 +300,93 @@ export class TriangleBlock extends Block {
     lightPoint: Position
   ) {
     const angle = this.body.rotation()
-    const h = (this.radius * Math.sqrt(3)) / 2
-    const lightAngle = this.lightAngle(lightPoint)
 
-    ctx.save()
-    ctx.translate(position.x, position.y)
-    ctx.rotate(angle)
-
-    // Base triangle
+    // Draw filled triangle first
     ctx.beginPath()
-    ctx.moveTo(0, -this.radius)
-    ctx.lineTo(h, this.radius / 2)
-    ctx.lineTo(-h, this.radius / 2)
-    ctx.closePath()
-    ctx.fillStyle = '#000'
-    ctx.fill()
-
-    const triangleEdges = [
-      {
-        start: [0, -this.radius],
-        end: [h, this.radius / 2],
-        normal: [-0.866, -0.5], // right edge normal (60° rotated)
-      },
-      {
-        start: [h, this.radius / 2],
-        end: [-h, this.radius / 2],
-        normal: [0, 1], // bottom edge normal
-      },
-      {
-        start: [-h, this.radius / 2],
-        end: [0, -this.radius],
-        normal: [0.866, -0.5], // left edge normal (60° rotated)
-      },
+    const vertices = [
+      [0, -1], // top
+      [0.866, 0.5], // bottom right (cos 60°, sin 60°)
+      [-0.866, 0.5], // bottom left (-cos 60°, sin 60°)
     ]
 
-    // Draw back edges (grey)
-    ctx.beginPath()
-    ctx.strokeStyle = '#333'
-    ctx.lineWidth = 2
-    triangleEdges.forEach((edge) => {
-      const rotatedNormal = {
+    // Transform first vertex
+    const firstVertex = {
+      x:
+        position.x +
+        (vertices[0][0] * Math.cos(angle) - vertices[0][1] * Math.sin(angle)) *
+          this.radius,
+      y:
+        position.y +
+        (vertices[0][0] * Math.sin(angle) + vertices[0][1] * Math.cos(angle)) *
+          this.radius,
+    }
+
+    ctx.moveTo(firstVertex.x, firstVertex.y)
+
+    // Draw rest of triangle
+    for (let i = 1; i < vertices.length; i++) {
+      const transformedVertex = {
         x:
-          edge.normal[0] * Math.cos(-angle) - edge.normal[1] * Math.sin(-angle),
+          position.x +
+          (vertices[i][0] * Math.cos(angle) -
+            vertices[i][1] * Math.sin(angle)) *
+            this.radius,
         y:
-          edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
+          position.y +
+          (vertices[i][0] * Math.sin(angle) +
+            vertices[i][1] * Math.cos(angle)) *
+            this.radius,
       }
-      const dotProduct =
-        Math.cos(lightAngle) * rotatedNormal.x +
-        Math.sin(lightAngle) * rotatedNormal.y
+      ctx.lineTo(transformedVertex.x, transformedVertex.y)
+    }
 
-      if (dotProduct >= 0) {
-        ctx.moveTo(edge.start[0], edge.start[1])
-        ctx.lineTo(edge.end[0], edge.end[1])
+    ctx.closePath()
+    ctx.fillStyle = 'black'
+    ctx.fill()
+
+    // Define edges with normals (60° angles)
+    const edges = [
+      { start: [0, -1], end: [0.866, 0.5], normal: [0.866, -0.5] }, // right edge
+      { start: [0.866, 0.5], end: [-0.866, 0.5], normal: [0, 1] }, // bottom edge
+      { start: [-0.866, 0.5], end: [0, -1], normal: [-0.866, -0.5] }, // left edge
+    ]
+
+    for (const edge of edges) {
+      const rotatedEdge = {
+        start: {
+          x: edge.start[0] * Math.cos(angle) - edge.start[1] * Math.sin(angle),
+          y: edge.start[0] * Math.sin(angle) + edge.start[1] * Math.cos(angle),
+        },
+        end: {
+          x: edge.end[0] * Math.cos(angle) - edge.end[1] * Math.sin(angle),
+          y: edge.end[0] * Math.sin(angle) + edge.end[1] * Math.cos(angle),
+        },
       }
-    })
-    ctx.stroke()
 
-    // Draw front edges (white)
-    ctx.beginPath()
-    ctx.strokeStyle = 'white'
-    triangleEdges.forEach((edge) => {
-      const rotatedNormal = {
-        x:
-          edge.normal[0] * Math.cos(-angle) - edge.normal[1] * Math.sin(-angle),
-        y:
-          edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
+      const scaledEdge = {
+        start: {
+          x: rotatedEdge.start.x * this.radius,
+          y: rotatedEdge.start.y * this.radius,
+        },
+        end: {
+          x: rotatedEdge.end.x * this.radius,
+          y: rotatedEdge.end.y * this.radius,
+        },
       }
-      const dotProduct =
-        Math.cos(lightAngle) * rotatedNormal.x +
-        Math.sin(lightAngle) * rotatedNormal.y
 
-      if (dotProduct < 0) {
-        ctx.moveTo(edge.start[0], edge.start[1])
-        ctx.lineTo(edge.end[0], edge.end[1])
+      const translatedEdge = {
+        start: {
+          x: position.x + scaledEdge.start.x,
+          y: position.y + scaledEdge.start.y,
+        },
+        end: {
+          x: position.x + scaledEdge.end.x,
+          y: position.y + scaledEdge.end.y,
+        },
       }
-    })
-    ctx.stroke()
 
-    ctx.restore()
+      this.drawHighlightedLine(ctx, translatedEdge, lightPoint)
+    }
   }
 }
 
