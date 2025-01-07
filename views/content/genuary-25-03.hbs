@@ -7,10 +7,7 @@
       <div id="description"></div>
       <div id="datavizChart" class="chart"></div>
       <br>
-      <h3>Code:</h3>
-      <pre id="codeDisplay" class="language-typescript">
-        {{{typescript}}}
-      </pre>
+      {{> showSource}}
     </div>
 
   </div>
@@ -20,43 +17,6 @@
   @font-face {
     font-family: "m6x11";
     src: url("/fonts/genuary25/m6x11.ttf") format("truetype");
-  }
-
-  pre#codeDisplay {
-    background: #282c34;
-    padding: 1em;
-    border-radius: 5px;
-    overflow-x: auto;
-    width: 100%;
-  }
-
-  /* for block of numbers */
-  .hljs-ln-numbers {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-
-    text-align: center;
-    color: #ccc;
-    border-right: 1px solid #CCC;
-    vertical-align: top;
-    padding-right: 15px;
-
-    /* your custom style here */
-  }
-
-  table.hljs-ln tr {
-    td.hljs-ln-numbers {
-      padding-right: 0.5em;
-      text-align: right;
-    }
-
-    td.hljs-ln-code {
-      padding-left: 0.5em;
-    }
   }
 </style>
 
@@ -73,15 +33,4 @@
 This isn't really much to look at, but today's challenge got me to upgrade my tooling quite a bit. I added a code renderer with syntax highlighting, and added [Rapier](https://rapier.rs/) which is a 2D physics engine written in Rust. It compiles to WebAssembly which we can use in the browser. I'm excited to see what I can do with this in the future.
 
 Clearly I'm still thinking about falling objects, from my viz from [yesterday](/blog/genuary-25-02). I wanted to see if using a library would shorten the code and allow me to do it in less lines.`));
-
-  hljs.initLineNumbersOnLoad();
-
-  fetch("/js/genuary-25-03.ts")
-    .then(response => response.text())
-    .then(code => {
-      document.getElementById('codeDisplay').textContent = code;
-      hljs.highlightElement(document.getElementById('codeDisplay'));
-      hljs.lineNumbersBlock(document.getElementById('codeDisplay'));
-    });
-
 </script>

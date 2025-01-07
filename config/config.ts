@@ -289,6 +289,26 @@ let config: Thalia.WebsiteConfig = {
         })
       }
     },
+    source: function source(router) {
+      // Show the source code for a typescript file
+      // Created for Genuary 2025
+      const filepath = router.path.join('/')
+      const regex = /js\/(.*).js/
+
+      // console.log(filepath)
+      if (regex.test(filepath)) {
+        const shortname = regex.exec(filepath)[1]
+        // console.log('Shortname', shortname)
+        router.response.setHeader('Content-Type', 'text/javascript')
+        router.response.end(
+          fs.readFileSync(
+            path.resolve(__dirname, '..', 'src', 'js', `${shortname}.ts`)
+          )
+        )
+      } else {
+        router.response.end('404')
+      }
+    },
   },
 }
 

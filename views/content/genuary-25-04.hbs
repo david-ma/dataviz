@@ -7,10 +7,7 @@
       <div id="description"></div>
       <div id="datavizChart" class="chart"></div>
       <br>
-      <h3>Code:</h3>
-      <pre id="codeDisplay" class="language-typescript">
-        {{{typescript}}}
-      </pre>
+      {{> showSource}}
     </div>
 
   </div>
@@ -21,47 +18,10 @@
     font-family: "m6x11";
     src: url("/fonts/genuary25/m6x11.ttf") format("truetype");
   }
-
-  pre#codeDisplay {
-    background: #282c34;
-    padding: 1em;
-    border-radius: 5px;
-    overflow-x: auto;
-    width: 100%;
-  }
-
-  /* for block of numbers */
-  .hljs-ln-numbers {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-
-    text-align: center;
-    color: #ccc;
-    border-right: 1px solid #CCC;
-    vertical-align: top;
-    padding-right: 15px;
-
-    /* your custom style here */
-  }
-
-  table.hljs-ln tr {
-    td.hljs-ln-numbers {
-      padding-right: 0.5em;
-      text-align: right;
-    }
-
-    td.hljs-ln-code {
-      padding-left: 0.5em;
-    }
-  }
 </style>
 
 
-{{> require codeHighlight=true}}
+{{> require }}
 
 <script>
   var md = new showdown.Converter({ openLinksInNewWindow: true });
@@ -69,15 +29,4 @@
   $("#description").html(md.makeHtml(`#Genuary 2025
 
 [Day 4](https://genuary.art/prompts#jan2) prompt: "Black on black."`));
-
-  hljs.initLineNumbersOnLoad();
-
-  fetch("/js/genuary-25-04.ts")
-    .then(response => response.text())
-    .then(code => {
-      document.getElementById('codeDisplay').textContent = code;
-      hljs.highlightElement(document.getElementById('codeDisplay'));
-      hljs.lineNumbersBlock(document.getElementById('codeDisplay'));
-    });
-
 </script>

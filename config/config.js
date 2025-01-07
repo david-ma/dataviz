@@ -228,6 +228,18 @@ let config = {
                 });
             }
         },
+        source: function source(router) {
+            const filepath = router.path.join('/');
+            const regex = /js\/(.*).js/;
+            if (regex.test(filepath)) {
+                const shortname = regex.exec(filepath)[1];
+                router.response.setHeader('Content-Type', 'text/javascript');
+                router.response.end(fs_1.default.readFileSync(path_1.default.resolve(__dirname, '..', 'src', 'js', `${shortname}.ts`)));
+            }
+            else {
+                router.response.end('404');
+            }
+        },
     },
 };
 exports.config = config;

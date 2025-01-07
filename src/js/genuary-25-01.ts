@@ -1,4 +1,3 @@
-import { col } from 'sequelize'
 import { Chart, d3 } from './chart'
 // import * as d3 from 'd3'
 // import $ from 'jquery'
