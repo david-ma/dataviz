@@ -193,12 +193,22 @@ export function blockFactory(options: BlockOptions): Block {
 
 type Line = { start: Position; end: Position }
 
-export class Block {
+interface ShapeDefinition {
+  vertices: [number, number][]
+  edges: {
+    start: [number, number]
+    end: [number, number]
+    normal: [number, number]
+  }[]
+}
+
+export abstract class Block {
   body: RAPIER.RigidBody
   shape: ShapeType
   radius: number
   physicsRadius: number
   colour: string
+  vertices: ShapeDefinition
 
   constructor(
     body: RAPIER.RigidBody,
@@ -232,7 +242,83 @@ export class Block {
     position: Position,
     lightPoint: Position
   ) {
-    throw new Error('Method not implemented.')
+    const angle = this.body.rotation()
+
+    // Get shape-specific vertices and edges
+    const { vertices, edges } = this.vertices
+
+    // Draw filled shape
+    ctx.beginPath()
+    const firstVertex = {
+      x:
+        position.x +
+        (vertices[0][0] * Math.cos(angle) - vertices[0][1] * Math.sin(angle)) *
+          this.radius,
+      y:
+        position.y +
+        (vertices[0][0] * Math.sin(angle) + vertices[0][1] * Math.cos(angle)) *
+          this.radius,
+    }
+
+    ctx.moveTo(firstVertex.x, firstVertex.y)
+
+    for (let i = 1; i < vertices.length; i++) {
+      const transformedVertex = {
+        x:
+          position.x +
+          (vertices[i][0] * Math.cos(angle) -
+            vertices[i][1] * Math.sin(angle)) *
+            this.radius,
+        y:
+          position.y +
+          (vertices[i][0] * Math.sin(angle) +
+            vertices[i][1] * Math.cos(angle)) *
+            this.radius,
+      }
+      ctx.lineTo(transformedVertex.x, transformedVertex.y)
+    }
+
+    ctx.closePath()
+    ctx.fillStyle = 'black'
+    ctx.fill()
+
+    // Draw edges with highlights
+    edges.forEach((edge) => {
+      const rotatedEdge = {
+        start: {
+          x: edge.start[0] * Math.cos(angle) - edge.start[1] * Math.sin(angle),
+          y: edge.start[0] * Math.sin(angle) + edge.start[1] * Math.cos(angle),
+        },
+        end: {
+          x: edge.end[0] * Math.cos(angle) - edge.end[1] * Math.sin(angle),
+          y: edge.end[0] * Math.sin(angle) + edge.end[1] * Math.cos(angle),
+        },
+      }
+
+      const scaledEdge = {
+        start: {
+          x: rotatedEdge.start.x * this.radius,
+          y: rotatedEdge.start.y * this.radius,
+        },
+        end: {
+          x: rotatedEdge.end.x * this.radius,
+          y: rotatedEdge.end.y * this.radius,
+        },
+      }
+
+      const translatedEdge = {
+        start: {
+          x: position.x + scaledEdge.start.x,
+          y: position.y + scaledEdge.start.y,
+        },
+        end: {
+          x: position.x + scaledEdge.end.x,
+          y: position.y + scaledEdge.end.y,
+        },
+      }
+
+      this.drawHighlightedLine(ctx, translatedEdge, lightPoint)
+    })
   }
 
   rotation() {
@@ -283,6 +369,19 @@ export class Block {
 }
 
 export class TriangleBlock extends Block {
+  vertices: ShapeDefinition = {
+    vertices: [
+      [0, -1],
+      [0.866, 0.5],
+      [-0.866, 0.5],
+    ],
+    edges: [
+      { start: [0, -1], end: [0.866, 0.5], normal: [0.866, -0.5] },
+      { start: [0.866, 0.5], end: [-0.866, 0.5], normal: [0, 1] },
+      { start: [-0.866, 0.5], end: [0, -1], normal: [-0.866, -0.5] },
+    ],
+  }
+
   physicsVertices() {
     const h = (this.physicsRadius * Math.sqrt(3)) / 2
     return new Float32Array([
@@ -294,103 +393,24 @@ export class TriangleBlock extends Block {
       -h / 2, // bottom right
     ])
   }
-  draw(
-    ctx: CanvasRenderingContext2D,
-    position: Position,
-    lightPoint: Position
-  ) {
-    const angle = this.body.rotation()
-
-    // Draw filled triangle first
-    ctx.beginPath()
-    const vertices = [
-      [0, -1], // top
-      [0.866, 0.5], // bottom right (cos 60°, sin 60°)
-      [-0.866, 0.5], // bottom left (-cos 60°, sin 60°)
-    ]
-
-    // Transform first vertex
-    const firstVertex = {
-      x:
-        position.x +
-        (vertices[0][0] * Math.cos(angle) - vertices[0][1] * Math.sin(angle)) *
-          this.radius,
-      y:
-        position.y +
-        (vertices[0][0] * Math.sin(angle) + vertices[0][1] * Math.cos(angle)) *
-          this.radius,
-    }
-
-    ctx.moveTo(firstVertex.x, firstVertex.y)
-
-    // Draw rest of triangle
-    for (let i = 1; i < vertices.length; i++) {
-      const transformedVertex = {
-        x:
-          position.x +
-          (vertices[i][0] * Math.cos(angle) -
-            vertices[i][1] * Math.sin(angle)) *
-            this.radius,
-        y:
-          position.y +
-          (vertices[i][0] * Math.sin(angle) +
-            vertices[i][1] * Math.cos(angle)) *
-            this.radius,
-      }
-      ctx.lineTo(transformedVertex.x, transformedVertex.y)
-    }
-
-    ctx.closePath()
-    ctx.fillStyle = 'black'
-    ctx.fill()
-
-    // Define edges with normals (60° angles)
-    const edges = [
-      { start: [0, -1], end: [0.866, 0.5], normal: [0.866, -0.5] }, // right edge
-      { start: [0.866, 0.5], end: [-0.866, 0.5], normal: [0, 1] }, // bottom edge
-      { start: [-0.866, 0.5], end: [0, -1], normal: [-0.866, -0.5] }, // left edge
-    ]
-
-    for (const edge of edges) {
-      const rotatedEdge = {
-        start: {
-          x: edge.start[0] * Math.cos(angle) - edge.start[1] * Math.sin(angle),
-          y: edge.start[0] * Math.sin(angle) + edge.start[1] * Math.cos(angle),
-        },
-        end: {
-          x: edge.end[0] * Math.cos(angle) - edge.end[1] * Math.sin(angle),
-          y: edge.end[0] * Math.sin(angle) + edge.end[1] * Math.cos(angle),
-        },
-      }
-
-      const scaledEdge = {
-        start: {
-          x: rotatedEdge.start.x * this.radius,
-          y: rotatedEdge.start.y * this.radius,
-        },
-        end: {
-          x: rotatedEdge.end.x * this.radius,
-          y: rotatedEdge.end.y * this.radius,
-        },
-      }
-
-      const translatedEdge = {
-        start: {
-          x: position.x + scaledEdge.start.x,
-          y: position.y + scaledEdge.start.y,
-        },
-        end: {
-          x: position.x + scaledEdge.end.x,
-          y: position.y + scaledEdge.end.y,
-        },
-      }
-
-      this.drawHighlightedLine(ctx, translatedEdge, lightPoint)
-    }
-  }
 }
 
 export class SquareBlock extends Block {
+  vertices: ShapeDefinition = {
+    vertices: [
+      [-1, -1],
+      [1, -1],
+      [1, 1],
+      [-1, 1],
+    ],
+    edges: [
+      { start: [-1, -1], end: [1, -1], normal: [0, -1] },
+      { start: [1, -1], end: [1, 1], normal: [1, 0] },
+      { start: [1, 1], end: [-1, 1], normal: [0, 1] },
+      { start: [-1, 1], end: [-1, -1], normal: [-1, 0] },
+    ],
+  }
+
   physicsVertices() {
     return new Float32Array([
       -this.physicsRadius,
@@ -402,147 +422,6 @@ export class SquareBlock extends Block {
       -this.physicsRadius,
       this.physicsRadius,
     ])
-  }
-  draw(
-    ctx: CanvasRenderingContext2D,
-    position: Position,
-    lightPoint: Position
-  ) {
-    const angle = this.body.rotation()
-
-    // Draw filled square first
-    ctx.beginPath()
-    const corners = [
-      [-1, -1],
-      [1, -1],
-      [1, 1],
-      [-1, 1],
-    ]
-
-    // Transform first corner
-    const firstCorner = {
-      x:
-        position.x +
-        (corners[0][0] * Math.cos(angle) - corners[0][1] * Math.sin(angle)) *
-          this.radius,
-      y:
-        position.y +
-        (corners[0][0] * Math.sin(angle) + corners[0][1] * Math.cos(angle)) *
-          this.radius,
-    }
-
-    ctx.moveTo(firstCorner.x, firstCorner.y)
-
-    // Draw rest of square
-    for (let i = 1; i < corners.length; i++) {
-      const transformedCorner = {
-        x:
-          position.x +
-          (corners[i][0] * Math.cos(angle) - corners[i][1] * Math.sin(angle)) *
-            this.radius,
-        y:
-          position.y +
-          (corners[i][0] * Math.sin(angle) + corners[i][1] * Math.cos(angle)) *
-            this.radius,
-      }
-      ctx.lineTo(transformedCorner.x, transformedCorner.y)
-    }
-
-    ctx.closePath()
-    ctx.fillStyle = 'black'
-    ctx.fill()
-    // Define edges with normals
-    const edges = [
-      { start: [-1, -1], end: [1, -1], normal: [0, -1] }, // top
-      { start: [1, -1], end: [1, 1], normal: [1, 0] }, // right
-      { start: [1, 1], end: [-1, 1], normal: [0, 1] }, // bottom
-      { start: [-1, 1], end: [-1, -1], normal: [-1, 0] }, // left
-    ]
-
-    for (const edge of edges) {
-      const rotatedEdge = {
-        start: {
-          x: edge.start[0] * Math.cos(angle) - edge.start[1] * Math.sin(angle),
-          y: edge.start[0] * Math.sin(angle) + edge.start[1] * Math.cos(angle),
-        },
-        end: {
-          x: edge.end[0] * Math.cos(angle) - edge.end[1] * Math.sin(angle),
-          y: edge.end[0] * Math.sin(angle) + edge.end[1] * Math.cos(angle),
-        },
-      }
-
-      const scaledEdge = {
-        start: {
-          x: rotatedEdge.start.x * this.radius,
-          y: rotatedEdge.start.y * this.radius,
-        },
-        end: {
-          x: rotatedEdge.end.x * this.radius,
-          y: rotatedEdge.end.y * this.radius,
-        },
-      }
-
-      const translatedEdge = {
-        start: {
-          x: position.x + scaledEdge.start.x,
-          y: position.y + scaledEdge.start.y,
-        },
-        end: {
-          x: position.x + scaledEdge.end.x,
-          y: position.y + scaledEdge.end.y,
-        },
-      }
-
-      this.drawHighlightedLine(ctx, translatedEdge, lightPoint)
-    }
-    // ctx.fillStyle = this.colour
-
-    // Draw edges, in their correct colours
-    // ctx.beginPath()
-    // ctx.lineWidth = 2
-    // edges.forEach((edge) => {
-    //   const rotatedNormal = {
-    //     x:
-    //       edge.normal[0] * Math.cos(-angle) - edge.normal[1] * Math.sin(-angle),
-    //     y:
-    //       edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
-    //   }
-    //   const normal_direction = Math.atan2(rotatedNormal.y, rotatedNormal.x)
-
-    //   const dotProduct = light_direction * normal_direction * Math.cos(angle)
-
-    //   // Set color based on whether edge faces light
-    //   ctx.strokeStyle = dotProduct < 0 ? 'white' : '#333'
-
-    //   // Draw edge scaled by radius
-    //   ctx.moveTo(edge.start[0] * this.radius, edge.start[1] * this.radius)
-    //   ctx.lineTo(edge.end[0] * this.radius, edge.end[1] * this.radius)
-    // })
-
-    // ctx.stroke()
-    // ctx.restore()
-
-    // // Draw back edges (grey)
-    // ctx.beginPath()
-    // ctx.strokeStyle = '#333'
-    // edges.forEach((edge) => {
-    //   const rotatedNormal = {
-    //     x:
-    //       edge.normal[0] * Math.cos(-angle) - edge.normal[1] * Math.sin(-angle),
-    //     y:
-    //       edge.normal[0] * Math.sin(-angle) + edge.normal[1] * Math.cos(-angle),
-    //   }
-    //   const dotProduct =
-    //     rotatedNormal.x * lightVector.x + rotatedNormal.y * lightVector.y
-
-    //   if (dotProduct < 0) {
-    //     ctx.moveTo(edge.start[0] * this.radius, edge.start[1] * this.radius)
-    //     ctx.lineTo(edge.end[0] * this.radius, edge.end[1] * this.radius)
-    //   }
-    // })
-    // ctx.stroke()
-
-    // ctx.restore()
   }
 }
 
