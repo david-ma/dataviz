@@ -257,7 +257,11 @@ export class Block {
     return naiveLightAngle
   }
 
-  drawHighlightedLine(ctx: CanvasRenderingContext2D, line: Line, lightPoint: Position) {
+  drawHighlightedLine(
+    ctx: CanvasRenderingContext2D,
+    line: Line,
+    lightPoint: Position
+  ) {
     ctx.save()
     ctx.beginPath()
     ctx.lineWidth = 2
@@ -408,25 +412,49 @@ export class SquareBlock extends Block {
     position: Position,
     lightPoint: Position
   ) {
-    // const angle = this.rotation()
+    const angle = this.body.rotation()
 
-    // Calculate vector from square to light
-    const lightVector = {
-      x: lightPoint.x - position.x,
-      y: lightPoint.y - position.y,
+    // Draw filled square first
+    ctx.beginPath()
+    const corners = [
+      [-1, -1],
+      [1, -1],
+      [1, 1],
+      [-1, 1],
+    ]
+
+    // Transform first corner
+    const firstCorner = {
+      x:
+        position.x +
+        (corners[0][0] * Math.cos(angle) - corners[0][1] * Math.sin(angle)) *
+          this.radius,
+      y:
+        position.y +
+        (corners[0][0] * Math.sin(angle) + corners[0][1] * Math.cos(angle)) *
+          this.radius,
     }
-    const light_direction = Math.atan2(lightVector.y, lightVector.x)
 
-    // ctx.save()
-    // ctx.translate(position.x, position.y)
-    // ctx.rotate(angle)
+    ctx.moveTo(firstCorner.x, firstCorner.y)
 
-    // // Base square
-    // ctx.beginPath()
-    // ctx.rect(-this.radius, -this.radius, this.radius * 2, this.radius * 2)
-    // ctx.fillStyle = this.colour
-    // ctx.fill()
+    // Draw rest of square
+    for (let i = 1; i < corners.length; i++) {
+      const transformedCorner = {
+        x:
+          position.x +
+          (corners[i][0] * Math.cos(angle) - corners[i][1] * Math.sin(angle)) *
+            this.radius,
+        y:
+          position.y +
+          (corners[i][0] * Math.sin(angle) + corners[i][1] * Math.cos(angle)) *
+            this.radius,
+      }
+      ctx.lineTo(transformedCorner.x, transformedCorner.y)
+    }
 
+    ctx.closePath()
+    ctx.fillStyle = 'black'
+    ctx.fill()
     // Define edges with normals
     const edges = [
       { start: [-1, -1], end: [1, -1], normal: [0, -1] }, // top
@@ -435,7 +463,6 @@ export class SquareBlock extends Block {
       { start: [-1, 1], end: [-1, -1], normal: [-1, 0] }, // left
     ]
 
-    const angle = this.body.rotation()
     for (const edge of edges) {
       const rotatedEdge = {
         start: {
@@ -469,7 +496,6 @@ export class SquareBlock extends Block {
           y: position.y + scaledEdge.end.y,
         },
       }
-
 
       this.drawHighlightedLine(ctx, translatedEdge, lightPoint)
     }
