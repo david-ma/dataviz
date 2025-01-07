@@ -67,10 +67,10 @@ new RapierChart({
       requestAnimationFrame(render)
     }
 
-    globalThis.blockSpawner = setInterval(spawnBlock, 1)
+    globalThis.blockSpawner = setInterval(spawnBlock, 20)
     requestAnimationFrame(render)
   })
 
 window.setTimeout(() => {
   clearInterval(globalThis.blockSpawner)
-}, 1000)
+}, 5000)

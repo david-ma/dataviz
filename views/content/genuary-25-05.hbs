@@ -68,13 +68,15 @@
 
   $("#description").html(md.makeHtml(`#Genuary 2025
 
-[Day 4](https://genuary.art/prompts#jan2) prompt: "Black on black."
+[Day 5](https://genuary.art/prompts#jan5) prompt: "Isometric Art (No vanishing points)."
 
-Don't ask me which direction the light source is coming from. It's a mystery.`));
+I'm just using this scratchpad to figure out the math for lighting the shapes from yesterday.
+
+Turns out it counts as isometric art, so I'll post this as my day 5.`));
 
   hljs.initLineNumbersOnLoad();
 
-  fetch("/js/genuary-25-04.ts")
+  fetch("/js/genuary-25-05.ts")
     .then(response => response.text())
     .then(code => {
       document.getElementById('codeDisplay').textContent = code;
