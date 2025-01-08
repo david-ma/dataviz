@@ -1,12 +1,4 @@
 import { Chart, d3 } from './chart'
-// import * as d3 from 'd3'
-// import $ from 'jquery'
-// import 'datatables.net'
-
-console.log('Running example.ts')
-
-const width = 1080,
-  height = 1920
 
 let number_of_lines = 20,
   line_birth = 5,
@@ -18,11 +10,8 @@ let interval_pointer = null
 
 $.when($.ready).then(function () {
   const chart = new Chart({
-    // eslint-disable-line
     element: 'exampleDiv',
     margin: 20,
-    width,
-    height,
     nav: false,
   })
     .scratchpad(reset_chart)
@@ -73,8 +62,8 @@ function reset_chart(chart: Chart) {
     .append('rect')
     .attr('x', 0)
     .attr('y', 0)
-    .attr('width', width)
-    .attr('height', height)
+    .attr('width', chart.width)
+    .attr('height', chart.height)
     .attr('fill', '#222')
 }
 
@@ -91,8 +80,8 @@ function safe_parse_int(element_id, default_value) {
 
 function drawLine(chart: Chart, color = 'white') {
   const line = chart.svg.append('line')
-  const randomX = Math.random() * width
-  const randomY = Math.random() * height
+  const randomX = Math.random() * chart.width
+  const randomY = Math.random() * chart.height
   const randomDistance = Math.random() * 1000
 
   line
