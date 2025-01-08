@@ -1,3 +1,4 @@
+import { d3 } from './chart'
 import {
   Block,
   Position,
@@ -36,13 +37,15 @@ new RapierChart({
     function drawLine(
       ctx: CanvasRenderingContext2D,
       line: { start: Position; end: Position },
-      lightPosition: Position
+      lightPosition: Position,
+      colour: string = 'white'
     ) {
       ctx.save()
       ctx.beginPath()
       ctx.moveTo(line.start.x, line.start.y)
       ctx.lineTo(line.end.x, line.end.y)
-      ctx.strokeStyle = 'white'
+      ctx.lineWidth = 2
+      ctx.strokeStyle = colour
 
       if (
         Math.sign(
@@ -50,7 +53,7 @@ new RapierChart({
             (line.end.y - line.start.y) * (lightPosition.x - line.start.x)
         ) === 1
       ) {
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'
+        ctx.globalAlpha = 0.5
       }
       ctx.stroke()
       // Draw arrow at end
@@ -63,7 +66,7 @@ new RapierChart({
       ctx.lineTo(-10, -5)
       ctx.lineTo(-10, 5)
       ctx.lineTo(0, 0)
-      ctx.fillStyle = 'white'
+      ctx.fillStyle = colour
       ctx.fill()
 
       ctx.restore()
@@ -109,7 +112,14 @@ new RapierChart({
       drawLightSource(chart.context, lightPosition)
 
       chart.draw_blocks(blocks)
-      lines.forEach((line) => drawLine(chart.context, line, lightPosition))
+      lines.forEach((line, i) =>
+        drawLine(
+          chart.context,
+          line,
+          lightPosition,
+          d3.color(d3.schemeCategory10[i % 10]).toString()
+        )
+      )
 
       requestAnimationFrame(render)
     }
