@@ -4,6 +4,7 @@ import * as THREE from 'three'
 new Chart({
   element: 'datavizChart',
   nav: false,
+  // renderer: 'three.js',
   renderer: 'canvas',
 })
   .clear_canvas()
@@ -26,8 +27,9 @@ new Chart({
     const mesh = new THREE.Mesh(geometry, material)
     scene.add(mesh)
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    const renderer = new THREE.WebGLRenderer({ antialias: true })
     // renderer.setSize(width, height)
+    renderer.setSize(chart.width, chart.height)
     renderer.setAnimationLoop(animate)
     // document.body.appendChild( renderer.domElement );
     // #viz

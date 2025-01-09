@@ -19,7 +19,7 @@ type chartOptions = {
     };
     colours?: string[];
     nav?: boolean;
-    renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu';
+    renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu' | 'three.js';
 };
 type Position = {
     x: number;
@@ -77,7 +77,7 @@ declare class Chart {
     innerHeight: number;
     innerWidth: number;
     fullscreen: boolean;
-    renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu';
+    renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu' | 'three.js';
     mouse_position: Position;
     projection?: any;
     calculate?: Function;

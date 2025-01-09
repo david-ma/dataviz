@@ -3,6 +3,7 @@
 // console.log('Running chart.ts')
 
 import * as d3 from 'd3'
+import * as THREE from 'three'
 
 import $ from 'jquery'
 import 'datatables.net'
@@ -24,7 +25,7 @@ type chartOptions = {
   margin?: number | { top: number; right: number; bottom: number; left: number }
   colours?: string[]
   nav?: boolean
-  renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu'
+  renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu' | 'three.js'
 }
 
 type commit = {
@@ -105,7 +106,7 @@ class Chart {
   innerHeight: number
   innerWidth: number
   fullscreen: boolean
-  renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu'
+  renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu' | 'three.js'
   mouse_position: Position
 
   // drawMap stuff
@@ -203,7 +204,16 @@ class Chart {
         .style('background', 'rgba(0,0,0,0.05)')
 
       this.context = this.canvas.node().getContext('webgpu')
-    }
+    } 
+    // else if (this.renderer === 'three.js') {
+    //   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    //   d3
+    //     .select(`#${opts.element}`)
+    //     .style('aspect-ratio', `${this.width}/${this.height}`)
+    //     // .append()
+    //   domainToASCII
+      
+    // }
 
     this.svg = d3
       .select(`#${opts.element}`)
