@@ -11,6 +11,9 @@ dependencies:
   '@dimforge/rapier2d':
     specifier: ^0.14.0
     version: 0.14.0
+  '@dimforge/rapier3d':
+    specifier: ^0.14.0
+    version: 0.14.0
   '@observablehq/stdlib':
     specifier: ^5.8.8
     version: 5.8.8
@@ -1390,6 +1393,10 @@ packages:
 
   /@dimforge/rapier2d@0.14.0:
     resolution: {integrity: sha512-gqFHPytBONq4/fhQGECa9fr7LnWFg+9fX+YTONrK1zt20y+P3P6qarcq2+vpb0L36dR7W0uyCGI2Lyf5dRko+g==}
+    dev: false
+
+  /@dimforge/rapier3d@0.14.0:
+    resolution: {integrity: sha512-+R9T/AGbvdRLentporVaOYEYjPHKdUeUuGObOBAskhSv8fFFyTiUcGMKhRH4VyCaGP8JAKMLapAETR4xAvJqlg==}
     dev: false
 
   /@discoveryjs/json-ext@0.5.7:

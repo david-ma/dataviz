@@ -1268,6 +1268,7 @@ class Chart {
       } else if (this.canvas.node().getContext('webgl2')) {
         this.context.clear(this.context.COLOR_BUFFER_BIT)
         this.context.clearColor(0.129, 0.129, 0.129, 1.0)
+        this.canvas.style("background-color", "#213")
       } else if (this.canvas.node().getContext('webgpu')) {
         // this.context.clearColor(0.129, 0.129, 0.129, 1.0)
         // this.context.clear(this.context.COLOR_BUFFER_BIT)
