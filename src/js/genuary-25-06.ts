@@ -33,8 +33,12 @@ new Chart({
       .setTranslation({ x: 0, y: -1.0, z: 0 })
 
     const blocks = []
-    setInterval(() => {
+    const maxBlocks = 1000
+    const interval = setInterval(() => {
       blocks.push(spawnBlock())
+      if (blocks.length > maxBlocks) {
+        clearInterval(interval)
+      }
     }, 10)
 
     function spawnBlock() {
