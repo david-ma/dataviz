@@ -6,7 +6,7 @@
     "declaration": true,
     "declarationMap": false,
     "skipDefaultLibCheck": true,
-    "types": ["@webgpu/types", "node"],
+    "types": ["@webgpu/types", "@types/three", "node"],
     // "typeRoots": ["../../node_modules/@types/d3-selection-multi/index.d.ts"],
     // "target": "ES2015",
     "target": "ES2021",

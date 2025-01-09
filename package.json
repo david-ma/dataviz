@@ -37,7 +37,8 @@
     "sequelize": "^6.37.2",
     "showdown": "^2.1.0",
     "socket.io": "^4.7.5",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "three": "^0.172.0"
   },
   "resolutions": {
     "css-what": "5.0.1"
@@ -50,6 +51,7 @@
     "@types/d3-sankey": "^0.12.4",
     "@types/jest": "^29.5.12",
     "@types/node": "^18.19.31",
+    "@types/three": "^0.172.0",
     "@webgpu/types": "^0.1.52",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
