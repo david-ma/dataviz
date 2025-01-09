@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import * as THREE from 'three';
 import $ from 'jquery';
 import 'datatables.net';
 import * as DataTables from 'datatables.net';
@@ -85,6 +86,7 @@ declare class Chart {
     svg: any;
     canvas: any;
     context: any;
+    three_renderer: THREE.WebGLRenderer;
     plot: any;
     xScale: d3.ScaleLinear<number, number>;
     yBand: d3.ScaleBand<string>;

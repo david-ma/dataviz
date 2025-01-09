@@ -118,6 +118,7 @@ class Chart {
   svg: any
   canvas: any
   context: any
+  three_renderer: THREE.WebGLRenderer
   plot: any
   // @ts-ignore
   xScale: d3.ScaleLinear<number, number>
@@ -170,7 +171,7 @@ class Chart {
 
     if (this.renderer === 'canvas') {
       this.canvas = d3
-        .select(`#${opts.element}`)
+        .select(`#${this.element}`)
         .style('aspect-ratio', `${this.width}/${this.height}`)
         .classed('stacked-canvas', true)
         .classed('chart', true)
@@ -182,7 +183,7 @@ class Chart {
       this.context = this.canvas.node().getContext('2d')
     } else if (this.renderer === 'canvas-webgl2') {
       this.canvas = d3
-        .select(`#${opts.element}`)
+        .select(`#${this.element}`)
         .style('aspect-ratio', `${this.width}/${this.height}`)
         .classed('stacked-canvas', true)
         .classed('chart', true)
@@ -194,7 +195,7 @@ class Chart {
       this.context = this.canvas.node().getContext('webgl2')
     } else if (this.renderer === 'webgpu') {
       this.canvas = d3
-        .select(`#${opts.element}`)
+        .select(`#${this.element}`)
         .style('aspect-ratio', `${this.width}/${this.height}`)
         .classed('stacked-canvas', true)
         .classed('chart', true)
@@ -204,23 +205,37 @@ class Chart {
         .style('background', 'rgba(0,0,0,0.05)')
 
       this.context = this.canvas.node().getContext('webgpu')
-    } 
-    // else if (this.renderer === 'three.js') {
-    //   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    //   d3
-    //     .select(`#${opts.element}`)
-    //     .style('aspect-ratio', `${this.width}/${this.height}`)
-    //     // .append()
-    //   domainToASCII
-      
-    // }
+    } else if (this.renderer === 'three.js') {
+      console.log('Add a three.js renderer & canvas to:', this.element)
+
+      d3.select(`#${this.element}`)
+        .style('aspect-ratio', `${this.width}/${this.height}`)
+        .classed('stacked-canvas', true)
+
+      this.three_renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+      })
+
+      document
+        .getElementById(this.element)
+        .appendChild(this.three_renderer.domElement)
+      this.three_renderer.setSize(this.width, this.height)
+
+      this.context = this.three_renderer.getContext()
+      this.canvas = d3
+        .select(`#${this.element} canvas`)
+        .style('display', '')
+        .style('width', '')
+        .style('height', '')
+    }
 
     this.svg = d3
-      .select(`#${opts.element}`)
+      .select(`#${this.element}`)
       .classed('chart', true)
       .append('svg')
       .on('mousemove', (event) => {
-        const [x,y] = d3.pointer(event)
+        const [x, y] = d3.pointer(event)
         this.mouse_position = { x, y }
       })
       .attr('viewBox', `0 0 ${this.width} ${this.height}`)
