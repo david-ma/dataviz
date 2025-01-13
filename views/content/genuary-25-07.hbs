@@ -1,0 +1,28 @@
+<section class="blogpost">
+  {{> genuary }}
+
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-lg-8">
+      <div id="description"></div>
+      <div id="chart" class="chart"></div>
+      {{> showSource}}
+    </div>
+
+  </div>
+</section>
+
+
+{{> require }}
+
+<script>
+  var md = new showdown.Converter({ openLinksInNewWindow: true });
+
+  $("#description").html(md.makeHtml(`#Genuary 2025
+
+[Day 6](https://genuary.art/prompts#jan6) prompt: "Make a landscape using only [primitive shapes](https://en.wikipedia.org/wiki/Geometric_primitive)."
+
+[Paperclip](https://poly.pizza/m/dltdSb45BuE) by [Poly by Google](https://poly.pizza/u/Poly%20by%20Google) [CC-BY](https://creativecommons.org/licenses/by/3.0/) via [Poly Pizza](https://poly.pizza/m/dltdSb45BuE)
+
+`));
+
+</script>
