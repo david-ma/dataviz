@@ -1,0 +1,1 @@
+(self.webpackChunkdataviz=self.webpackChunkdataviz||[]).push([[605],{2599:()=>{console.log("Hello, this is a paperclips dashboard")}},a=>{a(a.s=2599)}]);
