@@ -18,6 +18,5 @@ export declare class Paperclip {
     rigidBody: RAPIER.RigidBody;
     private readonly hitbox;
     constructor(model: THREE.Group, materials: MTLLoader.MaterialCreator, scale: number, world: RAPIER.World);
-    private addHitboxMesh;
     update(): void;
 }
