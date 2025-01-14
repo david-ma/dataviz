@@ -20,3 +20,10 @@ export declare class Paperclip {
     constructor(model: THREE.Group, materials: MTLLoader.MaterialCreator, scale: number, world: RAPIER.World);
     update(): void;
 }
+export declare class Block {
+    mesh: THREE.Mesh;
+    rigidBody: RAPIER.RigidBody;
+    private readonly size;
+    constructor(world: RAPIER.World);
+    update(): void;
+}

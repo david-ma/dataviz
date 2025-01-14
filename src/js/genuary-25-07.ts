@@ -117,7 +117,7 @@ export class Paperclip {
   }
 }
 
-class Block {
+export class Block {
   public mesh: THREE.Mesh
   public rigidBody: RAPIER.RigidBody
   private readonly size = { x: 0.2, y: 0.2, z: 0.2 }
@@ -190,7 +190,6 @@ new Chart({
     const width = chart.width,
       height = chart.height
     const renderer = chart.three_renderer
-    renderer.setAnimationLoop(animate)
 
     const camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 10)
     // const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 10)
@@ -264,6 +263,7 @@ new Chart({
       return block
     }
 
+    renderer.setAnimationLoop(animate)
     function animate(time) {
       world.step()
 
