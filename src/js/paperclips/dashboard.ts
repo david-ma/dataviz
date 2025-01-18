@@ -6,6 +6,8 @@ import { Chart, d3 } from '../chart'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 
+await RAPIER.init()
+
 export class PaperclipLoader {
   private static instance: PaperclipLoader
   private objModel: THREE.Group | null = null
@@ -197,13 +199,13 @@ export class Dashboard {
   async init() {
     // Initialize RAPIER WASM
     await RAPIER.init()
-    
+
     const chart = new Chart({
       nav: false,
-      renderer: 'three.js'
+      renderer: 'three.js',
     })
       .clear_canvas()
-    // this.chart
+      // this.chart
       .asyncScratchpad(async (chart: Chart) => {
         const width = chart.width,
           height = chart.height
@@ -247,7 +249,7 @@ export class Dashboard {
         const blocks = []
         const maxPaperclips = 100
 
-        d3.select("#btnMakePaperclip").on("click", () => {
+        d3.select('#btnMakePaperclip').on('click', () => {
           console.log('Spawning paperclip')
           spawnPaperclip()
         })
@@ -270,8 +272,6 @@ export class Dashboard {
         //     blocks.push(spawnBlock())
         //   }
         // }, 10)
-
-
 
         const loader = PaperclipLoader.getInstance()
         await loader.loadAssets()

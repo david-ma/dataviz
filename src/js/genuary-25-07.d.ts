@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import RAPIER from '@dimforge/rapier3d';
+import RAPIER from '@dimforge/rapier3d-compat';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 export declare class PaperclipLoader {
     private static instance;

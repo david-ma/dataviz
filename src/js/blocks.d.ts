@@ -1,4 +1,4 @@
-import RAPIER from '@dimforge/rapier2d';
+import RAPIER from '@dimforge/rapier2d-compat';
 import { Chart } from './chart';
 export declare class RapierChart extends Chart {
     private static readonly PHYSICS_SCALE;

@@ -8,10 +8,7 @@ overrides:
   css-what: 5.0.1
 
 dependencies:
-  '@dimforge/rapier2d':
-    specifier: ^0.14.0
-    version: 0.14.0
-  '@dimforge/rapier3d':
+  '@dimforge/rapier2d-compat':
     specifier: ^0.14.0
     version: 0.14.0
   '@dimforge/rapier3d-compat':
@@ -1397,16 +1394,12 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dimforge/rapier2d@0.14.0:
-    resolution: {integrity: sha512-gqFHPytBONq4/fhQGECa9fr7LnWFg+9fX+YTONrK1zt20y+P3P6qarcq2+vpb0L36dR7W0uyCGI2Lyf5dRko+g==}
+  /@dimforge/rapier2d-compat@0.14.0:
+    resolution: {integrity: sha512-sljQVPstRS63hVLnVNphsZUjH51TZoptVM0XlglKAdZ8CT+kWnmA6olwjkF7omPWYrlKMd/nHORxOUdJDOSoAQ==}
     dev: false
 
   /@dimforge/rapier3d-compat@0.14.0:
     resolution: {integrity: sha512-/uHrUzS+CRQ+NQrrJCEDUkhwHlNsAAexbNXgbN9sHY+GwR+SFFAFrxRr8Llf5/AJZzqiLANdQIfJ63Cw4gJVqw==}
-    dev: false
-
-  /@dimforge/rapier3d@0.14.0:
-    resolution: {integrity: sha512-+R9T/AGbvdRLentporVaOYEYjPHKdUeUuGObOBAskhSv8fFFyTiUcGMKhRH4VyCaGP8JAKMLapAETR4xAvJqlg==}
     dev: false
 
   /@discoveryjs/json-ext@0.5.7:

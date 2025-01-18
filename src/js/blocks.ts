@@ -1,6 +1,7 @@
-import RAPIER from '@dimforge/rapier2d'
+import RAPIER from '@dimforge/rapier2d-compat'
 import { Chart, d3 } from './chart'
 
+await RAPIER.init()
 export class RapierChart extends Chart {
   private static readonly PHYSICS_SCALE = 50
   private static readonly WALL_THICKNESS = 0.1

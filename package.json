@@ -17,8 +17,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@dimforge/rapier2d": "^0.14.0",
-    "@dimforge/rapier3d": "^0.14.0",
+    "@dimforge/rapier2d-compat": "^0.14.0",
     "@dimforge/rapier3d-compat": "^0.14.0",
     "@observablehq/stdlib": "^5.8.8",
     "@types/jquery": "^3.5.29",

@@ -1,5 +1,7 @@
 import { Chart, d3 } from './chart'
-import RAPIER from '@dimforge/rapier2d'
+import RAPIER from '@dimforge/rapier2d-compat'
+
+await RAPIER.init()
 
 new Chart({
   element: 'datavizChart',

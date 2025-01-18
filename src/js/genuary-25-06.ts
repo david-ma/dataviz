@@ -1,6 +1,8 @@
 import { Chart } from './chart'
 import * as THREE from 'three'
-import RAPIER from '@dimforge/rapier3d'
+import RAPIER from '@dimforge/rapier3d-compat'
+
+await RAPIER.init()
 
 new Chart({
   nav: false,

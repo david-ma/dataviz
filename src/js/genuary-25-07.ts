@@ -1,6 +1,8 @@
 import { Chart } from './chart'
 import * as THREE from 'three'
-import RAPIER from '@dimforge/rapier3d'
+import RAPIER from '@dimforge/rapier3d-compat'
+
+await RAPIER.init()
 
 // OBJLoader is not a part of the main three.js library, so we need to import it separately
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
