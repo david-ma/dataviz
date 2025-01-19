@@ -6,8 +6,6 @@ import { Chart, d3 } from '../chart'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 
-await RAPIER.init()
-
 export class PaperclipLoader {
   private static instance: PaperclipLoader
   private objModel: THREE.Group | null = null
@@ -189,14 +187,15 @@ export class Dashboard {
   private loader: PaperclipLoader
 
   constructor() {
-    console.log('Creating dashboard')
-    this.chart = new Chart({
-      nav: false,
-      renderer: 'three.js',
-    })
+    console.log('Dashboard constructor')
+    // this.chart = new Chart({
+    //   nav: false,
+    //   renderer: 'three.js',
+    // })
   }
 
   async init() {
+    console.log('Dashboard init')
     // Initialize RAPIER WASM
     await RAPIER.init()
 
