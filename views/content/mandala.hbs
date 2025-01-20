@@ -1,4 +1,6 @@
 <section id="madala" class="blogpost">
+  <div id="description"></div>
+
   <br>
 
   {{!-- DOM.download(() => rasterize(chart), undefined, "Save as PNG") --}}
@@ -52,7 +54,7 @@
       {{!-- Add options to control the mandala. Specifically the number of circles --}}
 
       <div class="option">
-        <label for="numberOfCircles">Number of circles:</label><br>
+        <label for="numberOfCircles"><s>Number of circles</s>: (this input doesn't work yet)</label><br>
 
         <input id="numberOfCircles" type="range" min="0" max="12" value="8">
         <div>
@@ -133,3 +135,27 @@
 </script>
 
 {{> require}}
+
+
+<script>
+  var md = new showdown.Converter({ openLinksInNewWindow: true });
+
+  $("#description").html(md.makeHtml(`#Mandala
+
+2024-04-12
+
+Grace wanted to do some colouring in, for mindfulness. She found a mandala colouring book and started colouring in the shapes. She found it very relaxing and enjoyed the process.
+
+I decided to have a play with the concept and make a mandala generator.
+
+Features:
+- Uses SVG to draw the mandala.
+- Save button to save the mandala as an SVG file.
+
+Todo:
+- Add options to control the mandala generation. Specifically the number of circles, shapes, etc.
+- Randomise on load?
+
+`));
+
+</script>

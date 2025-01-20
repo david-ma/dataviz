@@ -196,7 +196,7 @@ new Chart({
     const camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 10)
     // const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 10)
 
-    camera.position.z = 1
+    camera.position.z = 2
 
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0x222222)
@@ -229,7 +229,7 @@ new Chart({
 
     const paperclips = []
     const blocks = []
-    const maxPaperclips = 100
+    const maxPaperclips = 100000
     const interval = setInterval((i) => {
       console.log('Spawning paperclip', i)
       spawnPaperclip()
@@ -281,10 +281,10 @@ new Chart({
       })
 
       // Orbit camera around origin
-      const speed = 0.7
-      camera.position.x = 2 * Math.sin((time * speed) / 1000)
-      camera.position.z = 2 * Math.cos((time * speed) / 1000)
-      camera.lookAt(0, 0, 0)
+      // const speed = 0.7
+      // camera.position.x = 2 * Math.sin((time * speed) / 1000)
+      // camera.position.z = 2 * Math.cos((time * speed) / 1000)
+      // camera.lookAt(0, 0, 0)
 
       renderer.render(scene, camera)
     }
