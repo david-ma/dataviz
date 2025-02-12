@@ -1,0 +1,69 @@
+{{> clean }}
+{{> require }}
+{{> tableCSS }}
+{{> darkMode }}
+
+
+<style>
+  span.green {
+    color: green;
+  }
+
+  span.red {
+    color: red;
+  }
+</style>
+
+<div id="mounted_vast"></div>
+
+<div id="contract_folders">
+  <table></table>
+</div>
+
+<div id="runs">
+  <table>
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+
+
+<div id="monthly"></div>
+
+<div id="dashboard" style="display:none;">
+
+  <div style="margin-top:5px;">
+    <button onclick="toggle_links()">Toggle Links</button>
+    <button onclick="disable_dark_mode()">Disable Dark Mode</button>
+  </div>
+
+  <div id="sankey"></div>
+
+  <div id="my_table_wrapper">
+    <table id="my_table">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="files">
+    <h2>Files</h2>
+    <table id="files_table">
+      <thead>
+        <tr>
+          <th>Original</th>
+          <th>Both</th>
+          <th>AWS</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="summary">
+    <h2>Summary</h2>
+    <table id="summary_table">
+    </table>
+  </div>
+</div>
