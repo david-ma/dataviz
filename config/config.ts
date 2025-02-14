@@ -9,6 +9,9 @@ import fs from 'fs'
 import _ from 'lodash'
 const fsPromise = fs.promises
 import Formidable from 'formidable'
+import { agrf_sequelize } from './db_bootstrap'
+
+let cache = null
 
 let config: Thalia.WebsiteConfig = {
   services: {
@@ -146,6 +149,36 @@ let config: Thalia.WebsiteConfig = {
         // .then((files) => files.filter((d) => d.indexOf('CAGRF') == -1)) // Non-standard IDs
         .then((files) => files.map((d) => d.replace('.json.gz', '.json')))
         .then((files) => res.end(JSON.stringify(files)))
+    },
+    agrf_monthly_data: function (res, req) {
+      if (cache) {
+        res.end(JSON.stringify(cache))
+        return
+      } else {
+        agrf_sequelize
+          .query(
+            `SELECT *
+# tcfu.id, path, run_id, contract_folder, tcfu.contract_id, demux_id, storage_platform, data_size
+
+FROM
+temp_contract_folder_usage as tcfu,
+nextgenruns_contract as nc,
+nextgenruns_run as nr
+
+WHERE tcfu.contract_id = nc.contract_id
+and tcfu.run_id = nc.run
+and tcfu.run_id = nr.run_name`
+          )
+          .then(
+            (results) => {
+              cache = results
+              res.end(JSON.stringify(results))
+            },
+            (error) => {
+              res.end(JSON.stringify(error))
+            }
+          )
+      }
     },
 
     upload: function (res, req) {

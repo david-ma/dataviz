@@ -1,8 +1,6 @@
 console.log('AGRF Monthly data usage')
 
-import { hierarchy } from 'd3'
 import { d3, Chart, decorateTable, DataTableDataset, _ } from './chart'
-import { size } from 'lodash'
 
 const columns = [
   'run_name',
@@ -83,6 +81,148 @@ const disk_usage_cols = [
 function drawContractFolders(data) {
   d3.select('#contract_folders table').selectAll('tr').data(data).append(data)
 }
+
+d3.csv('/AGRF/disk_usage_2025-02-11.csv').then((data) => {
+  console.log('disk_usage_2025-02-11.csv', data)
+})
+
+const monthly_data = {}
+d3.json('/agrf_monthly_data')
+  .then((data) => data[1])
+  .then((data) => {
+    console.log('agrf_monthly_data', data)
+    console.log(Object.keys(data[0]))
+
+    // 'id', 'path', 'run_id', 'contract_folder', 'contract_id', 'demux_id', 'storage_platform', 'data_size'
+    // stop_timestamp
+
+    // Bucket the data by month.
+    var total_data_used = 0
+    var total_disk_used = 0
+    data.forEach((row) => {
+      row.bytes = parseInt(row.bytes)
+      row.preflight_bytes = parseInt(row.preflight_bytes)
+      row.size = Math.max(row.bytes, row.preflight_bytes)
+      total_data_used += row.size
+      total_disk_used += row.bytes
+
+      if (!row.stop_timestamp) {
+        // console.log("No stop_timestamp", row)
+        return
+      }
+      const parts = row.stop_timestamp.split('-')
+
+      if (parts[0]) {
+        const month = `${parts[0]}-${parts[1]}`
+        monthly_data[month] = monthly_data[month] || {
+          disk_size: 0,
+          total_size: 0,
+          total_rows: 0,
+          rows: [],
+        }
+        monthly_data[month].rows.push(row)
+        monthly_data[month].disk_size += row.bytes
+        monthly_data[month].total_size += row.size
+        monthly_data[month].total_rows += 1
+        monthly_data[month].human_readable_size = human_readable_size(
+          monthly_data[month].total_size
+        )
+      }
+    })
+    console.log('Total data used', human_readable_size(total_data_used))
+    console.log('Total disk used', human_readable_size(total_disk_used))
+    return monthly_data
+  })
+  .then((monthly_data) => {
+    console.log('monthly_data', monthly_data)
+
+    new Chart({
+      title: 'Monthly Data Usage',
+      element: 'data_per_month',
+      data: Object.entries(monthly_data)
+        .map(([month, data]: any) => {
+          return {
+            timestamp: d3.timeParse('%Y-%m')(month),
+            month,
+            disk_size: data.disk_size,
+            total_size: data.total_size,
+            total_rows: data.total_rows,
+            human_readable_size: data.human_readable_size,
+          }
+        })
+        .sort((a: any, b: any) => a.timestamp - b.timestamp)
+        .slice(-12), // Last 12 months
+      nav: false,
+    }).scratchpad((chart: any) => {
+      console.log('Chart', chart)
+      console.log(chart.data)
+
+      const x = d3.scaleTime().range([0, chart.innerWidth])
+      const y = d3.scaleLinear().range([chart.innerHeight, 0])
+      // .domain([0, 1])
+
+      const valueline = d3
+        .line()
+        .x((d: any) => x(d.timestamp))
+        .y((d: any) => y(d.total_size))
+
+      const disk_line = d3
+        .line()
+        .x((d: any) => x(d.timestamp))
+        .y((d: any) => y(d.disk_size))
+
+      x.domain(d3.extent(chart.data, (d: any) => d.timestamp) as [Date, Date])
+      // y.domain(d3.extent(chart.data, (d) => d.total_size) as [number, number])
+      y.domain([
+        0,
+        (1.1 * d3.max(chart.data, (d: any) => d.total_size)) as number,
+      ])
+
+      const xAxis = d3.axisBottom(x)
+      const yAxis = d3.axisLeft(y).tickFormat((d) => human_readable_size(d))
+
+      chart.svg
+        .append('g')
+        .attr(
+          'transform',
+          `translate(${chart.margin.left},${
+            chart.innerHeight + chart.margin.top
+          })`
+        )
+        .call(xAxis)
+
+      chart.svg
+        .append('g')
+        .attr(
+          'transform',
+          `translate(${chart.margin.left},${chart.margin.top})`
+        )
+        .call(yAxis)
+
+      chart.plot
+        .append('path')
+        .data([chart.data])
+        .attr('class', 'line')
+        .attr('d', valueline)
+
+      chart.plot
+        .append('path')
+        .data([chart.data])
+        .attr('class', 'line')
+        .style('stroke', 'red')
+        .attr('d', disk_line)
+
+      chart.plot
+        .selectAll('circle')
+        .data(chart.data)
+        .enter()
+        .append('circle')
+        .attr('cx', (d) => x(d.timestamp))
+        .attr('cy', (d) => y(d.total_size))
+        .attr('r', 5)
+        .attr('fill', 'red')
+    })
+  })
 
 d3.tsv('/AGRF/disk_usage_agrf.tsv')
   .then((data) => {
@@ -529,7 +669,7 @@ globalThis.displayFiles = function displayFiles(log_id) {
 
 draw_mounted_vast()
 function draw_mounted_vast() {
-  d3.tsv('/AGRF/vast_allocation.tsv').then((data :any) => {
+  d3.tsv('/AGRF/vast_allocation.tsv').then((data: any) => {
     console.log('VAST allocated disk', data)
     // clean
     data.forEach((row: any) => {
@@ -556,8 +696,10 @@ function draw_mounted_vast() {
       }
     })
 
-    const root = d3.stratify().path((d: any) => d.tree)(data.concat(used, available))
-    root.sum((d: any) => d ? d.size || 0 : 0)
+    const root = d3.stratify().path((d: any) => d.tree)(
+      data.concat(used, available)
+    )
+    root.sum((d: any) => (d ? d.size || 0 : 0))
     console.log('root', root)
     var chart = new Chart({
       title: 'VAST Allocated Disk',

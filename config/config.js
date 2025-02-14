@@ -13,6 +13,8 @@ const fs_1 = __importDefault(require("fs"));
 const lodash_1 = __importDefault(require("lodash"));
 const fsPromise = fs_1.default.promises;
 const formidable_1 = __importDefault(require("formidable"));
+const db_bootstrap_1 = require("./db_bootstrap");
+let cache = null;
 let config = {
     services: {
         fridge_images: function (res, req, db) {
@@ -106,6 +108,32 @@ let config = {
                 .then((files) => files.filter((d) => d.indexOf('.json') > -1))
                 .then((files) => files.map((d) => d.replace('.json.gz', '.json')))
                 .then((files) => res.end(JSON.stringify(files)));
+        },
+        agrf_monthly_data: function (res, req) {
+            if (cache) {
+                res.end(JSON.stringify(cache));
+                return;
+            }
+            else {
+                db_bootstrap_1.agrf_sequelize
+                    .query(`SELECT *
+# tcfu.id, path, run_id, contract_folder, tcfu.contract_id, demux_id, storage_platform, data_size
+
+FROM
+temp_contract_folder_usage as tcfu,
+nextgenruns_contract as nc,
+nextgenruns_run as nr
+
+WHERE tcfu.contract_id = nc.contract_id
+and tcfu.run_id = nc.run
+and tcfu.run_id = nr.run_name`)
+                    .then((results) => {
+                    cache = results;
+                    res.end(JSON.stringify(results));
+                }, (error) => {
+                    res.end(JSON.stringify(error));
+                });
+            }
         },
         upload: function (res, req) {
             const uploadFolder = 'websites/dataviz/data/campjs/';

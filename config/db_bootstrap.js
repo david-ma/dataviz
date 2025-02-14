@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.agrf_sequelize = void 0;
+const sequelize_1 = require("sequelize");
 const models_1 = require("../models");
 const path = require("path");
 const _ = require("lodash");
@@ -156,3 +158,6 @@ if (false) {
     });
 }
 exports.seq = seq;
+const agrf_connection = require(path.resolve(__dirname, '..', 'config', 'config.json'))['agrf_nightly'];
+const agrf_sequelize = new sequelize_1.Sequelize(agrf_connection);
+exports.agrf_sequelize = agrf_sequelize;

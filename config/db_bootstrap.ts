@@ -190,3 +190,13 @@ if (false) {
 }
 
 exports.seq = seq
+
+const agrf_connection: Options = require(path.resolve(
+  __dirname,
+  '..',
+  'config',
+  'config.json'
+))['agrf_nightly']
+
+const agrf_sequelize: Sequelize = new Sequelize(agrf_connection)
+export { agrf_sequelize }
