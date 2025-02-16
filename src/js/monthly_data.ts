@@ -106,16 +106,11 @@ d3.json('/agrf_monthly_data')
       total_data_used += row.size
       total_disk_used += row.bytes
 
-      // if (row.stop_timestamp) {
-      //   // console.log("No stop_timestamp", row)
-      //   return
-      // }
-
-      if (!row.start_timestamp) {
-        // console.log("No stop_timestamp", row)
+      if (!row.stop_timestamp) {
+        console.log("No stop_timestamp", row)
         return
       }
-      const parts = row.start_timestamp.split('-')
+      const parts = row.stop_timestamp.split('-')
 
       if (parts[0]) {
         const month = `${parts[0]}-${parts[1]}`
@@ -142,7 +137,7 @@ d3.json('/agrf_monthly_data')
     console.log('monthly_data', monthly_data)
 
     new Chart({
-      title: 'Monthly Data Usage',
+      title: 'Monthly Data Usage (sent date)',
       element: 'data_per_month',
       data: Object.entries(monthly_data)
         .map(([month, data]: any) => {
@@ -156,9 +151,9 @@ d3.json('/agrf_monthly_data')
             human_readable_size: data.human_readable_size,
           }
         })
-        .sort((a: any, b: any) => a.timestamp - b.timestamp),
+        .sort((a: any, b: any) => a.timestamp - b.timestamp)
       // .slice(-24),
-      // .slice(-12), // Last 12 months
+      .slice(-12), // Last 12 months
       nav: false,
     }).scratchpad((chart: any) => {
       console.log('Chart', chart)
@@ -776,7 +771,7 @@ globalThis.displayFiles = function displayFiles(log_id) {
     })
 }
 
-draw_mounted_vast()
+// draw_mounted_vast()
 function draw_mounted_vast() {
   d3.tsv('/AGRF/vast_allocation.tsv').then((data: any) => {
     console.log('VAST allocated disk', data)
@@ -813,7 +808,6 @@ function draw_mounted_vast() {
     var chart = new Chart({
       title: 'VAST Allocated Disk',
       element: 'mounted_vast',
-      margin: 10,
     }).initTreemap({
       hierarchy: root,
       target: 'size',
