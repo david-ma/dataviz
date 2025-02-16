@@ -106,11 +106,16 @@ d3.json('/agrf_monthly_data')
       total_data_used += row.size
       total_disk_used += row.bytes
 
-      if (!row.stop_timestamp) {
+      // if (row.stop_timestamp) {
+      //   // console.log("No stop_timestamp", row)
+      //   return
+      // }
+
+      if (!row.start_timestamp) {
         // console.log("No stop_timestamp", row)
         return
       }
-      const parts = row.stop_timestamp.split('-')
+      const parts = row.start_timestamp.split('-')
 
       if (parts[0]) {
         const month = `${parts[0]}-${parts[1]}`
@@ -144,14 +149,16 @@ d3.json('/agrf_monthly_data')
           return {
             timestamp: d3.timeParse('%Y-%m')(month),
             month,
+            rows: data.rows,
             disk_size: data.disk_size,
             total_size: data.total_size,
             total_rows: data.total_rows,
             human_readable_size: data.human_readable_size,
           }
         })
-        .sort((a: any, b: any) => a.timestamp - b.timestamp)
-        .slice(-12), // Last 12 months
+        .sort((a: any, b: any) => a.timestamp - b.timestamp),
+      // .slice(-24),
+      // .slice(-12), // Last 12 months
       nav: false,
     }).scratchpad((chart: any) => {
       console.log('Chart', chart)
@@ -175,11 +182,11 @@ d3.json('/agrf_monthly_data')
       // y.domain(d3.extent(chart.data, (d) => d.total_size) as [number, number])
       y.domain([
         0,
-        (1.1 * d3.max(chart.data, (d: any) => d.total_size)) as number,
+        d3.max(chart.data, (d: any) => Math.max(d.total_size, d.disk_size)) * 1.2
       ])
 
       const xAxis = d3.axisBottom(x)
-      const yAxis = d3.axisLeft(y).tickFormat((d) => human_readable_size(d))
+      const yAxis = d3.axisLeft(y).tickFormat((d:number) => human_readable_size(d))
 
       chart.svg
         .append('g')
@@ -200,27 +207,129 @@ d3.json('/agrf_monthly_data')
         .call(yAxis)
 
       chart.plot
-        .append('path')
-        .data([chart.data])
-        .attr('class', 'line')
-        .attr('d', valueline)
-
-      chart.plot
-        .append('path')
-        .data([chart.data])
-        .attr('class', 'line')
-        .style('stroke', 'red')
-        .attr('d', disk_line)
-
-      chart.plot
-        .selectAll('circle')
+        .selectAll('rect')
         .data(chart.data)
         .enter()
-        .append('circle')
-        .attr('cx', (d) => x(d.timestamp))
-        .attr('cy', (d) => y(d.total_size))
-        .attr('r', 5)
+        .append('rect')
+        .attr('x', (d) => x(d.timestamp))
+        .attr('y', (d) => y(d.total_size))
+        .attr('width', 10)
+        .attr('height', (d) => chart.innerHeight - y(d.total_size))
+        .attr('fill', 'steelblue')
+
+      // chart.plot
+      //   .selectAll('text')
+      //   .data(chart.data)
+      //   .enter()
+      //   .append('text')
+      //   .attr('x', (d) => x(d.timestamp))
+      //   .attr('y', (d) => y(d.total_size))
+      //   .attr('dy', '-0.5em')
+      //   .attr('dx', '1em')
+      //   .text((d) => d.human_readable_size)
+
+      chart.plot
+        .selectAll('rect.disk')
+        .data(chart.data)
+        .enter()
+        .append('rect')
+        .attr('class', 'disk')
+        .attr('x', (d) => x(d.timestamp))
+        .attr('y', (d) => y(d.disk_size))
+        .attr('width', 10)
+        .attr('height', (d) => chart.innerHeight - y(d.disk_size))
         .attr('fill', 'red')
+
+      // Create label positions with force layout
+      const labels = chart.data.map((d) => ({
+        x: x(d.timestamp),
+        y: y(d.disk_size),
+        text: human_readable_size(d.disk_size),
+      }))
+      .concat(chart.data.map((d) => ({
+        x: x(d.timestamp),
+        y: y(d.total_size),
+        text: human_readable_size(d.total_size),
+      })))
+
+      const simulation = d3
+        .forceSimulation(labels)
+        .force('collision', d3.forceCollide().radius(30))
+        .force(
+          'x',
+          d3.forceX((d) => d.x)
+        )
+        .force(
+          'y',
+          d3.forceY((d) => d.y)
+        )
+        .stop()
+
+      // Run the simulation
+      for (let i = 0; i < 300; i++) simulation.tick()
+
+
+// Add connecting lines first (so they're behind the labels)
+      const connections = chart.plot
+      .selectAll('line.label-connector')
+      .data(labels)
+      .enter()
+      .append('line')
+      .attr('class', 'label-connector')
+      .attr('x1', d => d.x)
+      .attr('y1', d => d.y)
+      .attr('x2', d => d.originalX || d.x)
+      .attr('y2', d => d.originalY || d.y)
+      .style('stroke', '#999')
+      .style('stroke-width', 0.5)
+      .style('stroke-dasharray', '2,2')
+      .style('opacity', 1)
+
+  // Place labels using calculated positions
+      chart.plot
+        .selectAll('text.disk')
+        .data(labels)
+        .enter()
+        .append('text')
+        .attr('class', 'disk')
+        .attr('x', (d) => d.x)
+        .attr('y', (d) => d.y)
+        .text((d) => d.text)
+
+      // chart.plot
+      //   .selectAll('text.disk')
+      //   .data(chart.data)
+      //   .enter()
+      //   .append('text')
+      //   .attr('class', 'disk')
+      //   .attr('x', (d) => x(d.timestamp))
+      //   .attr('y', (d) => y(d.disk_size))
+      //   .attr('dy', '0.5')
+      //   .attr('dx', '1em')
+      //   .text((d) => human_readable_size(d.disk_size))
+
+      // chart.plot
+      //   .append('path')
+      //   .data([chart.data])
+      //   .attr('class', 'line')
+      //   .attr('d', valueline)
+
+      // chart.plot
+      //   .append('path')
+      //   .data([chart.data])
+      //   .attr('class', 'line')
+      //   .style('stroke', 'red')
+      //   .attr('d', disk_line)
+
+      // chart.plot
+      //   .selectAll('circle')
+      //   .data(chart.data)
+      //   .enter()
+      //   .append('circle')
+      //   .attr('cx', (d) => x(d.timestamp))
+      //   .attr('cy', (d) => y(d.total_size))
+      //   .attr('r', 5)
+      //   .attr('fill', 'red')
     })
   })
 
