@@ -424,16 +424,21 @@ function drawReadLookingGraph(data: any) {
       const size = parseInt(row.preflight_bytes) || parseInt(row.bytes)
 
       return {
+        name: row.contract_id,
         start: new Date(start),
         stop: new Date(stop),
         end: new Date(end),
+        height: Math.max(1, size / 100000000000),
         size,
       }
     })
     .sort((a, b) => a.start - b.start)
 
   new Chart({
+    title: 'Folders stored on VAST on any given date',
     element: 'read_looking_graph',
+    height: 2000,
+    width: 2000,
     data: mapped_data,
   }).scratchpad((chart) => {
     // const y = d3.scaleLinear().range([chart.innerHeight, 0])
@@ -460,49 +465,59 @@ function drawReadLookingGraph(data: any) {
       .domain([0, d3.max(chart.data, (d: any) => parseInt(d.size))])
 
     // Draw rectangles for each time period
-    chart.svg
+    const svg = chart.svg
       .append('g')
       .classed('graph', true)
       .attr('transform', `translate(${chart.margin.left},${chart.margin.top})`)
+
+    let offset = 0
+    svg
       .selectAll('g.folder')
       .data(chart.data)
       .enter()
       .append('g')
-      .attr(
-        'transform',
-        (d, i) =>
-          `translate(${x(d.start)},${
-            (i / chart.data.length) * chart.innerHeight
-            // Math.random() * chart.innerHeight
-          })`
-      )
+      .attr('transform', (d, i) => {
+        offset += d.height
+        d.offset = offset
+        return `translate(${x(d.start)},${
+          (offset / (chart.data.length * 3)) * chart.innerHeight
+          // Math.random() * chart.innerHeight
+        })`
+      })
       // .attr('x', (d) => x(d.start))
       // .attr('y', Math.random() * chart.innerHeight)
       .classed('folder', true)
+      .on('mouseover', function (e, d) {
+        console.log(d.name)
+      })
       .each((d, i, nodes) => {
         const folder = d3.select(nodes[i])
-        folder
-          .append('rect')
-          .attr('x', 0)
-          .attr('y', 0)
-          .attr('width', x(d.stop) - x(d.start))
-          .attr('height', 1)
-          .attr('fill', 'red')
-          .attr('opacity', 0.5)
+        // const height = Math.max(1, d.size / 100000000000)
+        // offset += height
 
         folder
           .append('rect')
-          .attr('y', 0)
+          .attr('x', 0)
+          .attr('y', -d.height)
+          .attr('width', x(d.stop) - x(d.start))
+          .attr('height', d.height)
+          .attr('fill', 'red')
+          .attr('opacity', 0.1)
+
+        folder
+          .append('rect')
+          // .attr('y', d.offset)
+          .attr('y', -d.height)
           .attr('x', x(d.stop) - x(d.start))
           .attr('width', x(d.end) - x(d.stop))
-          .attr('height', 1)
+          .attr('height', d.height)
           .attr('fill', 'steelblue')
-          .attr('opacity', 0.2)
+          .attr('opacity', 0.1)
       })
 
     // Add axes
     const xAxis = d3.axisBottom(x)
-    const yAxis = d3.axisLeft(y).tickFormat((d: any) => human_readable_size(d))
+    // const yAxis = d3.axisLeft(y).tickFormat((d: any) => human_readable_size(d))
 
     chart.svg
       .append('g')
@@ -514,10 +529,20 @@ function drawReadLookingGraph(data: any) {
       )
       .call(xAxis)
 
-    chart.svg
-      .append('g')
-      .call(yAxis)
-      .attr('transform', `translate(${chart.margin.left},${chart.margin.top})`)
+    // Draw a line at 2025-02-17
+    svg
+      .append('line')
+      .attr('x1', x(d3.timeParse('%Y-%m-%d')('2025-02-17')))
+      .attr('x2', x(d3.timeParse('%Y-%m-%d')('2025-02-17')))
+      .attr('y1', 0)
+      .attr('y2', chart.innerHeight)
+      .attr('stroke', 'black')
+      .attr('stroke-width', 1)
+
+    // chart.svg
+    //   .append('g')
+    //   .call(yAxis)
+    //   .attr('transform', `translate(${chart.margin.left},${chart.margin.top})`)
     // chart.svg
     //   .selectAll('rect.read')
     //   .data(chart.data)
