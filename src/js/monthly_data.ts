@@ -471,6 +471,7 @@ function drawReadLookingGraph(data: any) {
       .attr('transform', `translate(${chart.margin.left},${chart.margin.top})`)
 
     let offset = 0
+    const multiplier = 2.5
     svg
       .selectAll('g.folder')
       .data(chart.data)
@@ -480,7 +481,7 @@ function drawReadLookingGraph(data: any) {
         offset += d.height
         d.offset = offset
         return `translate(${x(d.start)},${
-          (offset / (chart.data.length * 3)) * chart.innerHeight
+          (offset / (chart.data.length * multiplier)) * chart.innerHeight
           // Math.random() * chart.innerHeight
         })`
       })
@@ -498,21 +499,21 @@ function drawReadLookingGraph(data: any) {
         folder
           .append('rect')
           .attr('x', 0)
-          .attr('y', -d.height)
+          .attr('y', -d.height / multiplier)
           .attr('width', x(d.stop) - x(d.start))
-          .attr('height', d.height)
+          .attr('height', d.height / multiplier)
           .attr('fill', 'red')
-          .attr('opacity', 0.1)
+          .attr('opacity', 0.5)
 
         folder
           .append('rect')
           // .attr('y', d.offset)
-          .attr('y', -d.height)
+          .attr('y', -d.height / multiplier)
           .attr('x', x(d.stop) - x(d.start))
           .attr('width', x(d.end) - x(d.stop))
-          .attr('height', d.height)
+          .attr('height', d.height / multiplier)
           .attr('fill', 'steelblue')
-          .attr('opacity', 0.1)
+          .attr('opacity', 0.5)
       })
 
     // Add axes
