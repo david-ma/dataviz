@@ -107,7 +107,7 @@ d3.json('/agrf_monthly_data')
       total_disk_used += row.bytes
 
       if (!row.stop_timestamp) {
-        console.log("No stop_timestamp", row)
+        // console.log('No stop_timestamp', row)
         return
       }
       const parts = row.stop_timestamp.split('-')
@@ -136,24 +136,27 @@ d3.json('/agrf_monthly_data')
   .then((monthly_data) => {
     console.log('monthly_data', monthly_data)
 
+    const shaped_data = Object.entries(monthly_data)
+    .map(([month, data]: any) => {
+      return {
+        timestamp: d3.timeParse('%Y-%m')(month),
+        month,
+        rows: data.rows,
+        disk_size: data.disk_size,
+        total_size: data.total_size,
+        total_rows: data.total_rows,
+        human_readable_size: data.human_readable_size,
+      }
+    })
+    .sort((a: any, b: any) => a.timestamp - b.timestamp)
+
     new Chart({
-      title: 'Monthly Data Usage (sent date)',
+      title: 'Monthly Data Usage (sent date) red = data on VAST',
       element: 'data_per_month',
-      data: Object.entries(monthly_data)
-        .map(([month, data]: any) => {
-          return {
-            timestamp: d3.timeParse('%Y-%m')(month),
-            month,
-            rows: data.rows,
-            disk_size: data.disk_size,
-            total_size: data.total_size,
-            total_rows: data.total_rows,
-            human_readable_size: data.human_readable_size,
-          }
-        })
-        .sort((a: any, b: any) => a.timestamp - b.timestamp)
-      // .slice(-24),
-      .slice(-12), // Last 12 months
+      data: shaped_data
+        // .slice(-24),
+        // .slice(-12), // Last 12 months
+        .slice(-6),
       nav: false,
     }).scratchpad((chart: any) => {
       console.log('Chart', chart)
@@ -173,15 +176,26 @@ d3.json('/agrf_monthly_data')
         .x((d: any) => x(d.timestamp))
         .y((d: any) => y(d.disk_size))
 
-      x.domain(d3.extent(chart.data, (d: any) => d.timestamp) as [Date, Date])
+      // x.domain(d3.extent(chart.data, (d: any) => d.timestamp) as [Date, Date])
+      // Add an extra month to the end
+      x.domain([
+        // chart.data[0].timestamp,
+        // Add month to start
+        d3.timeMonth.offset(chart.data[0].timestamp, -1),
+        d3.timeMonth.offset(chart.data[chart.data.length - 1].timestamp, 1),
+      ])
+
       // y.domain(d3.extent(chart.data, (d) => d.total_size) as [number, number])
       y.domain([
         0,
-        d3.max(chart.data, (d: any) => Math.max(d.total_size, d.disk_size)) * 1.2
+        d3.max(chart.data, (d: any) => Math.max(d.total_size, d.disk_size)) *
+          1.2,
       ])
 
       const xAxis = d3.axisBottom(x)
-      const yAxis = d3.axisLeft(y).tickFormat((d:number) => human_readable_size(d))
+      const yAxis = d3
+        .axisLeft(y)
+        .tickFormat((d: number) => human_readable_size(d))
 
       chart.svg
         .append('g')
@@ -201,27 +215,22 @@ d3.json('/agrf_monthly_data')
         )
         .call(yAxis)
 
+      const columnWidth =
+        (chart.innerWidth - chart.margin.left * 2) / chart.data.length
+
+      console.log("Drawing blue columns", chart.data)
+
       chart.plot
-        .selectAll('rect')
+        .selectAll('rect.blue-total')
         .data(chart.data)
         .enter()
         .append('rect')
-        .attr('x', (d) => x(d.timestamp))
+        .classed('blue-total', true)
+        .attr('x', (d) => x(d.timestamp) - columnWidth / 2)
         .attr('y', (d) => y(d.total_size))
-        .attr('width', 10)
+        .attr('width', columnWidth)
         .attr('height', (d) => chart.innerHeight - y(d.total_size))
         .attr('fill', 'steelblue')
-
-      // chart.plot
-      //   .selectAll('text')
-      //   .data(chart.data)
-      //   .enter()
-      //   .append('text')
-      //   .attr('x', (d) => x(d.timestamp))
-      //   .attr('y', (d) => y(d.total_size))
-      //   .attr('dy', '-0.5em')
-      //   .attr('dx', '1em')
-      //   .text((d) => d.human_readable_size)
 
       chart.plot
         .selectAll('rect.disk')
@@ -229,79 +238,94 @@ d3.json('/agrf_monthly_data')
         .enter()
         .append('rect')
         .attr('class', 'disk')
-        .attr('x', (d) => x(d.timestamp))
+        .attr('x', (d) => x(d.timestamp) - columnWidth / 2)
         .attr('y', (d) => y(d.disk_size))
-        .attr('width', 10)
+        .attr('width', columnWidth)
         .attr('height', (d) => chart.innerHeight - y(d.disk_size))
         .attr('fill', 'red')
 
       // Create label positions with force layout
-      const labels = chart.data.map((d) => ({
-        x: x(d.timestamp),
-        y: y(d.disk_size),
-        text: human_readable_size(d.disk_size),
-      }))
-      .concat(chart.data.map((d) => ({
-        x: x(d.timestamp),
-        y: y(d.total_size),
-        text: human_readable_size(d.total_size),
-      })))
+      // const labels = chart.data
+      //   .map((d) => ({
+      //     x: x(d.timestamp),
+      //     y: y(d.disk_size),
+      //     text: human_readable_size(d.disk_size),
+      //   }))
+      //   .concat(
+      //     chart.data.map((d) => ({
+      //       x: x(d.timestamp),
+      //       y: y(d.total_size),
+      //       text: human_readable_size(d.total_size),
+      //     }))
+      //   )
 
-      const simulation = d3
-        .forceSimulation(labels)
-        .force('collision', d3.forceCollide().radius(30))
-        .force(
-          'x',
-          d3.forceX((d) => d.x)
-        )
-        .force(
-          'y',
-          d3.forceY((d) => d.y)
-        )
-        .stop()
+      // const simulation = d3
+      //   .forceSimulation(labels)
+      //   .force('collision', d3.forceCollide().radius(30))
+      //   .force(
+      //     'x',
+      //     d3.forceX((d) => d.x)
+      //   )
+      //   .force(
+      //     'y',
+      //     d3.forceY((d) => d.y)
+      //   )
+      //   .stop()
 
-      // Run the simulation
-      for (let i = 0; i < 300; i++) simulation.tick()
+      // // Run the simulation
+      // for (let i = 0; i < 300; i++) simulation.tick()
 
+      // // Add connecting lines first (so they're behind the labels)
+      // const connections = chart.plot
+      //   .selectAll('line.label-connector')
+      //   .data(labels)
+      //   .enter()
+      //   .append('line')
+      //   .attr('class', 'label-connector')
+      //   .attr('x1', (d) => d.x)
+      //   .attr('y1', (d) => d.y)
+      //   .attr('x2', (d) => d.originalX || d.x)
+      //   .attr('y2', (d) => d.originalY || d.y)
+      //   .style('stroke', '#999')
+      //   .style('stroke-width', 0.5)
+      //   .style('stroke-dasharray', '2,2')
+      //   .style('opacity', 1)
 
-// Add connecting lines first (so they're behind the labels)
-      const connections = chart.plot
-      .selectAll('line.label-connector')
-      .data(labels)
-      .enter()
-      .append('line')
-      .attr('class', 'label-connector')
-      .attr('x1', d => d.x)
-      .attr('y1', d => d.y)
-      .attr('x2', d => d.originalX || d.x)
-      .attr('y2', d => d.originalY || d.y)
-      .style('stroke', '#999')
-      .style('stroke-width', 0.5)
-      .style('stroke-dasharray', '2,2')
-      .style('opacity', 1)
-
-  // Place labels using calculated positions
-      chart.plot
-        .selectAll('text.disk')
-        .data(labels)
-        .enter()
-        .append('text')
-        .attr('class', 'disk')
-        .attr('x', (d) => d.x)
-        .attr('y', (d) => d.y)
-        .text((d) => d.text)
-
+      // // Place labels using calculated positions
       // chart.plot
       //   .selectAll('text.disk')
-      //   .data(chart.data)
+      //   .data(labels)
       //   .enter()
       //   .append('text')
       //   .attr('class', 'disk')
-      //   .attr('x', (d) => x(d.timestamp))
-      //   .attr('y', (d) => y(d.disk_size))
-      //   .attr('dy', '0.5')
-      //   .attr('dx', '1em')
-      //   .text((d) => human_readable_size(d.disk_size))
+      //   .attr('x', (d) => d.x)
+      //   .attr('y', (d) => d.y)
+      //   .text((d) => d.text)
+
+      chart.plot
+        .selectAll('text')
+        .data(chart.data)
+        .enter()
+        .append('text')
+        .style('text-anchor', 'middle')
+        .attr('x', (d) => x(d.timestamp))
+        .attr('y', (d) => y(d.total_size))
+        .attr('dy', '-0.1em')
+        // .attr('dx', '1em')
+        .text((d) => d.human_readable_size)
+
+      chart.plot
+        .selectAll('text.disk')
+        .data(chart.data)
+        .enter()
+        .append('text')
+        .attr('class', 'disk')
+        .style('text-anchor', 'middle')
+        .attr('x', (d) => x(d.timestamp))
+        .attr('y', (d) => y(d.disk_size))
+        .attr('dy', '0.8em')
+        // .attr('dx', '1em')
+        .text((d) => human_readable_size(d.disk_size))
 
       // chart.plot
       //   .append('path')
@@ -325,6 +349,48 @@ d3.json('/agrf_monthly_data')
       //   .attr('cy', (d) => y(d.total_size))
       //   .attr('r', 5)
       //   .attr('fill', 'red')
+
+      // Draw a legend in the top right corner
+
+
+      const total_data = shaped_data.reduce((acc, d) => acc + d.total_size, 0)
+      const total_disk = shaped_data.reduce((acc, d) => acc + d.disk_size, 0)
+
+      const legend = chart.svg.append('g').attr('transform', 'translate(20,100)')
+      legend
+        .append('rect')
+        .attr('x', chart.innerWidth - 100)
+        .attr('y', 10)
+        .attr('width', 190)
+        .attr('height', 60)
+        .attr('fill', 'white')
+        .attr('stroke', 'black')
+      legend
+        .append('text')
+        .attr('x', chart.innerWidth - 80)
+        .attr('y', 30)
+        .text(`Total Data: ${human_readable_size(total_data)}`)
+      legend
+        .append('rect')
+        .attr('x', chart.innerWidth - 95)
+        .attr('y', 20)
+        .attr('width', 10)
+        .attr('height', 10)
+        .attr('fill', 'steelblue')
+      legend
+        .append('text')
+        .attr('x', chart.innerWidth - 80)
+        .attr('y', 50)
+        .text(`Total Disk: ${human_readable_size(total_disk)}`)
+      legend
+        .append('rect')
+        .attr('x', chart.innerWidth - 95)
+        .attr('y', 40)
+        .attr('width', 10)
+        .attr('height', 10)
+        .attr('fill', 'red')
+
+
     })
   })
 
