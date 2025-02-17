@@ -93,6 +93,8 @@ d3.json('/agrf_monthly_data')
     console.log('agrf_monthly_data', data)
     console.log(Object.keys(data[0]))
 
+    drawReadLookingGraph(data)
+
     // 'id', 'path', 'run_id', 'contract_folder', 'contract_id', 'demux_id', 'storage_platform', 'data_size'
     // stop_timestamp
 
@@ -137,18 +139,18 @@ d3.json('/agrf_monthly_data')
     console.log('monthly_data', monthly_data)
 
     const shaped_data = Object.entries(monthly_data)
-    .map(([month, data]: any) => {
-      return {
-        timestamp: d3.timeParse('%Y-%m')(month),
-        month,
-        rows: data.rows,
-        disk_size: data.disk_size,
-        total_size: data.total_size,
-        total_rows: data.total_rows,
-        human_readable_size: data.human_readable_size,
-      }
-    })
-    .sort((a: any, b: any) => a.timestamp - b.timestamp)
+      .map(([month, data]: any) => {
+        return {
+          timestamp: d3.timeParse('%Y-%m')(month),
+          month,
+          rows: data.rows,
+          disk_size: data.disk_size,
+          total_size: data.total_size,
+          total_rows: data.total_rows,
+          human_readable_size: data.human_readable_size,
+        }
+      })
+      .sort((a: any, b: any) => a.timestamp - b.timestamp)
 
     new Chart({
       title: 'Monthly Data Usage (sent date) red = data on VAST',
@@ -218,7 +220,7 @@ d3.json('/agrf_monthly_data')
       const columnWidth =
         (chart.innerWidth - chart.margin.left * 2) / chart.data.length
 
-      console.log("Drawing blue columns", chart.data)
+      console.log('Drawing blue columns', chart.data)
 
       chart.plot
         .selectAll('rect.blue-total')
@@ -352,12 +354,13 @@ d3.json('/agrf_monthly_data')
 
       // Draw a legend in the top right corner
 
-
       const chart_data = chart.data.reduce((acc, d) => acc + d.total_size, 0)
       const chart_disk = chart.data.reduce((acc, d) => acc + d.disk_size, 0)
       const total_disk = shaped_data.reduce((acc, d) => acc + d.disk_size, 0)
 
-      const legend = chart.svg.append('g').attr('transform', 'translate(-80,90)')
+      const legend = chart.svg
+        .append('g')
+        .attr('transform', 'translate(-80,90)')
       legend
         .append('rect')
         .attr('x', chart.innerWidth - 100)
@@ -402,10 +405,95 @@ d3.json('/agrf_monthly_data')
         .attr('width', 10)
         .attr('height', 10)
         .attr('fill', 'red')
-
-
     })
   })
+
+function drawReadLookingGraph(data: any) {
+  console.log('drawReadLookingGraph', data)
+
+  const mapped_data = data
+    .filter((row) => row.stop_timestamp)
+    .map((row) => {
+      // stop + 90 days
+      // "2024-06-19T01:11:02.774Z"
+      const start = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')(row.start_timestamp)
+      const stop = row.stop_timestamp
+        ? d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')(row.stop_timestamp)
+        : new Date()
+      const end = d3.timeDay.offset(stop, 90)
+      const size = parseInt(row.preflight_bytes) || parseInt(row.bytes)
+
+      return {
+        start: new Date(start),
+        stop: new Date(stop),
+        end: new Date(end),
+        size,
+      }
+    }).sort((a, b) => a.start - b.start)
+
+  new Chart({
+    element: 'read_looking_graph',
+    data: mapped_data,
+  }).scratchpad((chart) => {
+    // const y = d3.scaleLinear().range([chart.innerHeight, 0])
+    // const x = d3.scaleLinear().range([0, chart.innerWidth])
+    const x = d3
+      .scaleTime() // Changed from scaleLinear to scaleTime
+      // .scaleLinear()
+      .range([0, chart.innerWidth])
+      .domain([
+        // 2022-01-01
+        // 2025-01-01
+        // d3.timeParse('%Y-%m-%d')('2022-01-01'),
+        d3.timeParse('%Y-%m-%d')('2024-01-01'),
+
+        // chart.data[0].start,
+        chart.data[chart.data.length - 1].end,
+        // d3.min(chart.data, (d: any) => d.start),
+        // d3.max(chart.data, (d: any) => d.end),
+      ])
+
+    const y = d3
+      .scaleLinear()
+      .range([chart.innerHeight, 0])
+      .domain([0, d3.max(chart.data, (d: any) => parseInt(d.size))])
+
+    // Draw rectangles for each time period
+    chart.svg
+      .selectAll('rect.read')
+      .data(chart.data)
+      .enter()
+      .append('rect')
+      .attr('class', 'read')
+      .attr('x', (d) => x(d.start))
+      // .attr('y', (d) => y(d.size))
+      .attr('y', (d) => Math.random() * chart.innerHeight)
+      // .attr('y')
+      .attr('width', (d) => x(d.end) - x(d.start))
+      // .attr('height', (d) => chart.innerHeight - y(d.size))
+      .attr('height', 1)
+      .attr('fill', 'steelblue')
+      // .attr('stroke', 'black')
+      .attr('opacity', 0.5)
+
+    // Add axes
+    const xAxis = d3.axisBottom(x)
+    const yAxis = d3.axisLeft(y).tickFormat((d) => human_readable_size(d))
+
+    chart.svg
+      .append('g')
+      .attr('transform', `translate(0,${chart.innerHeight})`)
+      .call(xAxis)
+
+    chart.svg.append('g').call(yAxis)
+    // chart.svg
+    //   .selectAll('rect.read')
+    //   .data(chart.data)
+    //   .enter()
+    //   .append('rect')
+    //   .attr('x')
+  })
+}
 
 d3.tsv('/AGRF/disk_usage_agrf.tsv')
   .then((data) => {
