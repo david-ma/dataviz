@@ -429,7 +429,8 @@ function drawReadLookingGraph(data: any) {
         end: new Date(end),
         size,
       }
-    }).sort((a, b) => a.start - b.start)
+    })
+    .sort((a, b) => a.start - b.start)
 
   new Chart({
     element: 'read_looking_graph',
@@ -445,7 +446,7 @@ function drawReadLookingGraph(data: any) {
         // 2022-01-01
         // 2025-01-01
         // d3.timeParse('%Y-%m-%d')('2022-01-01'),
-        d3.timeParse('%Y-%m-%d')('2024-01-01'),
+        d3.timeParse('%Y-%m-%d')('2024-09-01'),
 
         // chart.data[0].start,
         chart.data[chart.data.length - 1].end,
@@ -460,32 +461,63 @@ function drawReadLookingGraph(data: any) {
 
     // Draw rectangles for each time period
     chart.svg
-      .selectAll('rect.read')
+      .append('g')
+      .classed('graph', true)
+      .attr('transform', `translate(${chart.margin.left},${chart.margin.top})`)
+      .selectAll('g.folder')
       .data(chart.data)
       .enter()
-      .append('rect')
-      .attr('class', 'read')
-      .attr('x', (d) => x(d.start))
-      // .attr('y', (d) => y(d.size))
-      .attr('y', (d) => Math.random() * chart.innerHeight)
-      // .attr('y')
-      .attr('width', (d) => x(d.end) - x(d.start))
-      // .attr('height', (d) => chart.innerHeight - y(d.size))
-      .attr('height', 1)
-      .attr('fill', 'steelblue')
-      // .attr('stroke', 'black')
-      .attr('opacity', 0.5)
+      .append('g')
+      .attr(
+        'transform',
+        (d, i) =>
+          `translate(${x(d.start)},${
+            (i / chart.data.length) * chart.innerHeight
+            // Math.random() * chart.innerHeight
+          })`
+      )
+      // .attr('x', (d) => x(d.start))
+      // .attr('y', Math.random() * chart.innerHeight)
+      .classed('folder', true)
+      .each((d, i, nodes) => {
+        const folder = d3.select(nodes[i])
+        folder
+          .append('rect')
+          .attr('x', 0)
+          .attr('y', 0)
+          .attr('width', x(d.stop) - x(d.start))
+          .attr('height', 1)
+          .attr('fill', 'red')
+          .attr('opacity', 0.5)
+
+        folder
+          .append('rect')
+          .attr('y', 0)
+          .attr('x', x(d.stop) - x(d.start))
+          .attr('width', x(d.end) - x(d.stop))
+          .attr('height', 1)
+          .attr('fill', 'steelblue')
+          .attr('opacity', 0.2)
+      })
 
     // Add axes
     const xAxis = d3.axisBottom(x)
-    const yAxis = d3.axisLeft(y).tickFormat((d) => human_readable_size(d))
+    const yAxis = d3.axisLeft(y).tickFormat((d: any) => human_readable_size(d))
 
     chart.svg
       .append('g')
-      .attr('transform', `translate(0,${chart.innerHeight})`)
+      .attr(
+        'transform',
+        `translate(${chart.margin.left},${
+          chart.innerHeight + chart.margin.top
+        })`
+      )
       .call(xAxis)
 
-    chart.svg.append('g').call(yAxis)
+    chart.svg
+      .append('g')
+      .call(yAxis)
+      .attr('transform', `translate(${chart.margin.left},${chart.margin.top})`)
     // chart.svg
     //   .selectAll('rect.read')
     //   .data(chart.data)
