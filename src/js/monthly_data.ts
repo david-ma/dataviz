@@ -2,57 +2,6 @@ console.log('AGRF Monthly data usage')
 
 import { d3, Chart, decorateTable, DataTableDataset, _ } from './chart'
 
-const columns = [
-  'run_name',
-  'run_number',
-  'logical_location',
-  'instrument_name',
-  'purged',
-  'basecalls_present',
-  'basecalls_size',
-  'basecalls_count',
-  'contract_pk',
-  'contract_id',
-  'contract_status',
-  'approved_to_send_out',
-  'first_approver',
-  'second_approver',
-  'contract_sent',
-  'contract_sent_days_ago',
-  'archive_file_retention_days_fastq',
-  'archive_file_retention_date_fastq',
-  'has_archive_files_retention_period_passed_fastq',
-  'archive_file_retention_days_vcf',
-  'archive_file_retention_date_vcf',
-  'has_archive_files_retention_period_passed_vcf',
-  'is_clinical_internal_or_reference',
-  'is_clinical',
-  'is_internal',
-  'reference_data',
-  'has_archive_keep_file',
-  'has_retain_file',
-  'client_username',
-  'client_emails',
-  'additional_bioinformatics',
-  'has_current_secondary_analysis',
-  'secondary_analysis_analyst',
-  'contract_expected_fastq_count',
-  'matching_contract_folders',
-  'contract_folder_storage',
-  'contract_folder_keep_file_count',
-  'contract_folder_fastq_checksum_count',
-  'contract_folder_fastq_count',
-  'contract_folder_fastq_size',
-  'contract_folder_bam_count',
-  'contract_folder_bam_size',
-  'contract_folder_vcf_count',
-  'contract_folder_vcf_size',
-  'contract_folder_path',
-  'secondary_analysis_folder_count',
-  'secondary_analysis_folder_size',
-  'secondary_analysis_folder_path',
-]
-
 const important_columns = [
   // "contract_sent",
   // 'basecalls_size',
@@ -94,7 +43,6 @@ d3.json('/agrf_monthly_data')
     console.log(Object.keys(data[0]))
 
     drawReadLookingGraph(data)
-    // drawStreamGraph(data)
 
     // 'id', 'path', 'run_id', 'contract_folder', 'contract_id', 'demux_id', 'storage_platform', 'data_size'
     // stop_timestamp
@@ -409,63 +357,113 @@ d3.json('/agrf_monthly_data')
     })
   })
 
-function drawStreamGraph(data: any) {
-  console.log('Drawing stream graph')
+type DataBucket = {
+  start: Date
+  stop: Date
+  working_data: number
+  stored_data: number
+  cloud_data: number
+}
+type DataRow = {
+  name: string
+  start: Date
+  stop: Date
+  clean: Date
+  purge: Date
+  expire: Date
 
-  const mapped_data = data
-    .map((row) => {
-      const start = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')(row.start_timestamp)
-      const stop = row.stop_timestamp
-        ? d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')(row.stop_timestamp)
-        : new Date()
-      const end = d3.timeDay.offset(stop, 90)
-      const size = parseInt(row.preflight_bytes) || parseInt(row.bytes)
+  height: number
+  size: number
+}
 
-      return {
-        name: row.contract_id,
-        start: new Date(start),
-        stop: new Date(stop),
-        end: new Date(end),
-        height: Math.max(1, size / 100000000000),
-        size,
-      }
-    })
-    .sort((a, b) => a.start - b.start)
+function drawStreamGraph(data: DataRow[]) {
+  console.log('Drawing stream graph', data)
 
-  const sampled_data = []
+  const sampled_data: DataBucket[] = []
   // For all months from 2022-01 to 2025-01, add a row
   for (let i = 0; i < 36; i++) {
-    const month = d3.timeMonth
-      .offset(d3.timeParse('%Y-%m')('2022-01'), i)
-      .toISOString()
+    const month = d3.timeMonth.offset(d3.timeParse('%Y-%m')('2022-01'), i)
     sampled_data.push({
       start: month,
-      stop: d3.timeMonth
-        .offset(d3.timeParse('%Y-%m')('2022-01'), i + 1)
-        .toISOString(),
+      stop: d3.timeMonth.offset(d3.timeParse('%Y-%m')('2022-01'), i + 1),
       working_data: 0,
       stored_data: 0,
       cloud_data: 0,
     })
   }
 
-  mapped_data.forEach((row) => {
+  // For each row in the data, add it to the sampled data (month buckets)
+  data.forEach((row) => {
+    // For each row, and each month, add the size to the correct bucket
     for (let i = 0; i < sampled_data.length; i++) {
-      if (sampled_data[i].month < row.start) {
-      } else if (sampled_data[i].month < row.stop) {
-        sampled_data[i].working_data += row.size
-        break
-      } else if (row.stop < new Date(sampled_data[i].stop)) {
-        sampled_data[i].stored_data += row.size
-        break
-      } else if (row.end < new Date(sampled_data[i].stop)) {
-        sampled_data[i].cloud_data += row.size
-        break
-      }
+      const bucket = sampled_data[i]
+      addDataToBucket(bucket, row)
     }
   })
 
+  // Draw a stream graph based on this
   console.log('Sampled data', sampled_data)
+
+  var stackedData = d3
+    .stack()
+    .offset(d3.stackOffsetWiggle)
+    .keys(['working_data', 'stored_data', 'cloud_data'])
+    // (sampled_data)
+    // (
+    // sampled_data.reduce((acc, d) => {
+    //   acc.push(d)
+    //   return acc
+    // }, []))
+
+    console.log('Stacked data', stackedData)
+
+  new Chart({
+    title: 'Data Usage at any given time',
+    element: 'stream_graph',
+    data: stackedData,
+    nav: false,
+  }).scratchpad((chart) => {
+    const x = d3.scaleTime().range([0, chart.innerWidth])
+    const y = d3.scaleLinear().range([chart.innerHeight, 0])
+
+    const area = d3
+      .area()
+      .x((d, i) => x(sampled_data[i].start))
+      .y0((d) => y(d[0]))
+      .y1((d) => y(d[1]))
+
+    // color palette
+    var color = d3.scaleOrdinal().range(d3.schemeDark2)
+
+    chart.svg
+      .selectAll('path.myLayers')
+      .data(stackedData)
+      .enter()
+      .append('path')
+      .attr('class', 'myArea')
+      .style('fill', function (d) {
+        return color(d.key)
+      })
+      .attr('d', area)
+
+    console.log("Finished Drawing stream chart")
+  })
+}
+
+function addDataToBucket(bucket: DataBucket, row: DataRow) {
+  if (bucket.stop < row.start) {
+    // Don't do anything
+  } else if (bucket.stop < row.stop) {
+    // Add to working data
+    // Might need to double or triple this number?
+    bucket.working_data += row.size * 3
+  } else if (bucket.stop < row.clean) {
+    bucket.stored_data += row.size * 2
+  } else if (bucket.stop < row.purge) {
+    bucket.stored_data += row.size
+  } else if (bucket.stop < row.expire) {
+    bucket.cloud_data += row.size
+  }
 }
 
 drawExampleContractLifecycle()
@@ -603,7 +601,7 @@ function drawReadLookingGraph(data: any) {
     //   (row) =>
     //     (parseInt(row.preflight_bytes) || parseInt(row.bytes)) > 100000000000
     // )
-    .filter((row) => row.stop_timestamp)
+    // .filter((row) => row.stop_timestamp)
     .map((row) => {
       // stop + 90 days
       // "2024-06-19T01:11:02.774Z"
@@ -611,24 +609,30 @@ function drawReadLookingGraph(data: any) {
       const stop = row.stop_timestamp
         ? d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')(row.stop_timestamp)
         : new Date()
-      const end = d3.timeDay.offset(stop, 90)
+      const clean = d3.timeDay.offset(stop, 14)
+      const purge = d3.timeDay.offset(stop, 60)
+      const expire = d3.timeDay.offset(stop, 90)
       const size = parseInt(row.preflight_bytes) || parseInt(row.bytes)
 
       return {
         name: row.contract_id,
         start: new Date(start),
         stop: new Date(stop),
-        end: new Date(end),
+        clean: new Date(clean),
+        purge: new Date(purge),
+        expire: new Date(expire),
         height: Math.max(1, size / 100000000000),
         size,
       }
     })
     .sort((a, b) => a.start - b.start)
 
+  // drawStreamGraph(mapped_data)
+
   new Chart({
     title: 'Folders stored on VAST on any given date',
     element: 'read_looking_graph',
-    height: 3000,
+    height: 1000,
     width: 2000,
     data: mapped_data,
   }).scratchpad((chart) => {
@@ -645,7 +649,7 @@ function drawReadLookingGraph(data: any) {
         d3.timeParse('%Y-%m-%d')('2024-09-01'),
 
         // chart.data[0].start,
-        chart.data[chart.data.length - 1].end,
+        chart.data[chart.data.length - 1].expire,
         // d3.min(chart.data, (d: any) => d.start),
         // d3.max(chart.data, (d: any) => d.end),
       ])
@@ -701,7 +705,7 @@ function drawReadLookingGraph(data: any) {
           // .attr('y', d.offset)
           .attr('y', -d.height / multiplier)
           .attr('x', x(d.stop) - x(d.start))
-          .attr('width', x(d.end) - x(d.stop))
+          .attr('width', x(d.expire) - x(d.stop))
           .attr('height', d.height / multiplier)
           .attr('fill', 'steelblue')
           .attr('opacity', 0.5)
