@@ -94,6 +94,7 @@ d3.json('/agrf_monthly_data')
     console.log(Object.keys(data[0]))
 
     drawReadLookingGraph(data)
+    // drawStreamGraph(data)
 
     // 'id', 'path', 'run_id', 'contract_folder', 'contract_id', 'demux_id', 'storage_platform', 'data_size'
     // stop_timestamp
@@ -408,10 +409,200 @@ d3.json('/agrf_monthly_data')
     })
   })
 
+function drawStreamGraph(data: any) {
+  console.log('Drawing stream graph')
+
+  const mapped_data = data
+    .map((row) => {
+      const start = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')(row.start_timestamp)
+      const stop = row.stop_timestamp
+        ? d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')(row.stop_timestamp)
+        : new Date()
+      const end = d3.timeDay.offset(stop, 90)
+      const size = parseInt(row.preflight_bytes) || parseInt(row.bytes)
+
+      return {
+        name: row.contract_id,
+        start: new Date(start),
+        stop: new Date(stop),
+        end: new Date(end),
+        height: Math.max(1, size / 100000000000),
+        size,
+      }
+    })
+    .sort((a, b) => a.start - b.start)
+
+  const sampled_data = []
+  // For all months from 2022-01 to 2025-01, add a row
+  for (let i = 0; i < 36; i++) {
+    const month = d3.timeMonth
+      .offset(d3.timeParse('%Y-%m')('2022-01'), i)
+      .toISOString()
+    sampled_data.push({
+      start: month,
+      stop: d3.timeMonth
+        .offset(d3.timeParse('%Y-%m')('2022-01'), i + 1)
+        .toISOString(),
+      working_data: 0,
+      stored_data: 0,
+      cloud_data: 0,
+    })
+  }
+
+  mapped_data.forEach((row) => {
+    for (let i = 0; i < sampled_data.length; i++) {
+      if (sampled_data[i].month < row.start) {
+      } else if (sampled_data[i].month < row.stop) {
+        sampled_data[i].working_data += row.size
+        break
+      } else if (row.stop < new Date(sampled_data[i].stop)) {
+        sampled_data[i].stored_data += row.size
+        break
+      } else if (row.end < new Date(sampled_data[i].stop)) {
+        sampled_data[i].cloud_data += row.size
+        break
+      }
+    }
+  })
+
+  console.log('Sampled data', sampled_data)
+}
+
+drawExampleContractLifecycle()
+function drawExampleContractLifecycle() {
+  const chart = new Chart({
+    element: 'contract_lifecycle',
+    title: 'Example Contract Lifecycle',
+    nav: false,
+  }).scratchpad((chart) => {
+    // Y is TeraBytes
+    const y = d3
+      .scaleLinear()
+      .range([chart.innerHeight / 2, 0])
+      .domain([0, 5])
+
+    // X is time, in days
+    const x = d3.scaleLinear().range([0, chart.innerWidth]).domain([0, 130])
+
+    // Draw a box for the contract
+    const data = [
+      {
+        label: 'Demux',
+        size: 1,
+        days: 5,
+        day: 1,
+        storage: 'vast',
+      },
+      {
+        label: 'Analysis',
+        size: 2,
+        days: 14,
+        day: 6,
+        storage: 'vast',
+      },
+      {
+        label: 'Delivered to client',
+        size: 2,
+        days: 14,
+        day: 20,
+        storage: 'vast',
+      },
+      {
+        label: 'Backed up to AWS',
+        size: 1,
+        days: 90,
+        day: 34,
+        storage: 'aws',
+      },
+    ]
+
+    const svg = chart.svg
+      .append('g')
+      .attr('transform', `translate(${chart.margin.left},${chart.margin.top})`)
+      .classed('graph', true)
+
+    svg
+      .selectAll('rect')
+      .data(data)
+      .enter()
+      .append('rect')
+      .attr('x', (d, i) => x(d.day))
+      .attr('y', (d, i) => y(d.size))
+      .attr('width', (d) => x(d.days))
+      .attr('height', (d) => chart.innerHeight / 2 - y(d.size))
+      .attr('fill', (d) => (d.storage === 'vast' ? 'red' : 'steelblue'))
+      .attr('opacity', 0.5)
+      .attr('stroke', 'black')
+
+    svg
+      .selectAll('text.rect-label')
+      .data(data)
+      .enter()
+      .append('g')
+      .classed('rect-label', true)
+      .each((d, i, nodes) => {
+        const group = d3.select(nodes[i])
+        group
+          .append('text')
+          .datum(d)
+          .attr('x', (d) => (x(d.days) + x(d.day)) / 2)
+          .attr('y', (d) => chart.innerHeight / 4 - 30 + ((i + 1) % 2) * 20)
+          .text((d) => d.label)
+        group
+          .append('line')
+          .datum(d)
+          .attr('x1', (d) => (x(d.days) + x(d.day)) / 2)
+          .attr('x2', (d) => (x(d.days) + x(d.day)) / 2)
+          .attr('y1', chart.innerHeight / 4 - 30 + ((i + 1) % 2) * 20)
+          .attr('y2', (d) => y(d.size))
+          .attr('stroke-dasharray', '2,2')
+          .attr('stroke', 'grey')
+      })
+
+    // Draw x and y axis
+    const xAxis = d3.axisBottom(x)
+    const yAxis = d3.axisLeft(y)
+
+    chart.svg
+      .append('g')
+      .attr(
+        'transform',
+        `translate(${chart.margin.left},${
+          chart.innerHeight / 2 + chart.margin.top
+        })`
+      )
+      .call(xAxis)
+      .append('text')
+      .attr('x', chart.innerWidth / 2)
+      .attr('y', 40)
+      .text('Days')
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'black')
+      .attr('font-size', '1.5em')
+
+    chart.svg
+      .append('g')
+      .attr('transform', `translate(${chart.margin.left},${chart.margin.top})`)
+      .call(yAxis)
+      .append('text')
+      .attr('transform', 'rotate(-90)')
+      .attr('x', -chart.innerHeight / 4)
+      .attr('y', -40)
+      .text('TeraBytes')
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'black')
+      .attr('font-size', '1.5em')
+  })
+}
+
 function drawReadLookingGraph(data: any) {
   console.log('drawReadLookingGraph', data)
 
   const mapped_data = data
+    // .filter(
+    //   (row) =>
+    //     (parseInt(row.preflight_bytes) || parseInt(row.bytes)) > 100000000000
+    // )
     .filter((row) => row.stop_timestamp)
     .map((row) => {
       // stop + 90 days
@@ -437,7 +628,7 @@ function drawReadLookingGraph(data: any) {
   new Chart({
     title: 'Folders stored on VAST on any given date',
     element: 'read_looking_graph',
-    height: 2000,
+    height: 3000,
     width: 2000,
     data: mapped_data,
   }).scratchpad((chart) => {
