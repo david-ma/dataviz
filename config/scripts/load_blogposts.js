@@ -82,21 +82,30 @@ const blogposts = [
     },
 ];
 import { blogpostTable } from '../../models/drizzle-schema.js';
-export async function loadBlogposts() {
-    const blogposts = await blogpostTable.findMany();
-    return blogposts;
-}
 import { drizzle } from 'drizzle-orm/mysql2';
 import path from 'path';
 // @ts-ignore
 const drizzleConfig = await import(path.join(import.meta.dirname, '..', '..', 'drizzle.config.ts'));
 const db = drizzle(drizzleConfig.default.dbCredentials.url);
-// db.insert(blogpostTable).values(blogposts)
-db.select().from(blogpostTable)
+db.select()
+    .from(blogpostTable)
     .then((results) => {
-    console.log(results);
+    if (results.length === 0) {
+        console.log('No blogposts found, inserting...');
+        // db.insert(blogpostTable).values(blogposts)
+        Promise.all(blogposts.map((blogpost) => db.insert(blogpostTable).values(blogpost)))
+            .then(() => {
+            console.log('Blogposts inserted');
+            process.exit(0);
+        })
+            .catch((error) => {
+            console.error('Error inserting blogposts:', error);
+            process.exit(1);
+        });
+    }
+    else {
+        console.log('Blogposts found, skipping...');
+        process.exit(0);
+    }
 });
-// blogposts.forEach(async (blogpost) => {
-//   await db.insert(blogpostTable).values(blogpost)
-// })
 //# sourceMappingURL=load_blogposts.js.map

@@ -1,1 +1,1 @@
-export declare function xray(html: any): void;
+export declare function xray(html: any): void
