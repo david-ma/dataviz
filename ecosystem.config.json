@@ -1,0 +1,13 @@
+{
+  "apps": [
+    {
+      "name": "dataviz",
+      "script": "dist/server/cli.js",
+      "env": {
+        "NODE_ENV": "production",
+        "PORT": 2002,
+        "PROJECT": "dataviz"
+      }
+    }
+  ]
+}
