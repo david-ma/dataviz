@@ -1,51 +1,8 @@
-const webpack = require('webpack')
-const fs = require('fs')
-const path = require('path')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const CopyPlugin = require('copy-webpack-plugin')
-
-// const files = fs
-//   .readdirSync('./src/js')
-//   .filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts'))
-//   .reduce((acc, file) => {
-//     acc[file.replace('.ts', '')] = {
-//       import: `./src/js/${file}`,
-//       dependOn: 'chart',
-//     }
-//     return acc
-//   }, {})
-
-// function getFiles(dir) {
-//   let results = {}
-//   const list = fs.readdirSync(dir)
-
-//   list.forEach(file => {
-//     const filePath = path.join(dir, file)
-//     const stat = fs.statSync(filePath)
-
-//     if (stat.isDirectory()) {
-//       // Not /js/vendor
-//       Object.assign(results, getFiles(filePath))
-//     } else if (
-//       file.endsWith('.ts') &&
-//       !file.endsWith('.d.ts') ||
-//       file.endsWith('.js')
-//     ) {
-//       const relativePath = path.relative('./src/js', dir)
-//       const entryName = path.join(
-//         relativePath,
-//         file.replace(/\.(ts|js)$/, '')
-//       ).replace(/\\/g, '/')
-
-//       results[entryName] = {
-//         import: `./${path.relative('.', filePath)}`,
-//         dependOn: 'chart'
-//       }
-//     }
-//   })
-
-//   return results
-// }
+import webpack from 'webpack'
+import fs from 'fs'
+import path from 'path'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import CopyPlugin from 'copy-webpack-plugin'
 
 function getFiles(dir) {
   let results = {}
@@ -85,7 +42,10 @@ var config = {
     chart: ['./src/js/chart.ts', './src/css/chart.scss'],
   },
   output: {
-    path: __dirname + '/dist/js',
+    library: {
+      type: 'module',
+    },
+    path: path.resolve(import.meta.dirname, 'dist', 'js'),
     filename: '[name].js',
     assetModuleFilename: '[hash][ext][query]',
     publicPath: '/js/',
@@ -123,15 +83,15 @@ var config = {
     extensions: ['.ts', '.tsx', '.js', '.wasm'],
     alias: {
       'three/examples/jsm/loaders/OBJLoader': path.resolve(
-        __dirname,
+        import.meta.dirname,
         'node_modules/three/examples/jsm/loaders/OBJLoader.js'
       ),
       'three/examples/jsm/loaders/MTLLoader': path.resolve(
-        __dirname,
+        import.meta.dirname,
         'node_modules/three/examples/jsm/loaders/MTLLoader.js'
       ),
       './diff_match_patch': path.resolve(
-        __dirname,
+        import.meta.dirname,
         'src/js/diff_match_patch.js'
       ),
     },
@@ -143,6 +103,7 @@ var config = {
     },
   },
   experiments: {
+    outputModule: true,
     asyncWebAssembly: true,
     topLevelAwait: true,
   },
@@ -201,12 +162,12 @@ var config = {
   },
 }
 
-module.exports = (env, argv) => {
+export default (env, argv) => {
   // development by default
   if (argv.mode === 'production') {
     config.mode = 'production'
     delete config.devtool
-    config.output.path = __dirname + '/public/js'
+    config.output.path = import.meta.dirname + '/public/js'
   }
 
   return config

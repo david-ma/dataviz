@@ -1,4 +1,4 @@
-declare const sd: showdown.Converter;
+declare const sd: any;
 type Issue = {
     number: number;
     title: string;

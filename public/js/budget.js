@@ -1,1 +1,1 @@
-(self.webpackChunkdataviz=self.webpackChunkdataviz||[]).push([[416],{5560:()=>{}},a=>{a(a.s=5560)}]);
+export const __webpack_id__=416;export const __webpack_ids__=[416];export const __webpack_modules__={6488:()=>{}};import _ from"./chart.js";import*as o from"./budget.js";_.C(o),_(_.s=6488);

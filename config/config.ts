@@ -130,8 +130,9 @@ let config: RawWebsiteConfig = {
           .orderBy(desc(blogpostTable.publish_date))
           .then((results) => {
             const html = website.getContentHtml('homepage')({
-              // blogposts: results,
+              gitHash,
               blogposts,
+              // blogposts: results,
             })
 
             res.end(html)
@@ -155,9 +156,13 @@ let config: RawWebsiteConfig = {
           .from(blogpostTable)
           .where(eq(blogpostTable.published, true))
           .then((results) => {
-            const html = website.getContentHtml(shortname, 'blog')({
+            const html = website.getContentHtml(
+              shortname,
+              'blog',
+            )({
+              gitHash,
               typescript: `/js/${shortname}.js`,
-              blogposts
+              blogposts,
               // blogpost: results,
             })
             res.end(html)
