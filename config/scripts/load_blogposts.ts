@@ -89,8 +89,8 @@ import { blogpostTable } from '../../models/drizzle-schema.js'
 import { drizzle } from 'drizzle-orm/mysql2'
 import path from 'path'
 
-// @ts-ignore
 const drizzleConfig = await import(
+  // @ts-ignore
   path.join(import.meta.dirname, '..', '..', 'drizzle.config.ts')
 )
 

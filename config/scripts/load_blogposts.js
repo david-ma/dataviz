@@ -84,8 +84,9 @@ const blogposts = [
 import { blogpostTable } from '../../models/drizzle-schema.js';
 import { drizzle } from 'drizzle-orm/mysql2';
 import path from 'path';
+const drizzleConfig = await import(
 // @ts-ignore
-const drizzleConfig = await import(path.join(import.meta.dirname, '..', '..', 'drizzle.config.ts'));
+path.join(import.meta.dirname, '..', '..', 'drizzle.config.ts'));
 const db = drizzle(drizzleConfig.default.dbCredentials.url);
 db.select()
     .from(blogpostTable)
