@@ -1,3 +1,3 @@
-import { RawWebsiteConfig } from 'thalia';
-declare let config: RawWebsiteConfig;
-export { config };
+import { RawWebsiteConfig } from 'thalia'
+declare let config: RawWebsiteConfig
+export { config }
