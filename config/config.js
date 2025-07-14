@@ -1,4 +1,3 @@
-import { gitHash } from './utilities.js';
 import path from 'path';
 import fs from 'fs';
 const fsPromise = fs.promises;
@@ -127,6 +126,50 @@ let config = {
                 });
             }
         },
+        blog: (res, req, website, requestInfo) => {
+            const shortname = requestInfo.action;
+            if (!shortname) {
+                res.statusCode = 301;
+                res.setHeader('Location', '/');
+                res.end();
+                return;
+            }
+            if (!website.db) {
+                res.end('Database not connected');
+            }
+            else {
+                website.db.drizzle
+                    .select()
+                    .from(blogpostTable)
+                    .where(eq(blogpostTable.published, true))
+                    .then((results) => {
+                    const html = website.getContentHtml(shortname, 'blog')({
+                        typescript: `/js/${shortname}.js`,
+                        blogposts
+                        // blogpost: results,
+                    });
+                    res.end(html);
+                })
+                    .catch((error) => {
+                    console.error(error);
+                    res.end('Error');
+                });
+            }
+        },
+        source: (res, req, website, requestInfo) => {
+            // Show the source code for a typescript file
+            // Created for Genuary 2025
+            const filepath = requestInfo.pathname;
+            const regex = /js\/(.*).js/;
+            if (regex.test(filepath)) {
+                const shortname = regex.exec(filepath)[1];
+                res.setHeader('Content-Type', 'text/javascript');
+                res.end(fs.readFileSync(path.resolve(website.rootPath, 'src', 'js', `${shortname}.ts`)));
+            }
+            else {
+                res.end('404');
+            }
+        },
         fridge_images: function (res, req, db) {
             const basePath = path.resolve(__dirname, '..', 'data', 'fridge');
             // check if az_images, ruby_images and renee_images exist
@@ -160,67 +203,6 @@ let config = {
                     .map((d) => 'renee_images/' + d));
                 res.end(JSON.stringify(images));
             });
-        },
-        blog: function blogpost(router) {
-            if (!router.db) {
-                router.res.end('Database not connected');
-            }
-            else {
-                // const promises = [loadTemplates('blog.mustache', router.path)]
-                const promises = [new Promise(router.readAllViews)];
-                Promise.all(promises).then(function ([views]) {
-                    const data = {
-                        gitHash: gitHash,
-                    };
-                    router.db.Blogpost.findAll({
-                        where: {
-                            published: true,
-                        },
-                        order: [['publish_date', 'DESC']],
-                    }).then((results) => {
-                        data.blogposts = results.map((d) => d.dataValues);
-                        data.blogpost = data.blogposts.filter((d) => d.shortname === router.path[0]);
-                        try {
-                            const shortname = router.path[0];
-                            data.typescript = `"/js/${shortname}.js"`;
-                        }
-                        catch (e) { }
-                        const template = router.handlebars.compile(views.blog);
-                        setHandlebarsContent(views[router.path[0]], router.handlebars).then(() => {
-                            router.handlebars.registerHelper('parseArray', (array, options) => array.split(',').map(options.fn).join(''));
-                            try {
-                                loadViewsAsPartials(views, router.handlebars);
-                                router.res.end(template(data));
-                            }
-                            catch (error) {
-                                console.log('Error in dataviz/blog');
-                                console.log(error);
-                                router.res.end('Error loading content:<br>' + error.message);
-                            }
-                        }, (error) => {
-                            console.log('Error in dataviz/blog');
-                            console.log(error);
-                            router.res.end('Error loading content');
-                        });
-                    });
-                });
-            }
-        },
-        source: function source(router) {
-            // Show the source code for a typescript file
-            // Created for Genuary 2025
-            const filepath = router.path.join('/');
-            const regex = /js\/(.*).js/;
-            // console.log(filepath)
-            if (regex.test(filepath)) {
-                const shortname = regex.exec(filepath)[1];
-                // console.log('Shortname', shortname)
-                router.response.setHeader('Content-Type', 'text/javascript');
-                router.response.end(fs.readFileSync(path.resolve(__dirname, '..', 'src', 'js', `${shortname}.ts`)));
-            }
-            else {
-                router.response.end('404');
-            }
         },
     },
     database: {
