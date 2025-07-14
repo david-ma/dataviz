@@ -1,31 +1,22 @@
-services:
-  web:
-    build: .
-    image: dataviz
-    ports:
-      - '1334:1337'
-    environment:
-      - NODE_ENV=docker
-    restart: always
-    volumes:
-      - ./data:/usr/app/Thalia/websites/dataviz/data
-
-  db:
-    image: postgres
-    volumes:
-      - dataviz_db:/var/lib/postgresql/data
-    expose:
-      - '5432'
-    ports:
-      - '5433:5432'
-    environment:
-      PGUSER: 'postgres'
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'mysecretpassword'
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready', '-d', 'postgres']
-    restart: always
-
 volumes:
-  dataviz_db:
-  data:
+  db_data:
+
+services:
+  db:
+    image: mariadb:11.4.7
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3346:3306"
+    environment:
+      MYSQL_DATABASE: dataviz
+      MYSQL_USER: dataviz_user
+      MYSQL_PASSWORD: mysecretpassword
+      MYSQL_ROOT_PASSWORD: mysecretrootpassword
+    healthcheck:
+      # https://mariadb.com/kb/en/using-healthcheck-sh/#compose-file-example
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 1s
+      retries: 5

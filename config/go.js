@@ -1,10 +1,5 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.config = void 0;
-const lodash_1 = __importDefault(require("lodash"));
+// Transient data store, will need to use a real database in future.
+import _ from 'lodash';
 const goBoard = {};
 const config = {
     sockets: {
@@ -12,16 +7,20 @@ const config = {
             {
                 name: 'fullGoBoard',
                 callback: function (socket, packet, seq) {
+                    // eslint-disable-line
                     socket.broadcast.emit('fullGoBoard', packet);
-                    lodash_1.default.merge(goBoard, {
-                        [packet.name]: packet.data
+                    _.merge(goBoard, {
+                        [packet.name]: packet.data,
                     });
-                }
-            }
+                },
+            },
         ],
         emit: [
-            (socket, seq) => { socket.emit('fullGoBoard', goBoard); }
-        ]
-    }
+            (socket, seq) => {
+                socket.emit('fullGoBoard', goBoard);
+            }, // eslint-disable-line
+        ],
+    },
 };
-exports.config = config;
+export { config };
+//# sourceMappingURL=go.js.map

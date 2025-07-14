@@ -4,11 +4,13 @@ var fs = require('fs');
 var stuff = fs.readFileSync('data/melbourne_export_all.csv', {
     encoding: 'utf8',
 });
+// console.log(thing)
 const records = csv.parse(stuff, {
     delimiter: ',',
     columns: true,
     skip_empty_lines: true,
 });
+// console.log(records[0])
 records.forEach((record) => {
     seq.AwesomeProject.findOne({
         where: {
@@ -27,3 +29,10 @@ records.forEach((record) => {
         }
     });
 });
+export {};
+// seq.AwesomeProject.findAll({})
+//   .then(function (d) {
+//     console.log("Here are all the things")
+//     console.log(d.length)
+//   })
+//# sourceMappingURL=csv_to_sqlite.js.map

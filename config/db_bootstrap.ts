@@ -5,7 +5,6 @@ import path = require('path')
 import _ = require('lodash')
 import { SeqObject } from 'thalia'
 
-
 // Default options
 let seqOptions: Options = {
   dialect: 'sqlite',
@@ -21,12 +20,9 @@ const env = process.env.NODE_ENV || 'development'
 console.debug('env is:', env)
 try {
   // const configOptions = require(__dirname + '/../config/config.json')[env]
-  const configOptions = require(path.resolve(
-    __dirname,
-    '..',
-    'config',
-    'config.json'
-  ))[env]
+  const configOptions = require(
+    path.resolve(__dirname, '..', 'config', 'config.json'),
+  )[env]
   seqOptions = _.merge(seqOptions, configOptions)
 
   // console.log('seqOptions are:', seqOptions)
@@ -191,12 +187,9 @@ if (false) {
 
 exports.seq = seq
 
-const agrf_connection: Options = require(path.resolve(
-  __dirname,
-  '..',
-  'config',
-  'config.json'
-))['agrf_nightly']
+const agrf_connection: Options = require(
+  path.resolve(__dirname, '..', 'config', 'config.json'),
+)['agrf_nightly']
 
 const agrf_sequelize: Sequelize = new Sequelize(agrf_connection)
 export { agrf_sequelize }

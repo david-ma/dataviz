@@ -1,20 +1,14 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.loadTemplates = exports.sanitise = exports.asyncForEach = exports.gitHash = void 0;
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
-const sass_1 = __importDefault(require("sass"));
-const fsPromise = fs_1.default.promises;
-let gitHash = new Date().getTime().toString();
-exports.gitHash = gitHash;
+import fs from 'fs';
+import path from 'path';
+import sass from 'sass';
+const fsPromise = fs.promises;
+let gitHash = new Date().getTime().toString(); // use the start up time as fallback if a proper git hash is unavailable
 try {
-    const rawGitHash = fs_1.default.readFileSync(path_1.default.resolve(__dirname, 'git-commit-version.txt'), 'utf8');
-    exports.gitHash = gitHash = rawGitHash.split('-').pop().trim();
+    const rawGitHash = fs.readFileSync(path.resolve(__dirname, 'git-commit-version.txt'), 'utf8');
+    gitHash = rawGitHash.split('-').pop().trim();
 }
 catch (e) { }
+// Asynchronous for each, doing a limited number of things at a time.
 async function asyncForEach(array, limit, callback) {
     let i = 0;
     for (; i < limit; i++) {
@@ -29,23 +23,27 @@ async function asyncForEach(array, limit, callback) {
     }
     return 1;
 }
-exports.asyncForEach = asyncForEach;
 function sanitise(string) {
     return string.replace(/\W+/g, ' ').trim().replace(/\W/g, '_').toLowerCase();
 }
-exports.sanitise = sanitise;
+// TODO: handle rejection & errors?
 async function loadTemplates(template, content = '') {
     return new Promise((resolve) => {
         const promises = [];
         const filenames = ['template', 'content'];
-        promises.push(fsPromise.readFile(path_1.default.resolve(__dirname, '..', 'views', template), {
+        // Load the mustache template (outer layer)
+        promises.push(
+        // fsPromise.readFile(`${__dirname}/../views/${template}`, {
+        fsPromise.readFile(path.resolve(__dirname, '..', 'views', template), {
             encoding: 'utf8',
         }));
+        // Load the mustache content (innermost layer)
         promises.push(new Promise((resolve) => {
             if (Array.isArray(content) && content[0])
                 content = content[0];
+            // fsPromise.readFile(`${__dirname}/../views/content/${content}.mustache`, {
             fsPromise
-                .readFile(path_1.default.resolve(__dirname, '..', 'views', 'content', content + '.mustache'), {
+                .readFile(path.resolve(__dirname, '..', 'views', 'content', content + '.mustache'), {
                 encoding: 'utf8',
             })
                 .then((result) => {
@@ -55,7 +53,7 @@ async function loadTemplates(template, content = '') {
                     const scripts = [...result.matchAll(scriptEx)].map((d) => d[0]);
                     const styles = [...result.matchAll(styleEx)].map((d) => d[1]);
                     let styleData = styles.join('\n');
-                    sass_1.default.render({
+                    sass.render({
                         data: styleData,
                         outputStyle: 'compressed',
                     }, function (err, sassResult) {
@@ -80,8 +78,9 @@ async function loadTemplates(template, content = '') {
                 }
             })
                 .catch((e) => {
+                // fsPromise.readFile(`${__dirname}/../views/404.mustache`, {
                 fsPromise
-                    .readFile(path_1.default.resolve(__dirname, '..', 'views', '404.mustache'), {
+                    .readFile(path.resolve(__dirname, '..', 'views', '404.mustache'), {
                     encoding: 'utf8',
                 })
                     .then((result) => {
@@ -89,13 +88,17 @@ async function loadTemplates(template, content = '') {
                 });
             });
         }));
+        // Load all the other partials we may need
+        // fsPromise.readdir(`${__dirname}/../views/partials/`)
         fsPromise
-            .readdir(path_1.default.resolve(__dirname, '..', 'views', 'partials'))
+            .readdir(path.resolve(__dirname, '..', 'views', 'partials'))
             .then(function (d) {
             d.forEach(function (filename) {
                 if (filename.indexOf('.mustache') > 0) {
                     filenames.push(filename.split('.mustache')[0]);
-                    promises.push(fsPromise.readFile(path_1.default.resolve(__dirname, '..', 'views', 'partials', filename), {
+                    promises.push(
+                    // fsPromise.readFile(`${__dirname}/../views/partials/${filename}`, {
+                    fsPromise.readFile(path.resolve(__dirname, '..', 'views', 'partials', filename), {
                         encoding: 'utf8',
                     }));
                 }
@@ -115,4 +118,5 @@ async function loadTemplates(template, content = '') {
         });
     });
 }
-exports.loadTemplates = loadTemplates;
+export { gitHash, asyncForEach, sanitise, loadTemplates };
+//# sourceMappingURL=utilities.js.map

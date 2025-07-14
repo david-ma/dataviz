@@ -5,6 +5,7 @@
   "repository": "https://github.com/david-ma/dataviz.git",
   "author": "David Ma <github@david-ma.net>",
   "license": "MIT",
+  "type": "module",
   "private": true,
   "scripts": {
     "build": "webpack --mode production",
@@ -39,6 +40,7 @@
     "showdown": "^2.1.0",
     "socket.io": "^4.7.5",
     "sqlite3": "^5.1.7",
+    "thalia": "file:../../",
     "three": "^0.172.0"
   },
   "resolutions": {

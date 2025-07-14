@@ -1,9 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.xray = void 0;
 var AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto;
 var x = require('x-ray')();
-function xray(html) {
+export function xray(html) {
+    // Get the project IDs
     x(html, ['article.project@data-id'])(function (err, projects) {
         if (err) {
             console.log('ERROR', err);
@@ -14,7 +12,9 @@ function xray(html) {
             photos: 0,
             newPhotos: 0,
         };
+        // Get the photos for each project
         Promise.all(projects.map((project) => {
+            // console.log("Processing project ", project)
             new Promise((resolve, reject) => {
                 x(html, `article.project[data-id=${project}]`, {
                     project: project,
@@ -30,7 +30,11 @@ function xray(html) {
                         console.log('ERROR', err);
                         reject(err);
                     }
+                    // console.log("Blob is", blob)
+                    // console.log(`Project ${project}:`, blob)
+                    // Save the photos to the database
                     Promise.all(blob.photos.map((photo) => {
+                        // console.log("Photo is", photo)
                         photo.awesome_project_id = project;
                         new Promise((resolve, reject) => {
                             tally.photos++;
@@ -40,9 +44,13 @@ function xray(html) {
                                 },
                             }).then((d) => {
                                 if (d) {
+                                    // console.log('Found existing record', d.id)
+                                    // d.update(photo)
                                 }
                                 else {
                                     tally.newPhotos++;
+                                    // console.log('Creating new record', photo.url)
+                                    // console.log(photo)
                                     AwesomePhoto.create(photo).catch((error) => {
                                         console.log('Error creating new record', error);
                                     });
@@ -63,4 +71,4 @@ function xray(html) {
         });
     });
 }
-exports.xray = xray;
+//# sourceMappingURL=xray_test.js.map

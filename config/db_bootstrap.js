@@ -1,10 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.agrf_sequelize = void 0;
-const sequelize_1 = require("sequelize");
-const models_1 = require("../models");
-const path = require("path");
-const _ = require("lodash");
+import { createRequire as _createRequire } from "module";
+const __require = _createRequire(import.meta.url);
+import { Sequelize } from 'sequelize';
+import { datavizDBFactory } from '../models';
+const path = __require("path");
+const _ = __require("lodash");
+// Default options
 let seqOptions = {
     dialect: 'sqlite',
     storage: path.resolve(__dirname, '..', 'models', 'database.sqlite'),
@@ -13,33 +13,44 @@ let seqOptions = {
         underscored: true,
     },
 };
+// Load options from config.json if one is provided
 const env = process.env.NODE_ENV || 'development';
 console.debug('env is:', env);
 try {
+    // const configOptions = require(__dirname + '/../config/config.json')[env]
     const configOptions = require(path.resolve(__dirname, '..', 'config', 'config.json'))[env];
     seqOptions = _.merge(seqOptions, configOptions);
+    // console.log('seqOptions are:', seqOptions)
 }
 catch (e) {
     console.error('No config.json provided for Sequelize', e);
     process.exit(1);
 }
+// Do NOT log your password on production!!!
 if (env === 'development') {
     console.debug('Initialising Sequelize with options:', seqOptions);
 }
-const seq = (0, models_1.datavizDBFactory)(seqOptions);
+const seq = datavizDBFactory(seqOptions);
 if (false) {
+    // eslint-disable-line
     seq.Family.create({
         brand: 'Nikon',
         name: 'Coolpix',
         description: 'None',
     });
 }
+// rebuild entire database & reload data..?
 if (false) {
+    // console.log('sync true, force & alter')
+    // eslint-disable-line
     seq.sequelize
         .sync({
         alter: true,
+        // force: true,
     })
         .then(function (d) {
+        // eslint-disable-line
+        // Add blog posts
         const blogposts = [
             {
                 shortname: 'georgia',
@@ -142,6 +153,7 @@ if (false) {
             },
         ];
         blogposts.forEach(function (blogpost) {
+            // console.log(`Adding ${blogpost.shortname}`)
             seq.Blogpost.findOne({
                 where: {
                     shortname: blogpost.shortname,
@@ -159,5 +171,6 @@ if (false) {
 }
 exports.seq = seq;
 const agrf_connection = require(path.resolve(__dirname, '..', 'config', 'config.json'))['agrf_nightly'];
-const agrf_sequelize = new sequelize_1.Sequelize(agrf_connection);
-exports.agrf_sequelize = agrf_sequelize;
+const agrf_sequelize = new Sequelize(agrf_connection);
+export { agrf_sequelize };
+//# sourceMappingURL=db_bootstrap.js.map

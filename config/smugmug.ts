@@ -5,34 +5,35 @@ import { Thalia } from '../../../server/thalia'
 import _ from 'lodash'
 import path from 'path'
 
-const tokens :{
-    'consumer_key' : string;
-    'consumer_secret' : string;
-    'oauth_token' : string;
-    'oauth_token_secret': string;
+const tokens: {
+  consumer_key: string
+  consumer_secret: string
+  oauth_token: string
+  oauth_token_secret: string
 } = require('./config.json').smugmug
 
-import fs = require('fs');
-import https = require('https');
-import mime = require('mime');
-import crypto = require('crypto');
+import fs = require('fs')
+import https = require('https')
+import mime = require('mime')
+import crypto = require('crypto')
 import Formidable = require('formidable')
 
-const config :Thalia.WebsiteConfig = {
+const config: Thalia.WebsiteConfig = {
   services: {
-    test: function (res :ServerResponse, req :IncomingMessage) { // eslint-disable-line
+    test: function (res: ServerResponse, req: IncomingMessage) {
+      // eslint-disable-line
       res.end('Hello World')
     },
-    uploadPhoto: function (res :ServerResponse, req :IncomingMessage) {
+    uploadPhoto: function (res: ServerResponse, req: IncomingMessage) {
       // const uploadFolder = `${__dirname}/../data/tmp/`
       const uploadFolder = path.resolve(__dirname, '..', 'data', 'tmp')
 
       const form = Formidable({
-        maxFileSize: 25 * 1024 * 1024 // 25 megabytes. Note we're also putting this size limit in nginx.conf
+        maxFileSize: 25 * 1024 * 1024, // 25 megabytes. Note we're also putting this size limit in nginx.conf
       })
       // console.log("uploading files to ", uploadFolder);
 
-      form.parse(req, (err :Error, fields, files) => {
+      form.parse(req, (err: Error, fields, files) => {
         if (err) {
           res.writeHead(413, err.message)
           res.end(err.message)
@@ -80,7 +81,7 @@ const config :Thalia.WebsiteConfig = {
               Cookie: 'cookieGoesHereLol',
               FileName: '',
               AllowInsecure: false,
-              Uri: `https://dataviz.david-ma.net/tmp/${file.name}`
+              Uri: `https://dataviz.david-ma.net/tmp/${file.name}`,
             })
 
             const extraParams = {
@@ -119,11 +120,11 @@ const config :Thalia.WebsiteConfig = {
                 // Connection: "keep-alive",
                 'Content-Type': 'application/json',
                 'Content-Length': payload.length,
-                Accept: 'application/json; charset=utf-8'
-              }
+                Accept: 'application/json; charset=utf-8',
+              },
             }
 
-            const req = https.request(options, function (res :IncomingMessage) {
+            const req = https.request(options, function (res: IncomingMessage) {
               console.log('STATUS: ' + res.statusCode)
               console.log('HEADERS: ' + JSON.stringify(res.headers))
 
@@ -145,8 +146,8 @@ const config :Thalia.WebsiteConfig = {
           })
         })
       })
-    }
-  }
+    },
+  },
 }
 
 // Useful resources:
@@ -154,54 +155,61 @@ const config :Thalia.WebsiteConfig = {
 // https://medium.com/@imashishmathur/0auth-a142656859c6
 // https://developer.chrome.com/extensions/examples/extensions/oauth_contacts/chrome_ex_oauthsimple.js
 // https://github.com/pH200/hmacsha1-js
-function b64_hmac_sha1 (key :string, data: string) {  // eslint-disable-line
+function b64_hmac_sha1(key: string, data: string) {
+  // eslint-disable-line
   return crypto.createHmac('sha1', key).update(data).digest('base64')
 }
 
-function oauthEscape (string :string) {
+function oauthEscape(string: string) {
   if (string === undefined) {
     return ''
   }
-  if (string as any instanceof Array) {
-    throw ('Array passed to _oauthEscape') // eslint-disable-line
+  if ((string as any) instanceof Array) {
+    throw 'Array passed to _oauthEscape' // eslint-disable-line
   }
-  return encodeURIComponent(string).replace(/\!/g, '%21') // eslint-disable-line
+  return encodeURIComponent(string)
+    .replace(/\!/g, '%21') // eslint-disable-line
     .replace(/\*/g, '%2A')
     .replace(/'/g, '%27')
     .replace(/\(/g, '%28')
     .replace(/\)/g, '%29')
-};
+}
 
-function bundleAuthorization (url :string, params :object) {
+function bundleAuthorization(url: string, params: object) {
   const keys = Object.keys(params)
-  const authorization = `OAuth realm="${url}",${keys.map(key => `${key}="${params[key]}"`).join(',')}`
+  const authorization = `OAuth realm="${url}",${keys.map((key) => `${key}="${params[key]}"`).join(',')}`
   return authorization
 }
 
-function expandParams (params) {
-  return Object.keys(params).map(key => `${key}=${params[key]}`).join('&')
+function expandParams(params) {
+  return Object.keys(params)
+    .map((key) => `${key}=${params[key]}`)
+    .join('&')
 }
 
-function signRequest (method :string, targetUrl :string, extraParams ?:object) {
-  const normalParams :any = {
+function signRequest(method: string, targetUrl: string, extraParams?: object) {
+  const normalParams: any = {
     oauth_consumer_key: tokens.consumer_key,
     oauth_nonce: Math.random().toString().replace('0.', ''),
     oauth_signature_method: 'HMAC-SHA1',
     oauth_timestamp: Date.now(),
     oauth_token: tokens.oauth_token,
     oauth_token_secret: tokens.oauth_token_secret,
-    oauth_version: '1.0'
+    oauth_version: '1.0',
   }
 
-  const normalized = oauthEscape(expandParams(sortParams(_.merge(normalParams, extraParams))))
+  const normalized = oauthEscape(
+    expandParams(sortParams(_.merge(normalParams, extraParams))),
+  )
 
-  normalParams.oauth_signature = b64_hmac_sha1(`${tokens.consumer_secret}&${tokens.oauth_token_secret}`,
-    `${method}&${oauthEscape(targetUrl)}&${normalized}`
+  normalParams.oauth_signature = b64_hmac_sha1(
+    `${tokens.consumer_secret}&${tokens.oauth_token_secret}`,
+    `${method}&${oauthEscape(targetUrl)}&${normalized}`,
   )
   return normalParams
 }
 
-function sortParams (object:object) {
+function sortParams(object: object) {
   const keys = Object.keys(object).sort()
   const result = {}
   keys.forEach(function (key) {

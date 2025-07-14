@@ -7,7 +7,7 @@ let gitHash: string = new Date().getTime().toString() // use the start up time a
 try {
   const rawGitHash = fs.readFileSync(
     path.resolve(__dirname, 'git-commit-version.txt'),
-    'utf8'
+    'utf8',
   )
   gitHash = rawGitHash.split('-').pop().trim()
 } catch (e) {}
@@ -46,7 +46,7 @@ async function loadTemplates(template, content = '') {
       // fsPromise.readFile(`${__dirname}/../views/${template}`, {
       fsPromise.readFile(path.resolve(__dirname, '..', 'views', template), {
         encoding: 'utf8',
-      })
+      }),
     )
 
     // Load the mustache content (innermost layer)
@@ -61,11 +61,11 @@ async function loadTemplates(template, content = '') {
               '..',
               'views',
               'content',
-              content + '.mustache'
+              content + '.mustache',
             ),
             {
               encoding: 'utf8',
-            }
+            },
           )
           .then((result) => {
             try {
@@ -86,7 +86,7 @@ async function loadTemplates(template, content = '') {
                 function (err, sassResult) {
                   if (err) {
                     console.error(
-                      `Error reading SCSS from file: ${content}.mustache`
+                      `Error reading SCSS from file: ${content}.mustache`,
                     )
                     console.error(err)
                   } else {
@@ -97,7 +97,7 @@ async function loadTemplates(template, content = '') {
                     scripts: scripts.join('\n'),
                     styles: `<style>${styleData}</style>`,
                   })
-                }
+                },
               )
             } catch (e) {
               resolve({
@@ -112,13 +112,13 @@ async function loadTemplates(template, content = '') {
                 path.resolve(__dirname, '..', 'views', '404.mustache'),
                 {
                   encoding: 'utf8',
-                }
+                },
               )
               .then((result) => {
                 resolve(result)
               })
           })
-      })
+      }),
     )
 
     // Load all the other partials we may need
@@ -135,8 +135,8 @@ async function loadTemplates(template, content = '') {
                 path.resolve(__dirname, '..', 'views', 'partials', filename),
                 {
                   encoding: 'utf8',
-                }
-              )
+                },
+              ),
             )
           }
         })

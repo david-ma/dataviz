@@ -61,7 +61,7 @@ let config: Thalia.WebsiteConfig = {
                           .replace(/<span class="no"><\/span>/g, 'No')
 
                         const data = tabletojson.convert(
-                          `<table>${d}</table>`
+                          `<table>${d}</table>`,
                         )[0]
 
                         const camera = data.reduce((obj, detail) => {
@@ -77,7 +77,7 @@ let config: Thalia.WebsiteConfig = {
                       }
                     })
                     .catch((e) =>
-                      res.end('fail??? ' + JSON.stringify(e.message))
+                      res.end('fail??? ' + JSON.stringify(e.message)),
                     )
                 })
               } else {
@@ -153,7 +153,7 @@ let config: Thalia.WebsiteConfig = {
                   })
                 })
                 .catch((err) => console.log('ok error..', err))
-            }
+            },
           )
         }
         done()
@@ -180,7 +180,7 @@ let config: Thalia.WebsiteConfig = {
               [Op.gt]: 2010,
             },
           },
-        })
+        }),
       )
 
       promises.push(
@@ -189,7 +189,7 @@ let config: Thalia.WebsiteConfig = {
             brand: brand,
             model: model,
           },
-        })
+        }),
       )
 
       promises.push(
@@ -199,7 +199,7 @@ let config: Thalia.WebsiteConfig = {
               [Op.like]: `%${type}%`,
             },
           },
-        })
+        }),
       )
 
       Promise.all(promises).then(function ([views, allCameras, model, scrape]) {
@@ -210,7 +210,7 @@ let config: Thalia.WebsiteConfig = {
             scrape: scrape.dataValues,
             cameraData: JSON.stringify(model.dataValues),
             allCameras: JSON.stringify(
-              allCameras.map((d) => `${d.brand} ${d.model} (${d.year})`)
+              allCameras.map((d) => `${d.brand} ${d.model} (${d.year})`),
             ),
           }
 
@@ -237,20 +237,20 @@ let config: Thalia.WebsiteConfig = {
           where: {
             brand: type,
           },
-        })
+        }),
       )
       promises.push(
         db.Family.findAll({
           where: {
             brand: type,
           },
-        })
+        }),
       )
 
       Promise.all(promises).then(function ([views, cameras, familes]: [
         any,
         any,
-        any
+        any,
       ]) {
         const data: any = {
           gitHash: gitHash,
@@ -274,8 +274,8 @@ let config: Thalia.WebsiteConfig = {
         },
       }).then((d) =>
         res.end(
-          JSON.stringify(d.map((d) => `${d.brand} ${d.model} (${d.year})`))
-        )
+          JSON.stringify(d.map((d) => `${d.brand} ${d.model} (${d.year})`)),
+        ),
       )
     },
     fetchCamera: function (res, req, db, type) {

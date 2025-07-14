@@ -1,0 +1,1 @@
+ALTER TABLE `blogpost` MODIFY COLUMN `summary` varchar(1000);

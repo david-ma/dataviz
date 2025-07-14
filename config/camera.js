@@ -1,11 +1,6 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.config = void 0;
-const utilities_1 = require("./utilities");
-const mustache_1 = __importDefault(require("mustache"));
+import { gitHash, asyncForEach, sanitise, loadTemplates } from './utilities';
+import mustache from 'mustache';
+// These have been set to false because they take an extra second to load and we don't need them if we're not scraping any websites.
 let xray, request, tabletojson;
 let scrapingToolsLoaded = false;
 if (scrapingToolsLoaded) {
@@ -24,11 +19,14 @@ let config = {
                 tabletojson = require('tabletojson');
             }
             db.Scrape.findAll({
-                where: {},
+                where: {
+                // brand: brand.toLowerCase()
+                },
             }).then(function (d) {
                 const results = d.map((d) => d.dataValues);
                 if (results.length > 0) {
-                    (0, utilities_1.asyncForEach)(results, 20, function (d, i, array, done) {
+                    // async.mapLimit(results, 20, function(d, loopback){
+                    asyncForEach(results, 20, function (d, i, array, done) {
                         const target = d.link;
                         const brand = d.title.split(/(?<=^\S+)\s/)[0].trim();
                         const model = d.title.split(/(?<=^\S+)\s/)[1].trim();
@@ -53,7 +51,7 @@ let config = {
                                                 .replace(/<span class="no"><\/span>/g, 'No');
                                             const data = tabletojson.convert(`<table>${d}</table>`)[0];
                                             const camera = data.reduce((obj, detail) => {
-                                                obj[(0, utilities_1.sanitise)(detail[0])] = detail[1];
+                                                obj[sanitise(detail[0])] = detail[1];
                                                 return obj;
                                             }, {});
                                             db.Camera.create(camera);
@@ -79,6 +77,8 @@ let config = {
                 }
             });
         },
+        // Todo: fix this one.
+        // The on-demand loading of tools isn't really working.
         scrapeAllBrands: function (res, req, db) {
             if (!scrapingToolsLoaded) {
                 scrapingToolsLoaded = true;
@@ -99,9 +99,10 @@ let config = {
                 'sony',
                 'zeiss',
             ];
-            (0, utilities_1.asyncForEach)(brands, 1, function (brand, iterator, brands, done) {
+            asyncForEach(brands, 1, function (brand, iterator, brands, done) {
                 let lastPageReached = false;
                 let i = 0;
+                // TODO: the lastPageReached thing doesn't work... because it loops through all 20 requests before the first one finishes.
                 while (!lastPageReached && i < 20) {
                     i++;
                     console.log(`Scrapeing Page ${i} of ${brand}`);
@@ -145,7 +146,8 @@ let config = {
             const promises = [];
             const brand = type.indexOf('_') > 0 ? type.split('_')[0] : '';
             const model = type.indexOf('_') > 0 ? type.split('_')[1].replace(/-/g, ' ') : '';
-            promises.push((0, utilities_1.loadTemplates)('camera.mustache'));
+            promises.push(loadTemplates('camera.mustache'));
+            // Get the data from the database
             promises.push(db.Camera.findAll({
                 attributes: ['brand', 'model', 'year'],
                 where: {
@@ -170,13 +172,13 @@ let config = {
             Promise.all(promises).then(function ([views, allCameras, model, scrape]) {
                 if (model) {
                     const data = {
-                        gitHash: utilities_1.gitHash,
+                        gitHash: gitHash,
                         model: model.dataValues,
                         scrape: scrape.dataValues,
                         cameraData: JSON.stringify(model.dataValues),
                         allCameras: JSON.stringify(allCameras.map((d) => `${d.brand} ${d.model} (${d.year})`)),
                     };
-                    const output = mustache_1.default.render(views.template, data, views);
+                    const output = mustache.render(views.template, data, views);
                     res.end(output);
                 }
                 else {
@@ -194,7 +196,7 @@ let config = {
             });
         },
         brand: function (res, req, db, type) {
-            const promises = [(0, utilities_1.loadTemplates)('brand.mustache')];
+            const promises = [loadTemplates('brand.mustache')];
             promises.push(db.Camera.findAll({
                 where: {
                     brand: type,
@@ -207,16 +209,17 @@ let config = {
             }));
             Promise.all(promises).then(function ([views, cameras, familes]) {
                 const data = {
-                    gitHash: utilities_1.gitHash,
+                    gitHash: gitHash,
                 };
                 data.cameras = JSON.stringify(cameras);
                 data.brand = type;
                 data.familes = JSON.stringify(familes);
-                const output = mustache_1.default.render(views.template, data, views);
+                const output = mustache.render(views.template, data, views);
                 res.end(output);
             });
         },
         'all-cameras': function (res, req, db) {
+            // res.end("hello");
             db.Camera.findAll({
                 attributes: ['brand', 'model', 'year'],
                 where: {
@@ -228,6 +231,9 @@ let config = {
         },
         fetchCamera: function (res, req, db, type) {
             console.log('Request for a camera..');
+            // console.log(db);
+            // console.log(db.Camera);
+            // console.log(type);
             db.Camera.findOne({
                 where: {
                     name: type,
@@ -241,7 +247,10 @@ let config = {
                 console.log('Error??', e);
                 res.end('bad');
             });
+            // return 200;
+            // res.end("Requesting camera...");
         },
     },
 };
-exports.config = config;
+export { config };
+//# sourceMappingURL=camera.js.map

@@ -1,19 +1,16 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.config = void 0;
-const lodash_1 = __importDefault(require("lodash"));
+// Transient data store, will need to use a real database in future.
+import _ from 'lodash';
 const datastore = {};
+// This stuff is being called before the database can be initialised.
+// Causes problems
 var AwesomeMetadata = require('./db_bootstrap').seq.AwesomeMetadata;
 AwesomeMetadata.findAll({}).then((data) => {
     data.reduce((acc, d) => {
-        lodash_1.default.merge(acc, d.dataValues.value);
+        _.merge(acc, d.dataValues.value);
         return acc;
     }, datastore);
 });
-const sequelize_1 = require("sequelize");
+import { Op } from 'sequelize';
 const config = {
     services: {
         awesome: function (res, req, db) {
@@ -22,42 +19,53 @@ const config = {
                 photos: [],
             };
             const params = new URLSearchParams(req.url.split('?')[1]);
+            // Try to get the provided date, otherwise give today's date minus 30 days
             var date = Date.parse(params.get('date'))
                 ? new Date(params.get('date'))
                 : new Date(new Date().setDate(new Date().getDate() - 25));
             const whitelist = [], blacklist = [];
+            // blacklist = [229432, 231426, 233994, 233860, 234555, 234659, 235745, 236850, 238783]
+            // const start = 231394,
+            //   end = 234099
             const start = 242711, end = 254092;
+            // 234101
+            // start 231394
+            // end 234099
+            // blacklist name Diana Hallare
             db.AwesomeProject.findAll({
                 limit: 100,
                 where: {
-                    [sequelize_1.Op.or]: [
+                    // ID is between start and end
+                    // And it isn't in the blacklist
+                    // And it isn't Diana Hallare
+                    [Op.or]: [
                         {
-                            [sequelize_1.Op.and]: [
+                            [Op.and]: [
                                 {
                                     id: {
-                                        [sequelize_1.Op.gte]: start,
+                                        [Op.gte]: start,
                                     },
                                 },
                                 {
                                     id: {
-                                        [sequelize_1.Op.lte]: end,
+                                        [Op.lte]: end,
                                     },
                                 },
                                 {
                                     id: {
-                                        [sequelize_1.Op.notIn]: blacklist,
+                                        [Op.notIn]: blacklist,
                                     },
                                 },
                                 {
                                     name: {
-                                        [sequelize_1.Op.notLike]: '%Diana Hallare%',
+                                        [Op.notLike]: '%Diana Hallare%',
                                     },
                                 },
                             ],
                         },
                         {
                             id: {
-                                [sequelize_1.Op.in]: whitelist,
+                                [Op.in]: whitelist,
                             },
                         },
                     ],
@@ -72,7 +80,7 @@ const config = {
                 db.AwesomePhoto.findAll({
                     where: {
                         awesome_project_id: {
-                            [sequelize_1.Op.in]: projects.map((p) => p.id),
+                            [Op.in]: projects.map((p) => p.id),
                         },
                     },
                 }).then(function (photos) {
@@ -95,7 +103,7 @@ const config = {
                     }).then((metadata) => {
                         if (metadata) {
                             const data = metadata.dataValues;
-                            lodash_1.default.merge(data.value, {
+                            _.merge(data.value, {
                                 [packet.name]: packet.data,
                             });
                             db.AwesomeMetadata.update(data, {
@@ -113,8 +121,9 @@ const config = {
                             });
                         }
                     });
+                    // eslint-disable-line
                     socket.broadcast.emit('overwriteText', packet);
-                    lodash_1.default.merge(datastore, {
+                    _.merge(datastore, {
                         [packet.name]: packet.data,
                     });
                 },
@@ -123,8 +132,9 @@ const config = {
         emit: [
             (socket, seq) => {
                 socket.emit('allData', datastore);
-            },
+            }, // eslint-disable-line
         ],
     },
 };
-exports.config = config;
+export { config };
+//# sourceMappingURL=awesome.js.map

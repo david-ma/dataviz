@@ -14,6 +14,7 @@ request(options, function callback(err, response, html) {
         console.log(err);
         response.end('error making request' + err);
     }
+    // console.log(html)
     xray(html);
 });
 var AwesomeProject = require('../db_bootstrap').seq.AwesomeProject;
@@ -40,6 +41,7 @@ request({
         }).then((d) => {
             if (d) {
                 console.log('Found existing record', d.id);
+                // d.update(record)
             }
             else {
                 console.log('Creating new record', record.id);
@@ -50,3 +52,5 @@ request({
         });
     });
 });
+export {};
+//# sourceMappingURL=scrape_awesome.js.map

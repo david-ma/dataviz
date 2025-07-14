@@ -1,21 +1,22 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.datavizDBFactory = void 0;
-const sequelize_1 = require("sequelize");
-const scrape_1 = require("./scrape");
-const family_1 = require("./family");
-const camera_1 = require("./camera");
-const blogpost_1 = require("./blogpost");
-const awesome_1 = require("./awesome");
-function datavizDBFactory(seqOptions) {
-    const sequelize = new sequelize_1.Sequelize(seqOptions);
-    const Scrape = (0, scrape_1.ScrapeFactory)(sequelize);
-    const Family = (0, family_1.FamilyFactory)(sequelize);
-    const Camera = (0, camera_1.CameraFactory)(sequelize);
-    const Blogpost = (0, blogpost_1.BlogpostFactory)(sequelize);
-    const AwesomeMetadata = (0, awesome_1.AwesomeMetadataFactory)(sequelize);
-    const AwesomePhoto = (0, awesome_1.AwesomePhotoFactory)(sequelize);
-    const AwesomeProject = (0, awesome_1.AwesomeProjectFactory)(sequelize);
+// @ts-nocheck
+import { Sequelize } from 'sequelize';
+// import _ from 'lodash'
+import { ScrapeFactory } from './scrape';
+import { FamilyFactory } from './family';
+import { CameraFactory } from './camera';
+import { BlogpostFactory } from './blogpost';
+import { AwesomeProjectFactory, AwesomePhotoFactory, AwesomeMetadataFactory, } from './awesome';
+export function datavizDBFactory(seqOptions) {
+    // Initialise Sequelize
+    const sequelize = new Sequelize(seqOptions);
+    // Initialise models
+    const Scrape = ScrapeFactory(sequelize);
+    const Family = FamilyFactory(sequelize);
+    const Camera = CameraFactory(sequelize);
+    const Blogpost = BlogpostFactory(sequelize);
+    const AwesomeMetadata = AwesomeMetadataFactory(sequelize);
+    const AwesomePhoto = AwesomePhotoFactory(sequelize);
+    const AwesomeProject = AwesomeProjectFactory(sequelize);
     AwesomeProject.hasOne(AwesomeMetadata);
     Camera.belongsTo(Family);
     Family.hasMany(Camera);
@@ -30,4 +31,4 @@ function datavizDBFactory(seqOptions) {
         AwesomeMetadata,
     };
 }
-exports.datavizDBFactory = datavizDBFactory;
+//# sourceMappingURL=index.js.map

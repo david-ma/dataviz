@@ -1,27 +1,138 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.config = void 0;
-const thalia_1 = require("thalia");
-const smugmug_1 = require("./smugmug");
-const utilities_1 = require("./utilities");
-const path_1 = __importDefault(require("path"));
-const http_1 = __importDefault(require("http"));
-const fs_1 = __importDefault(require("fs"));
-const lodash_1 = __importDefault(require("lodash"));
-const fsPromise = fs_1.default.promises;
-const formidable_1 = __importDefault(require("formidable"));
-const db_bootstrap_1 = require("./db_bootstrap");
+import { gitHash } from './utilities.js';
+import path from 'path';
+import fs from 'fs';
+const fsPromise = fs.promises;
 let cache = null;
+import { blogpostTable } from '../models/drizzle-schema.js';
+import { eq, desc } from 'drizzle-orm';
+const blogposts = [
+    {
+        shortname: 'georgia',
+        title: 'Which Georgia are you closest to?',
+        category: 'interactive',
+        summary: 'A simple interactive map to show which Georgia you are closest to',
+        image: 'images/georgia.png',
+        publish_date: '2024-04-17',
+        published: true,
+    },
+    {
+        shortname: 'war',
+        title: 'American Wartime',
+        category: '#MakeoverMonday',
+        summary: 'Nearly a quarter of Americans have never experienced the U.S. in a time of peace according to the Washington Post.',
+        image: 'images/war.jpg',
+        publish_date: '2020-02-01',
+        published: true,
+    },
+    {
+        shortname: 'wealth',
+        title: 'World Wealth',
+        category: '#MakeoverMonday',
+        summary: "All of the world's wealth, according to the Credit Suisse report",
+        image: 'images/wealth.png',
+        publish_date: '2020-02-17',
+        published: true,
+    },
+    {
+        shortname: 'influenza',
+        title: 'Influenza Surveillance Report',
+        category: '#MakeoverMonday',
+        summary: 'Influenza in the USA in 2018',
+        image: 'images/influenza.jpg',
+        publish_date: '2018-06-18',
+        published: false,
+    },
+    {
+        shortname: 'homelessness',
+        title: 'Australian homelessness',
+        category: '#MakeoverMonday',
+        summary: 'Housing outcomes for clients of Australian Specialist Homelessness Services',
+        image: 'images/homelessness.png',
+        publish_date: '2020-02-24',
+        published: false,
+    },
+    {
+        shortname: 'kids_sleep',
+        title: "Kids' sleep",
+        category: '#MakeoverMonday',
+        summary: 'Data from savvysleeper.org on how kids sleep',
+        image: 'images/kids_sleep.png',
+        publish_date: '2020-03-02',
+        published: false,
+    },
+    {
+        shortname: 'breathe',
+        title: 'Breathing Polygons',
+        category: 'animation',
+        summary: 'D3.js & maths practice by drawing breathing polygons',
+        image: 'images/breathe.png',
+        publish_date: '2020-11-07',
+        published: true,
+    },
+    {
+        shortname: 'AusIncome',
+        title: 'Australian Income',
+        category: 'charts',
+        summary: 'Graphs from ATO income stats 2018',
+        image: 'images/ausIncome.png',
+        publish_date: '2021-08-30',
+        published: true,
+    },
+    {
+        shortname: 'matrix',
+        title: 'Matrix Raining Code',
+        category: 'animation',
+        summary: 'The raining code from the movie The Matrix (1999)',
+        image: 'images/matrix.jpg',
+        publish_date: '2021-09-12',
+        published: true,
+    },
+    {
+        shortname: 'winamp',
+        title: 'Winamp Animation',
+        category: 'animation',
+        summary: 'A simple animation, reminiscent of the old winamp visualisations',
+        image: 'images/winamp.jpg',
+        publish_date: '2021-09-15',
+        published: true,
+    },
+    {
+        shortname: 'earthquake',
+        title: 'Melbourne Earthquake',
+        category: 'animation',
+        summary: 'A visualisation of the twitter activity when Melbourne had an earthquake',
+        image: 'images/earthquake.jpg',
+        publish_date: '2021-09-23',
+        published: true,
+    },
+];
 let config = {
-    services: {
+    controllers: {
+        '': (res, req, website, requestInfo) => {
+            if (!website.db) {
+                res.end('Database not connected');
+            }
+            else {
+                website.db.drizzle
+                    .select()
+                    .from(blogpostTable)
+                    .where(eq(blogpostTable.published, true))
+                    .orderBy(desc(blogpostTable.publish_date))
+                    .then((results) => {
+                    const html = website.getContentHtml('homepage')({
+                        // blogposts: results,
+                        blogposts,
+                    });
+                    res.end(html);
+                });
+            }
+        },
         fridge_images: function (res, req, db) {
-            const basePath = path_1.default.resolve(__dirname, '..', 'data', 'fridge');
-            if (!fs_1.default.existsSync(path_1.default.resolve(basePath, 'az_images')) ||
-                !fs_1.default.existsSync(path_1.default.resolve(basePath, 'ruby_images')) ||
-                !fs_1.default.existsSync(path_1.default.resolve(basePath, 'renee_images'))) {
+            const basePath = path.resolve(__dirname, '..', 'data', 'fridge');
+            // check if az_images, ruby_images and renee_images exist
+            if (!fs.existsSync(path.resolve(basePath, 'az_images')) ||
+                !fs.existsSync(path.resolve(basePath, 'ruby_images')) ||
+                !fs.existsSync(path.resolve(basePath, 'renee_images'))) {
                 res.end('No images');
                 return;
             }
@@ -34,9 +145,9 @@ let config = {
                 'printed',
             ];
             Promise.all([
-                fsPromise.readdir(path_1.default.resolve(basePath, 'az_images')),
-                fsPromise.readdir(path_1.default.resolve(basePath, 'ruby_images')),
-                fsPromise.readdir(path_1.default.resolve(basePath, 'renee_images')),
+                fsPromise.readdir(path.resolve(basePath, 'az_images')),
+                fsPromise.readdir(path.resolve(basePath, 'ruby_images')),
+                fsPromise.readdir(path.resolve(basePath, 'renee_images')),
             ]).then(function ([az, ruby, renee]) {
                 var images = az
                     .filter((d) => filter.indexOf(d) === -1)
@@ -50,177 +161,16 @@ let config = {
                 res.end(JSON.stringify(images));
             });
         },
-        dashboard_data: function (res, req, db) {
-            const phases = [
-                'phase0',
-                'phase1',
-                'phase2',
-                'phase3',
-                'phase4',
-                'phase5',
-                'phase6',
-            ];
-            Promise.all(phases.map((phase) => {
-                return fsPromise
-                    .readdir(path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'dashboard', phase, 'preflight_light'))
-                    .then((files) => {
-                    return files
-                        .filter((d) => d.indexOf('.json') > -1)
-                        .map((d) => d.replace('.json.gz', '.json'));
-                });
-            })).then((results) => {
-                res.end(JSON.stringify(results));
-            });
-        },
-        lims_logs: function (res, req, db) {
-            const basePath = path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'IISLogs');
-            if (!fs_1.default.existsSync(path_1.default.resolve(basePath))) {
-                res.end('No data');
-                return;
-            }
-            fsPromise
-                .readdir(path_1.default.resolve(basePath))
-                .then((files) => files.filter((d) => d.indexOf('.log.gz') > -1))
-                .then((files) => files.map((d) => d.replace('.log.gz', '.log')))
-                .then((files) => files.slice(1103, 2000))
-                .then((files) => res.end(JSON.stringify(files)));
-        },
-        summary_jsons: function (res, req, db) {
-            const basePath = path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'summary_jsons');
-            if (!fs_1.default.existsSync(path_1.default.resolve(basePath))) {
-                res.end('No data');
-                return;
-            }
-            fsPromise
-                .readdir(path_1.default.resolve(basePath))
-                .then((files) => files.filter((d) => d.indexOf('.json') > -1))
-                .then((files) => files.map((d) => d.replace('.json.gz', '.json')))
-                .then((files) => res.end(JSON.stringify(files)));
-        },
-        clinical: function (res, req) {
-            const basePath = path_1.default.resolve(__dirname, '..', 'data', 'AGRF', 'clinical');
-            if (!fs_1.default.existsSync(path_1.default.resolve(basePath))) {
-                res.end('No data');
-                return;
-            }
-            fsPromise
-                .readdir(path_1.default.resolve(basePath))
-                .then((files) => files.filter((d) => d.indexOf('.json') > -1))
-                .then((files) => files.map((d) => d.replace('.json.gz', '.json')))
-                .then((files) => res.end(JSON.stringify(files)));
-        },
-        agrf_monthly_data: function (res, req) {
-            if (cache) {
-                res.end(JSON.stringify(cache));
-                return;
-            }
-            else {
-                db_bootstrap_1.agrf_sequelize
-                    .query(`SELECT *
-# tcfu.id, path, run_id, contract_folder, tcfu.contract_id, demux_id, storage_platform, data_size
-
-FROM
-temp_contract_folder_usage as tcfu,
-nextgenruns_contract as nc,
-nextgenruns_run as nr
-
-WHERE tcfu.contract_id = nc.contract_id
-and tcfu.run_id = nc.run
-and tcfu.run_id = nr.run_name`)
-                    .then((results) => {
-                    cache = results;
-                    res.end(JSON.stringify(results));
-                }, (error) => {
-                    res.end(JSON.stringify(error));
-                });
-            }
-        },
-        upload: function (res, req) {
-            const uploadFolder = 'websites/dataviz/data/campjs/';
-            const form = new formidable_1.default.IncomingForm();
-            form.parse(req, (err, fields, files) => {
-                if (err) {
-                    console.log('Error uploading!');
-                    res.writeHead(500);
-                    res.end(err);
-                }
-                else {
-                    Object.keys(files).forEach((inputfield) => {
-                        const file = files[inputfield];
-                        const newLocation = uploadFolder + file.name;
-                        fs_1.default.rename(file.path, newLocation, function (err) {
-                            if (err) {
-                                console.log('Error renaming file');
-                                res.writeHead(500);
-                                res.end(err);
-                            }
-                            else {
-                                res.end('success');
-                            }
-                        });
-                    });
-                }
-            });
-        },
-        curl: function (incomingResponse, incomingRequest, db, type) {
-            const options = {
-                host: 'www.github.com',
-                port: 80,
-                path: '/',
-                method: 'GET',
-            };
-            const req = http_1.default.request(options, function (res) {
-                console.log('STATUS: ' + res.statusCode);
-                console.log('HEADERS: ' + JSON.stringify(res.headers));
-                res.setEncoding('utf8');
-                res.on('data', function (chunk) {
-                    console.log('BODY: ' + chunk);
-                });
-            });
-            req.on('error', function (e) {
-                console.log('problem with request: ' + e.message);
-            });
-            req.on('close', function () {
-                incomingResponse.end('Uhhh we did a thing');
-            });
-            req.end();
-        },
-    },
-    mustacheIgnore: ['homepage', 'upload_experiment', 'camera', 'blog', '404'],
-    controllers: {
-        '': function homepage(router) {
-            if (!router.db) {
-                router.res.end('Database not connected');
-            }
-            else {
-                const promises = [new Promise(router.readAllViews)];
-                Promise.all(promises).then(function ([views]) {
-                    const data = {
-                        gitHash: utilities_1.gitHash,
-                    };
-                    router.db.Blogpost.findAll({
-                        where: {
-                            published: true,
-                        },
-                        order: [['publish_date', 'DESC']],
-                    }).then((results) => {
-                        data.blogposts = results.map((d) => d.dataValues);
-                        const template = router.handlebars.compile(views.homepage);
-                        (0, thalia_1.loadViewsAsPartials)(views, router.handlebars);
-                        router.res.end(template(data));
-                    });
-                });
-            }
-        },
         blog: function blogpost(router) {
             if (!router.db) {
                 router.res.end('Database not connected');
             }
             else {
+                // const promises = [loadTemplates('blog.mustache', router.path)]
                 const promises = [new Promise(router.readAllViews)];
                 Promise.all(promises).then(function ([views]) {
                     const data = {
-                        gitHash: utilities_1.gitHash,
+                        gitHash: gitHash,
                     };
                     router.db.Blogpost.findAll({
                         where: {
@@ -236,10 +186,10 @@ and tcfu.run_id = nr.run_name`)
                         }
                         catch (e) { }
                         const template = router.handlebars.compile(views.blog);
-                        (0, thalia_1.setHandlebarsContent)(views[router.path[0]], router.handlebars).then(() => {
+                        setHandlebarsContent(views[router.path[0]], router.handlebars).then(() => {
                             router.handlebars.registerHelper('parseArray', (array, options) => array.split(',').map(options.fn).join(''));
                             try {
-                                (0, thalia_1.loadViewsAsPartials)(views, router.handlebars);
+                                loadViewsAsPartials(views, router.handlebars);
                                 router.res.end(template(data));
                             }
                             catch (error) {
@@ -257,23 +207,38 @@ and tcfu.run_id = nr.run_name`)
             }
         },
         source: function source(router) {
+            // Show the source code for a typescript file
+            // Created for Genuary 2025
             const filepath = router.path.join('/');
             const regex = /js\/(.*).js/;
+            // console.log(filepath)
             if (regex.test(filepath)) {
                 const shortname = regex.exec(filepath)[1];
+                // console.log('Shortname', shortname)
                 router.response.setHeader('Content-Type', 'text/javascript');
-                router.response.end(fs_1.default.readFileSync(path_1.default.resolve(__dirname, '..', 'src', 'js', `${shortname}.ts`)));
+                router.response.end(fs.readFileSync(path.resolve(__dirname, '..', 'src', 'js', `${shortname}.ts`)));
             }
             else {
                 router.response.end('404');
             }
         },
     },
+    database: {
+        schemas: {
+            blogpost: blogpostTable,
+        },
+    },
 };
-exports.config = config;
-if (fs_1.default.existsSync(path_1.default.resolve(__dirname, 'config.json'))) {
-    exports.config = config = lodash_1.default.merge(config, smugmug_1.config);
-}
-else {
-    console.warn('config.json not provided, skipping smugmug stuff');
-}
+// if (fs.existsSync(path.resolve(__dirname, 'config.json'))) {
+//   config = _.merge(config, smugmugConfig)
+// } else {
+//   console.warn('config.json not provided, skipping smugmug stuff')
+// }
+// import { config as awesomeConfig } from './awesome'
+// config = _.merge(config, awesomeConfig)
+// import { config as cameraConfig } from './camera'
+// config = _.merge(config, cameraConfig)
+// import { config as atlassianConfig } from './atlassianBackend'
+// config = _.merge(config, atlassianConfig)
+export { config };
+//# sourceMappingURL=config.js.map
