@@ -51,25 +51,6 @@ const blogposts = [
     published: false,
   },
   {
-    shortname: 'homelessness',
-    title: 'Australian homelessness',
-    category: '#MakeoverMonday',
-    summary:
-      'Housing outcomes for clients of Australian Specialist Homelessness Services',
-    image: 'images/homelessness.png',
-    publish_date: '2020-02-24',
-    published: false,
-  },
-  {
-    shortname: 'kids_sleep',
-    title: "Kids' sleep",
-    category: '#MakeoverMonday',
-    summary: 'Data from savvysleeper.org on how kids sleep',
-    image: 'images/kids_sleep.png',
-    publish_date: '2020-03-02',
-    published: false,
-  },
-  {
     shortname: 'breathe',
     title: 'Breathing Polygons',
     category: 'animation',
@@ -180,6 +161,7 @@ let config: RawWebsiteConfig = {
       const regex = /js\/(.*).js/
 
       if (regex.test(filepath)) {
+        // @ts-ignore
         const shortname = regex.exec(filepath)[1]
         res.setHeader('Content-Type', 'text/javascript')
         res.end(

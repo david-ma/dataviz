@@ -4,17 +4,17 @@ import path from 'path'
 let gitHash: string = new Date().getTime().toString() // use the start up time as fallback if a proper git hash is unavailable
 try {
   const rawGitHash = fs.readFileSync(
-    path.resolve(import.meta.dirname, 'git-commit-version.txt'),
+    path.resolve(__dirname, 'git-commit-version.txt'),
     'utf8',
   )
-  gitHash = rawGitHash.split('-').pop().trim()
+  gitHash = rawGitHash?.split('-')?.pop()?.trim() ?? ''
 } catch (e) {}
 
 // Asynchronous for each, doing a limited number of things at a time.
 async function asyncForEach(
   array: any[],
   limit: number,
-  callback: (item: any, index: number, array: any[]) => void,
+  callback: (item: any, index: number, array: any[], done: () => void) => void,
 ) {
   let i: number = 0
 

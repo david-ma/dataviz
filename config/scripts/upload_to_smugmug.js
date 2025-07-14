@@ -3,10 +3,10 @@ const AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto;
 import https from 'https';
 const blacklist = [
     626, 628, 629, 630, 631, 632, 640, 645, 649, 662, 664, 663, 665, 666, 637, 8,
-    4, 9, 10, 29, 25, 22, 13, 240, 239, 238, 235, 711, 684, 677, 580, 573, 561, 295, 732,
-    735, 765, 763, 715, 769
+    4, 9, 10, 29, 25, 22, 13, 240, 239, 238, 235, 711, 684, 677, 580, 573, 561,
+    295, 732, 735, 765, 763, 715, 769,
 ];
-console.log("Running upload_to_smugmug.ts");
+console.log('Running upload_to_smugmug.ts');
 // 472, 474, 489, 478
 const bannedFiletypes = ['.avif', '.webp', '.tiff', '.tif', '.heic', '.heif'];
 AwesomePhoto.findAll({
@@ -59,7 +59,7 @@ function updatePhoto(photo, next) {
                 target: photo.url,
                 // encode the caption to be safe to send in a header
                 caption: photo.caption ? encodeURIComponent(photo.caption) : '',
-                keywords: 'Awesome Foundation Melbourne, Batch Upload Script'
+                keywords: 'Awesome Foundation Melbourne, Batch Upload Script',
             },
             timeout: 120000, // 2 minutes. This isn't the problem
         }, (res) => {
@@ -67,7 +67,7 @@ function updatePhoto(photo, next) {
             // Check status code?
             // let status = res.statusCode
             // This one doesn't seem to work. Copilot thinks it's because the server is
-            // sending a 200 response before the upload is complete.        
+            // sending a 200 response before the upload is complete.
             // res.on('timeout', () => {
             //   console.log(`Timeout in photo upload ${photo.id} ${photo.url}`)
             //   res.destroy()
@@ -81,28 +81,26 @@ function updatePhoto(photo, next) {
                 console.error(e);
             });
             res.on('end', () => {
-                try {
-                    console.log(`Got data for photo ${photo.id} ${photo.url}`);
-                    const data = JSON.parse(rawData);
-                    console.log(data);
-                    if (data.Code === 400) {
-                        throw new Error(`(400) ${data.Message}`);
-                    }
-                    photo
-                        .update({
-                        smugmug_url: data.image_url,
-                        smugmug_key: data.imageKey,
-                        smugmug_album: data.albumId,
-                    })
-                        .then((newPhoto) => {
-                        console.log(`Updated photo ${photo.id} ${newPhoto.smugmug_url}`);
-                        setTimeout(next, 2000);
-                    });
+                console.log(`Got data for photo ${photo.id} ${photo.url}`);
+                const data = JSON.parse(rawData);
+                console.log(data);
+                if (data.Code === 400) {
+                    throw new Error(`(400) ${data.Message}`);
                 }
-                catch (e) {
+                photo
+                    .update({
+                    smugmug_url: data.image_url,
+                    smugmug_key: data.imageKey,
+                    smugmug_album: data.albumId,
+                })
+                    .then((newPhoto) => {
+                    console.log(`Updated photo ${photo.id} ${newPhoto.smugmug_url}`);
+                    setTimeout(next, 2000);
+                })
+                    .catch((e) => {
                     console.log(`Error parsing JSON ${photo.id} ${photo.url}`);
-                    console.log("Status", res.statusCode);
-                    console.log("Headers", res.headers);
+                    console.log('Status', res.statusCode);
+                    console.log('Headers', res.headers);
                     console.log(rawData);
                     console.error(e.message);
                     photo.update({
@@ -110,7 +108,7 @@ function updatePhoto(photo, next) {
                         smugmug_url: `Error: ${res.statusCode} ${e.message}`,
                     });
                     setTimeout(next, 5000);
-                }
+                });
             });
         });
     }

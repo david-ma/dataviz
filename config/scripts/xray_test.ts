@@ -78,13 +78,13 @@ export function xray(html) {
                     resolve('done')
                   })
                 })
-              })
+              }),
             ).then((d) => {
               resolve(blob)
             })
           })
         })
-      })
+      }),
     ).then((d) => {
       console.log('Done!')
       console.log(`Total projects: ${tally.total}`)

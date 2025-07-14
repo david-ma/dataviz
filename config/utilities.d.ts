@@ -1,12 +1,7 @@
 declare let gitHash: string
 declare function asyncForEach(
-  array: any,
-  limit: any,
-  callback: any,
+  array: any[],
+  limit: number,
+  callback: (item: any, index: number, array: any[], done: () => void) => void,
 ): Promise<number>
-declare function sanitise(string: any): any
-declare function loadTemplates(
-  template: any,
-  content?: string,
-): Promise<unknown>
-export { gitHash, asyncForEach, sanitise, loadTemplates }
+export { gitHash, asyncForEach }

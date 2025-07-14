@@ -1,3 +1,4 @@
+import { gitHash } from './utilities.js';
 import path from 'path';
 import fs from 'fs';
 const fsPromise = fs.promises;
@@ -39,24 +40,6 @@ const blogposts = [
         summary: 'Influenza in the USA in 2018',
         image: 'images/influenza.jpg',
         publish_date: '2018-06-18',
-        published: false,
-    },
-    {
-        shortname: 'homelessness',
-        title: 'Australian homelessness',
-        category: '#MakeoverMonday',
-        summary: 'Housing outcomes for clients of Australian Specialist Homelessness Services',
-        image: 'images/homelessness.png',
-        publish_date: '2020-02-24',
-        published: false,
-    },
-    {
-        shortname: 'kids_sleep',
-        title: "Kids' sleep",
-        category: '#MakeoverMonday',
-        summary: 'Data from savvysleeper.org on how kids sleep',
-        image: 'images/kids_sleep.png',
-        publish_date: '2020-03-02',
         published: false,
     },
     {
@@ -119,8 +102,9 @@ let config = {
                     .orderBy(desc(blogpostTable.publish_date))
                     .then((results) => {
                     const html = website.getContentHtml('homepage')({
-                        // blogposts: results,
+                        gitHash,
                         blogposts,
+                        // blogposts: results,
                     });
                     res.end(html);
                 });
@@ -144,8 +128,9 @@ let config = {
                     .where(eq(blogpostTable.published, true))
                     .then((results) => {
                     const html = website.getContentHtml(shortname, 'blog')({
+                        gitHash,
                         typescript: `/js/${shortname}.js`,
-                        blogposts
+                        blogposts,
                         // blogpost: results,
                     });
                     res.end(html);
@@ -162,6 +147,7 @@ let config = {
             const filepath = requestInfo.pathname;
             const regex = /js\/(.*).js/;
             if (regex.test(filepath)) {
+                // @ts-ignore
                 const shortname = regex.exec(filepath)[1];
                 res.setHeader('Content-Type', 'text/javascript');
                 res.end(fs.readFileSync(path.resolve(website.rootPath, 'src', 'js', `${shortname}.ts`)));
