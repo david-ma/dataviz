@@ -1,4 +1,4 @@
-import { RawWebsiteConfig, deepMerge } from 'thalia'
+import { RawWebsiteConfig, recursiveObjectMerge } from 'thalia'
 import { gitHash } from './utilities.js'
 
 import path from 'path'
@@ -159,6 +159,6 @@ let config: RawWebsiteConfig = {
 // import { config as atlassianConfig } from './atlassianBackend'
 // config = _.merge(config, atlassianConfig)
 
-config = deepMerge(config, blogpostConfig)
+config = recursiveObjectMerge(config, blogpostConfig)
 
 export { config }
