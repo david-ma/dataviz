@@ -115,7 +115,7 @@ let config = {
                 res.end(JSON.stringify(images));
             });
         },
-    }
+    },
 };
 // if (fs.existsSync(path.resolve(__dirname, 'config.json'))) {
 //   config = _.merge(config, smugmugConfig)

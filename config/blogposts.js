@@ -82,7 +82,7 @@ if (process.env.NODE_ENV === 'production') {
     config.database = {
         schemas: {
             blogpost: blogpostTable,
-        }
+        },
     };
 }
 export { config };

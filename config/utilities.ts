@@ -10,5 +10,4 @@ try {
   gitHash = rawGitHash?.split('-')?.pop()?.trim() ?? ''
 } catch (e) {}
 
-
 export { gitHash }
