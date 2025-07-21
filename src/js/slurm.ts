@@ -132,7 +132,7 @@ type FileInfoArray = [
   filesize: string,
   date_modified: string,
   status: string,
-  level: string
+  level: string,
 ]
 
 type ClinicalData = {
@@ -447,7 +447,7 @@ d3.json('/clinical')
           console.error(err)
           console.error(json)
           return null
-        })
+        }),
       ),
     ])
       .then(function ([excelData, ...data]: [any, ClinicalData]) {
@@ -467,7 +467,7 @@ d3.json('/clinical')
 
         const combined: CombinedData[] = excelData.map((exData) => {
           const clinical = data.find(
-            (c) => c.contract_dir === exData.contract_folder_path
+            (c) => c.contract_dir === exData.contract_folder_path,
           )
           if (!clinical) {
             console.info('No clinical data for', exData.contract_folder_path)
@@ -514,7 +514,7 @@ d3.json('/clinical')
         })
           .map((d) => {
             const clinical = data.find(
-              (c) => c.contract_dir === d.contract_folder_path
+              (c) => c.contract_dir === d.contract_folder_path,
             )
             return {
               ...d,
@@ -566,19 +566,19 @@ d3.json('/clinical')
           clean_project_folder.map((d) => {
             const info = extract_info_from_folder(d.contract_folder_path)
             return d3.json(
-              `/AGRF/clinical/${info.flowcell}_${info.contract_id}.json`
+              `/AGRF/clinical/${info.flowcell}_${info.contract_id}.json`,
             )
-          })
+          }),
         )
           .then((fullClinicalData: ClinicalData[]) => {
             return clean_project_folder.map((exData) => {
               const clinical = fullClinicalData.find(
-                (c) => c.contract_dir === exData.contract_folder_path
+                (c) => c.contract_dir === exData.contract_folder_path,
               )
               if (!clinical) {
                 console.info(
                   'No full clinical data for',
-                  exData.contract_folder_path
+                  exData.contract_folder_path,
                 )
                 return exData
               }
@@ -686,7 +686,7 @@ d3.json('/clinical')
             const { instrument, run, flowcell, contract_id } =
               extract_info_from_folder(d.contract_dir)
             const excel = excelData.find(
-              (ex) => ex.contract_folder_path === d.contract_dir
+              (ex) => ex.contract_folder_path === d.contract_dir,
             )
             if (!excel) {
               console.error('No excel data for', d.contract_dir)
@@ -719,7 +719,7 @@ d3.json('/clinical')
               .append('a')
               .attr(
                 'href',
-                `http://bioweb02.agrf.org.au/nextgenpipeline/admin/nextgenruns/contract/${contract_pk}/change/`
+                `http://bioweb02.agrf.org.au/nextgenpipeline/admin/nextgenruns/contract/${contract_pk}/change/`,
               )
               .attr('target', '_blank')
               .text(contract_pk)
@@ -801,7 +801,7 @@ d3.json('/clinical')
               .text(
                 `cloudian_cache_workaround.sh ${
                   d.contract_dir.split('/data/Analysis/')[1]
-                } clinical ${excel.contract_sent}`
+                } clinical ${excel.contract_sent}`,
               )
 
             // tr.append('td').text(d.contract_dir)
@@ -872,7 +872,7 @@ d3.json('/clinical')
                     .append('tbody')
                     .selectAll('tr')
                     .data(
-                      d.files.filter((file) => file[4] !== 'included_folder')
+                      d.files.filter((file) => file[4] !== 'included_folder'),
                     )
                     .enter()
                     .append('tr')
@@ -888,12 +888,12 @@ d3.json('/clinical')
                       const size = human_readable_size(parseInt(file[2]))
 
                       return `<td style="color: black; background:${color(
-                        filetype
+                        filetype,
                       )}">${filetype}</td><td>${file_relative_path}</td><td>${size}</td><td>${
                         file[4]
                       }</td><td>${file[5]}</td>`
                     })
-                }
+                },
               )
             }
           })
@@ -1403,17 +1403,17 @@ function drawSankey(data: SankeyData) {
       linkColor === 'source-target'
         ? (d: any) => d.uid
         : linkColor === 'source'
-        ? (d: any) => color(d.source.category)
-        : linkColor === 'target'
-        ? (d: any) => color(d.target.category)
-        : linkColor
+          ? (d: any) => color(d.source.category)
+          : linkColor === 'target'
+            ? (d: any) => color(d.target.category)
+            : linkColor,
     )
     .attr('stroke-width', (d) => Math.max(1, d.width))
 
   link
     .append('title')
     .text(
-      (d: any) => `${d.source.name} → ${d.target.name}\n${format(d.value)} TWh`
+      (d: any) => `${d.source.name} → ${d.target.name}\n${format(d.value)} TWh`,
     )
 
   // Adds labels on the nodes.

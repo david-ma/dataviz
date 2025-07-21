@@ -64,7 +64,7 @@ new Chart({
           drawTweet(tweet, twitter.users[tweet.userId], i)
         }, waitTime)
       })
-    }
+    },
   )
 
   const timeFormat = d3.timeFormat('%-I:%M %p · %b %-d, %Y')
@@ -100,7 +100,7 @@ new Chart({
       .text(timeFormat(new Date(data.created_at)))
       .attr(
         'href',
-        `https://twitter.com/${user.screen_name}/status/${data.id_str}`
+        `https://twitter.com/${user.screen_name}/status/${data.id_str}`,
       )
 
     const bottom = tweet.append('div').append('p')

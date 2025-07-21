@@ -76,7 +76,7 @@ d3.json('/agrf_monthly_data')
         monthly_data[month].total_size += row.size
         monthly_data[month].total_rows += 1
         monthly_data[month].human_readable_size = human_readable_size(
-          monthly_data[month].total_size
+          monthly_data[month].total_size,
         )
       }
     })
@@ -154,7 +154,7 @@ d3.json('/agrf_monthly_data')
           'transform',
           `translate(${chart.margin.left},${
             chart.innerHeight + chart.margin.top
-          })`
+          })`,
         )
         .call(xAxis)
 
@@ -162,7 +162,7 @@ d3.json('/agrf_monthly_data')
         .append('g')
         .attr(
           'transform',
-          `translate(${chart.margin.left},${chart.margin.top})`
+          `translate(${chart.margin.left},${chart.margin.top})`,
         )
         .call(yAxis)
 
@@ -408,14 +408,14 @@ function drawStreamGraph(data: DataRow[]) {
     .stack()
     .offset(d3.stackOffsetWiggle)
     .keys(['working_data', 'stored_data', 'cloud_data'])
-    // (sampled_data)
-    // (
-    // sampled_data.reduce((acc, d) => {
-    //   acc.push(d)
-    //   return acc
-    // }, []))
+  // (sampled_data)
+  // (
+  // sampled_data.reduce((acc, d) => {
+  //   acc.push(d)
+  //   return acc
+  // }, []))
 
-    console.log('Stacked data', stackedData)
+  console.log('Stacked data', stackedData)
 
   new Chart({
     title: 'Data Usage at any given time',
@@ -446,7 +446,7 @@ function drawStreamGraph(data: DataRow[]) {
       })
       .attr('d', area)
 
-    console.log("Finished Drawing stream chart")
+    console.log('Finished Drawing stream chart')
   })
 }
 
@@ -567,7 +567,7 @@ function drawExampleContractLifecycle() {
         'transform',
         `translate(${chart.margin.left},${
           chart.innerHeight / 2 + chart.margin.top
-        })`
+        })`,
       )
       .call(xAxis)
       .append('text')
@@ -721,7 +721,7 @@ function drawReadLookingGraph(data: any) {
         'transform',
         `translate(${chart.margin.left},${
           chart.innerHeight + chart.margin.top
-        })`
+        })`,
       )
       .call(xAxis)
 
@@ -760,7 +760,7 @@ d3.tsv('/AGRF/disk_usage_agrf.tsv')
       runs[row.run_id].data[id] = row
       runs[row.run_id].size += parseInt(row.bytes)
       runs[row.run_id].human_readable_size = human_readable_size(
-        runs[row.run_id].size
+        runs[row.run_id].size,
       )
     })
     return runs
@@ -769,7 +769,7 @@ d3.tsv('/AGRF/disk_usage_agrf.tsv')
     // console.log(runs)
 
     var data = Object.entries(runs).sort(
-      (a: any, b: any) => b[1].size - a[1].size
+      (a: any, b: any) => b[1].size - a[1].size,
     )
     const cols = ['size', 'run_id', 'contracts']
     d3.select('#runs table thead')
@@ -791,7 +791,7 @@ d3.tsv('/AGRF/disk_usage_agrf.tsv')
         var tr = d3.select(`#row-${run_id}`)
         tr.append('td').html(`${data.size}<br>${data.human_readable_size}`)
         tr.append('td').html(
-          `${run_id}<br><pre style='font-size:0.7em;padding:0 1em'>/data/Analysis/NovaSeqX/${run_id}</pre>`
+          `${run_id}<br><pre style='font-size:0.7em;padding:0 1em'>/data/Analysis/NovaSeqX/${run_id}</pre>`,
         )
 
         var contracts = Object.entries(data.data) //.sort((a,b) => a[1].demux_pk - b[1].demux_pk)
@@ -882,9 +882,9 @@ function loadDashboard() {
                 vast: `/AGRF/dashboard/phase${i}/postflight_vast/${file}`,
               }
             })
-          })
+          }),
         )
-      })
+      }),
     )
       .then((data) =>
         data.reduce((acc, phase) => {
@@ -895,14 +895,14 @@ function loadDashboard() {
             .filter(
               (folder) =>
                 !folder.summary.warnings.includes(
-                  'Contract directory is a symlink'
-                )
+                  'Contract directory is a symlink',
+                ),
             )
             .forEach((folder) => {
               acc.push(folder)
             })
           return acc
-        }, [])
+        }, []),
       )
       .then((data) => {
         var table = drawTable(data)
@@ -924,12 +924,12 @@ function loadDashboard() {
           customRenderers: {
             include_files_size: (data, type, row, meta) => {
               return `${row.include_files_size} bytes<br>${human_readable_size(
-                row.include_files_size
+                row.include_files_size,
               )}`
             },
             aws_size: (data, type, row, meta) => {
               return `${row.aws_size} bytes<br>${human_readable_size(
-                row.aws_size
+                row.aws_size,
               )}`
             },
           },
@@ -1038,7 +1038,7 @@ function drawTable(dataset: DataTableDataset) {
         parseInt(row.summary.include.file_count) +
         parseInt(row.summary.include.symlink_count)
       row.include_file_size_bytes = parseInt(
-        row.summary.include.file_size_bytes
+        row.summary.include.file_size_bytes,
       )
       row.include_file_size_display = row.summary.include.file_size_human
 
@@ -1147,10 +1147,10 @@ globalThis.displayFiles = function displayFiles(log_id) {
       // Normalise path so that /./ is removed
       original_files = _.concat(
         data.full_data.list.include.files,
-        data.full_data.list.include.symlinks
+        data.full_data.list.include.symlinks,
       )
         .map(([filename, relative_path, ...rest]) =>
-          `${base_dir}/${relative_path}/${filename}`.replace('/./', '/')
+          `${base_dir}/${relative_path}/${filename}`.replace('/./', '/'),
         )
         .sort()
 
@@ -1179,7 +1179,7 @@ globalThis.displayFiles = function displayFiles(log_id) {
       const max_length = Math.max(
         original_only.length,
         aws_only.length,
-        intersection.length
+        intersection.length,
       )
 
       for (let i = 0; i < max_length; i++) {
@@ -1221,7 +1221,7 @@ function draw_mounted_vast() {
     })
 
     const root = d3.stratify().path((d: any) => d.tree)(
-      data.concat(used, available)
+      data.concat(used, available),
     )
     root.sum((d: any) => (d ? d.size || 0 : 0))
     console.log('root', root)

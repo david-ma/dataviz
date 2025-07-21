@@ -91,7 +91,7 @@ function calculate(chart: Chart, yourCoordinates: Coordinates) {
   const statement = d3.select('#statement')
   const closestGeorgia = georgias[0]
   statement.text(
-    `Your closest Georgia is ${closestGeorgia.label} (${closestGeorgia.type}), which is ${closestGeorgia.distance} km away`
+    `Your closest Georgia is ${closestGeorgia.label} (${closestGeorgia.type}), which is ${closestGeorgia.distance} km away`,
   )
 
   you.label = `You are closer to ${closestGeorgia.label} (${closestGeorgia.type})`

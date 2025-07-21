@@ -92,7 +92,7 @@ const cite = [
         .filter((param) => param.name.startsWith('author'))
         .map(
           (author) =>
-            `<a href="/wiki/${author.value}" title="${author.value}">${author.value}</a>`
+            `<a href="/wiki/${author.value}" title="${author.value}">${author.value}</a>`,
         )
         .join('; ')
 
@@ -100,7 +100,7 @@ const cite = [
         .filter((param) => param.name.startsWith('editor'))
         .map(
           (editor) =>
-            `<a href="/wiki/${editor.value}" title="${editor.value}">${editor.value}</a>`
+            `<a href="/wiki/${editor.value}" title="${editor.value}">${editor.value}</a>`,
         )
         .join('; ')
 
@@ -109,45 +109,45 @@ const cite = [
           <cite id="CITEREF${
             parameters.find((param) => param.name === 'author1-last')?.value
           }${
-        parameters.find((param) => param.name === 'date')?.value
-      }" class="citation book cs1">
+            parameters.find((param) => param.name === 'date')?.value
+          }" class="citation book cs1">
             ${authors} (${
-        parameters.find((param) => param.name === 'date')?.value
-      }). ${
-        editors ? `${editors} (eds.). ` : ''
-      }<a rel="nofollow" class="external text" href="${
-        parameters.find((param) => param.name === 'url')?.value
-      }"><i>${
-        parameters.find((param) => param.name === 'title')?.value
-      }</i></a>. ${
-        parameters.find((param) => param.name === 'publisher')?.value
-      }. p.&nbsp;${
-        parameters.find((param) => param.name === 'pages')?.value
-      }. <a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>&nbsp;<a href="/wiki/Special:BookSources/${
-        parameters.find((param) => param.name === 'isbn')?.value
-      }" title="Special:BookSources/${
-        parameters.find((param) => param.name === 'isbn')?.value
-      }"><bdi>${
-        parameters.find((param) => param.name === 'isbn')?.value
-      }</bdi></a>.
+              parameters.find((param) => param.name === 'date')?.value
+            }). ${
+              editors ? `${editors} (eds.). ` : ''
+            }<a rel="nofollow" class="external text" href="${
+              parameters.find((param) => param.name === 'url')?.value
+            }"><i>${
+              parameters.find((param) => param.name === 'title')?.value
+            }</i></a>. ${
+              parameters.find((param) => param.name === 'publisher')?.value
+            }. p.&nbsp;${
+              parameters.find((param) => param.name === 'pages')?.value
+            }. <a href="/wiki/ISBN_(identifier)" class="mw-redirect" title="ISBN (identifier)">ISBN</a>&nbsp;<a href="/wiki/Special:BookSources/${
+              parameters.find((param) => param.name === 'isbn')?.value
+            }" title="Special:BookSources/${
+              parameters.find((param) => param.name === 'isbn')?.value
+            }"><bdi>${
+              parameters.find((param) => param.name === 'isbn')?.value
+            }</bdi></a>.
           </cite>
           <span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rft.genre=book&amp;rft.btitle=${
             parameters.find((param) => param.name === 'title')?.value
           }&amp;rft.pages=${
-        parameters.find((param) => param.name === 'pages')?.value
-      }&amp;rft.pub=${
-        parameters.find((param) => param.name === 'publisher')?.value
-      }&amp;rft.date=${
-        parameters.find((param) => param.name === 'date')?.value
-      }&amp;rft.isbn=${
-        parameters.find((param) => param.name === 'isbn')?.value
-      }&amp;rft.aulast=${
-        parameters.find((param) => param.name === 'author1-last')?.value
-      }&amp;rft.aufirst=${
-        parameters.find((param) => param.name === 'author1-first')?.value
-      }&amp;rft_id=${
-        parameters.find((param) => param.name === 'url')?.value
-      }&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AShip+of+Theseus" class="Z3988"></span>
+            parameters.find((param) => param.name === 'pages')?.value
+          }&amp;rft.pub=${
+            parameters.find((param) => param.name === 'publisher')?.value
+          }&amp;rft.date=${
+            parameters.find((param) => param.name === 'date')?.value
+          }&amp;rft.isbn=${
+            parameters.find((param) => param.name === 'isbn')?.value
+          }&amp;rft.aulast=${
+            parameters.find((param) => param.name === 'author1-last')?.value
+          }&amp;rft.aufirst=${
+            parameters.find((param) => param.name === 'author1-first')?.value
+          }&amp;rft_id=${
+            parameters.find((param) => param.name === 'url')?.value
+          }&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AShip+of+Theseus" class="Z3988"></span>
         `
 
       return htmlRepresentation
@@ -175,7 +175,7 @@ const cite = [
         .filter((param) => param.name.startsWith('author'))
         .map(
           (author) =>
-            `<a href="/wiki/${author.value}" title="${author.value}">${author.value}</a>`
+            `<a href="/wiki/${author.value}" title="${author.value}">${author.value}</a>`,
         )
         .join('; ')
 
@@ -184,45 +184,45 @@ const cite = [
           <cite id="CITEREF${
             parameters.find((param) => param.name === 'last1')?.value
           }${
-        parameters.find((param) => param.name === 'year')?.value
-      }" class="citation journal cs1">
+            parameters.find((param) => param.name === 'year')?.value
+          }" class="citation journal cs1">
             ${authors} (${
-        parameters.find((param) => param.name === 'year')?.value
-      }). <i>${
-        parameters.find((param) => param.name === 'title')?.value
-      }</i>. ${parameters.find((param) => param.name === 'journal')?.value} ${
-        parameters.find((param) => param.name === 'volume')?.value
-          ? `${parameters.find((param) => param.name === 'volume')?.value}`
-          : ''
-      }${
-        parameters.find((param) => param.name === 'issue')?.value
-          ? `(${parameters.find((param) => param.name === 'issue')?.value})`
-          : ''
-      }: ${
-        parameters.find((param) => param.name === 'pages')?.value
-      }. <a href="${
-        parameters.find((param) => param.name === 'url')?.value
-      }" class="external text">doi:${
-        parameters.find((param) => param.name === 'doi')?.value
-      }</a>.
+              parameters.find((param) => param.name === 'year')?.value
+            }). <i>${
+              parameters.find((param) => param.name === 'title')?.value
+            }</i>. ${parameters.find((param) => param.name === 'journal')?.value} ${
+              parameters.find((param) => param.name === 'volume')?.value
+                ? `${parameters.find((param) => param.name === 'volume')?.value}`
+                : ''
+            }${
+              parameters.find((param) => param.name === 'issue')?.value
+                ? `(${parameters.find((param) => param.name === 'issue')?.value})`
+                : ''
+            }: ${
+              parameters.find((param) => param.name === 'pages')?.value
+            }. <a href="${
+              parameters.find((param) => param.name === 'url')?.value
+            }" class="external text">doi:${
+              parameters.find((param) => param.name === 'doi')?.value
+            }</a>.
           </cite>
           <span title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal&amp;rft.genre=article&amp;rft.atitle=${
             parameters.find((param) => param.name === 'title')?.value
           }&amp;rft.jtitle=${
-        parameters.find((param) => param.name === 'journal')?.value
-      }&amp;rft.date=${
-        parameters.find((param) => param.name === 'year')?.value
-      }&amp;rft.volume=${
-        parameters.find((param) => param.name === 'volume')?.value
-      }&amp;rft.issue=${
-        parameters.find((param) => param.name === 'issue')?.value
-      }&amp;rft.pages=${
-        parameters.find((param) => param.name === 'pages')?.value
-      }&amp;rft.aulast=${
-        parameters.find((param) => param.name === 'last1')?.value
-      }&amp;rft.aufirst=${
-        parameters.find((param) => param.name === 'first1')?.value
-      }&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AShip+of+Theseus" class="Z3988"></span>
+            parameters.find((param) => param.name === 'journal')?.value
+          }&amp;rft.date=${
+            parameters.find((param) => param.name === 'year')?.value
+          }&amp;rft.volume=${
+            parameters.find((param) => param.name === 'volume')?.value
+          }&amp;rft.issue=${
+            parameters.find((param) => param.name === 'issue')?.value
+          }&amp;rft.pages=${
+            parameters.find((param) => param.name === 'pages')?.value
+          }&amp;rft.aulast=${
+            parameters.find((param) => param.name === 'last1')?.value
+          }&amp;rft.aufirst=${
+            parameters.find((param) => param.name === 'first1')?.value
+          }&amp;rfr_id=info%3Asid%2Fen.wikipedia.org%3AShip+of+Theseus" class="Z3988"></span>
         `
 
       return htmlRepresentation
@@ -244,7 +244,7 @@ const cite = [
       })
       // Check if we already have this citation
       const existing = citations.find(
-        (c) => c.fields[0].value === fields[0].value
+        (c) => c.fields[0].value === fields[0].value,
       )
       if (existing) {
         return `<sup id="cite_ref-${existing.id}_1-0" class="reference"><a href="#cite_note-${existing.id}-0">[0]</a></sup>`

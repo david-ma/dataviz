@@ -51,8 +51,8 @@ new Chart({
         new THREE.Euler(
           Math.random() * Math.PI,
           Math.random() * Math.PI,
-          Math.random() * Math.PI
-        )
+          Math.random() * Math.PI,
+        ),
       )
 
       const mesh = new THREE.Mesh(geometry, material)
@@ -65,7 +65,7 @@ new Chart({
         // RAPIER.RigidBodyDesc.newDynamic().setTranslation(mesh.position.x, mesh.position.y, mesh.position.z)
         RAPIER.RigidBodyDesc.newDynamic()
           .setTranslation(mesh.position.x, mesh.position.y, mesh.position.z)
-          .setRotation(rotation)
+          .setRotation(rotation),
       )
       world.createCollider(RAPIER.ColliderDesc.cuboid(0.1, 0.1, 0.1), rigidBody)
 
@@ -89,7 +89,7 @@ new Chart({
           rotation.x,
           rotation.y,
           rotation.z,
-          rotation.w
+          rotation.w,
         )
       })
 

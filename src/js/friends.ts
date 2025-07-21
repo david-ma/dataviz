@@ -91,7 +91,7 @@ $.ajax({
             d
               .map((dot) => dot.name)
               .reverse()
-              .join(', ')
+              .join(', '),
           )
           tr.append('td').text(d.length)
 
@@ -124,10 +124,10 @@ $.ajax({
         .attr('id', 'columns')
         .attr(
           'transform',
-          `translate(${chart.margin.left}, ${chart.margin.top})`
+          `translate(${chart.margin.left}, ${chart.margin.top})`,
         )
 
-        globalThis.buckets = buckets
+      globalThis.buckets = buckets
 
       const max = Math.max(...buckets.map((d) => d.length).filter((d) => d))
       console.log('Max', max)
@@ -137,23 +137,23 @@ $.ajax({
         .data(buckets)
         .enter()
         .append('rect')
-        
-        // .attrs(function (bucket, i) {
-        //   // console.log(d);
-        //   // console.log(i);
-        //   if (bucket) {
-        //     return {
-        //       height: bucket.length * (chart.innerHeight / max),
-        //       width: chart.innerWidth / buckets.length,
-        //       x: (i * chart.innerWidth) / buckets.length,
-        //       y: chart.innerHeight - bucket.length * (chart.innerHeight / max),
-        //       fill: 'grey',
-        //       stroke: 'black',
-        //     }
-        //   } else {
-        //     return {}
-        //   }
-        // })
+
+      // .attrs(function (bucket, i) {
+      //   // console.log(d);
+      //   // console.log(i);
+      //   if (bucket) {
+      //     return {
+      //       height: bucket.length * (chart.innerHeight / max),
+      //       width: chart.innerWidth / buckets.length,
+      //       x: (i * chart.innerWidth) / buckets.length,
+      //       y: chart.innerHeight - bucket.length * (chart.innerHeight / max),
+      //       fill: 'grey',
+      //       stroke: 'black',
+      //     }
+      //   } else {
+      //     return {}
+      //   }
+      // })
 
       const xAxis = d3
         .axisBottom(x as any)
@@ -169,7 +169,7 @@ $.ajax({
         .append('g')
         .attr(
           'transform',
-          `translate(${0},${chart.margin.top + chart.innerHeight})`
+          `translate(${0},${chart.margin.top + chart.innerHeight})`,
         )
         .call(xAxis)
 
@@ -196,7 +196,7 @@ function decodeFBEmoji(fbString: string, verbose?: boolean): string {
   const codeArray = fbString // starts as '\u00f0\u009f\u0098\u00a2'
     .split('')
     .map(
-      (char) => char.charCodeAt(0) // convert '\u00f0' to 0xf0
+      (char) => char.charCodeAt(0), // convert '\u00f0' to 0xf0
     ) // result is [0xf0, 0x9f, 0x98, 0xa2]
 
   // Convert plain JavaScript array to Uint8Array
@@ -206,7 +206,7 @@ function decodeFBEmoji(fbString: string, verbose?: boolean): string {
     console.log('fbString', fbString)
     console.log(
       'hex',
-      codeArray.map((char) => `\\u00${char.toString(16)}`).join('')
+      codeArray.map((char) => `\\u00${char.toString(16)}`).join(''),
     )
     console.log('codeArray', codeArray)
     console.log('byteArray', byteArray)

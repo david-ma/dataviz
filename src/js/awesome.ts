@@ -110,8 +110,8 @@ d3.json('/awesome').then(function (data: any) {
       rightSide
         .html(
           md.makeHtml(
-            `Dinosaur, Social Justice, Sports, Art, Church, Queer, Refugee, Education, Science, Collaboration, Environment, Health, Community, Technology, Feasibility with $1000, Other:`
-          )
+            `Dinosaur, Social Justice, Sports, Art, Church, Queer, Refugee, Education, Science, Collaboration, Environment, Health, Community, Technology, Feasibility with $1000, Other:`,
+          ),
         )
         .classed('categories', true)
         .style('display', 'none')
@@ -121,7 +121,10 @@ d3.json('/awesome').then(function (data: any) {
         .classed('photos', true)
         .selectAll('img')
         .data(
-          data.photos.filter((photo: any) => photo.awesome_project_id === d.id && photo.smugmug_key)
+          data.photos.filter(
+            (photo: any) =>
+              photo.awesome_project_id === d.id && photo.smugmug_key,
+          ),
         )
         .enter()
         // .append('b')
@@ -165,7 +168,7 @@ d3.json('/awesome').then(function (data: any) {
         .classed('smaller', (d: any) => d.about_me.length > 400)
       $('#me-' + d.id).html(md.makeHtml(d.about_me))
 
-      var extra_questions = left.append("div").classed("extra_questions", true)
+      var extra_questions = left.append('div').classed('extra_questions', true)
 
       extra_questions.append('h3').text((d) => d.extra_question_1)
       extra_questions.append('p').text((d) => d.extra_answer_1)
@@ -173,8 +176,14 @@ d3.json('/awesome').then(function (data: any) {
       extra_questions.append('h3').text((d) => d.extra_question_2)
       extra_questions.append('p').text((d) => d.extra_answer_2)
 
-      extra_questions.append('h3').text((d) => d.extra_question_3).classed("q3", true)
-      extra_questions.append('p').text((d) => d.extra_answer_3).classed("q3", true)
+      extra_questions
+        .append('h3')
+        .text((d) => d.extra_question_3)
+        .classed('q3', true)
+      extra_questions
+        .append('p')
+        .text((d) => d.extra_answer_3)
+        .classed('q3', true)
 
       right.append('h3').text('Awesome Trustee Comments:')
       right
@@ -264,11 +273,11 @@ d3.json('/awesome').then(function (data: any) {
         .append('li')
         .attr(
           'id',
-          (category) => `categoryLi-${d.id}-${cssSelectorSafe(category)}`
+          (category) => `categoryLi-${d.id}-${cssSelectorSafe(category)}`,
         )
         .each((category) => {
           const li = d3.select(
-            `#categoryLi-${d.id}-${cssSelectorSafe(category)}`
+            `#categoryLi-${d.id}-${cssSelectorSafe(category)}`,
           )
           const elementId = `category-${d.id}-${cssSelectorSafe(category)}`
 

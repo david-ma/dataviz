@@ -217,7 +217,8 @@ function drawTreemap(data, datatable: DataTables.Api) {
 
         const regionGroupTranslate = `translate(${d.x0},${d.y0})`
 
-        const regionGroup = svg.append('g')
+        const regionGroup = svg
+          .append('g')
           .attr('id', `${classifyName(d.data.name)}`)
           .attr('transform', regionGroupTranslate)
 
@@ -250,13 +251,13 @@ function drawTreemap(data, datatable: DataTables.Api) {
           .on('mouseover', function (d) {
             d3.select(`#row-${classifyName(d.data.name)}`).classed(
               'highlight',
-              true
+              true,
             )
           })
           .on('mouseout', function (d) {
             d3.select(`#row-${classifyName(d.data.name)}`).classed(
               'highlight',
-              false
+              false,
             )
           })
           .on('click', function (d) {
@@ -271,7 +272,9 @@ function drawTreemap(data, datatable: DataTables.Api) {
             const speed = 1000
             let done = false
 
-            regionGroup.transition().duration(speed)
+            regionGroup
+              .transition()
+              .duration(speed)
               .attr('transform', 'translate(0,0)')
             regionGroup
               .selectAll('rect.country')
@@ -367,7 +370,9 @@ function drawTreemap(data, datatable: DataTables.Api) {
                         .padding(2)
                       const regionTree = myTreemap(regionRoot)
 
-                      regionGroup.transition().duration(speed)
+                      regionGroup
+                        .transition()
+                        .duration(speed)
                         .attr('transform', regionGroupTranslate)
                       regionGroup
                         .selectAll('rect.country')

@@ -42,7 +42,7 @@ function drawCircle(svg, circle: circleInfo) {
 function calculateCircles(
   radius: number,
   numCircles: number,
-  center: coords
+  center: coords,
 ): circleInfo[] {
   const circles: circleInfo[] = []
 
@@ -68,7 +68,7 @@ function calculateCircles(
 function calculateCurves(
   center: coords,
   left: coords,
-  right: coords
+  right: coords,
 ): curveInfo[] {
   // Given the coordinates of the top left, top right and center of a petal
   // Generate bezier curves for the petal
@@ -154,7 +154,7 @@ function drawMandala() {
   const secondCircles: circleInfo[] = calculateCircles(
     layerRadius + 150,
     16,
-    center
+    center,
   )
 
   circles.forEach((circle, i) => {
@@ -173,7 +173,7 @@ function drawMandala() {
         .append('path')
         .attr(
           'd',
-          `M ${curve.x1},${curve.y1} C ${curve.x2},${curve.y2} ${curve.x3},${curve.y3} ${curve.x4},${curve.y4}`
+          `M ${curve.x1},${curve.y1} C ${curve.x2},${curve.y2} ${curve.x3},${curve.y3} ${curve.x4},${curve.y4}`,
         )
         .attr('stroke', 'black')
         .attr('fill', 'none')
@@ -183,7 +183,6 @@ function drawMandala() {
   circles.forEach((circle) => {
     drawCircle(box, circle)
   })
-
 }
 
 drawMandala()

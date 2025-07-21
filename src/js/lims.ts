@@ -97,7 +97,6 @@ var lims = d3.json('/lims_logs').then((files: string[]) => {
     console.log('Data is:', data)
     d3.select('#preview').html(`<pre>${JSON.stringify(data, null, 2)}</pre>`)
 
-
     data.forEach((day) => {
       _.merge(visitors, day.visitors)
       // console.log('Unique visitors', Object.keys(d.visitors).length)
@@ -142,13 +141,17 @@ var lims = d3.json('/lims_logs').then((files: string[]) => {
         visitors_by_hour_by_type.AGRF[hour].length
 
       hourly_client_visitors_avg[hour] =
-        visitors_by_hour_by_type.client[hour].reduce((acc, val) => acc + val, 0) /
-        visitors_by_hour_by_type.client[hour].length
+        visitors_by_hour_by_type.client[hour].reduce(
+          (acc, val) => acc + val,
+          0,
+        ) / visitors_by_hour_by_type.client[hour].length
 
       max_agrf_visitors[hour] = Math.max(...visitors_by_hour_by_type.AGRF[hour])
-      max_client_visitors[hour] = Math.max(...visitors_by_hour_by_type.client[hour])
+      max_client_visitors[hour] = Math.max(
+        ...visitors_by_hour_by_type.client[hour],
+      )
     })
-    
+
     console.log('Hourly visitors', hourly_visitors)
     console.log('Hourly visitors avg', hourly_visitors_avg)
     console.log('Max visitors', max_visitors)
@@ -156,7 +159,6 @@ var lims = d3.json('/lims_logs').then((files: string[]) => {
     console.log('Hourly client visitors avg', hourly_client_visitors_avg)
     console.log('Max AGRF visitors', max_agrf_visitors)
     console.log('Max client visitors', max_client_visitors)
-
   })
 })
 

@@ -10,7 +10,7 @@ const green = '#00c200',
 
 const charset =
   'ﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'.split(
-    ''
+    '',
   )
 
 const rabbit = (globalThis.rabbit = `                              __
@@ -127,7 +127,7 @@ class Column {
           line: i,
           col: this.col,
           board: this.board,
-        })
+        }),
       )
     }
   }
@@ -184,7 +184,7 @@ class Matrix {
           col: i,
           lines: opts.lines,
           board: opts.board,
-        })
+        }),
       )
     }
   }

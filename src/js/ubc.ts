@@ -37,7 +37,7 @@ const typefaces = [
   },
 ]
 
-const extras =[
+const extras = [
   'Oswald',
   'Ralway',
   'Roboto Slab',
@@ -67,7 +67,6 @@ const extras =[
   'Special Elite',
   'Carter One',
   'Hammersmith One',
-  
 ]
 
 console.log('extras', extras)
@@ -81,7 +80,9 @@ d3.select('#signs')
   .each(function (d) {
     var sign = d3.select(this).classed('sign row', true)
 
-    sign.append('img').attr('src', '/images/ubc-logo.jpg')
+    sign
+      .append('img')
+      .attr('src', '/images/ubc-logo.jpg')
       .classed('col-xs-3', true)
 
     var right = sign.append('div').classed('col-xs-9', true)
@@ -91,14 +92,14 @@ d3.select('#signs')
       .classed('subtitle', true)
       .text('BEARINGS, POWER TRANSMISSION & MORE')
 
-    sign.append("div").classed('label col-xs-12', true).text(d.typeface)
+    sign.append('div').classed('label col-xs-12', true).text(d.typeface)
 
     // Check fontfaces FontFaceSet
     // https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet
 
     console.log(
       `${d.typeface} is loaded: `,
-      document.fonts.check('1em ' + d.typeface)
+      document.fonts.check('1em ' + d.typeface),
     )
     if (!document.fonts.check('1em ' + d.typeface))
       console.error(`${d.typeface} is not loaded`)

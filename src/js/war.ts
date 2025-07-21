@@ -202,7 +202,7 @@ function drawPieChart() {
       .enter()
       .append('polyline')
       .style('display', (d) =>
-        data[d.data[0]].name.indexOf('peace') === 0 ? 'none' : ''
+        data[d.data[0]].name.indexOf('peace') === 0 ? 'none' : '',
       )
       .attr('stroke', 'black')
       .style('fill', 'none')
@@ -223,7 +223,7 @@ function drawPieChart() {
       .enter()
       .append('text')
       .style('display', (d) =>
-        data[d.data[0]].name.indexOf('peace') === 0 ? 'none' : ''
+        data[d.data[0]].name.indexOf('peace') === 0 ? 'none' : '',
       )
       .text((d) => data[d.data[0]].name)
       .attr('transform', function (d) {
@@ -258,7 +258,7 @@ function drawPieChart() {
       .attr('stroke', 'white')
       .style('stroke-width', '2px')
       .style('opacity', (d) =>
-        d.index % 2 === 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3
+        d.index % 2 === 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3,
       )
 
     const legend = c.plot.append('g').attr('transform', 'translate(220,0)')
@@ -275,7 +275,7 @@ function drawPieChart() {
       .attr('width', 20)
       .attr('fill', 'maroon')
       .style('opacity', (d) =>
-        d.index % 2 === 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3
+        d.index % 2 === 1 ? 0.1 : (d.value / longestWar) * 0.5 + 0.3,
       )
 
     d3.selectAll('.legendLabel')

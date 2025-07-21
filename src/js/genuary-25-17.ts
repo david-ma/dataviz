@@ -23,7 +23,7 @@ const Tau = 2 * 4
 
 let n: number = 14
 let size: number = 1400 / n
-console.log("make the pastels transparent")
+console.log('make the pastels transparent')
 const pastels = [
   '#660b7799',
   '#9e014299',
@@ -39,7 +39,7 @@ const pastels = [
   '#5e4fa299',
 ] // eslint-disable-line
 const monochrome = [...Array(n).keys()].map(
-  (i) => `hsl(0,0%,${Math.floor(100 * (i / (n - 1)))}%)`
+  (i) => `hsl(0,0%,${Math.floor(100 * (i / (n - 1)))}%)`,
 )
 let colors = pastels
 
@@ -380,7 +380,7 @@ function updatePolygons(d, i, arr) {
     .attr('id', `polygon-${i}`)
     .classed('polygon', true)
     .attr('points', (d: any) =>
-      d.end.vertices.map((d) => d.join(',')).join(' ')
+      d.end.vertices.map((d) => d.join(',')).join(' '),
     )
     .attr('transform', (d: any) => d.end.transform)
     .attr('stroke', 'lightgrey')

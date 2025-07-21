@@ -59,7 +59,7 @@ export class Paperclip {
     model: THREE.Group,
     materials: MTLLoader.MaterialCreator,
     scale: number,
-    world: RAPIER.World
+    world: RAPIER.World,
   ) {
     // Create visual mesh
     this.mesh = model.clone()
@@ -69,14 +69,14 @@ export class Paperclip {
     this.mesh.position.set(
       Math.random() * 2 - 1,
       Math.random() * 2 - 1,
-      Math.random() * 2 - 1
+      Math.random() * 2 - 1,
     )
     const rotation = new THREE.Quaternion().setFromEuler(
       new THREE.Euler(
         Math.random() * Math.PI,
         Math.random() * Math.PI,
-        Math.random() * Math.PI
-      )
+        Math.random() * Math.PI,
+      ),
     )
     this.mesh.quaternion.copy(rotation)
 
@@ -99,15 +99,15 @@ export class Paperclip {
         .setTranslation(
           this.mesh.position.x,
           this.mesh.position.y,
-          this.mesh.position.z
+          this.mesh.position.z,
         )
-        .setRotation(rotation)
+        .setRotation(rotation),
     )
 
     // Create collider
     world.createCollider(
       RAPIER.ColliderDesc.cuboid(this.hitbox.x, this.hitbox.y, this.hitbox.z),
-      this.rigidBody
+      this.rigidBody,
     )
   }
 
@@ -129,7 +129,7 @@ export class Block {
     const geometry = new THREE.BoxGeometry(
       this.size.x * 2,
       this.size.y * 2,
-      this.size.z * 2
+      this.size.z * 2,
     )
     const material = new THREE.MeshStandardMaterial({
       color: 0xffffff,
@@ -142,14 +142,14 @@ export class Block {
     this.mesh.position.set(
       Math.random() * 2 - 1,
       Math.random() * 2 - 1,
-      Math.random() * 2 - 1
+      Math.random() * 2 - 1,
     )
     const rotation = new THREE.Quaternion().setFromEuler(
       new THREE.Euler(
         Math.random() * Math.PI,
         Math.random() * Math.PI,
-        Math.random() * Math.PI
-      )
+        Math.random() * Math.PI,
+      ),
     )
     this.mesh.quaternion.copy(rotation)
 
@@ -163,15 +163,15 @@ export class Block {
         .setTranslation(
           this.mesh.position.x,
           this.mesh.position.y,
-          this.mesh.position.z
+          this.mesh.position.z,
         )
-        .setRotation(rotation)
+        .setRotation(rotation),
     )
 
     // Create collider
     world.createCollider(
       RAPIER.ColliderDesc.cuboid(this.size.x, this.size.y, this.size.z),
-      this.rigidBody
+      this.rigidBody,
     )
   }
 

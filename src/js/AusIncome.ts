@@ -250,7 +250,7 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
             d3.max(data, function (d) {
               return d[options.yField] as number
             })) /
-            options.rounding
+            options.rounding,
         ) * options.rounding,
       ])
 
@@ -274,9 +274,9 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
             valueline.x(function (d: any) {
               return x(
                 (100 * d.cumulativePopulation) /
-                  cumulativePopulation[type.label]
+                  cumulativePopulation[type.label],
               )
-            })
+            }),
           )
 
         chart.plot

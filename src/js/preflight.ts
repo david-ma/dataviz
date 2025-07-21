@@ -8,7 +8,7 @@ type FileInfo = [
   size_bytes: number,
   date_modified: number,
   agrf_data_type: string,
-  agrf_data_level: string
+  agrf_data_level: string,
 ]
 
 type PreflightData = {
@@ -171,7 +171,7 @@ var phases = d3
               //   title: 'Small Files',
               //   render: (data, type, row, meta) => {
               //     if (row && row.summary && type === 'display') {
-              //       if (row.summary) {  
+              //       if (row.summary) {
               //       return row.summary.include.files.reduce((acc, file) => {
               //         if (file[2] < 32000) {
               //           acc++
@@ -249,14 +249,14 @@ var phases = d3
                 },
               },
             ],
-          }
+          },
         )
 
         Promise.all([
           Promise.all(
             files.map((file) =>
-              d3.json(`/AGRF/preflight/preflight_${phase}/oct/${file}`)
-            )
+              d3.json(`/AGRF/preflight/preflight_${phase}/oct/${file}`),
+            ),
           ),
           Promise.all(
             files.map((file) =>
@@ -264,7 +264,7 @@ var phases = d3
                 .json(
                   `/AGRF/preflight/preflight_${phase}/postflight/${
                     file.split('.')[0]
-                  }_aws.json`
+                  }_aws.json`,
                 )
                 .catch((error) => {
                   // console.log("Error fetching postflight data", error)
@@ -277,8 +277,8 @@ var phases = d3
                     },
                     error: file,
                   }
-                })
-            )
+                }),
+            ),
           ),
         ]).then(([preflight_data, postflight_data]) => {
           console.log('Preflight data', preflight_data)
@@ -309,7 +309,7 @@ globalThis.drawDashboard = drawDashboard
 
 function drawDashboard(data: PreflightData) {
   d3.select('#preview').html(
-    `<h3>Preview</h3><pre>${JSON.stringify(data, null, 2)}</pre>`
+    `<h3>Preview</h3><pre>${JSON.stringify(data, null, 2)}</pre>`,
   )
 
   var dashboard = d3.select('#dashboard').html('')
@@ -368,7 +368,7 @@ const color = d3.scaleOrdinal([
 
 function drawDataviz(
   dataviz: d3.Selection<HTMLDivElement, unknown, HTMLElement, any>,
-  data: PreflightData
+  data: PreflightData,
 ) {
   var contract = data.contract_dir.split('/').pop()
   console.log('Contract: ', contract)

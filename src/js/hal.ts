@@ -30,53 +30,44 @@ globalThis.midiButton = function () {
   })
 }
 
-
 function listInputsAndOutputs(midiAccess) {
   for (const entry of midiAccess.inputs) {
-    const input = entry[1];
+    const input = entry[1]
     console.log(
       `Input port [type:'${input.type}']` +
         ` id:'${input.id}'` +
         ` manufacturer:'${input.manufacturer}'` +
         ` name:'${input.name}'` +
         ` version:'${input.version}'`,
-    );
+    )
   }
 
   for (const entry of midiAccess.outputs) {
-    const output = entry[1];
+    const output = entry[1]
     console.log(
       `Output port [type:'${output.type}'] id:'${output.id}' manufacturer:'${output.manufacturer}' name:'${output.name}' version:'${output.version}'`,
-    );
+    )
   }
 }
-
 
 function onMIDIMessage(event) {
-  let str = `MIDI message received at timestamp ${event.timeStamp}[${event.data.length} bytes]: `;
+  let str = `MIDI message received at timestamp ${event.timeStamp}[${event.data.length} bytes]: `
   let signal = ''
   for (const character of event.data) {
-    str += `0x${character.toString(16)} `;
+    str += `0x${character.toString(16)} `
     signal = `0x${character.toString(16)}`
   }
-  if(signal != '0xf8') { // ignore the clock signal 0xf8
-    console.log(str);
+  if (signal != '0xf8') {
+    // ignore the clock signal 0xf8
+    console.log(str)
   }
 }
-
 
 function startLoggingMIDIInput(midiAccess, indexOfPort) {
   midiAccess.inputs.forEach((entry) => {
-    entry.onmidimessage = onMIDIMessage;
-  });
+    entry.onmidimessage = onMIDIMessage
+  })
 }
-
-
-
-
-
-
-
 
 const height = 600,
   width = 960
@@ -279,8 +270,7 @@ function randomNumbers(length: number = 10): string {
     .slice(1, length)
 }
 
-
-// Paperclips per 
+// Paperclips per
 
 const paperclips = screens.append('svg').attrs({
   viewBox: `0 0 ${width} ${height}`,
@@ -298,24 +288,22 @@ paperclips.append('rect').attrs({
 // With average paperclips per minute?
 // Draw X and Y axes
 
-paperclips.append("line")
-  .attrs({
-    x1: 100,
-    y1: 100,
-    x2: 100,
-    y2: 500,
-    stroke: 'white',
-    'stroke-width': 0.5
-  })
+paperclips.append('line').attrs({
+  x1: 100,
+  y1: 100,
+  x2: 100,
+  y2: 500,
+  stroke: 'white',
+  'stroke-width': 0.5,
+})
 
-paperclips.append("line")
-  .attrs({
-    x1: 100,
-    y1: 500,
-    x2: 850,
-    y2: 500,
-    stroke: 'white',
-    'stroke-width': 0.5
-  })
+paperclips.append('line').attrs({
+  x1: 100,
+  y1: 500,
+  x2: 850,
+  y2: 500,
+  stroke: 'white',
+  'stroke-width': 0.5,
+})
 
-  d3.axisLeft()
+d3.axisLeft()

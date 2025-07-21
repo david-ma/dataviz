@@ -46,8 +46,8 @@ class CardAnimation {
 
   private animate() {
     // Clear canvas
-   this.chart.context.fillStyle = '#213'
-   this.chart.context.fillRect(0, 0, width, height)
+    this.chart.context.fillStyle = '#213'
+    this.chart.context.fillRect(0, 0, width, height)
 
     // Update and draw cards
     this.cards = this.cards.filter((card) => card.isAnimating)
@@ -127,7 +127,7 @@ $.when($.ready).then(function () {
           const cardPosY = event.y - card_height / 2
           d3.select(this).attr('x', cardPosX).attr('y', cardPosY)
           cardAnimation.addCard(cardPosX, cardPosY, image)
-        })
+        }),
     )
 })
 

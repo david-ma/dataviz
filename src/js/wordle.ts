@@ -126,12 +126,11 @@ function calculateBestWords() {
     console.log(index)
     console.log(words)
 
-    var scoredWords: [string, number] = scoreWords(words, index).sort(function (
-      a,
-      b
-    ) {
-      return b[1] - a[1]
-    })
+    var scoredWords: [string, number] = scoreWords(words, index).sort(
+      function (a, b) {
+        return b[1] - a[1]
+      },
+    )
 
     d3.select('#bestWords').selectAll('li').remove()
 
@@ -142,7 +141,7 @@ function calculateBestWords() {
         scoredWords
           .slice(0, 50)
           .map((array) => array[0])
-          .filter(onlyUnique)
+          .filter(onlyUnique),
         // .slice(0, 10)
       )
       .enter()

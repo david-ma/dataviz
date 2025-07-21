@@ -52,7 +52,7 @@ function getFeatureState(featureName, component = 'default') {
     // 3) if globalFeaturesTimestamp is fresh, use it
     // 4) if globalFeaturesTimestamp is stale, fetch it
 
-    globalFeaturesTimestamp = "inProgress"
+    globalFeaturesTimestamp = 'inProgress'
 
     // Check the timestamp of the cached features
     // Use the cached features if they are less than 5 minutes old
@@ -89,9 +89,6 @@ function getFeatureState(featureName, component = 'default') {
   })
 }
 
-
-
-
 // // Function usage examples
 // // src/feature-x/summary.js
 getFeatureState('extended-summary', 'homepage').then(function (isEnabled) {
@@ -113,9 +110,6 @@ getFeatureState('feedback-dialog').then(function (isEnabled) {
     // makeFeedbackButtonVisible();
   }
 })
-
-
-
 
 setTimeout(function () {
   // // src/feature-y/feedback-dialog.js

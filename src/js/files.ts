@@ -253,7 +253,7 @@ d3.select('#buttons')
           }
 
           return recordFile(node)
-        })
+        }),
       )
       .then(d3.stratify<FileNode>().path((d) => d.path))
       .then((root: d3.HierarchyNode<FileNode>) => {
@@ -284,7 +284,9 @@ type ElementWithDatum<Datum> = d3.Selection<
   any
 >
 
-export function drawDirs(selection: ElementWithDatum<d3.HierarchyNode<FileNode>>) {
+export function drawDirs(
+  selection: ElementWithDatum<d3.HierarchyNode<FileNode>>,
+) {
   const hierarchy = selection.datum()
   if (!hierarchy.data) {
     console.log('Error, no data on this node, creating one', hierarchy)
@@ -344,7 +346,7 @@ export function drawDirs(selection: ElementWithDatum<d3.HierarchyNode<FileNode>>
       .html(
         `<span class="foldername">${node.data.name}</span>
     <span class="fileStatus">${showFileStatus(node)}</span>
-    <span class="filesize">${filesizeLabel(node.value)}</span>`
+    <span class="filesize">${filesizeLabel(node.value)}</span>`,
       )
       .classed('folder', true)
       .attr('id', `directory-${classifyName(node.id)}`)
@@ -356,7 +358,7 @@ export function drawDirs(selection: ElementWithDatum<d3.HierarchyNode<FileNode>>
       .on('mouseout', function (e, d) {
         d3.select(`#folder-${classifyName(node.id)}`).classed(
           'mouseover',
-          false
+          false,
         )
       })
   }
@@ -394,7 +396,7 @@ function drawLegend(
       filesize: number
     }
   },
-  color: d3.ScaleOrdinal<string, any>
+  color: d3.ScaleOrdinal<string, any>,
 ) {
   const mainFiletypes = [
     'fastq.gz',
@@ -435,7 +437,7 @@ function drawLegend(
         count: 0,
         filesize: 0,
       },
-    ]
+    ],
   )
 
   d3.select('#legend table tbody')
@@ -445,10 +447,10 @@ function drawLegend(
         total,
         misc,
         ...Object.values(filetypes).sort(
-          (a: any, b: any) => b.filesize - a.filesize
+          (a: any, b: any) => b.filesize - a.filesize,
         ),
       ],
-      (d: any) => d.name
+      (d: any) => d.name,
     )
     .enter()
     .append('tr')
@@ -504,8 +506,8 @@ if (false) {
 
           let root = d3.hierarchy(hierarchy).sum((d: any) => d.filesize)
           return [root, filetypes]
-        })
-    )
+        }),
+    ),
   ).then((results) => {
     results.forEach(([root, filetypes]: [any, any], i) => {
       console.log(CSVs[i], filesizeLabel(root.value, false, false))
@@ -659,7 +661,7 @@ if (hash === '#aws') {
 
 if (hash === '#rsync') {
   console.log(
-    '#rsync selected, trying to process 20240709_LH00620_0027_A22KVHVLT3.csv'
+    '#rsync selected, trying to process 20240709_LH00620_0027_A22KVHVLT3.csv',
   )
   d3.text(`/AGRF/20240709_LH00620_0027_A22KVHVLT3.csv`)
     .then((fileBody: string): FileNode[] =>
@@ -702,14 +704,14 @@ if (hash === '#rsync') {
         }
 
         return recordFile(node)
-      })
+      }),
     )
     .then(d3.stratify<FileNode>().path((d) => d.path))
     .then((root: d3.HierarchyNode<FileNode>) => {
       console.log('Here is the hierarchy', root)
       console.log(
         'There are this many filetypes:',
-        Object.entries(filetypes).length
+        Object.entries(filetypes).length,
       )
 
       console.log('Filetypes', filetypes)
@@ -813,7 +815,7 @@ if (hash === '#pi4') {
             return data
           }
         })
-        .filter((d) => d !== null)
+        .filter((d) => d !== null),
     )
     .then(d3.stratify<FileNode>().path((d) => d.path))
     .then((root: d3.HierarchyNode<FileNode>) => {
@@ -946,14 +948,14 @@ if (hash === '#home') {
             return recordFile(node)
           }
         })
-        .filter((d) => d !== null)
+        .filter((d) => d !== null),
     )
     .then(d3.stratify<FileNode>().path((d) => d.path))
     .then((root: d3.HierarchyNode<FileNode>) => {
       console.log('Here is the hierarchy', root)
       console.log(
         'There are this many filetypes:',
-        Object.entries(filetypes).length
+        Object.entries(filetypes).length,
       )
 
       console.log('Filetypes', filetypes)
@@ -989,7 +991,7 @@ if (hash === '#home') {
 
 function getShallowHierarchy(
   hierarchy: d3.HierarchyNode<FileNode>,
-  depth: number
+  depth: number,
 ): d3.HierarchyNode<FileNode> {
   if (!hierarchy.children) {
     return hierarchy
@@ -1001,7 +1003,7 @@ function getShallowHierarchy(
       height: depth - hierarchy.depth,
       // children: [],
       children: hierarchy.children.filter(
-        (child) => child.data.filetype !== 'folder'
+        (child) => child.data.filetype !== 'folder',
       ),
     })
   } else if (hierarchy.depth === depth) {
@@ -1009,7 +1011,7 @@ function getShallowHierarchy(
       ...hierarchy,
       height: depth - hierarchy.depth,
       children: hierarchy.children.map((child) =>
-        getShallowHierarchy(child, depth)
+        getShallowHierarchy(child, depth),
       ),
     })
   } else {

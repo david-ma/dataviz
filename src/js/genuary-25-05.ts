@@ -38,7 +38,7 @@ new RapierChart({
       ctx: CanvasRenderingContext2D,
       line: { start: Position; end: Position },
       lightPosition: Position,
-      colour: string = 'white'
+      colour: string = 'white',
     ) {
       ctx.save()
       ctx.beginPath()
@@ -50,7 +50,7 @@ new RapierChart({
       if (
         Math.sign(
           (line.end.x - line.start.x) * (lightPosition.y - line.start.y) -
-            (line.end.y - line.start.y) * (lightPosition.x - line.start.x)
+            (line.end.y - line.start.y) * (lightPosition.x - line.start.x),
         ) === 1
       ) {
         ctx.globalAlpha = 0.5
@@ -60,7 +60,7 @@ new RapierChart({
       ctx.beginPath()
       ctx.translate(line.end.x, line.end.y)
       ctx.rotate(
-        Math.atan2(line.end.y - line.start.y, line.end.x - line.start.x)
+        Math.atan2(line.end.y - line.start.y, line.end.x - line.start.x),
       )
       ctx.moveTo(0, 0)
       ctx.lineTo(-10, -5)
@@ -89,7 +89,7 @@ new RapierChart({
 
     function drawLightSource(
       ctx: CanvasRenderingContext2D,
-      position: Position
+      position: Position,
     ) {
       ctx.save()
       ctx.beginPath()
@@ -117,8 +117,8 @@ new RapierChart({
           chart.context,
           line,
           lightPosition,
-          d3.color(d3.schemeCategory10[i % 10]).toString()
-        )
+          d3.color(d3.schemeCategory10[i % 10]).toString(),
+        ),
       )
 
       requestAnimationFrame(render)

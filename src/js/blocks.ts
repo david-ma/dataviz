@@ -31,11 +31,11 @@ export class RapierChart extends Chart {
   private createBoundaries() {
     const groundCollider = RAPIER.ColliderDesc.cuboid(
       this.width / this.scale / 2,
-      RapierChart.WALL_THICKNESS
+      RapierChart.WALL_THICKNESS,
     )
     const wallCollider = RAPIER.ColliderDesc.cuboid(
       RapierChart.WALL_THICKNESS,
-      this.height / this.scale / 2
+      this.height / this.scale / 2,
     )
 
     // Create and position boundaries
@@ -57,7 +57,7 @@ export class RapierChart extends Chart {
     ]
 
     this.colliders.forEach((collider, i) =>
-      collider.setTranslation(positions[i])
+      collider.setTranslation(positions[i]),
     )
   }
 
@@ -80,7 +80,7 @@ export class RapierChart extends Chart {
       // Transform context
       this.context.translate(
         position.x * this.scale + this.width / 2,
-        this.height - (position.y * this.scale + this.height / 2)
+        this.height - (position.y * this.scale + this.height / 2),
       )
       this.context.rotate(angle)
       this.context.beginPath()
@@ -96,7 +96,7 @@ export class RapierChart extends Chart {
             -half_width,
             -half_height,
             half_width * 2,
-            half_height * 2
+            half_height * 2,
           )
         } else if (shape instanceof RAPIER.ConvexPolygon) {
           const vertices = shape.vertices
@@ -107,12 +107,12 @@ export class RapierChart extends Chart {
           if (vertices.length > 0) {
             this.context.moveTo(
               vertices[0] * this.scale,
-              vertices[1] * this.scale
+              vertices[1] * this.scale,
             )
             for (let i = 2; i < vertices.length; i += 2) {
               this.context.lineTo(
                 vertices[i] * this.scale,
-                vertices[i + 1] * this.scale
+                vertices[i + 1] * this.scale,
               )
             }
             this.context.closePath()
@@ -178,7 +178,7 @@ export function blockFactory(options: BlockOptions): Block {
   const body = options.world.createRigidBody(
     RAPIER.RigidBodyDesc.dynamic()
       .setTranslation(position.x, position.y)
-      .setRotation(rotation)
+      .setRotation(rotation),
   )
   switch (shape) {
     case ShapeType.Circle:
@@ -215,7 +215,7 @@ export abstract class Block {
     body: RAPIER.RigidBody,
     shape: ShapeType,
     radius: number,
-    colour?: string
+    colour?: string,
   ) {
     this.body = body
     this.shape = shape
@@ -235,14 +235,14 @@ export abstract class Block {
   initPhysics(world: RAPIER.World) {
     world.createCollider(
       RAPIER.ColliderDesc.convexHull(this.physicsVertices()),
-      this.body
+      this.body,
     )
   }
 
   draw(
     ctx: CanvasRenderingContext2D,
     position: Position,
-    lightPoint: Position
+    lightPoint: Position,
   ) {
     const angle = this.body.rotation()
 
@@ -348,7 +348,7 @@ export abstract class Block {
   drawHighlightedLine(
     ctx: CanvasRenderingContext2D,
     line: Line,
-    lightPoint: Position
+    lightPoint: Position,
   ) {
     ctx.save()
     ctx.beginPath()
@@ -360,7 +360,7 @@ export abstract class Block {
     if (
       Math.sign(
         (line.end.x - line.start.x) * (lightPoint.y - line.start.y) -
-          (line.end.y - line.start.y) * (lightPoint.x - line.start.x)
+          (line.end.y - line.start.y) * (lightPoint.x - line.start.x),
       ) === 1
     ) {
       ctx.strokeStyle = '#333'
@@ -406,14 +406,14 @@ export class CircleBlock extends Block {
   initPhysics(world: RAPIER.World) {
     world.createCollider(
       RAPIER.ColliderDesc.ball(this.physicsRadius),
-      this.body
+      this.body,
     )
   }
 
   draw(
     ctx: CanvasRenderingContext2D,
     position: Position,
-    lightPoint: Position
+    lightPoint: Position,
   ) {
     const angle = this.body.rotation()
 
@@ -442,7 +442,7 @@ export class CircleBlock extends Block {
       0,
       this.radius,
       lightAngle - Math.PI / 2,
-      lightAngle + Math.PI / 2
+      lightAngle + Math.PI / 2,
     )
     ctx.stroke()
 
@@ -454,7 +454,7 @@ export class CircleBlock extends Block {
       0,
       this.radius,
       lightAngle + Math.PI / 2,
-      lightAngle + (3 * Math.PI) / 2
+      lightAngle + (3 * Math.PI) / 2,
     )
     ctx.stroke()
 

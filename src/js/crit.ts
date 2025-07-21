@@ -8,23 +8,23 @@ type Printout = {
 
 d3.csv('/cards.csv').then(function (data) {
   // Get all printouts
-  const printouts : Printout[] = []
+  const printouts: Printout[] = []
   data.forEach(function (d) {
     printouts.push({
       Type: 'Prompt',
       Category: d.Category,
-      Words: d.Prompt
+      Words: d.Prompt,
     })
     printouts.push({
       Type: 'Category',
       Category: d.Category,
-      Words: d.Category
+      Words: d.Category,
     })
   })
 
   // Sort printouts into sets of 9
-  const sets : Printout[][] = []
-  let set : Printout[] = []
+  const sets: Printout[][] = []
+  let set: Printout[] = []
   printouts.forEach(function (p) {
     set.push(p)
     if (set.length === 9) {
@@ -46,7 +46,6 @@ d3.csv('/cards.csv').then(function (data) {
       .html(function (d) {
         if (d.Type === 'Category') {
           return `<div class="category">${d.Category}</div>`
-
         } else {
           return `
             <div class="sideprompt">${d.Words}</div>

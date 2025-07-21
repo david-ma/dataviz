@@ -14,7 +14,7 @@ type Revision = {
   text?: string
   content: string
   previous?: string
-  pos?: number,
+  pos?: number
 }
 
 console.log('Running example.ts')

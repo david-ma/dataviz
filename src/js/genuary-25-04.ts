@@ -40,7 +40,7 @@ new RapierChart({
 
     function drawLightSource(
       ctx: CanvasRenderingContext2D,
-      position: Position
+      position: Position,
     ) {
       ctx.save()
       ctx.beginPath()

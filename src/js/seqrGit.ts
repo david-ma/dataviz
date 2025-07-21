@@ -62,7 +62,7 @@ Promise.all([
     Issue[],
     Issue[],
     Issue[],
-    Issue[]
+    Issue[],
   ]) => {
     ;[
       github100,
@@ -94,7 +94,7 @@ Promise.all([
       if (!allIssues[issue]) {
         console.log(d)
         console.log(
-          `Issue #${issue} by ${d.author} in ${d.hash} not found in allIssues`
+          `Issue #${issue} by ${d.author} in ${d.hash} not found in allIssues`,
         )
         unknownIssues[issue] = d
         return false
@@ -120,5 +120,5 @@ Promise.all([
         const issue = d.issue.slice(1)
         return sd.makeHtml(allIssues[issue].body.replaceAll('<img', '\n<img'))
       })
-  }
+  },
 )

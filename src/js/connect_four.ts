@@ -28,16 +28,15 @@ import { Chart, d3 } from './chart'
 //   var value = cell.text()
 //   if(value == "") {
 //     cell.text(player)
-//     player = player == "X" ? "O" : "X"  
+//     player = player == "X" ? "O" : "X"
 //   } else {
 //     row--
 //     drop(column, row)
 //   }
-  
+
 // }
 
 // globalThis.drop = drop
-
 
 class ConnectFour {
   public currentPlayer: string
@@ -48,50 +47,52 @@ class ConnectFour {
   public rows: number
 
   constructor() {
-    this.table = d3.select("#gameboard table")
-    this.currentPlayer = "X"
-    this.gameboard = Array.from({ length: 6 }, () => Array(7).fill(""))
+    this.table = d3.select('#gameboard table')
+    this.currentPlayer = 'X'
+    this.gameboard = Array.from({ length: 6 }, () => Array(7).fill(''))
     this.cols = 7
     this.rows = 6
     this.drawGameboard()
   }
 
   private drawGameboard() {
-    this.table.selectAll("tr").remove()
+    this.table.selectAll('tr').remove()
     for (let row = 0; row < this.rows; row++) {
-      var tr = this.table.append("tr")
-      tr.append("td").text(row)
+      var tr = this.table.append('tr')
+      tr.append('td').text(row)
       for (let col = 0; col < this.cols; col++) {
-        tr.append("td").classed("cell", true).attr("id", `cell-${row}-${col}`)
+        tr.append('td').classed('cell', true).attr('id', `cell-${row}-${col}`)
       }
     }
-    var tr = this.table.append("tr").classed("actions", true)
-    tr.append("td")
+    var tr = this.table.append('tr').classed('actions', true)
+    tr.append('td')
     for (let col = 0; col < this.cols; col++) {
-      tr.append("td").append("a").text("Drop").attr("href", "#").on("click", () => this.drop(col))
+      tr.append('td')
+        .append('a')
+        .text('Drop')
+        .attr('href', '#')
+        .on('click', () => this.drop(col))
     }
   }
 
   public drop(col: number) {
     var row = this.rows - 1
     var cell = this.table.select(`#cell-${row}-${col}`)
-    while(row >= 0 && cell.text() != "") {
+    while (row >= 0 && cell.text() != '') {
       row--
       cell = this.table.select(`#cell-${row}-${col}`)
     }
 
-    if(cell.text() == "") {
+    if (cell.text() == '') {
       cell.text(this.currentPlayer)
-      this.currentPlayer = this.currentPlayer == "X" ? "O" : "X"
+      this.currentPlayer = this.currentPlayer == 'X' ? 'O' : 'X'
     }
 
-    if(row < 0) {
-      alert("Column is full")
+    if (row < 0) {
+      alert('Column is full')
       return
     }
-
   }
 }
-
 
 new ConnectFour()

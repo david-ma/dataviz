@@ -404,7 +404,7 @@ class Chart {
           'd',
           valueline.x(function (d: any) {
             return x(d.date)
-          })
+          }),
         )
     })
 
@@ -462,7 +462,7 @@ class Chart {
           d3.max(data, function (d) {
             return d[options.yField] as number
           })) /
-          options.rounding
+          options.rounding,
       ) * options.rounding,
     ])
 
@@ -475,7 +475,7 @@ class Chart {
 
     types.forEach((type) => {
       const typeData = chart.data.filter(
-        (d) => d[options.filter] === type.label
+        (d) => d[options.filter] === type.label,
       )
       chart.plot
         .append('path')
@@ -486,7 +486,7 @@ class Chart {
           'd',
           valueline.x(function (d: any) {
             return x(d[options.xField])
-          })
+          }),
         )
 
       chart.plot
@@ -587,7 +587,7 @@ class Chart {
     x.domain(
       d3.extent(data, function (d) {
         return d.date
-      })
+      }),
     )
     y.domain([
       0,
@@ -600,7 +600,7 @@ class Chart {
       'Date extent...',
       d3.extent(data, function (d) {
         return d.date
-      })
+      }),
     )
 
     console.log('this is...', this)
@@ -663,7 +663,7 @@ class Chart {
         'd',
         valueline.x(function (d: any) {
           return x(d.month)
-        })
+        }),
       )
 
     const that = this
@@ -699,7 +699,7 @@ class Chart {
           'd',
           valueline.x(function (d: any) {
             return x(d.date)
-          })
+          }),
         )
     })
 
@@ -930,7 +930,7 @@ class Chart {
       .append('g')
       .attr(
         'transform',
-        `translate(${this.innerHeight * 0.05} ${this.innerHeight * 0.05})`
+        `translate(${this.innerHeight * 0.05} ${this.innerHeight * 0.05})`,
       )
 
     table
@@ -949,7 +949,7 @@ class Chart {
       .append('g')
       .attr(
         'transform',
-        (d: any, i: number) => `translate(0, ${i * blockHeight})`
+        (d: any, i: number) => `translate(0, ${i * blockHeight})`,
       )
       .each(function (this: any, d: any, i: number) {
         // console.log(d);
@@ -960,14 +960,14 @@ class Chart {
             // console.log("hello!");
             d3.select(`#circle-${camelize(d.name)}`).attr(
               'fill',
-              d3.schemeCategory10[i % 10]
+              d3.schemeCategory10[i % 10],
             )
           })
           .on('mouseout', function () {
             // console.log("hello!");
             d3.select(`#circle-${camelize(d.name)}`).attr(
               'fill',
-              'rgba(0,0,0,0.05)'
+              'rgba(0,0,0,0.05)',
             )
           })
 
@@ -1025,7 +1025,7 @@ class Chart {
       .append('g')
       .attr(
         'transform',
-        `translate(${this.innerHeight * 0.05} ${this.innerHeight * 0.05})`
+        `translate(${this.innerHeight * 0.05} ${this.innerHeight * 0.05})`,
       )
 
     table
@@ -1044,7 +1044,7 @@ class Chart {
       .append('g')
       .attr(
         'transform',
-        (d: any, i: number) => `translate(0, ${i * blockHeight})`
+        (d: any, i: number) => `translate(0, ${i * blockHeight})`,
       )
       .each(function (this: any, d: any, i: number) {
         // console.log(d);
@@ -1055,14 +1055,14 @@ class Chart {
             // console.log("hello!");
             d3.select(`#square-${camelize(d.name)}`).attr(
               'fill',
-              d3.schemeCategory10[i % 10]
+              d3.schemeCategory10[i % 10],
             )
           })
           .on('mouseout', function () {
             // console.log("hello!");
             d3.select(`#square-${camelize(d.name)}`).attr(
               'fill',
-              'rgba(0,0,0,0.05)'
+              'rgba(0,0,0,0.05)',
             )
           })
 
@@ -1188,7 +1188,7 @@ class Chart {
       // .attr("meetOrSlice", "meet")
       .attr(
         'xlink:href',
-        (d: any) => `/data/mm/2018-05-28/photos/${d.data.blob.photo}`
+        (d: any) => `/data/mm/2018-05-28/photos/${d.data.blob.photo}`,
       )
     // .attr("fill", function(d) { return color(d.parent.data.id); });
 
@@ -1268,7 +1268,7 @@ class Chart {
       } else if (this.canvas.node().getContext('webgl2')) {
         this.context.clear(this.context.COLOR_BUFFER_BIT)
         this.context.clearColor(0.129, 0.129, 0.129, 1.0)
-        this.canvas.style("background-color", "#213")
+        this.canvas.style('background-color', '#213')
       } else if (this.canvas.node().getContext('webgpu')) {
         // this.context.clearColor(0.129, 0.129, 0.129, 1.0)
         // this.context.clear(this.context.COLOR_BUFFER_BIT)
@@ -1280,7 +1280,7 @@ class Chart {
   }
 
   asyncScratchpad(
-    callback: (chart: Chart) => Promise<void> | Promise<Chart>
+    callback: (chart: Chart) => Promise<void> | Promise<Chart>,
   ): Promise<Chart> {
     const that = this
     return callback(this).then(() => this || that)
@@ -1579,7 +1579,7 @@ class Chart {
                             `translate(${projection([
                               d.longitude,
                               d.latitude,
-                            ])})`
+                            ])})`,
                         )
 
                       const marker = node.append('g').classed('marker', true)
@@ -1645,7 +1645,7 @@ class Chart {
                               node.classed('active', true)
                               d3.select('path.travel-line').classed(
                                 'active',
-                                true
+                                true,
                               )
                             })
                             .on('drag', function (d: DragEvent, data: object) {
@@ -1655,7 +1655,7 @@ class Chart {
                               'end',
                               function (d: DragEvent, data: Coordinates) {
                                 const [longitude, latitude] = projection.invert(
-                                  [d.x, d.y]
+                                  [d.x, d.y],
                                 )
 
                                 node.classed('active', false).datum({
@@ -1705,10 +1705,10 @@ class Chart {
                                           newMarkers[1].latitude,
                                         ],
                                       ],
-                                    })
+                                    }),
                                   )
-                              }
-                            )
+                              },
+                            ),
                         )
                       }
                     })
@@ -1724,7 +1724,7 @@ class Chart {
                             `translate(${projection([
                               d.longitude,
                               d.latitude,
-                            ])})`
+                            ])})`,
                         )
                       node.select('.mark-label').text(d.label)
                     })
@@ -1736,7 +1736,7 @@ class Chart {
                       d3.select(nodes[i]).remove()
                     })
                     return d3.selectAll('.mark')
-                  }
+                  },
                 )
 
               // this.loadingAnimation.animate
@@ -1752,13 +1752,13 @@ class Chart {
                       [start.longitude, start.latitude],
                       [end.longitude, end.latitude],
                     ],
-                  })
+                  }),
                 )
                 .attr('stroke', 'red')
                 .attr('stroke-width', 2)
             })
         }
-      }
+      },
     )
   }
 
@@ -1829,7 +1829,7 @@ class Chart {
       'd',
       `M ${arcx} ${arcy1}
                  A ${radius} ${radius}, 0, 0, 0, ${arcx} ${arcy2}
-                 A ${radius} ${radius}, 0, 0, 0, ${arcx} ${arcy1}`
+                 A ${radius} ${radius}, 0, 0, 0, ${arcx} ${arcy1}`,
     )
 
     $('.activeShape')
@@ -1969,7 +1969,7 @@ export type DataTableDataset = Array<any> & {
 
 function decorateTable(
   dataset: DataTableDataset,
-  newOptions?: DataTableConfig
+  newOptions?: DataTableConfig,
 ): DataTables.Api<any> {
   const element = newOptions ? newOptions.element : '#dataset table'
 

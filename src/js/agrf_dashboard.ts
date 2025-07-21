@@ -22,9 +22,9 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
               vast: `/AGRF/dashboard/phase${i}/postflight_vast/${file}`,
             }
           })
-        })
+        }),
       )
-    })
+    }),
   )
     .then((data) =>
       data.reduce((acc, phase) => {
@@ -35,14 +35,14 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
           .filter(
             (folder) =>
               !folder.summary.warnings.includes(
-                'Contract directory is a symlink'
-              )
+                'Contract directory is a symlink',
+              ),
           )
           .forEach((folder) => {
             acc.push(folder)
           })
         return acc
-      }, [])
+      }, []),
     )
     .then((data) => {
       var table = drawTable(data)
@@ -64,12 +64,12 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
         customRenderers: {
           include_files_size: (data, type, row, meta) => {
             return `${row.include_files_size} bytes<br>${human_readable_size(
-              row.include_files_size
+              row.include_files_size,
             )}`
           },
           aws_size: (data, type, row, meta) => {
             return `${row.aws_size} bytes<br>${human_readable_size(
-              row.aws_size
+              row.aws_size,
             )}`
           },
         },
@@ -80,7 +80,7 @@ d3.json('/dashboard_data').then((phases: string[][]) => {
       const summarise = _.debounce(function (data) {
         console.log('Summarising')
         console.log(data)
-        const summary_data = [0,1,2,3,4,5,6].map((phase) => {
+        const summary_data = [0, 1, 2, 3, 4, 5, 6].map((phase) => {
           return {
             phase: `phase${phase}`,
             total_files: 0,
@@ -178,7 +178,7 @@ function drawTable(dataset: DataTableDataset) {
         parseInt(row.summary.include.file_count) +
         parseInt(row.summary.include.symlink_count)
       row.include_file_size_bytes = parseInt(
-        row.summary.include.file_size_bytes
+        row.summary.include.file_size_bytes,
       )
       row.include_file_size_display = row.summary.include.file_size_human
 
@@ -287,10 +287,10 @@ globalThis.displayFiles = function displayFiles(log_id) {
       // Normalise path so that /./ is removed
       original_files = _.concat(
         data.full_data.list.include.files,
-        data.full_data.list.include.symlinks
+        data.full_data.list.include.symlinks,
       )
         .map(([filename, relative_path, ...rest]) =>
-          `${base_dir}/${relative_path}/${filename}`.replace('/./', '/')
+          `${base_dir}/${relative_path}/${filename}`.replace('/./', '/'),
         )
         .sort()
 
@@ -319,7 +319,7 @@ globalThis.displayFiles = function displayFiles(log_id) {
       const max_length = Math.max(
         original_only.length,
         aws_only.length,
-        intersection.length
+        intersection.length,
       )
 
       for (let i = 0; i < max_length; i++) {
