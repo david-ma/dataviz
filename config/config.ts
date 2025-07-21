@@ -1,21 +1,26 @@
-import { RawWebsiteConfig } from 'thalia'
+import { RawWebsiteConfig, deepMerge } from 'thalia'
 import { gitHash } from './utilities.js'
 
 import path from 'path'
-import http from 'http'
 import fs from 'fs'
 
 const fsPromise = fs.promises
 
-let cache = null
 import { blogpostTable } from '../models/drizzle-schema.js'
 import { eq, desc } from 'drizzle-orm'
+
+import { blogposts, config as blogpostConfig } from './blogposts.js'
 
 let config: RawWebsiteConfig = {
   controllers: {
     '': (res, req, website, requestInfo) => {
       if (!website.db) {
-        res.end('Database not connected')
+        const html = website.getContentHtml('homepage')({
+          gitHash,
+          blogposts,
+        })
+
+        res.end(html)
       } else {
         website.db.drizzle
           .select()
@@ -42,7 +47,15 @@ let config: RawWebsiteConfig = {
       }
 
       if (!website.db) {
-        res.end('Database not connected')
+        const html = website.getContentHtml(
+          shortname,
+          'blog',
+        )({
+          gitHash,
+          typescript: `/js/${shortname}.js`,
+          blogposts,
+        })
+        res.end(html)
       } else {
         website.db.drizzle
           .select()
@@ -128,13 +141,10 @@ let config: RawWebsiteConfig = {
         res.end(JSON.stringify(images))
       })
     },
-  },
-  database: {
-    schemas: {
-      blogpost: blogpostTable,
-    },
-  },
+  }
 }
+
+
 
 // if (fs.existsSync(path.resolve(__dirname, 'config.json'))) {
 //   config = _.merge(config, smugmugConfig)
@@ -150,5 +160,7 @@ let config: RawWebsiteConfig = {
 
 // import { config as atlassianConfig } from './atlassianBackend'
 // config = _.merge(config, atlassianConfig)
+
+config = deepMerge(config, blogpostConfig)
 
 export { config }

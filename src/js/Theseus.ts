@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import showdown from 'showdown'
-import { diff_match_patch } from './diff_match_patch'
+// import { diff_match_patch } from './diff_match_patch'
 
 type Revision = {
   id: number
@@ -43,11 +43,11 @@ console.log('Hello World')
 // import wiki from './showdown-wiki'
 declare var wiki: any
 
-showdown.extension('wiki', wiki)
+// showdown.extension('wiki', wiki)
 
 var md = new showdown.Converter({
   openLinksInNewWindow: true,
-  extensions: ['wiki'],
+  // extensions: ['wiki'],
 })
 
 var raw = new showdown.Converter({
@@ -119,6 +119,7 @@ d3.json('/ship_of_theseus_revisions.json')
         //   var content = parseDiffs(diffs)
         //   return md.makeHtml(content)
 
+        // @ts-ignore
         const dmp = new diff_match_patch()
         var diffs = dmp.diff_main(data[d.pos - 1].content, d.content)
         dmp.diff_cleanupSemantic(diffs)
