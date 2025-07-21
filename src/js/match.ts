@@ -8,46 +8,97 @@
 
 import { d3, Chart } from './chart'
 
+class Card {
+  public id: number
+  public color: string
+  public flipped: boolean = false
+  public matched: boolean = false
+  public view: any
+
+  constructor(id: number, color: string) {
+    this.id = id
+    this.color = color
+  }
+
+  public flip() {
+    this.flipped = !this.flipped
+    this.view.classed("flipped", this.flipped)
+  }
+
+  public setView(view: any) {
+    this.view = view
+  }
+}
+
+class MatchGame {
+  public svg: d3.Selection<SVGSVGElement, any, HTMLElement, any>
+  public cards: Card[]
+
+  constructor(cards: Card[], svg: d3.Selection<SVGSVGElement, any, HTMLElement, any>) {
+    this.cards = cards
+    this.svg = svg
+  }
+
+  public draw() {
+    this.svg.selectAll("rect.card")
+      .remove()
+      .data(this.cards)
+      .enter()
+      .append("g")
+      .attr("id", (d) => `card-${d.id}`)
+      .classed("card", true)
+      .attr("transform", (d) => {
+        const x = (d.id % 4) * 220 + 20
+        const y = Math.floor(d.id / 4) * 220 + 20
+        return `translate(${x}, ${y})`
+      })
+      .each(function(d) {
+        d.setView(d3.select(this))
+
+        d.view.append("text")
+          .text(d.id)
+          .classed("card-text", true)
+          .attr("x", 50)
+          .attr("y", 50)
+          .attr("text-anchor", "middle")
+          .attr("font-size", "40px")
+      })
+      .append("rect")
+      .attr("width", 200)
+      .attr("height", 200)
+      .attr("fill", (d) => d.color)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .attr("cursor", "pointer")
+      .on("click", (event, d) => {
+        console.log(d)
+        d.flip()
+      })
+  }
+}
+
 const chart = new Chart({
   title: "Matching Game",
-  width: 600,
-  height: 600,
+  width: 1200,
+  height: 1200,
   nav: false,
 }).scratchpad((chart) => {
 
   // Get 8 pairs of cards
   const colors = d3.scaleOrdinal(d3.schemeCategory10)
-  const cards = []
-  for (let i = 0; i < 8; i++) {
+  const limit = 8
+  let cards = []
+  for (let i = 0; i < limit; i++) {
     const color = colors(i.toString())
-    cards.push({
-      color,
-      id: i,
-    })
-    cards.push({
-      color,
-      id: i+1,
-    })
+    cards.push(new Card(i, color))
+    cards.push(new Card(i+limit, color))
   }
 
-  // Draw the cards
-  const board = chart.plot.append("g")
-  board.selectAll("rect")
-    .data(shuffle(cards))
-    .enter()
-    .append("rect")
-    .classed("card", true)
-    .attr("width", 100)
-    .attr("height", 100)
-    .attr("fill", (d) => d.color)
-    .attr("x", (d, i) => (i % 4) * 110 + 10)
-    .attr("y", (d, i) => Math.floor(i / 4) * 110 + 10)
-    .attr("rx", 10)
-    .attr("ry", 10)
-    .attr("cursor", "pointer")
-    .on("click", (d) => {
-      console.log(d)
-    })
+  // cards = shuffle(cards)
+
+  const game = new MatchGame(cards, chart.plot)
+  game.draw()
+
 })
 
 function shuffle(array: any[]) {
