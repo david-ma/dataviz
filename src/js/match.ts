@@ -198,36 +198,36 @@ const colourSchemes = {
     },
     {
       name: 'Snowy Mountains',
-      color: '#edede5'
+      color: '#edede5',
     },
     {
       name: 'Casper White',
-      color: '#edece6'
+      color: '#edece6',
     },
     {
       name: 'Highgate',
-      color: '#d9dddf'
+      color: '#d9dddf',
     },
     {
       name: 'Vivid White',
-      color: '#f7f8f4'
+      color: '#f7f8f4',
     },
     {
       name: 'Natural White',
-      color: '#eeece5'
+      color: '#eeece5',
     },
     {
       name: 'Berkshire White',
-      color: '#f4eee0'
+      color: '#f4eee0',
     },
     {
       name: 'Chalk U.S.A.',
-      color: '#f4ebd7'
+      color: '#f4ebd7',
     },
     {
       name: 'Lexicon',
-      color: '#e6eaeb'
-    }
+      color: '#e6eaeb',
+    },
   ],
 }
 
