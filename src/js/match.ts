@@ -9,16 +9,15 @@
 import { d3, Chart } from './chart'
 
 class Card {
-  public id: number
-  public color: string
   public flipped: boolean = false
   public matched: boolean = false
   public view: any
 
-  constructor(id: number, color: string) {
-    this.id = id
-    this.color = color
-  }
+  constructor(
+    public id: number,
+    public color: string,
+    public name: string = "",
+  ) {}
 
   public flip() {
     this.flipped = !this.flipped
@@ -47,20 +46,28 @@ class MatchGame {
       .append("g")
       .attr("id", (d) => `card-${d.id}`)
       .classed("card", true)
-      .attr("transform", (d) => {
-        const x = (d.id % 4) * 220 + 20
-        const y = Math.floor(d.id / 4) * 220 + 20
+      .attr("transform", (d, i) => {
+        const x = (i % 4) * 220 + 20
+        const y = Math.floor(i / 4) * 220 + 20
         return `translate(${x}, ${y})`
       })
       .each(function(d) {
         d.setView(d3.select(this))
 
         d.view.append("text")
-          .text(d.id)
+          .text(d.name)
           .classed("card-text", true)
-          .attr("x", 50)
+          .attr("x", 10)
           .attr("y", 50)
-          .attr("text-anchor", "middle")
+          .attr("text-anchor", "left")
+          .attr("font-size", "40px")
+
+        d.view.append("text")
+          .text(d.color)
+          .classed("card-text", true)
+          .attr("x", 10)
+          .attr("y", 100)
+          .attr("text-anchor", "left")
           .attr("font-size", "40px")
       })
       .append("rect")
@@ -77,6 +84,43 @@ class MatchGame {
   }
 }
 
+const colourSchemes = {
+  "Easy": [
+    {
+      name: "Red",
+      color: "#d62728",
+    },
+    {
+      name: "Blue",
+      color: "#1f77b4",
+    },
+    {
+      name: "Green",
+      color: "#2ca02c",
+    },
+    {
+      name: "Yellow",
+      color: "#ff7f0e",
+    },
+    {
+      name: "Purple",
+      color: "#9467bd",
+    },
+    {
+      name: "Brown",
+      color: "#8c564b",
+    },
+    {
+      name: "Pink",
+      color: "#e377c2",
+    },
+    {
+      name: "Grey",
+      color: "#7f7f7f",
+    },
+  ]
+}
+
 const chart = new Chart({
   title: "Matching Game",
   width: 1200,
@@ -85,18 +129,16 @@ const chart = new Chart({
 }).scratchpad((chart) => {
 
   // Get 8 pairs of cards
-  const colors = d3.scaleOrdinal(d3.schemeCategory10)
-  const limit = 8
+  const colors = colourSchemes["Easy"]
+  const limit = colors.length
   let cards = []
   for (let i = 0; i < limit; i++) {
-    const color = colors(i.toString())
-    cards.push(new Card(i, color))
-    cards.push(new Card(i+limit, color))
+    const color = colors[i].color
+    cards.push(new Card(i, color, colors[i].name))
+    cards.push(new Card(i+limit, color, colors[i].name))
   }
 
-  // cards = shuffle(cards)
-
-  const game = new MatchGame(cards, chart.plot)
+  const game = new MatchGame(shuffle(cards), chart.plot)
   game.draw()
 
 })
