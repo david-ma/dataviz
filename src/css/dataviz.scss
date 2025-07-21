@@ -11,6 +11,13 @@
       min-height: calc(100vh - 105px);
     }
   }
+
+  section.blogpost {
+    div#description {
+      margin-top: 15px;
+    }
+  }
+
   .preview {
     @media (max-width: 767px) {
       margin-top: 55px;

@@ -28,17 +28,20 @@
     <div id="title">
         <h1><a href="/">David's Dataviz</a></h1>
     </div>
-    {{!
-    <div id="search">
+
+    {{!-- <div id="search">
         <input class="blogSearch" placeholder="Search">
         <i class="fas fa-search fa-2x"></i>
-    </div>
-    <div id="hamburger">
+    </div> --}}
+    <div id="hamburger" onclick=" $('#mobile_nav').toggleClass('hidden-xs'); $('#sidebar').toggleClass('hidden-xs')">
         <i class="fas fa-bars fa-2x"></i>
     </div>
-    }}
 </div>
-<div class="col-md-2 col-sm-3 hidden-xs sidebar">
+<div class="col-md-2 col-sm-3 col-xs-12 hidden-xs sidebar" id="sidebar">
+    <div id="close" onclick="$('#mobile_nav').toggleClass('hidden-xs'); $('#sidebar').toggleClass('hidden-xs')" style="text-align: right;" class="visible-xs">
+        <i class="fas fa-times fa-2x"></i>
+    </div>
+
     <ul>
         <li>
             <a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>

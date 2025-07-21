@@ -1,0 +1,21 @@
+<style>
+  .card {
+    stroke: #000;
+    stroke-width: 1;
+    &:hover {
+      stroke-width: 5;
+    }
+  }
+</style>
+
+<section class="blogpost">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-lg-8">
+      <div id="description"></div>
+      <div id="chart" class="chart"></div>
+      {{> showSource }}
+    </div>
+  </div>
+</section>
+
+{{> require }}

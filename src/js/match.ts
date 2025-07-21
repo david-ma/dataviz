@@ -36,6 +36,7 @@ const chart = new Chart({
     .data(shuffle(cards))
     .enter()
     .append("rect")
+    .classed("card", true)
     .attr("width", 100)
     .attr("height", 100)
     .attr("fill", (d) => d.color)
