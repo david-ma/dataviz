@@ -89,6 +89,7 @@ class MatchGame {
           .append('text')
           .text(d.name)
           .classed('card-text', true)
+          .classed('card-text-name', true)
           .attr('x', 10)
           .attr('y', 50)
           .attr('text-anchor', 'left')
@@ -152,6 +153,82 @@ const colourSchemes = {
       color: '#7f7f7f',
     },
   ],
+  Medium: [
+    {
+      name: 'Red',
+      color: '#d62728',
+    },
+    {
+      name: 'Pink',
+      color: '#e377c2',
+    },
+    {
+      name: 'Fuchsia',
+      color: '#9467bd',
+    },
+    {
+      name: 'Purple',
+      color: '#800080',
+    },
+    {
+      name: 'Violet',
+      color: '#7F00FF',
+    },
+    {
+      name: 'Indigo',
+      color: '#4B0082',
+    },
+    {
+      name: 'Bubblegum',
+      color: '#ff0081',
+    },
+    {
+      name: 'Lavender',
+      color: '#DFC5FE',
+    },
+  ],
+  Hard: [
+    {
+      name: 'Feather Soft',
+      color: '#d6d2c7',
+    },
+    {
+      name: 'China White',
+      color: '#e4dece',
+    },
+    {
+      name: 'Snowy Mountains',
+      color: '#edede5'
+    },
+    {
+      name: 'Casper White',
+      color: '#edece6'
+    },
+    {
+      name: 'Highgate',
+      color: '#d9dddf'
+    },
+    {
+      name: 'Vivid White',
+      color: '#f7f8f4'
+    },
+    {
+      name: 'Natural White',
+      color: '#eeece5'
+    },
+    {
+      name: 'Berkshire White',
+      color: '#f4eee0'
+    },
+    {
+      name: 'Chalk U.S.A.',
+      color: '#f4ebd7'
+    },
+    {
+      name: 'Lexicon',
+      color: '#e6eaeb'
+    }
+  ],
 }
 
 const chart = new Chart({
@@ -161,8 +238,8 @@ const chart = new Chart({
   nav: false,
 }).scratchpad((chart) => {
   // Get 8 pairs of cards
-  const colors = colourSchemes['Easy']
-  const limit = colors.length
+  const colors = colourSchemes['Hard']
+  const limit = 8
   let cards = []
   for (let i = 0; i < limit; i++) {
     const color = colors[i].color
