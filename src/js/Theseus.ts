@@ -1,3 +1,7 @@
+// TODO:
+// Add back WikiMarkdown? https://www.mediawiki.org/wiki/Extension:WikiMarkdown
+// Use Marked JS instead of showdown
+
 import * as d3 from 'd3'
 import showdown from 'showdown'
 // import { diff_match_patch } from './diff_match_patch'
