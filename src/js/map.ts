@@ -99,7 +99,7 @@ function drawMap(lat, long, place) {
       .attr('d', path)
       .attr('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
       .attr('fill', function (d, i) {
-        return color(i)
+        return color(i.toString())
       })
 
     // States

@@ -138,7 +138,6 @@ declare class Chart {
         markers?: Coordinates[];
         calculate: Function;
     }): void;
-    venn(options: any): void;
 }
 export type DataTableConfig = DataTables.Config & {
     element?: string;
