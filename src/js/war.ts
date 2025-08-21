@@ -28,11 +28,17 @@ d3.csv('/blogposts/AmericanWars.csv', <any>function (d: war) {
   return d
 }).then(function (data) {
   AmericanWars = data
+  globalThis.data = data
 
-  decorateTable(AmericanWars, {
+  globalThis.datatable = decorateTable(AmericanWars, {
     element: '#AmericanWars table',
     order: [1, 'asc'],
     titles: ['War', 'Start', 'End'],
+    columns: [
+      { title: 'War', data: 'name' },
+      { title: 'Start', data: 'start' },
+      { title: 'End', data: 'end' }
+    ]
   })
 
   drawPieChart()

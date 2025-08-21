@@ -1,4 +1,4 @@
-import { deepMerge } from 'thalia';
+import { recursiveObjectMerge } from 'thalia';
 import { gitHash } from './utilities.js';
 import path from 'path';
 import fs from 'fs';
@@ -128,6 +128,6 @@ let config = {
 // config = _.merge(config, cameraConfig)
 // import { config as atlassianConfig } from './atlassianBackend'
 // config = _.merge(config, atlassianConfig)
-config = deepMerge(config, blogpostConfig);
+config = recursiveObjectMerge(config, blogpostConfig);
 export { config };
 //# sourceMappingURL=config.js.map
