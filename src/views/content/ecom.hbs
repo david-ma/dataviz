@@ -1,0 +1,31 @@
+{{> clean }}
+{{> require }}
+{{> tableCSS }}
+
+
+<section class="blogpost">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-lg-8">
+      <div id="description"></div>
+      <div id="ip_addresses">
+        <table>
+          <thead>
+            <tr>
+              <th>IP</th>
+              <th>Count</th>
+              <th>Country</th>
+              <th>State</th>
+              <th>City</th>
+              <th>Coords</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="chart" class="chart"></div>
+      {{> showSource }}
+    </div>
+  </div>
+</section>
+
+{{> require }}
