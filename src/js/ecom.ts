@@ -1,3 +1,5 @@
+import { Chart, d3 } from './chart'
+
 console.log('hello world')
 
 const chart = d3.select('#chart')
@@ -7,16 +9,18 @@ const column_names = ['Date/Time', 'IP', 'User', 'Operation', 'Debtor', 'Debtors
 const search_terms = []
 const ip_addresses = {}
 const ip_lookups = []
+let shaped_data = {}
 
 d3.csv('/ubc/micronet_ecom_logs_20251005.csv').then(data => {
   // Shape the data, group by Debtor
-  const shaped_data = data.reduce((acc: any, d: any, i: number) => {
+  shaped_data = data.reduce((acc: any, d: any, i: number) => {
     acc[d.Debtor] = acc[d.Debtor] || {
       interactions: [],
       searches: [],
       orders: []
     }
 
+    // Geoip lookup format
     // http://localhost:7777/geoip?ip=61.29.116.50
     if(d.IP) {
       window.setTimeout(() => {
@@ -25,9 +29,10 @@ d3.csv('/ubc/micronet_ecom_logs_20251005.csv').then(data => {
           d3.json(`http://localhost:7777/geoip?ip=${d.IP}`).then(geoip => {
             ip_addresses[d.IP] = {
               count: 1,
+              Debtor: d.Debtor,
+              'Debtors Name': d['Debtors Name'],
               geoip
             }
-            console.log(geoip)
             drawIPAddresses(ip_addresses)
           })
           ip_lookups.push(promise)
@@ -36,6 +41,7 @@ d3.csv('/ubc/micronet_ecom_logs_20251005.csv').then(data => {
         }
       }, i * 10)
     }
+    console.log(d)
 
     acc[d.Debtor].interactions.push(d)
     acc[d.Debtor].searches.push(d['Search String'])
@@ -50,18 +56,6 @@ d3.csv('/ubc/micronet_ecom_logs_20251005.csv').then(data => {
   console.log(shaped_data)
 
   d3.select('#description').text(`There are ${Object.keys(shaped_data).length} different customers.`)
-
-  const ip_addresses_list = d3.select('#description').append('div').append("ul")
- 
-  
-  Promise.all(ip_lookups).then(() => {
-    console.log(ip_addresses)
-    Object.keys(ip_addresses).forEach(ip => {
-      console.log(ip, ip_addresses[ip])
-  
-      ip_addresses_list.append('li').text(`${ip} (${ip_addresses[ip].count}) ${ip_addresses[ip].location.country.names.en}`)
-    })
-  })
 
   // Get search terms
   // d3.select('#description').text(`The search terms are: ${search_terms.join(', ')}`)
@@ -80,13 +74,12 @@ function drawIPAddresses(ip_addresses) {
       .append('tr')
       .each((d, i, nodes) => {
         const row = d3.select(nodes[i])
-        console.log(ip_addresses[d])
         row.append('td').text(d)
-        row.append('td').text(ip_addresses[d].count)
-        row.append('td').text(ip_addresses[d].geoip.country.names.en)
-        row.append('td').text(ip_addresses[d].geoip.subdivisions[0].names.en)
-        row.append('td').text(ip_addresses[d].geoip.city.names.en)
-        row.append('td').text(`${ip_addresses[d].geoip.location.latitude}, ${ip_addresses[d].geoip.location.longitude}`)
+        row.append('td').html(`${ip_addresses[d].geoip.country.names.en}<br>${ip_addresses[d].geoip.subdivisions[0].names.en}<br>${ip_addresses[d].geoip.city.names.en}`)
+        row.append('td').html(`${ip_addresses[d].geoip.location.latitude}, ${ip_addresses[d].geoip.location.longitude}`)
+        row.append('td').html(`<a href="/debtor/${ip_addresses[d].Debtor}">${ip_addresses[d].Debtor}</a><br>${ip_addresses[d]['Debtors Name']}<br>${shaped_data[ip_addresses[d].Debtor].interactions.length} interactions`)
+        row.append('td').html(shaped_data[ip_addresses[d].Debtor].orders.length)
+        row.append('td').html(`${shaped_data[ip_addresses[d].Debtor].searches.length} searches<br>${shaped_data[ip_addresses[d].Debtor].searches.join(', ')}`)
       })
       // .selectAll('td')
       // .data(d => [d, ip_addresses[d].count, ip_addresses[d].location.country.names.en, ip_addresses[d].location.region.names.en, ip_addresses[d].location.city.names.en, ip_addresses[d].location.latitude, ip_addresses[d].location.longitude])
@@ -119,3 +112,207 @@ function drawTable(data) {
     .text(d => d)
 }
 
+
+
+
+// new Chart({
+//   element: 'map',
+//   width: 600,
+//   height: 600,
+//   margin: 0,
+//   nav: false,
+// }).scratchpad((chart) => {
+//   var lat = -36,
+//     long = 145,
+//     w = chart.width,
+//     h = chart.height
+
+//   // Define map projection
+//   const projection = d3
+//     .geoMercator()
+//     .center([Math.floor(long), Math.floor(lat)])
+//     .translate([w / 2, h / 2])
+//     .scale(1600)
+
+//   // Define path generator
+//   const path = d3.geoPath().projection(projection)
+
+//   const color = d3
+//     .scaleOrdinal()
+//     .range([
+//       '#8dd3c7',
+//       '#ffffb3',
+//       '#bebada',
+//       '#fb8072',
+//       '#80b1d3',
+//       '#fdb462',
+//       '#b3de69',
+//       '#fccde5',
+//       '#d9d9d9',
+//     ])
+
+//   // Create SVG
+//   const svg = chart.svg
+
+//   Promise.all([d3.json('/aust.json'), d3.json('/earthquakeTweets.json')]).then(
+//     ([json, twitter]: [any, any]) => {
+//       drawMap(json)
+//       svg.append('g').attr('id', 'pings')
+
+//       let timestamp = earthquakeDay.getTime()
+
+//       twitter.tweets.forEach((tweet, i) => {
+//         if (new Date(tweet.created_at) < earthquakeDay) {
+//           return
+//         }
+
+//         const geocodes = twitter.geocodes[tweet.id_str]
+//         const point = geocodesCenter(geocodes)
+
+//         const waitTime =
+//           (new Date(tweet.created_at).getTime() - timestamp) / 100
+//         setTimeout(() => {
+//           // console.log('drawing tweet', i)
+//           pingMap(point[0], point[1])
+//           drawTweet(tweet, twitter.users[tweet.userId], i)
+//         }, waitTime)
+//       })
+//     },
+//   )
+
+//   const timeFormat = d3.timeFormat('%-I:%M %p · %b %-d, %Y')
+
+//   function drawTweet(data, user, i = 0) {
+//     var tweets = d3.select('#tweets')
+
+//     var tweet = tweets.append('div').classed('tweet', true)
+
+//     tweet
+//       .append('img')
+//       .attr('x', 0)
+//       .attr('y', 0)
+//       .attr('height', 50)
+//       .attr('width', 50)
+//       .attr('src', user.profile_image_url_https)
+//       .style('border-radius', '50%')
+//       .style('border', 'solid 1px lightgrey')
+
+//     var name = tweet.append('p')
+//     name
+//       .append('span')
+//       .text(user.name + ' ')
+//       .classed('name', true)
+//     name
+//       .append('span')
+//       .text('@' + user.screen_name)
+//       .classed('username', true)
+
+//     tweet.append('p').text(data.full_text)
+//     tweet
+//       .append('a')
+//       .text(timeFormat(new Date(data.created_at)))
+//       .attr(
+//         'href',
+//         `https://twitter.com/${user.screen_name}/status/${data.id_str}`,
+//       )
+
+//     const bottom = tweet.append('div').append('p')
+
+//     bottom
+//       .append('span')
+//       .append('i')
+//       .classed('fa', true)
+//       .classed('fa-retweet', true)
+//     bottom.append('span').text(data.retweet_count)
+
+//     bottom
+//       .append('span')
+//       .append('i')
+//       .classed('fa', true)
+//       .classed('fa-heart', true)
+//     bottom.append('span').text(data.favorite_count)
+
+//     setTimeout(() => {
+//       tweet.remove()
+//     }, 1000)
+//   }
+
+//   function pingMap(lat: number, long: number) {
+//     d3.select('#pings')
+//       .append('circle')
+//       .datum({
+//         lat: lat,
+//         long: long,
+//       })
+//       .attr('cx', 0)
+//       .attr('cy', 0)
+//       .attr('r', 0)
+//       .attr('fill', '#FF0000')
+//       .attr('fill-opacity', 1)
+//       .attr('transform', (d: any) => {
+//         return `translate(${projection([long, lat])})`
+//       })
+//       .transition()
+//       .duration(2000)
+//       .attr('r', 20)
+//       .attr('fill-opacity', 0.01)
+//   }
+
+//   function drawMap(json) {
+//     // Bind data and create one path per GeoJSON feature
+//     svg
+//       .append('g')
+//       .attr('id', 'shapes')
+//       .selectAll('path')
+//       .data(json.features)
+//       .enter()
+//       .append('path')
+//       .attr('d', path)
+//       .style('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
+//       .attr('fill', function (d, i) {
+//         return color(i.toString())
+//       })
+
+//     svg
+//       .append('g')
+//       .attr('id', 'state_labels')
+//       .selectAll('text')
+//       .data(json.features)
+//       .enter()
+//       .append('text')
+//       .attr('fill', 'darkslategray')
+//       .attr('transform', function (d: any) {
+//         return `translate(${path.centroid(d)})`
+//       })
+//       .attr('text-anchor', 'middle')
+//       .attr('dy', '.35em')
+//       .style('opacity', 0.5)
+//       .text(function (d: any) {
+//         return d.properties.STATE_NAME
+//       })
+//   }
+// })
+
+// function geocodesCenter(geocodes: string[]) {
+//   let totalLat = 0,
+//     totalLong = 0,
+//     weight: number = geocodes.length
+//   geocodes.forEach((geocode) => {
+//     const [lat, long, range]: number[] = geocode.split(',').map(parseFloat)
+
+//     totalLat += lat
+//     totalLong += long
+//     if (range < 30) {
+//       totalLat += lat
+//       totalLong += long
+//       weight++
+//     }
+//     if (range < 15) {
+//       totalLat += lat
+//       totalLong += long
+//       weight++
+//     }
+//   })
+
+//   return [totalLat / weight, totalLong / weight]
+// }
