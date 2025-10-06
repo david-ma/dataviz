@@ -11,58 +11,58 @@ const ip_addresses = {}
 const ip_lookups = []
 let shaped_data = {}
 
-d3.csv('/ubc/micronet_ecom_logs_20251005.csv').then(data => {
-  // Shape the data, group by Debtor
-  shaped_data = data.reduce((acc: any, d: any, i: number) => {
-    acc[d.Debtor] = acc[d.Debtor] || {
-      interactions: [],
-      searches: [],
-      orders: []
-    }
+d3.csv('/ubc/micronet_ecom_logs_20251005.csv')
+  .then((data) => {
+    // Shape the data, group by Debtor
+    shaped_data = data.reduce((acc: any, d: any, i: number) => {
+      acc[d.Debtor] = acc[d.Debtor] || {
+        interactions: [],
+        searches: [],
+        orders: [],
+      }
 
-    // Geoip lookup format
-    // http://localhost:7777/geoip?ip=61.29.116.50
-    if(d.IP) {
-      window.setTimeout(() => {
-        if(!ip_addresses[d.IP]) {
-        const promise = 
-          d3.json(`http://localhost:7777/geoip?ip=${d.IP}`).then(geoip => {
-            ip_addresses[d.IP] = {
-              count: 1,
-              Debtor: d.Debtor,
-              'Debtors Name': d['Debtors Name'],
-              geoip
-            }
-            drawIPAddresses(ip_addresses)
-          })
-          ip_lookups.push(promise)
-        } else {
-          ip_addresses[d.IP].count++
-        }
-      }, i * 10)
-    }
+      // Geoip lookup format
+      // http://localhost:7777/geoip?ip=61.29.116.50
+      if (d.IP) {
+        window.setTimeout(() => {
+          if (!ip_addresses[d.IP]) {
+            const promise = d3.json(`http://localhost:7777/geoip?ip=${d.IP}`).then((geoip) => {
+              ip_addresses[d.IP] = {
+                count: 1,
+                Debtor: d.Debtor,
+                'Debtors Name': d['Debtors Name'],
+                geoip,
+              }
+              drawIPAddresses(ip_addresses)
+            })
+            ip_lookups.push(promise)
+          } else {
+            ip_addresses[d.IP].count++
+          }
+        }, i * 10)
+      }
 
-    acc[d.Debtor].interactions.push(d)
-    const search = d['Search String']
-    if(search) {
-      acc[d.Debtor].searches.push(search)
-    }
-    if(d['Order Value'] > 0) {
-      acc[d.Debtor].orders.push(d)
-    }
-    return acc
-  }, {})
+      acc[d.Debtor].interactions.push(d)
+      const search = d['Search String']
+      if (search) {
+        acc[d.Debtor].searches.push(search)
+      }
+      if (d['Order Value'] > 0) {
+        acc[d.Debtor].orders.push(d)
+      }
+      return acc
+    }, {})
 
-  return shaped_data  
-}).then(shaped_data => {
-  console.log(shaped_data)
+    return shaped_data
+  })
+  .then((shaped_data) => {
+    console.log(shaped_data)
 
-  d3.select('#description').text(`There are ${Object.keys(shaped_data).length} different customers.`)
+    d3.select('#description').text(`There are ${Object.keys(shaped_data).length} different customers.`)
 
-  // Get search terms
-  // d3.select('#description').text(`The search terms are: ${search_terms.join(', ')}`)
-})
-
+    // Get search terms
+    // d3.select('#description').text(`The search terms are: ${search_terms.join(', ')}`)
+  })
 
 // #description area, write down how many different customers we have
 
@@ -70,24 +70,36 @@ function drawIPAddresses(ip_addresses) {
   const ip_addresses_list = d3.select('#ip_addresses table tbody')
 
   ip_addresses_list
-      .selectAll('tr')
-      .data(Object.keys(ip_addresses))
-      .enter()
-      .append('tr')
-      .each((d, i, nodes) => {
-        const row = d3.select(nodes[i])
-        row.append('td').text(d)
-        row.append('td').html(`${ip_addresses[d].geoip.country.names.en}<br>${ip_addresses[d].geoip.subdivisions[0].names.en}<br>${ip_addresses[d].geoip.city.names.en}`)
-        row.append('td').html(`${ip_addresses[d].geoip.location.latitude}, ${ip_addresses[d].geoip.location.longitude}`)
-        row.append('td').html(`<a href="/debtor/${ip_addresses[d].Debtor}">${ip_addresses[d].Debtor}</a><br>${ip_addresses[d]['Debtors Name']}<br>${shaped_data[ip_addresses[d].Debtor].interactions.length} interactions`)
-        row.append('td').html(shaped_data[ip_addresses[d].Debtor].orders.length)
-        row.append('td').html(`${shaped_data[ip_addresses[d].Debtor].searches.length} searches<br>${shaped_data[ip_addresses[d].Debtor].searches.join(', ')}`)
-      })
-      // .selectAll('td')
-      // .data(d => [d, ip_addresses[d].count, ip_addresses[d].location.country.names.en, ip_addresses[d].location.region.names.en, ip_addresses[d].location.city.names.en, ip_addresses[d].location.latitude, ip_addresses[d].location.longitude])
-      // .enter()
-      // .append('td')
-      // .text(d => d)
+    .selectAll('tr')
+    .data(Object.keys(ip_addresses))
+    .enter()
+    .append('tr')
+    .each((d, i, nodes) => {
+      const row = d3.select(nodes[i])
+      row.append('td').text(d)
+      row
+        .append('td')
+        .html(
+          `${ip_addresses[d].geoip.country.names.en}<br>${ip_addresses[d].geoip.subdivisions[0].names.en}<br>${ip_addresses[d].geoip.city.names.en}`,
+        )
+      row.append('td').html(`${ip_addresses[d].geoip.location.latitude}, ${ip_addresses[d].geoip.location.longitude}`)
+      row
+        .append('td')
+        .html(
+          `<a href="/debtor/${ip_addresses[d].Debtor}">${ip_addresses[d].Debtor}</a><br>${ip_addresses[d]['Debtors Name']}<br>${shaped_data[ip_addresses[d].Debtor].interactions.length} interactions`,
+        )
+      row.append('td').html(shaped_data[ip_addresses[d].Debtor].orders.length)
+      row
+        .append('td')
+        .html(
+          `${shaped_data[ip_addresses[d].Debtor].searches.length} searches<br>${shaped_data[ip_addresses[d].Debtor].searches.join(', ')}`,
+        )
+    })
+  // .selectAll('td')
+  // .data(d => [d, ip_addresses[d].count, ip_addresses[d].location.country.names.en, ip_addresses[d].location.region.names.en, ip_addresses[d].location.city.names.en, ip_addresses[d].location.latitude, ip_addresses[d].location.longitude])
+  // .enter()
+  // .append('td')
+  // .text(d => d)
 
   // ip_addresses_list.selectAll('li').remove()
   // Object.keys(ip_addresses).forEach(ip => {
@@ -95,23 +107,22 @@ function drawIPAddresses(ip_addresses) {
   // })
 }
 
-
-
 /**
  * Draw a table with the data
  */
 function drawTable(data) {
   const chart = d3.select('#chart')
-  chart.append('table')
+  chart
+    .append('table')
     .selectAll('tr')
     .data(data)
     .enter()
     .append('tr')
     .selectAll('td')
-    .data(d => Object.values(d))
+    .data((d) => Object.values(d))
     .enter()
     .append('td')
-    .text(d => d)
+    .text((d) => d)
 }
 
 const map_settings = {
@@ -119,19 +130,33 @@ const map_settings = {
     width: 1300,
     height: 1200,
     lat: -28,
-    long: 134
+    long: 134,
   },
   vic: {
     width: 600,
     height: 600,
     lat: -36,
-    long: 145
+    long: 145,
   },
   nsw: {
-    
-  }
+    width: 600,
+    height: 700,
+    lat: -32.5,
+    long: 147,
+  },
+  qld: {
+    width: 600,
+    height: 800,
+    lat: -23,
+    long: 145,
+  },
+  wa: {
+    width: 700,
+    height: 800,
+    lat: -26,
+    long: 122,
+  },
 }
-
 
 new Chart({
   element: 'map',
@@ -157,22 +182,12 @@ new Chart({
 
   const color = d3
     .scaleOrdinal()
-    .range([
-      '#8dd3c7',
-      '#ffffb3',
-      '#bebada',
-      '#fb8072',
-      '#80b1d3',
-      '#fdb462',
-      '#b3de69',
-      '#fccde5',
-      '#d9d9d9',
-    ])
+    .range(['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', '#d9d9d9'])
 
   // Create SVG
   const svg = chart.svg
 
-  d3.json('/aust.json').then(json => {
+  d3.json('/aust.json').then((json) => {
     console.log(json)
     drawMap(json)
   })
@@ -208,25 +223,14 @@ new Chart({
     tweet
       .append('a')
       .text(timeFormat(new Date(data.created_at)))
-      .attr(
-        'href',
-        `https://twitter.com/${user.screen_name}/status/${data.id_str}`,
-      )
+      .attr('href', `https://twitter.com/${user.screen_name}/status/${data.id_str}`)
 
     const bottom = tweet.append('div').append('p')
 
-    bottom
-      .append('span')
-      .append('i')
-      .classed('fa', true)
-      .classed('fa-retweet', true)
+    bottom.append('span').append('i').classed('fa', true).classed('fa-retweet', true)
     bottom.append('span').text(data.retweet_count)
 
-    bottom
-      .append('span')
-      .append('i')
-      .classed('fa', true)
-      .classed('fa-heart', true)
+    bottom.append('span').append('i').classed('fa', true).classed('fa-heart', true)
     bottom.append('span').text(data.favorite_count)
 
     setTimeout(() => {
@@ -256,7 +260,8 @@ new Chart({
   }
 
   function drawFeature(lat: number, long: number) {
-    svg.append('circle')
+    svg
+      .append('circle')
       .attr('cx', 0)
       .attr('cy', 0)
       .attr('r', 0)
@@ -272,7 +277,7 @@ new Chart({
   }
 
   function drawMap(json) {
-    console.log("Drawing map", json)
+    console.log('Drawing map', json)
     // Bind data and create one path per GeoJSON feature
     svg
       .append('g')
