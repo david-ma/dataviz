@@ -41,10 +41,12 @@ d3.csv('/ubc/micronet_ecom_logs_20251005.csv').then(data => {
         }
       }, i * 10)
     }
-    console.log(d)
 
     acc[d.Debtor].interactions.push(d)
-    acc[d.Debtor].searches.push(d['Search String'])
+    const search = d['Search String']
+    if(search) {
+      acc[d.Debtor].searches.push(search)
+    }
     if(d['Order Value'] > 0) {
       acc[d.Debtor].orders.push(d)
     }
@@ -112,207 +114,220 @@ function drawTable(data) {
     .text(d => d)
 }
 
+const map_settings = {
+  australia: {
+    width: 1300,
+    height: 1200,
+    lat: -28,
+    long: 134
+  },
+  vic: {
+    width: 600,
+    height: 600,
+    lat: -36,
+    long: 145
+  },
+  nsw: {
+    
+  }
+}
 
 
+new Chart({
+  element: 'map',
+  width: 1300,
+  height: 1200,
+  margin: 0,
+  nav: false,
+}).scratchpad((chart) => {
+  var lat = -28,
+    long = 134,
+    w = chart.width,
+    h = chart.height
 
-// new Chart({
-//   element: 'map',
-//   width: 600,
-//   height: 600,
-//   margin: 0,
-//   nav: false,
-// }).scratchpad((chart) => {
-//   var lat = -36,
-//     long = 145,
-//     w = chart.width,
-//     h = chart.height
+  // Define map projection
+  const projection = d3
+    .geoMercator()
+    .center([Math.floor(long), Math.floor(lat)])
+    .translate([w / 2, h / 2])
+    .scale(1600)
 
-//   // Define map projection
-//   const projection = d3
-//     .geoMercator()
-//     .center([Math.floor(long), Math.floor(lat)])
-//     .translate([w / 2, h / 2])
-//     .scale(1600)
+  // Define path generator
+  const path = d3.geoPath().projection(projection)
 
-//   // Define path generator
-//   const path = d3.geoPath().projection(projection)
+  const color = d3
+    .scaleOrdinal()
+    .range([
+      '#8dd3c7',
+      '#ffffb3',
+      '#bebada',
+      '#fb8072',
+      '#80b1d3',
+      '#fdb462',
+      '#b3de69',
+      '#fccde5',
+      '#d9d9d9',
+    ])
 
-//   const color = d3
-//     .scaleOrdinal()
-//     .range([
-//       '#8dd3c7',
-//       '#ffffb3',
-//       '#bebada',
-//       '#fb8072',
-//       '#80b1d3',
-//       '#fdb462',
-//       '#b3de69',
-//       '#fccde5',
-//       '#d9d9d9',
-//     ])
+  // Create SVG
+  const svg = chart.svg
 
-//   // Create SVG
-//   const svg = chart.svg
+  d3.json('/aust.json').then(json => {
+    console.log(json)
+    drawMap(json)
+  })
 
-//   Promise.all([d3.json('/aust.json'), d3.json('/earthquakeTweets.json')]).then(
-//     ([json, twitter]: [any, any]) => {
-//       drawMap(json)
-//       svg.append('g').attr('id', 'pings')
+  const timeFormat = d3.timeFormat('%-I:%M %p · %b %-d, %Y')
 
-//       let timestamp = earthquakeDay.getTime()
+  function drawTweet(data, user, i = 0) {
+    var tweets = d3.select('#tweets')
 
-//       twitter.tweets.forEach((tweet, i) => {
-//         if (new Date(tweet.created_at) < earthquakeDay) {
-//           return
-//         }
+    var tweet = tweets.append('div').classed('tweet', true)
 
-//         const geocodes = twitter.geocodes[tweet.id_str]
-//         const point = geocodesCenter(geocodes)
+    tweet
+      .append('img')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('height', 50)
+      .attr('width', 50)
+      .attr('src', user.profile_image_url_https)
+      .style('border-radius', '50%')
+      .style('border', 'solid 1px lightgrey')
 
-//         const waitTime =
-//           (new Date(tweet.created_at).getTime() - timestamp) / 100
-//         setTimeout(() => {
-//           // console.log('drawing tweet', i)
-//           pingMap(point[0], point[1])
-//           drawTweet(tweet, twitter.users[tweet.userId], i)
-//         }, waitTime)
-//       })
-//     },
-//   )
+    var name = tweet.append('p')
+    name
+      .append('span')
+      .text(user.name + ' ')
+      .classed('name', true)
+    name
+      .append('span')
+      .text('@' + user.screen_name)
+      .classed('username', true)
 
-//   const timeFormat = d3.timeFormat('%-I:%M %p · %b %-d, %Y')
+    tweet.append('p').text(data.full_text)
+    tweet
+      .append('a')
+      .text(timeFormat(new Date(data.created_at)))
+      .attr(
+        'href',
+        `https://twitter.com/${user.screen_name}/status/${data.id_str}`,
+      )
 
-//   function drawTweet(data, user, i = 0) {
-//     var tweets = d3.select('#tweets')
+    const bottom = tweet.append('div').append('p')
 
-//     var tweet = tweets.append('div').classed('tweet', true)
+    bottom
+      .append('span')
+      .append('i')
+      .classed('fa', true)
+      .classed('fa-retweet', true)
+    bottom.append('span').text(data.retweet_count)
 
-//     tweet
-//       .append('img')
-//       .attr('x', 0)
-//       .attr('y', 0)
-//       .attr('height', 50)
-//       .attr('width', 50)
-//       .attr('src', user.profile_image_url_https)
-//       .style('border-radius', '50%')
-//       .style('border', 'solid 1px lightgrey')
+    bottom
+      .append('span')
+      .append('i')
+      .classed('fa', true)
+      .classed('fa-heart', true)
+    bottom.append('span').text(data.favorite_count)
 
-//     var name = tweet.append('p')
-//     name
-//       .append('span')
-//       .text(user.name + ' ')
-//       .classed('name', true)
-//     name
-//       .append('span')
-//       .text('@' + user.screen_name)
-//       .classed('username', true)
+    setTimeout(() => {
+      tweet.remove()
+    }, 1000)
+  }
 
-//     tweet.append('p').text(data.full_text)
-//     tweet
-//       .append('a')
-//       .text(timeFormat(new Date(data.created_at)))
-//       .attr(
-//         'href',
-//         `https://twitter.com/${user.screen_name}/status/${data.id_str}`,
-//       )
+  function pingMap(lat: number, long: number) {
+    d3.select('#pings')
+      .append('circle')
+      .datum({
+        lat: lat,
+        long: long,
+      })
+      .attr('cx', 0)
+      .attr('cy', 0)
+      .attr('r', 0)
+      .attr('fill', '#FF0000')
+      .attr('fill-opacity', 1)
+      .attr('transform', (d: any) => {
+        return `translate(${projection([long, lat])})`
+      })
+      .transition()
+      .duration(2000)
+      .attr('r', 20)
+      .attr('fill-opacity', 0.01)
+  }
 
-//     const bottom = tweet.append('div').append('p')
+  function drawFeature(lat: number, long: number) {
+    svg.append('circle')
+      .attr('cx', 0)
+      .attr('cy', 0)
+      .attr('r', 0)
+      .attr('fill', '#FF0000')
+      .attr('fill-opacity', 1)
+      .attr('transform', (d: any) => {
+        return `translate(${projection([long, lat])})`
+      })
+      .transition()
+      .duration(2000)
+      .attr('r', 20)
+      .attr('fill-opacity', 0.01)
+  }
 
-//     bottom
-//       .append('span')
-//       .append('i')
-//       .classed('fa', true)
-//       .classed('fa-retweet', true)
-//     bottom.append('span').text(data.retweet_count)
+  function drawMap(json) {
+    console.log("Drawing map", json)
+    // Bind data and create one path per GeoJSON feature
+    svg
+      .append('g')
+      .attr('id', 'shapes')
+      .selectAll('path')
+      .data(json.features)
+      .enter()
+      .append('path')
+      .attr('d', path)
+      .style('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
+      .attr('fill', function (d, i) {
+        return color(i.toString())
+      })
 
-//     bottom
-//       .append('span')
-//       .append('i')
-//       .classed('fa', true)
-//       .classed('fa-heart', true)
-//     bottom.append('span').text(data.favorite_count)
+    svg
+      .append('g')
+      .attr('id', 'state_labels')
+      .selectAll('text')
+      .data(json.features)
+      .enter()
+      .append('text')
+      .attr('fill', 'darkslategray')
+      .attr('transform', function (d: any) {
+        return `translate(${path.centroid(d)})`
+      })
+      .attr('text-anchor', 'middle')
+      .attr('dy', '.35em')
+      .style('opacity', 0.5)
+      .text(function (d: any) {
+        return d.properties.STATE_NAME
+      })
+  }
+  return chart
+})
 
-//     setTimeout(() => {
-//       tweet.remove()
-//     }, 1000)
-//   }
+function geocodesCenter(geocodes: string[]) {
+  let totalLat = 0,
+    totalLong = 0,
+    weight: number = geocodes.length
+  geocodes.forEach((geocode) => {
+    const [lat, long, range]: number[] = geocode.split(',').map(parseFloat)
 
-//   function pingMap(lat: number, long: number) {
-//     d3.select('#pings')
-//       .append('circle')
-//       .datum({
-//         lat: lat,
-//         long: long,
-//       })
-//       .attr('cx', 0)
-//       .attr('cy', 0)
-//       .attr('r', 0)
-//       .attr('fill', '#FF0000')
-//       .attr('fill-opacity', 1)
-//       .attr('transform', (d: any) => {
-//         return `translate(${projection([long, lat])})`
-//       })
-//       .transition()
-//       .duration(2000)
-//       .attr('r', 20)
-//       .attr('fill-opacity', 0.01)
-//   }
+    totalLat += lat
+    totalLong += long
+    if (range < 30) {
+      totalLat += lat
+      totalLong += long
+      weight++
+    }
+    if (range < 15) {
+      totalLat += lat
+      totalLong += long
+      weight++
+    }
+  })
 
-//   function drawMap(json) {
-//     // Bind data and create one path per GeoJSON feature
-//     svg
-//       .append('g')
-//       .attr('id', 'shapes')
-//       .selectAll('path')
-//       .data(json.features)
-//       .enter()
-//       .append('path')
-//       .attr('d', path)
-//       .style('stroke', 'dimgray') // @ts-ignore @types/d3 is missing this overload.
-//       .attr('fill', function (d, i) {
-//         return color(i.toString())
-//       })
-
-//     svg
-//       .append('g')
-//       .attr('id', 'state_labels')
-//       .selectAll('text')
-//       .data(json.features)
-//       .enter()
-//       .append('text')
-//       .attr('fill', 'darkslategray')
-//       .attr('transform', function (d: any) {
-//         return `translate(${path.centroid(d)})`
-//       })
-//       .attr('text-anchor', 'middle')
-//       .attr('dy', '.35em')
-//       .style('opacity', 0.5)
-//       .text(function (d: any) {
-//         return d.properties.STATE_NAME
-//       })
-//   }
-// })
-
-// function geocodesCenter(geocodes: string[]) {
-//   let totalLat = 0,
-//     totalLong = 0,
-//     weight: number = geocodes.length
-//   geocodes.forEach((geocode) => {
-//     const [lat, long, range]: number[] = geocode.split(',').map(parseFloat)
-
-//     totalLat += lat
-//     totalLong += long
-//     if (range < 30) {
-//       totalLat += lat
-//       totalLong += long
-//       weight++
-//     }
-//     if (range < 15) {
-//       totalLat += lat
-//       totalLong += long
-//       weight++
-//     }
-//   })
-
-//   return [totalLat / weight, totalLong / weight]
-// }
+  return [totalLat / weight, totalLong / weight]
+}
