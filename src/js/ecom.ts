@@ -11,6 +11,17 @@ const ip_addresses = {}
 const ip_lookups = []
 let shaped_data = {}
 
+const states = {
+  NSW: [],
+  VIC: [],
+  QLD: [],
+  WA: [],
+  SA: [],
+  TAS: [],
+  NT: [],
+  ACT: [],
+}
+
 d3.csv('/ubc/micronet_ecom_logs_20251005.csv')
   .then((data) => {
     // Shape the data, group by Debtor
@@ -33,6 +44,9 @@ d3.csv('/ubc/micronet_ecom_logs_20251005.csv')
                 'Debtors Name': d['Debtors Name'],
                 geoip,
               }
+              // subdivisions
+              // states[geoip.subdivisions[0].names.en].push(d.IP)
+              // states[geoip.country.iso_code].push(d.IP)
               drawIPAddresses(ip_addresses)
             })
             ip_lookups.push(promise)
@@ -94,6 +108,7 @@ function drawIPAddresses(ip_addresses) {
         .html(
           `${shaped_data[ip_addresses[d].Debtor].searches.length} searches<br>${shaped_data[ip_addresses[d].Debtor].searches.join(', ')}`,
         )
+      row.append('td').append('textarea').classed('notes', true)
     })
   // .selectAll('td')
   // .data(d => [d, ip_addresses[d].count, ip_addresses[d].location.country.names.en, ip_addresses[d].location.region.names.en, ip_addresses[d].location.city.names.en, ip_addresses[d].location.latitude, ip_addresses[d].location.longitude])
