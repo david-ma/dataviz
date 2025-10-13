@@ -85,6 +85,9 @@ function filterToState(selected_state) {
     if (selected_state === 'All') {
       return 'table-row'
     }
+    if (selected_state === 'Other') {
+      return row_state === 'New South Wales' || row_state === 'Victoria' || row_state === 'Queensland' || row_state === 'Western Australia' || row_state === 'South Australia' || row_state === 'Tasmania' || row_state === 'Northern Territory' || row_state === 'Australian Capital Territory' ? 'none' : 'table-row'
+    }
     return selected_state === row_state ? 'table-row' : 'none'
   })
 }
