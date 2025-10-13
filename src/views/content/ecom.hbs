@@ -42,49 +42,9 @@
 <section class="blogpost">
 
 
-  <div class="row">
-    <div id="map" class="col-xs-8"></div>
-    <div id="options" class="col-xs-4">
-      {{!-- radio buttons --}}
-      <div id="state_options">
-        <div class="state_option">
-          <input type="radio" name="state" value="All" checked></input>
-          <label for="All">All</label>
-        </div>
-        <div class="state_option">
-          <input type="radio" name="state" value="NSW"></input>
-          <label for="NSW">NSW</label>
-        </div>
-        <div class="state_option">
-          <input type="radio" name="state" value="VIC"></input>
-          <label for="VIC">VIC</label>
-        </div>
-        <div class="state_option">
-          <input type="radio" name="state" value="QLD"></input>
-          <label for="QLD">QLD</label>
-        </div>
-        <div class="state_option">
-          <input type="radio" name="state" value="WA"></input>
-          <label for="WA">WA</label>
-        </div>
-        <div class="state_option">
-          <input type="radio" name="state" value="SA"></input>
-          <label for="SA">SA</label>
-        </div>
-        <div class="state_option">
-          <input type="radio" name="state" value="TAS"></input>
-          <label for="TAS">TAS</label>
-        </div>
-        <div class="state_option">
-          <input type="radio" name="state" value="NT"></input>
-          <label for="NT">NT</label>
-        </div>
-        <div class="state_option">
-          <input type="radio" name="state" value="ACT"></input>
-          <label for="ACT">ACT</label>
-        </div>
-      </div>
-      <button id="update">Update</button>
+  <div class="row" style="padding: 10px;">
+    <div id="map" style="display: none;" class="col-xs-6"></div>
+    <div id="buttons" class="col-xs-12">
     </div>
   </div>
   <div class="row" id="contentBox">
@@ -99,13 +59,12 @@
               <th>Debtor</th>
               <th>Orders</th>
               <th>Searches</th>
-              <th>Notes</th>
+              {{!-- <th>Notes (These are not being saved... yet)</th> --}}
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
-      {{> showSource }}
     </div>
   </div>
 </section>
