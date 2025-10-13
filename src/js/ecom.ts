@@ -33,6 +33,7 @@ d3.csv('/ubc/micronet_ecom_log.csv')
                 count: 1,
                 Debtor: d.Debtor,
                 'Debtors Name': d['Debtors Name'],
+                date: d['Date/Time'],
                 geoip,
               }
 
@@ -127,6 +128,8 @@ function drawIPAddresses(ip_addresses) {
     })
     .each((d, i, nodes) => {
       const row = d3.select(nodes[i])
+      row.append('td').text(ip_addresses[d].date).style('white-space', 'nowrap')
+
       row.append('td').text(d)
       row
         .append('td')
