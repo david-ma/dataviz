@@ -28,7 +28,7 @@ d3.csv('/ubc/micronet_ecom_log.csv')
       if (d.IP) {
         window.setTimeout(() => {
           if (!ip_addresses[d.IP]) {
-            const promise = d3.json(`http://localhost:7777/geoip?ip=${d.IP}`).then((geoip :any) => {
+            const promise = d3.json(`https://monetiseyourwebsite.com/geoip?ip=${d.IP}`).then((geoip :any) => {
               ip_addresses[d.IP] = {
                 count: 1,
                 Debtor: d.Debtor,
