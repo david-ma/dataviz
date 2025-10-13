@@ -13,7 +13,7 @@ let shaped_data = {}
 
 let states = {}
 
-d3.csv('/ubc/micronet_ecom_logs_20251005.csv')
+d3.csv('/ubc/micronet_ecom_log.csv')
   .then((data) => {
     // Shape the data, group by Debtor
     shaped_data = data.reduce((acc: any, d: any, i: number) => {
