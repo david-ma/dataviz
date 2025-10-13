@@ -8,13 +8,25 @@ const column_names = ['Date/Time', 'IP', 'User', 'Operation', 'Debtor', 'Debtors
 
 const search_terms = []
 const ip_addresses = {}
-const ip_lookups = []
+// const ip_lookups = []
 let shaped_data = {}
 
 let states = {}
 
-d3.csv('/ubc/micronet_ecom_log.csv')
-  .then((data) => {
+Promise.all([d3.csv('/ubc/micronet_ecom_log.csv'), d3.tsv('/ubc/ip_lookup.tsv')])
+  .then(([data, raw_ip_lookup]) => {
+    const ip_lookup = Object.entries(raw_ip_lookup).reduce((acc: any, [index, { ip, geoip }]) => {
+      if (geoip) {
+        acc[ip] = JSON.parse(geoip)
+      }
+      return acc
+    }, {})
+
+    return [data, ip_lookup]
+  })
+  .then(([data, ip_lookup]) => {
+    console.log('IP lookup', ip_lookup)
+    console.log('Data', data)
     // Shape the data, group by Debtor
     shaped_data = data.reduce((acc: any, d: any, i: number) => {
       acc[d.Debtor] = acc[d.Debtor] || {
@@ -28,27 +40,27 @@ d3.csv('/ubc/micronet_ecom_log.csv')
       if (d.IP) {
         window.setTimeout(() => {
           if (!ip_addresses[d.IP]) {
-            const promise = d3.json(`https://monetiseyourwebsite.com/geoip?ip=${d.IP}`).then((geoip :any) => {
-              ip_addresses[d.IP] = {
-                count: 1,
-                Debtor: d.Debtor,
-                'Debtors Name': d['Debtors Name'],
-                date: d['Date/Time'],
-                geoip,
-              }
+            const geoip = ip_lookup[d.IP]
+            ip_addresses[d.IP] = {
+              count: 1,
+              Debtor: d.Debtor,
+              'Debtors Name': d['Debtors Name'],
+              date: d['Date/Time'],
+              geoip,
+            }
 
-              if (geoip.subdivisions && geoip.subdivisions[0].names.en) {
-                states[geoip.subdivisions[0].names.en] = states[geoip.subdivisions[0].names.en] || []
-                states[geoip.subdivisions[0].names.en].push(d.IP)
-              }
+            if (geoip.subdivisions && geoip.subdivisions[0].names.en) {
+              states[geoip.subdivisions[0].names.en] = states[geoip.subdivisions[0].names.en] || []
+              states[geoip.subdivisions[0].names.en].push(d.IP)
+            }
 
-              drawIPAddresses(ip_addresses)
-            })
-            ip_lookups.push(promise)
+            drawIPAddresses(ip_addresses)
+            // })
+            // ip_lookups.push(promise)
           } else {
             ip_addresses[d.IP].count++
           }
-        }, i * 10)
+        }, i * 1)
       }
 
       acc[d.Debtor].interactions.push(d)
@@ -81,13 +93,22 @@ let selected_state = 'All'
 
 function filterToState(selected_state) {
   console.log(`Selecting state ${selected_state}`)
-  d3.selectAll('#ip_addresses table tbody tr').style('display', (ip:any) => {
+  d3.selectAll('#ip_addresses table tbody tr').style('display', (ip: any) => {
     const row_state = ip_addresses[ip].geoip.subdivisions[0].names.en
     if (selected_state === 'All') {
       return 'table-row'
     }
     if (selected_state === 'Other') {
-      return row_state === 'New South Wales' || row_state === 'Victoria' || row_state === 'Queensland' || row_state === 'Western Australia' || row_state === 'South Australia' || row_state === 'Tasmania' || row_state === 'Northern Territory' || row_state === 'Australian Capital Territory' ? 'none' : 'table-row'
+      return row_state === 'New South Wales' ||
+        row_state === 'Victoria' ||
+        row_state === 'Queensland' ||
+        row_state === 'Western Australia' ||
+        row_state === 'South Australia' ||
+        row_state === 'Tasmania' ||
+        row_state === 'Northern Territory' ||
+        row_state === 'Australian Capital Territory'
+        ? 'none'
+        : 'table-row'
     }
     return selected_state === row_state ? 'table-row' : 'none'
   })
@@ -95,23 +116,23 @@ function filterToState(selected_state) {
 globalThis.filterToState = filterToState
 
 const state_options = [
-  "All",
-  "New South Wales",
-  "Victoria",
-  "Queensland",
-  "Western Australia",
-  "South Australia",
-  "Tasmania",
-  "Other",
+  'All',
+  'New South Wales',
+  'Victoria',
+  'Queensland',
+  'Western Australia',
+  'South Australia',
+  'Tasmania',
+  'Other',
 ]
 
-d3.select("#buttons")
-  .selectAll("button")
+d3.select('#buttons')
+  .selectAll('button')
   .data(state_options)
   .enter()
-  .append("button")
-  .text(d => d)
-  .on("click", (event, d) => {
+  .append('button')
+  .text((d) => d)
+  .on('click', (event, d) => {
     filterToState(d)
   })
 
@@ -123,7 +144,7 @@ function drawIPAddresses(ip_addresses) {
     .data(Object.keys(ip_addresses))
     .enter()
     .append('tr')
-    .attr('data-state', ip => {
+    .attr('data-state', (ip) => {
       return ip_addresses[ip].geoip.subdivisions[0].names.en
     })
     .each((d, i, nodes) => {
