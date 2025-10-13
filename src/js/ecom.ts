@@ -45,6 +45,7 @@ Promise.all([d3.csv('/ubc/micronet_ecom_log.csv'), d3.tsv('/ubc/ip_lookup.tsv')]
               count: 1,
               Debtor: d.Debtor,
               'Debtors Name': d['Debtors Name'],
+              User: d.User,
               date: d['Date/Time'],
               geoip,
             }
@@ -161,7 +162,7 @@ function drawIPAddresses(ip_addresses) {
       row
         .append('td')
         .html(
-          `<a href="/debtor/${ip_addresses[d].Debtor}">${ip_addresses[d].Debtor}</a><br>${ip_addresses[d]['Debtors Name']}<br>${shaped_data[ip_addresses[d].Debtor].interactions.length} interactions`,
+          `${ip_addresses[d].User}<br><a href="https://www.google.com/search?q=${encodeURIComponent(ip_addresses[d]['Debtors Name'])}%20${ip_addresses[d].geoip.city.names.en}">${ip_addresses[d].Debtor}</a><br>${ip_addresses[d]['Debtors Name']}<br>${shaped_data[ip_addresses[d].Debtor].interactions.length} interactions`,
         )
       row.append('td').html(shaped_data[ip_addresses[d].Debtor].orders.length)
       row
