@@ -80,7 +80,7 @@ let selected_state = 'All'
 
 function filterToState(selected_state) {
   console.log(`Selecting state ${selected_state}`)
-  d3.selectAll('#ip_addresses table tbody tr').style('display', ip => {
+  d3.selectAll('#ip_addresses table tbody tr').style('display', (ip:any) => {
     const row_state = ip_addresses[ip].geoip.subdivisions[0].names.en
     if (selected_state === 'All') {
       return 'table-row'
