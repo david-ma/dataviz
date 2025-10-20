@@ -137,7 +137,8 @@ declare class Chart {
         zoom?: number;
         markers?: Coordinates[];
         calculate: Function;
-    }): void;
+        projection?: d3.GeoProjection;
+    }): Promise<void>;
 }
 export type DataTableConfig = DataTables.Config & {
     element?: string;

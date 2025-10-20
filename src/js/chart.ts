@@ -1449,6 +1449,7 @@ class Chart {
     zoom?: number
     markers?: Coordinates[]
     calculate: Function
+    projection?: d3.GeoProjection
   }) {
     let chart: Chart = this
     chart.calculate = options.calculate
@@ -1466,15 +1467,18 @@ class Chart {
     const h = this.height
 
     // Define map projection
-    const projection = d3
-      // .geoEqualEarth()
-      // .geoConicConformal()
-      // .geoAlbersUsa()
-      // .geoAzimuthalEqualArea()
-      // .geoProjection()
-      // .geoOrthographic()
-      // .geoGnomonic()
-      .geoMercator()
+    const projection = options.projection || d3.geoMercator()
+
+    // const projection = d3
+    //   // .geoEqualEarth()
+    //   // .geoConicConformal()
+    //   // .geoAlbersUsa()
+    //   // .geoAzimuthalEqualArea()
+    //   // .geoProjection()
+    //   // .geoOrthographic()
+    //   // .geoGnomonic()
+    //   .geoMercator()
+    projection
       .center([Math.floor(long), Math.floor(lat)])
       .translate([w / 2, h / 2])
       .scale(zoom)
@@ -1489,7 +1493,7 @@ class Chart {
     const svg = this.svg
 
     // Load in GeoJSON data
-    Promise.all([d3.json(json), d3.json(usa), d3.json(aus)]).then(
+    return Promise.all([d3.json(json), d3.json(usa), d3.json(aus)]).then(
       ([json, usa, aus]: any) => {
         // Bind data and create one path per GeoJSON feature
         const georgias = []
@@ -1821,6 +1825,22 @@ export type DataTableDataset = Array<any> & {
   [key: string]: any
 }
 
+/**
+ * Draw a datatables.net table, using data
+ * Minimal config required
+ * 
+ * Options:
+ * - element: string - the element to draw the table into, defaults to `#dataset table`
+ * - titles: string[] - the titles of the columns
+ * - render: any - the render function to use, defaults to `d => d` 
+ * - customData: { [key: string]: any } - custom data to inject into the table
+ * - customRenderers: { [key: string]: any } - custom renderers to use, defaults to `d => d`
+ * - columns: DataTables.ConfigColumns[] - the columns to use, defaults to `Object.keys(dataset[0])`
+ * 
+ * @param dataset - the dataset to draw the table from
+ * @param newOptions - the options to use
+ * @returns the DataTables.Api instance
+ */
 function decorateTable(
   dataset: DataTableDataset,
   newOptions?: DataTableConfig,
