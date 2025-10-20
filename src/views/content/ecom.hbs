@@ -37,6 +37,20 @@
     }
   }
 
+{{!-- //<th data-dt-column="0" rowspan="1" colspan="1" class="dt-type-date dt-orderable-asc dt-orderable-desc dt-ordering-asc" aria-sort="ascending"><div class="dt-column-header"><span class="dt-column-title">Latest Date</span><span class="dt-column-order" role="button" aria-label="Latest Date: Activate to invert sorting" tabindex="0"></span></div></th> --}}
+
+  th.dt-ordering-asc {
+    div.dt-column-header::after {
+      content: '↑';
+    }
+  }
+  th.dt-ordering-desc {
+    div.dt-column-header::after {
+      content: '↓';
+    }
+  }
+
+
 </style>
 
 <section class="blogpost">
@@ -49,6 +63,8 @@
   </div>
   <div class="row" id="contentBox">
     <div class="col-xs-12 col-lg-8">
+      <div id="debtors"><table></table></div>
+
       <div id="ip_addresses">
         <table>
           <thead>

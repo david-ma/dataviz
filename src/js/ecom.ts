@@ -1,4 +1,4 @@
-import { Chart, d3 } from './chart'
+import { Chart, d3, decorateTable } from './chart'
 
 console.log('hello world')
 
@@ -9,7 +9,25 @@ const column_names = ['Date/Time', 'IP', 'User', 'Operation', 'Debtor', 'Debtors
 const search_terms = []
 const ip_addresses = {}
 // const ip_lookups = []
-let shaped_data = {}
+type Interaction = {
+  'Date/Time': string
+  'Debtor': string
+  'Debtors Name': string
+  'IP': string
+  'Operation': string
+  'Order Value': string
+  'Search String': string
+  'User': string
+}
+type Debtor = {
+  interactions: Interaction[]
+  searches: string[]
+  orders: Interaction[]
+}
+
+let debtors : Record<string, Debtor> = {}
+
+
 
 let states = {}
 
@@ -28,7 +46,7 @@ Promise.all([d3.csv('/ubc/micronet_ecom_log.csv'), d3.tsv('/ubc/ip_lookup.tsv')]
     console.log('IP lookup', ip_lookup)
     console.log('Data', data)
     // Shape the data, group by Debtor
-    shaped_data = data.reduce((acc: any, d: any, i: number) => {
+    debtors = data.reduce((acc: any, d: any, i: number) => {
       acc[d.Debtor] = acc[d.Debtor] || {
         interactions: [],
         searches: [],
@@ -55,7 +73,7 @@ Promise.all([d3.csv('/ubc/micronet_ecom_log.csv'), d3.tsv('/ubc/ip_lookup.tsv')]
               states[geoip.subdivisions[0].names.en].push(d.IP)
             }
 
-            drawIPAddresses(ip_addresses)
+            // drawIPAddresses(ip_addresses)
             // })
             // ip_lookups.push(promise)
           } else {
@@ -75,16 +93,61 @@ Promise.all([d3.csv('/ubc/micronet_ecom_log.csv'), d3.tsv('/ubc/ip_lookup.tsv')]
       return acc
     }, {})
 
-    return shaped_data
+    return [debtors, ip_addresses]
   })
-  .then((shaped_data) => {
-    console.log(shaped_data)
+  .then(([debtors, ip_addresses]: [Record<string, Debtor>, Record<string, any>]) => {
+    console.log("Debtors are:", debtors)
+    console.log("IP Addresses are:", ip_addresses)
 
-    d3.select('#description').text(`There are ${Object.keys(shaped_data).length} different customers.`)
+    const datatables_data = Object.entries(debtors).map(([debtor, data]: [string, Debtor]) => {
+      const interaction = data.interactions[0]
+      // const ip_addresses = data.interactions.map((interaction: Interaction) => interaction.IP)
+      const ip_addresses = Array.from(data.interactions.reduce((acc: Set<string>, interaction: Interaction) => {
+        acc.add(interaction.IP)
+        return acc
+      }, new Set<string>())).filter((ip: string) => ip )
+
+      const dates = Array.from(data.interactions.reduce((acc: Set<string>, interaction: Interaction) => {
+        acc.add(interaction['Date/Time'])
+        return acc
+      }, new Set<string>()))
+
+      const latest_date = dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0]
+
+
+      return {
+        'Latest Date': latest_date,
+        'Debtor': debtor,
+        'Debtors Name': interaction['Debtors Name'],
+        'User': interaction['User'],
+        'Interactions': data.interactions.length,
+        'Searches': data.searches.length,
+        'Orders': data.orders.length,
+        'IP Addresses': ip_addresses.join(', ')
+      }
+    })
+
+    console.log('Datatables data is', datatables_data)
+
+    decorateTable(datatables_data, {
+      element: '#debtors table',
+      // titles: ['Debtor', 'Debtors Name', 'User', 'Interactions', 'Searches', 'Orders'],
+    })
+
+    // drawIPAddresses(ip_addresses)
+    // decorateTable(Object.values(ip_addresses), {
+    //   element: '#ip_addresses table',
+    //   titles: ['Date', 'IP', 'Location', 'Coords', 'Debtor', 'Orders', 'Searches'],
+    // })
 
     // Get search terms
     // d3.select('#description').text(`The search terms are: ${search_terms.join(', ')}`)
+    return debtors
   })
+
+
+
+
 
 // #description area, write down how many different customers we have
 
@@ -162,13 +225,13 @@ function drawIPAddresses(ip_addresses) {
       row
         .append('td')
         .html(
-          `${ip_addresses[d].User}<br><a href="https://www.google.com/search?q=${encodeURIComponent(ip_addresses[d]['Debtors Name'])}%20${ip_addresses[d].geoip.city.names.en}">${ip_addresses[d].Debtor}</a><br>${ip_addresses[d]['Debtors Name']}<br>${shaped_data[ip_addresses[d].Debtor].interactions.length} interactions`,
+          `${ip_addresses[d].User}<br><a href="https://www.google.com/search?q=${encodeURIComponent(ip_addresses[d]['Debtors Name'])}%20${ip_addresses[d].geoip.city.names.en}">${ip_addresses[d].Debtor}</a><br>${ip_addresses[d]['Debtors Name']}<br>${debtors[ip_addresses[d].Debtor].interactions.length} interactions`,
         )
-      row.append('td').html(shaped_data[ip_addresses[d].Debtor].orders.length)
+      row.append('td').html(debtors[ip_addresses[d].Debtor].orders.length)
       row
         .append('td')
         .html(
-          `${shaped_data[ip_addresses[d].Debtor].searches.length} searches<br>${shaped_data[ip_addresses[d].Debtor].searches.join(', ')}`,
+          `${debtors[ip_addresses[d].Debtor].searches.length} searches<br>${debtors[ip_addresses[d].Debtor].searches.join(', ')}`,
         )
       // row.append('td').append('textarea').classed('notes', true)
     })
