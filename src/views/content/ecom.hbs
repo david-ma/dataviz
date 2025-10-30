@@ -37,8 +37,6 @@
     }
   }
 
-{{!-- //<th data-dt-column="0" rowspan="1" colspan="1" class="dt-type-date dt-orderable-asc dt-orderable-desc dt-ordering-asc" aria-sort="ascending"><div class="dt-column-header"><span class="dt-column-title">Latest Date</span><span class="dt-column-order" role="button" aria-label="Latest Date: Activate to invert sorting" tabindex="0"></span></div></th> --}}
-
   th.dt-ordering-asc {
     div.dt-column-header::after {
       content: '↑';
@@ -49,6 +47,13 @@
       content: '↓';
     }
   }
+
+  table.dataTable {
+    td span.search-terms {
+      white-space: normal;
+    }
+  }
+
 
 
 </style>

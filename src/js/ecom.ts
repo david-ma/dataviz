@@ -56,30 +56,25 @@ Promise.all([d3.csv('/ubc/micronet_ecom_log.csv'), d3.tsv('/ubc/ip_lookup.tsv')]
       // Geoip lookup format
       // http://localhost:7777/geoip?ip=61.29.116.50
       if (d.IP) {
-        window.setTimeout(() => {
-          if (!ip_addresses[d.IP]) {
-            const geoip = ip_lookup[d.IP]
-            ip_addresses[d.IP] = {
-              count: 1,
-              Debtor: d.Debtor,
-              'Debtors Name': d['Debtors Name'],
-              User: d.User,
-              date: d['Date/Time'],
-              geoip,
-            }
-
-            if (geoip.subdivisions && geoip.subdivisions[0].names.en) {
-              states[geoip.subdivisions[0].names.en] = states[geoip.subdivisions[0].names.en] || []
-              states[geoip.subdivisions[0].names.en].push(d.IP)
-            }
-
-            // drawIPAddresses(ip_addresses)
-            // })
-            // ip_lookups.push(promise)
-          } else {
-            ip_addresses[d.IP].count++
+        if (!ip_addresses[d.IP]) {
+          const geoip = ip_lookup[d.IP]
+          ip_addresses[d.IP] = {
+            count: 1,
+            Debtor: d.Debtor,
+            'Debtors Name': d['Debtors Name'],
+            User: d.User,
+            date: d['Date/Time'],
+            geoip,
           }
-        }, i * 1)
+
+          if (geoip.subdivisions && geoip.subdivisions[0].names.en) {
+            states[geoip.subdivisions[0].names.en] = states[geoip.subdivisions[0].names.en] || []
+            states[geoip.subdivisions[0].names.en].push(d.IP)
+          }
+
+        } else {
+          ip_addresses[d.IP].count++
+        }
       }
 
       acc[d.Debtor].interactions.push(d)
@@ -96,13 +91,11 @@ Promise.all([d3.csv('/ubc/micronet_ecom_log.csv'), d3.tsv('/ubc/ip_lookup.tsv')]
     return [debtors, ip_addresses]
   })
   .then(([debtors, ip_addresses]: [Record<string, Debtor>, Record<string, any>]) => {
-    console.log("Debtors are:", debtors)
-    console.log("IP Addresses are:", ip_addresses)
 
     const datatables_data = Object.entries(debtors).map(([debtor, data]: [string, Debtor]) => {
       const interaction = data.interactions[0]
-      // const ip_addresses = data.interactions.map((interaction: Interaction) => interaction.IP)
-      const ip_addresses = Array.from(data.interactions.reduce((acc: Set<string>, interaction: Interaction) => {
+
+      const ips = Array.from(data.interactions.reduce((acc: Set<string>, interaction: Interaction) => {
         acc.add(interaction.IP)
         return acc
       }, new Set<string>())).filter((ip: string) => ip )
@@ -114,16 +107,33 @@ Promise.all([d3.csv('/ubc/micronet_ecom_log.csv'), d3.tsv('/ubc/ip_lookup.tsv')]
 
       const latest_date = dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0]
 
+      // const Location = ips.map((ip: string) => {
+      //   console.log("IP", ip)
+      //   console.log("geoip", ip_addresses[ip])
+
+      // return ip_addresses[ip]?.geoip?.subdivisions[0]?.names?.en
+      // }).join(', ')
+
+      const Location = Array.from(ips.reduce((acc: Set<string>, ip: string) => {
+        acc.add(ip_addresses[ip]?.geoip?.subdivisions[0]?.names?.en)
+        return acc
+      }, new Set<string>()))
+
+      const Coords = Array.from(ips.reduce((acc: Set<string>, ip: string) => {
+        acc.add(ip_addresses[ip]?.geoip?.location?.latitude + ', ' + ip_addresses[ip]?.geoip?.location?.longitude)
+        return acc
+      }, new Set<string>()))
+
 
       return {
         'Latest Date': latest_date,
-        'Debtor': debtor,
-        'Debtors Name': interaction['Debtors Name'],
-        'User': interaction['User'],
+        'IP Addresses': ips.join('<br>'),
+        'Location': Location.join('<br>'),
+        // 'Coords': Coords.join('<br>'),
+        'Customer': `${interaction['User']}<br>${debtor}<br><a href="https://www.google.com/search?q=${encodeURIComponent(interaction['Debtors Name'])}%20${Location[0]}">${interaction['Debtors Name']}</a>`,
+        'Searches': `<u>${data.searches.length} searches</u><br><span class="search-terms">${data.searches.join(', ')}</span>`,
+        'Orders': `${data.orders.length} orders<br>${data.orders.map((order: Interaction) => order['Order Value']).join(', ')}`,
         'Interactions': data.interactions.length,
-        'Searches': data.searches.length,
-        'Orders': data.orders.length,
-        'IP Addresses': ip_addresses.join(', ')
       }
     })
 
@@ -227,7 +237,7 @@ function drawIPAddresses(ip_addresses) {
         .html(
           `${ip_addresses[d].User}<br><a href="https://www.google.com/search?q=${encodeURIComponent(ip_addresses[d]['Debtors Name'])}%20${ip_addresses[d].geoip.city.names.en}">${ip_addresses[d].Debtor}</a><br>${ip_addresses[d]['Debtors Name']}<br>${debtors[ip_addresses[d].Debtor].interactions.length} interactions`,
         )
-      row.append('td').html(debtors[ip_addresses[d].Debtor].orders.length)
+      row.append('td').html(debtors[ip_addresses[d].Debtor].orders.length.toString())
       row
         .append('td')
         .html(
