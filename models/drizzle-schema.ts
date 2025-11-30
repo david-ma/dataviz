@@ -6,7 +6,7 @@
  */
 
 import { mysqlTable, MySqlTableWithColumns, json, unique, boolean, date } from 'drizzle-orm/mysql-core'
-import { baseTableConfig, vc } from '../node_modules/thalia/dist/models/util.js'
+import { baseTableConfig, vc } from '../../../models/util'
 
 // export const contactInteractionTable: MySqlTableWithColumns<any> = mysqlTable('contact_interaction', {
 //   ...baseTableConfig,
