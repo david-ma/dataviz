@@ -1,4 +1,4 @@
-import { recursiveObjectMerge } from '../../../server/website.js';
+import { recursiveObjectMerge } from '../node_modules/thalia/server/website.js';
 import { gitHash } from './utilities.js';
 import path from 'path';
 import fs from 'fs';
