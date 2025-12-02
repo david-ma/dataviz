@@ -1,0 +1,102 @@
+<section>
+  <h1>Statues of Women and Goats in the UK</h1>
+  
+  <p>In 2021, an audit of London's public monuments revealed a striking statistic: there are more statues of animals than there are of named women. Out of approximately 1,500 monuments in the capital, only about 50 (4%) are dedicated to named women, while nearly 100 (8%) depict animals.</p>
+  
+  <p>This visualization maps public statues across the UK that feature either women or goats. The data comes from the Public Statues and Sculpture Association (PSSA) database and Art UK, documenting the representation of women in public spaces.</p>
+  
+  <p>According to the PSSA, there are 176 statues of women across the UK, with 149 depicting named non-royal women and 27 representing generic female figures. In contrast, a study found that out of 4,912 statues analyzed, only 351 depicted women, with just 128 of these being named women. Remarkably, there are 82 statues dedicated to men named "John" – nearly as many as all named women combined.</p>
+  
+  <p>Goat statues, while less common overall, can be found scattered across the UK in various forms: from public art installations like Kenny Hunter's "I Goat" in Spitalfields, London, to sculptures celebrating local wildlife like the Kashmir Goat at Great Orme in Wales, and various goat-themed artworks in museums and collections.</p>
+  
+  <p>This map shows the geographic distribution of these statues. Red markers indicate statues of women, blue markers indicate statues of goats. Hover over the markers to see details about each statue.</p>
+  
+  <div id="map"></div>
+  
+  <h2>Key Findings</h2>
+  <ul>
+    <li><strong>London dominance:</strong> Many statues of women are concentrated in London, particularly in Westminster and Bloomsbury areas.</li>
+    <li><strong>Regional diversity:</strong> Statues of women can be found across the UK, from Manchester to Plymouth, Glasgow to Canterbury.</li>
+    <li><strong>Goat distribution:</strong> Goat statues tend to be more scattered, often located in rural areas, parks, or museum collections.</li>
+    <li><strong>Underrepresentation:</strong> The overall number of statues of women remains disproportionately low compared to statues of men.</li>
+  </ul>
+  
+  <h2>Notable Statues</h2>
+  <p>Some of the most prominent statues of women include:</p>
+  <ul>
+    <li><strong>Millicent Fawcett</strong> - Parliament Square, London (the first statue of a woman in Parliament Square)</li>
+    <li><strong>Emmeline Pankhurst</strong> - St Peter's Square, Manchester (suffragette leader)</li>
+    <li><strong>Mary Seacole</strong> - St Thomas' Hospital, London (Crimean War nurse)</li>
+    <li><strong>Boudicca</strong> - Westminster Bridge, London (ancient British queen)</li>
+    <li><strong>Amy Winehouse</strong> - Camden Market, London (singer-songwriter)</li>
+  </ul>
+  
+  <p>Notable goat statues include:</p>
+  <ul>
+    <li><strong>I Goat</strong> - Spitalfields, London (contemporary public art)</li>
+    <li><strong>Kashmir Goat</strong> - Great Orme, Llandudno (celebrating local wildlife)</li>
+    <li><strong>Goats series</strong> - Gateshead Riverside Park (public art installation)</li>
+    <li><strong>Redesdale Goat</strong> - Carter Bar, Northumberland (rural sculpture)</li>
+  </ul>
+  
+  <h2>Data Sources</h2>
+  <p>This visualization uses data from:</p>
+  <ul>
+    <li><a href="https://pssauk.org/women/">Public Statues and Sculpture Association (PSSA)</a> - Database of statues of women in the UK</li>
+    <li><a href="https://artuk.org/">Art UK</a> - Public art database</li>
+    <li>Various local authority and museum records</li>
+  </ul>
+  
+  <p><em>Note: This map shows a sample of publicly accessible statues. Some statues in private collections or museums may not be included. Coordinates are approximate and based on location descriptions.</em></p>
+  
+  {{> showSource}}
+</section>
+
+{{> require }}
+
+<style>
+  #map {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 20px 0;
+    background: #f9f9f9;
+  }
+  
+  section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  h1 {
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    color: #555;
+    margin-top: 30px;
+    margin-bottom: 15px;
+  }
+  
+  ul {
+    line-height: 1.8;
+  }
+  
+  li {
+    margin-bottom: 8px;
+  }
+  
+  a {
+    color: #3498db;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  strong {
+    color: #333;
+  }
+</style>

@@ -74,6 +74,16 @@ export const blogposts = [
     publish_date: '2021-09-23',
     published: true,
   },
+  {
+    shortname: 'statues',
+    title: 'Statues of Women and Goats in the UK',
+    category: 'interactive',
+    summary:
+      'Mapping the geographic distribution of public statues featuring women and goats across the UK, highlighting the underrepresentation of women in public monuments',
+    image: 'images/statues.png',
+    publish_date: '2025-12-03',
+    published: true,
+  },
 ]
 
 import { blogpostTable } from '../models/drizzle-schema.js'
