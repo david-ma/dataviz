@@ -388,9 +388,10 @@ export function wiki() {
           })
         }
         
+        // Create proper img tag with sensible attributes
         let figureContent = `<figure style="width: ${imgWidth}px;">
   <a href="${url}">
-  <img src="${img}" alt="${processedCaption || link}" style="max-width: 100%; height: auto;">
+  <img src="${img}" alt="${filename}" style="max-width: 100%; height: auto;" loading="lazy">
   </a>`
         
         if (processedCaption) {
@@ -503,13 +504,17 @@ export function wiki() {
       },
     },
 
-    // {{main|Temporal parts}}
+    // {{main|Temporal parts}} or {{Main|Temporal parts}}
     // <div role="note" class="hatnote navigation-not-searchable">Main article: <a href="/wiki/Temporal_parts" title="Temporal parts">Temporal parts</a></div>
+    // Note: This must come before the generic template handler
     {
       type: 'lang',
-      regex: /{{main\|([^|]+)}}/g,
+      regex: /\{\{[Mm]ain\|([^}]+)\}\}/g,
       replace: function (match, content) {
-        return `<div role="note" class="hatnote navigation-not-searchable">Main article: <a href="/wiki/${content}" title="${content}">${content}</a></div>`
+        // Handle cases where content might contain | characters
+        const linkText = content.split('|')[0].trim()
+        const linkForUrl = linkText.replace(/ /g, '_')
+        return `<div role="note" class="hatnote navigation-not-searchable">Main article: <a href="/wiki/${linkForUrl}" title="${linkText}">${linkText}</a></div>`
       },
     },
 
@@ -542,8 +547,9 @@ export function wiki() {
         
         let content = parts[0] || ''
         let about = parts[1] || ''
-        // Join remaining parts - the link might contain | characters
-        let link = parts.slice(2).join('|')
+        // Take the third parameter (index 2) as the link text
+        // If there are more parts, they might be duplicates or variations - take the first one
+        let link = parts[2] || parts.slice(2).join('|')
         
         // Clean up the parameters
         content = content.trim()
@@ -560,13 +566,35 @@ export function wiki() {
         
         // Remove any trailing artifacts
         link = link.replace(/\}\}+$/, '').trim()
-        link = link.replace(/^\(film\)\s*/, '').trim() // Remove leading "(film)" if present
+        
+        // If link contains a pipe, it might be a duplicate - take the first part before the pipe
+        // This handles cases like "Ship of Theseus (film)|Ship of Theseus (film)"
+        if (link.includes('|')) {
+          const linkParts = link.split('|')
+          // Find the part that looks like a title (has parentheses or is the longest)
+          link = linkParts.find(p => p.includes('(')) || linkParts[0]
+          link = link.trim()
+        }
+        
+        // Extract the main title and any parenthetical (like "(film)")
+        // Format: "Ship of Theseus (film)" -> title: "Ship of Theseus", suffix: " (film)"
+        const parenMatch = link.match(/^(.+?)\s*(\([^)]+\))$/)
+        let linkTitle = link
+        let linkSuffix = ''
+        
+        if (parenMatch) {
+          linkTitle = parenMatch[1].trim()
+          linkSuffix = ' ' + parenMatch[2] // Keep the space before parentheses
+        }
         
         // Encode the link for URL (spaces become underscores in Wikipedia URLs)
+        // The URL should include the full title with parentheses
         const linkForUrl = link.replace(/ /g, '_')
         const encodedLink = encodeURIComponent(linkForUrl)
         
-        return `<div role="note" class="hatnote navigation-not-searchable">This article is about ${content}. For ${about}, see <a href="/wiki/${encodedLink}" title="${link}"><i>${link}</i></a>.</div>`
+        // Format: "This article is about X. For Y, see <i>Title</i> (suffix)."
+        // Match Wikipedia's format exactly
+        return `<div role="note" class="hatnote navigation-not-searchable">This article is about ${content}. For ${about}, see <a href="/wiki/${encodedLink}" title="${link}"><i>${linkTitle}</i>${linkSuffix}</a>.</div>`
       },
     },
 
@@ -652,10 +680,10 @@ export function wiki() {
       },
     },
 
-    // {{Wikiquote}} - Link to Wikiquote page
+    // {{Wikiquote}} or {{wikiquote-inline}} - Link to Wikiquote page
     {
       type: 'lang',
-      regex: /\{\{Wikiquote\}\}/gi,
+      regex: /\{\{[Ww]ikiquote(?:-inline)?\}\}/gi,
       replace: function () {
         // This would need the article title to generate the link, but we don't have context
         // For now, just remove it silently or render as a comment
@@ -686,11 +714,18 @@ export function wiki() {
         // Check for templates we've already handled specifically
         const knownPatterns = [
           'cite', 'longcite', 'Quote', 'About', 'Short description',
-          'main', 'sfn', 'Reflist', 'Div col', 'ISBN', 'Use dmy dates',
-          'refbegin', 'refend', 'Wikiquote', 'DEFAULTSORT'
+          'main', 'Main', 'sfn', 'Reflist', 'Div col', 'ISBN', 'Use dmy dates',
+          'refbegin', 'refend', 'Wikiquote', 'wikiquote', 'DEFAULTSORT'
         ]
         
-        if (knownPatterns.some(pattern => name.toLowerCase().includes(pattern.toLowerCase()))) {
+        // Check if this is a known template that should be handled by a specific handler
+        const isKnown = knownPatterns.some(pattern => {
+          const nameLower = name.toLowerCase()
+          const patternLower = pattern.toLowerCase()
+          return nameLower === patternLower || nameLower.includes(patternLower) || patternLower.includes(nameLower)
+        })
+        
+        if (isKnown) {
           return match // Return unchanged, let other handlers process it
         }
         

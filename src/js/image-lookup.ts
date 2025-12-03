@@ -22,28 +22,29 @@ export const imageLookup: Record<string, string> = {
 
 // Helper function to get image URL for a given filename
 // This matches the ImageUrlResolver type signature from showdown-wiki.ts
+// Note: The lookup table contains full URLs with widths already included
 export function getImageUrl(filename: string, width: number = 200): string {
   // Try exact match first
-  let baseUrl = imageLookup[filename]
+  let imageUrl = imageLookup[filename]
   
   // If not found, try case-insensitive match
-  if (!baseUrl) {
+  if (!imageUrl) {
     const lowerFilename = filename.toLowerCase()
     for (const [key, value] of Object.entries(imageLookup)) {
       if (key.toLowerCase() === lowerFilename) {
-        baseUrl = value
+        imageUrl = value
         break
       }
     }
   }
   
-  if (!baseUrl) {
+  if (!imageUrl) {
     console.warn(`Image not found in lookup: "${filename}"`)
     return '' // Return empty string to trigger fallback to MD5
   }
   
-  // Wikipedia URL format: {baseUrl}/{width}px-{encodedFilename}
-  const encodedFilename = encodeURIComponent(filename.replace(/ /g, '_'))
-  return `${baseUrl}/${width}px-${encodedFilename}`
+  // The lookup table contains full URLs, so return them as-is
+  // If you need different widths, update the URLs in the lookup table
+  return imageUrl
 }
 

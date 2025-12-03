@@ -88,16 +88,129 @@ d3.json('/ship_of_theseus_revisions.json')
   // })
   .then(function (data: Revision[]) {
     console.log('data', data)
-    const first = data[0]
-
-    const renderedHtml = md.makeHtml(first.content)
-    const timestamp = new Date().toISOString()
-    console.log(`[${timestamp}] Rendered HTML for revision ${first.id} (${first.timestamp}):`)
-    console.log('=== START HTML OUTPUT ===')
-    console.log(renderedHtml)
-    console.log('=== END HTML OUTPUT ===')
     
-    d3.select('#main').html(renderedHtml)
+    // Track current revision index
+    let currentIndex = 0
+    let showRaw = false
+    
+    // Helper to format timestamp for datetime-local input (YYYY-MM-DDTHH:mm)
+    function formatForDateTimeLocal(timestamp: string): string {
+      const date = new Date(timestamp)
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      return `${year}-${month}-${day}T${hours}:${minutes}`
+    }
+    
+    // Function to update the display
+    function updateDisplay(index: number) {
+      if (index < 0 || index >= data.length) return
+      
+      currentIndex = index
+      const revision = data[index]
+      
+      // Update revision info
+      const date = new Date(revision.timestamp)
+      const dateStr = date.toLocaleString()
+      d3.select('#revision-info').text(`Revision ${revision.id} • ${dateStr} • ${revision.user}`)
+      
+      // Update button states
+      d3.select('#btn-back').property('disabled', index === 0)
+      d3.select('#btn-forward').property('disabled', index === data.length - 1)
+      
+      // Update display based on toggle
+      if (showRaw) {
+        // Show raw wikimarkdown
+        d3.select('#main').html('')
+        d3.select('#main')
+          .append('pre')
+          .style('white-space', 'pre-wrap')
+          .style('background', '#f5f5f5')
+          .style('padding', '15px')
+          .style('border-radius', '4px')
+          .style('overflow-x', 'auto')
+          .style('font-family', 'monospace')
+          .style('font-size', '0.9em')
+          .text(revision.content)
+      } else {
+        // Show parsed HTML
+        const renderedHtml = md.makeHtml(revision.content)
+        d3.select('#main').html(renderedHtml)
+      }
+      
+      // Update slider highlight (only if slider exists)
+      const sliderRects = d3.selectAll('#slider rect[data-revision-index]')
+      if (!sliderRects.empty()) {
+        sliderRects
+          .attr('stroke', (d: any, i: number) => i === index ? 'yellow' : 'none')
+          .attr('stroke-width', (d: any, i: number) => i === index ? 3 : 0)
+      }
+      
+      // Update date input
+      updateDateInput(index)
+    }
+    
+    // Navigation functions
+    function goBack() {
+      if (currentIndex > 0) {
+        updateDisplay(currentIndex - 1)
+      }
+    }
+    
+    function goForward() {
+      if (currentIndex < data.length - 1) {
+        updateDisplay(currentIndex + 1)
+      }
+    }
+    
+    function jumpToDate(dateStr: string) {
+      if (!dateStr) return
+      
+      // Convert datetime-local input (YYYY-MM-DDTHH:mm) to Date
+      // Note: datetime-local doesn't include timezone, so we'll treat it as local time
+      const targetDate = new Date(dateStr)
+      
+      // Find the closest revision to the target date
+      let closestIndex = 0
+      let closestDiff = Math.abs(new Date(data[0].timestamp).getTime() - targetDate.getTime())
+      
+      data.forEach((rev, index) => {
+        const revDate = new Date(rev.timestamp)
+        const diff = Math.abs(revDate.getTime() - targetDate.getTime())
+        if (diff < closestDiff) {
+          closestDiff = diff
+          closestIndex = index
+        }
+      })
+      
+      updateDisplay(closestIndex)
+    }
+    
+    // Update date input when revision changes
+    function updateDateInput(index: number) {
+      const revision = data[index]
+      const dateValue = formatForDateTimeLocal(revision.timestamp)
+      d3.select('#date-input').property('value', dateValue)
+    }
+    
+    // Set up event handlers
+    d3.select('#btn-back').on('click', goBack)
+    d3.select('#btn-forward').on('click', goForward)
+    d3.select('#toggle-raw').on('change', function() {
+      showRaw = (this as HTMLInputElement).checked
+      updateDisplay(currentIndex)
+    })
+    d3.select('#date-input').on('change', function() {
+      const dateValue = (this as HTMLInputElement).value
+      if (dateValue) {
+        jumpToDate(dateValue)
+      }
+    })
+    
+    // Initial display
+    updateDisplay(0)
 
     var slider = d3
       .select('#slider')
@@ -118,42 +231,67 @@ d3.json('/ship_of_theseus_revisions.json')
       .append('rect')
       .attr('width', 10)
       .attr('height', 80)
+      .attr('data-revision-index', (d: any, i: number) => i)
       .attr('fill', (d, i) => {
         d.pos = i
         return i % 2 === 0 ? 'blue' : 'green'
       })
       .attr('x', (d, i) => i)
       .attr('y', 0)
+      .style('cursor', 'pointer')
+      .on('click', (event, d: any) => {
+        // Click to jump to this revision
+        updateDisplay(d.pos)
+      })
       .on('mouseover', (event, d: any) => {
-        // console.log('hey', i)
-        // console.log(d)
+        // Update date input on hover
+        updateDateInput(d.pos)
+        
+        // Update display based on toggle state
+        if (showRaw) {
+          // Show raw wikimarkdown for hovered revision
+          d3.select('#main').html('')
+          d3.select('#main')
+            .append('pre')
+            .style('white-space', 'pre-wrap')
+            .style('background', '#f5f5f5')
+            .style('padding', '15px')
+            .style('border-radius', '4px')
+            .style('overflow-x', 'auto')
+            .style('font-family', 'monospace')
+            .style('font-size', '0.9em')
+            .text(d.content)
+        } else {
+          // Show diff on hover (optional - can be removed if not needed)
+          if (d.pos > 0) {
+            // @ts-ignore
+            const dmp = new diff_match_patch()
+            var diffs = dmp.diff_main(data[d.pos - 1].content, d.content)
+            dmp.diff_cleanupSemantic(diffs)
 
-        //   var diffs = dmp.diff_main(d.previous, d.content)
-        //   dmp.diff_cleanupSemantic(diffs)
-
-        //   var content = parseDiffs(diffs)
-        //   return md.makeHtml(content)
-
-        // @ts-ignore
-        const dmp = new diff_match_patch()
-        var diffs = dmp.diff_main(data[d.pos - 1].content, d.content)
-        dmp.diff_cleanupSemantic(diffs)
-
-        var result = parseDiffs(diffs)
-        const renderedHtml = md.makeHtml(result)
-        const timestamp = new Date().toISOString()
-        console.log(`[${timestamp}] Rendered HTML for revision ${d.id} (${d.timestamp}) on hover:`)
-        console.log('=== START HTML OUTPUT ===')
-        console.log(renderedHtml)
-        console.log('=== END HTML OUTPUT ===')
-
-        d3.select('#main').html(renderedHtml)
-
-        // d3.select('#main').html(md.makeHtml(d.content))
+            var result = parseDiffs(diffs)
+            const renderedHtml = md.makeHtml(result)
+            d3.select('#main').html(renderedHtml)
+          } else {
+            // Show current revision if it's the first one
+            const renderedHtml = md.makeHtml(d.content)
+            d3.select('#main').html(renderedHtml)
+          }
+        }
       })
-      .on('mouseout', (d, i) => {
-        // d3.select("#main").html(md.makeHtml(first.content))
+      .on('mouseout', (event, d: any) => {
+        // Restore current revision display and date input
+        if (!showRaw) {
+          updateDisplay(currentIndex)
+        } else {
+          updateDateInput(currentIndex)
+        }
       })
+    
+    // Initial slider highlight
+    d3.selectAll('#slider rect[data-revision-index="0"]')
+      .attr('stroke', 'yellow')
+      .attr('stroke-width', 3)
 
     // Add an x axis
     var x = d3.scaleLinear().domain([0, data.length]).range([0, 1800])
