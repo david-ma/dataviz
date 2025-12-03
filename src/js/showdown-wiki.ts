@@ -267,6 +267,17 @@ const cite = [
   },
 ]
 
+// Optional image URL resolver function
+// If provided, will be used instead of MD5 calculation
+export type ImageUrlResolver = (filename: string, width: number) => string
+
+let imageUrlResolver: ImageUrlResolver | null = null
+
+// Set the image URL resolver (called from Theseus.ts)
+export function setImageUrlResolver(resolver: ImageUrlResolver | null) {
+  imageUrlResolver = resolver
+}
+
 // Export the wiki extension function
 export function wiki() {
   return [
@@ -331,11 +342,6 @@ export function wiki() {
         const link = filename.trim().replace(/\s/g, '_')
         const url = `https://en.wikipedia.org/wiki/File:${encodeURIComponent(link)}`
         
-        // Wikipedia uses MD5 hash: first char + first two chars as directory structure
-        const hash = md5(link)
-        const hashDir1 = hash.charAt(0)
-        const hashDir2 = hash.substring(0, 2)
-        
         // Find width (look for "200px" pattern) - skip "thumb" if present
         const widthMatch = parts.find(p => /^\d+px$/.test(p))
         if (widthMatch) {
@@ -347,8 +353,26 @@ export function wiki() {
         const captionStartIndex = widthIndex >= 0 ? widthIndex + 1 : (parts[0] === 'thumb' ? 2 : 1)
         caption = parts.slice(captionStartIndex).join('|')
         
-        const encodedFilename = encodeURIComponent(link)
-        const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hashDir1}/${hashDir2}/${encodedFilename}/${imgWidth}px-${encodedFilename}`
+        // Use image URL resolver if available, otherwise fall back to MD5 calculation
+        let img: string
+        if (imageUrlResolver) {
+          img = imageUrlResolver(filename, imgWidth)
+          if (!img) {
+            // Fallback to MD5 if resolver returns empty string
+            const hashParts = md5(link).split('/')
+            const hashDir1 = hashParts[0] || '0'
+            const hashDir2 = hashParts[1] || '00'
+            const encodedFilename = encodeURIComponent(link)
+            img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hashDir1}/${hashDir2}/${encodedFilename}/${imgWidth}px-${encodedFilename}`
+          }
+        } else {
+          // Use MD5 calculation as fallback
+          const hashParts = md5(link).split('/')
+          const hashDir1 = hashParts[0] || '0'
+          const hashDir2 = hashParts[1] || '00'
+          const encodedFilename = encodeURIComponent(link)
+          img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hashDir1}/${hashDir2}/${encodedFilename}/${imgWidth}px-${encodedFilename}`
+        }
         
         // Process caption to convert [[links]] to HTML links
         // We need to do this manually since the caption won't go through the [[link]] handler
@@ -715,22 +739,110 @@ if (typeof window !== 'undefined') {
   window.globalThis.wiki = wiki
 }
 
-// We need the 1st then 1st & 2nd parts of an md5 hash of filename
-// This is used for Wikimedia Commons image URLs
-// For now, we use a simple hash function - in production you'd want a proper md5 library
+// MD5 implementation for Wikimedia Commons image URLs
+// Wikipedia uses MD5 hash: first char, then first two chars as directory structure
+// This is a compact MD5 implementation based on the standard algorithm
 function md5(str: string): string {
-  // Simple hash function - replace with proper md5 if needed
-  // Wikimedia Commons uses md5 hash: first char, then first two chars
-  let hash = 0
+  // Convert string to UTF-8 bytes
+  const utf8 = []
   for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash // Convert to 32bit integer
+    let c = str.charCodeAt(i)
+    if (c < 0x80) {
+      utf8.push(c)
+    } else if (c < 0x800) {
+      utf8.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f))
+    } else {
+      utf8.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f))
+    }
   }
   
-  // Convert to positive hex and take first 3 chars
-  const hex = Math.abs(hash).toString(16).padStart(8, '0')
-  return `${hex[0]}/${hex[0]}${hex[1]}`
+  // MD5 constants
+  const s = [7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21]
+  const K = [0xd76aa478,0xe8c7b756,0x242070db,0xc1bdceee,0xf57c0faf,0x4787c62a,0xa8304613,0xfd469501,0x698098d8,0x8b44f7af,0xffff5bb1,0x895cd7be,0x6b901122,0xfd987193,0xa679438e,0x49b40821,0xf61e2562,0xc040b340,0x265e5a51,0xe9b6c7aa,0xd62f105d,0x02441453,0xd8a1e681,0xe7d3fbc8,0x21e1cde6,0xc33707d6,0xf4d50d87,0x455a14ed,0xa9e3e905,0xfcefa3f8,0x676f02d9,0x8d2a4c8a,0xfffa3942,0x8771f681,0x6d9d6122,0xfde5380c,0xa4beea44,0x4bdecfa9,0xf6bb4b60,0xbebfbc70,0x289b7ec6,0xeaa127fa,0xd4ef3085,0x04881d05,0xd9d4d039,0xe6db99e5,0x1fa27cf8,0xc4ac5665,0xf4292244,0x432aff97,0xab9423a7,0xfc93a039,0x655b59c3,0x8f0ccc92,0xffeff47d,0x85845dd1,0x6fa87e4f,0xfe2ce6e0,0xa3014314,0x4e0811a1,0xf7537e82,0xbd3af235,0x2ad7d2bb,0xeb86d391]
+  
+  // Initialize MD5 buffer
+  let h0 = 0x67452301, h1 = 0xefcdab89, h2 = 0x98badcfe, h3 = 0x10325476
+  
+  // Pre-processing: add padding
+  const msgLen = utf8.length * 8
+  utf8.push(0x80)
+  while ((utf8.length % 64) !== 56) utf8.push(0x00)
+  
+  // Append length (little-endian)
+  const lenBytes = []
+  let len = msgLen
+  for (let i = 0; i < 8; i++) {
+    lenBytes.push(len & 0xff)
+    len >>>= 8
+  }
+  utf8.push(...lenBytes)
+  
+  // Process message in 512-bit chunks
+  for (let chunk = 0; chunk < utf8.length; chunk += 64) {
+    const w = []
+    for (let i = 0; i < 16; i++) {
+      w[i] = utf8[chunk + i*4] | (utf8[chunk + i*4 + 1] << 8) | 
+             (utf8[chunk + i*4 + 2] << 16) | (utf8[chunk + i*4 + 3] << 24)
+    }
+    
+    let a = h0, b = h1, c = h2, d = h3
+    
+    for (let i = 0; i < 64; i++) {
+      let f, g
+      if (i < 16) {
+        f = (b & c) | ((~b) & d)
+        g = i
+      } else if (i < 32) {
+        f = (d & b) | ((~d) & c)
+        g = (5*i + 1) % 16
+      } else if (i < 48) {
+        f = b ^ c ^ d
+        g = (3*i + 5) % 16
+      } else {
+        f = c ^ (b | (~d))
+        g = (7*i) % 16
+      }
+      
+      f = (f + a + K[i] + w[g]) | 0
+      a = d
+      d = c
+      c = b
+      b = (b + ((f << s[i]) | (f >>> (32 - s[i])))) | 0
+    }
+    
+    h0 = (h0 + a) | 0
+    h1 = (h1 + b) | 0
+    h2 = (h2 + c) | 0
+    h3 = (h3 + d) | 0
+  }
+  
+  // Convert to hex string
+  const hex = [h0, h1, h2, h3].map(h => {
+    const str = (h >>> 0).toString(16)
+    return '00000000'.substring(str.length) + str
+  }).join('')
+  
+  // Return first char and first two chars for Wikipedia directory structure
+  return hex.charAt(0) + '/' + hex.substring(0, 2)
+}
+
+function utf8Encode(str: string): string {
+  str = str.replace(/\r\n/g, '\n')
+  let utftext = ''
+  for (let n = 0; n < str.length; n++) {
+    const c = str.charCodeAt(n)
+    if (c < 128) {
+      utftext += String.fromCharCode(c)
+    } else if ((c > 127) && (c < 2048)) {
+      utftext += String.fromCharCode((c >> 6) | 192)
+      utftext += String.fromCharCode((c & 63) | 128)
+    } else {
+      utftext += String.fromCharCode((c >> 12) | 224)
+      utftext += String.fromCharCode(((c >> 6) & 63) | 128)
+      utftext += String.fromCharCode((c & 63) | 128)
+    }
+  }
+  return utftext
 }
 
 function getFieldValue(fields: string[], fieldName: string): string {

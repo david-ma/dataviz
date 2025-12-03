@@ -1,3 +1,5 @@
+export type ImageUrlResolver = (filename: string, width: number) => string;
+export declare function setImageUrlResolver(resolver: ImageUrlResolver | null): void;
 export declare function wiki(): {
     type: string;
     regex: RegExp;
