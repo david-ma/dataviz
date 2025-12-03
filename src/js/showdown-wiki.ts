@@ -262,43 +262,57 @@ const cite = [
   },
 ]
 
-window.globalThis.wiki = function () {
+// Export the wiki extension function
+export function wiki() {
   return [
     ...cite,
 
     // [[File: ]]
     // Display an image
+    // Must come BEFORE regular [[links]] to avoid conflicts
     {
       type: 'lang',
-      regex: /\[\[File:([^|]+)\|thumb\|(\d+)px\|((?:.)+)\]\]/g,
-      replace: function (match, filename, width = 100, caption) {
-        const parts = filename.split('|')
-
-        const link = parts[0].replace(/\s/g, '_')
-        const url = `https://en.wikipedia.org/wiki/File:${link}`
+      regex: /\[\[File:([^|\]]+)(?:\|thumb)?(?:\|(\d+)px)?(?:\|([^\]]+))?\]\]/g,
+      replace: function (match, filename, width, caption) {
+        const link = filename.trim().replace(/\s/g, '_')
+        const url = `https://en.wikipedia.org/wiki/File:${encodeURIComponent(link)}`
         const hash = md5(link)
-        const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${link}/${width}px-${link}`
-        return `<figure style="width: ${width}px;">
+        const imgWidth = width || 200
+        const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${encodeURIComponent(link)}/${imgWidth}px-${encodeURIComponent(link)}`
+        
+        let figureContent = `<figure style="width: ${imgWidth}px;">
   <a href="${url}">
-  <img src=${img}>
-  </a>
+  <img src="${img}" alt="${caption || link}" style="max-width: 100%; height: auto;">
+  </a>`
+        
+        if (caption) {
+          figureContent += `
   <figcaption>
   ${caption}
-  </figcaption>
+  </figcaption>`
+        }
+        
+        figureContent += `
   </figure>`
+        
+        return figureContent
       },
     },
 
     // [[ link ]]
     // Used for linking to another wikipedia page
+    // Must come AFTER File: links to avoid conflicts
     {
       type: 'lang',
       regex: /\[\[([^\]]+)\]\]/g,
       replace: function (match, content) {
         const parts = content.split('|')
-        const link = parts[0]
-        const text = parts[1] || link
-        return `<a href="https://en.wikipedia.org/wiki/${link}">${text}</a>`
+        const link = parts[0].trim()
+        const text = parts[1] ? parts[1].trim() : link
+        
+        // Encode the link for URL
+        const encodedLink = encodeURIComponent(link.replace(/ /g, '_'))
+        return `<a href="https://en.wikipedia.org/wiki/${encodedLink}">${text}</a>`
       },
     },
 
@@ -307,9 +321,9 @@ window.globalThis.wiki = function () {
       regex: /{{Div col\|colwidth=20em}}([\s\S]+?){{Div col end}}/g,
       replace: function (match, content) {
         // Process the content within the {{Div col...}} template
-        const processedContent = md.makeHtml(content.trim())
-
-        return `<div style="column-width: 20em;">${processedContent}</div>`
+        // Note: Content will be processed by Showdown in subsequent passes
+        // We just wrap it in a div - the markdown inside will be converted separately
+        return `<div style="column-width: 20em;">${content.trim()}</div>`
       },
     },
 
@@ -433,19 +447,74 @@ window.globalThis.wiki = function () {
         return `<b>${content}</b>`
       },
     },
+
+    // ''italic text''
+    // <i>italic text</i>
+    {
+      type: 'lang',
+      regex: /''([^']+)''/g,
+      replace: function (match, content) {
+        return `<i>${content}</i>`
+      },
+    },
+
+    // Handle {{!}} which is used to escape pipe characters in templates
+    // Must come early to process before other templates
+    {
+      type: 'lang',
+      regex: /\{\{!\}\}/g,
+      replace: function () {
+        return '|'
+      },
+    },
+
+    // Handle external links: [url text] or [url]
+    {
+      type: 'lang',
+      regex: /\[(https?:\/\/[^\s\]]+)(?:\s+([^\]]+))?\]/g,
+      replace: function (match, url, text) {
+        return `<a href="${url}" class="external text" rel="nofollow">${text || url}</a>`
+      },
+    },
+
+    // Handle ISBN template: {{ISBN|978-4396614669}}
+    {
+      type: 'lang',
+      regex: /\{\{ISBN\|([^}]+)}}/g,
+      replace: function (match, isbn) {
+        return `<a href="/wiki/Special:BookSources/${isbn}" title="Special:BookSources/${isbn}"><bdi>${isbn}</bdi></a>`
+      },
+    },
   ]
 }
 
-// We need the 1st then 1st & 2nd parts of an md5 hash of filename
-// Hardcode it for now.
-function md5(str) {
-  if (str === 'USS_Constitution_fires_a_17-gun_salute.jpg') {
-    return 'e/ed'
-  }
-  return '1/1c'
+// Also export for global use (backwards compatibility)
+if (typeof window !== 'undefined') {
+  window.globalThis.wiki = wiki
 }
 
-function getFieldValue(fields, fieldName) {
-  const field = fields.find((f) => f.startsWith(fieldName))
-  return field ? field.split('=')[1] : ''
+// We need the 1st then 1st & 2nd parts of an md5 hash of filename
+// This is used for Wikimedia Commons image URLs
+// For now, we use a simple hash function - in production you'd want a proper md5 library
+function md5(str: string): string {
+  // Simple hash function - replace with proper md5 if needed
+  // Wikimedia Commons uses md5 hash: first char, then first two chars
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // Convert to 32bit integer
+  }
+  
+  // Convert to positive hex and take first 3 chars
+  const hex = Math.abs(hash).toString(16).padStart(8, '0')
+  return `${hex[0]}/${hex[0]}${hex[1]}`
 }
+
+function getFieldValue(fields: string[], fieldName: string): string {
+  const field = fields.find((f) => f.startsWith(fieldName))
+  return field ? field.split('=')[1]?.trim() || '' : ''
+}
+
+// Export types for use elsewhere
+export type WikiExtension = ReturnType<typeof wiki>

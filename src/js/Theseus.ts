@@ -44,19 +44,19 @@ console.log('Hello World')
 // And should become this:
 // <blockquote class="templatequote"><p>The ship wherein <a href="/wiki/Theseus" title="Theseus">Theseus</a> and the youth of Athens returned from Crete had thirty oars, and was preserved by the Athenians down even to the time of <a href="/wiki/Demetrius_of_Phalerum" title="Demetrius of Phalerum">Demetrius Phalereus</a>, for they took away the old planks as they decayed, putting in new and stronger timber in their places, insomuch that this ship became a standing example among the philosophers, for the logical question of things that grow; one side holding that the ship remained the same, and the other contending that it was not the same.</p><div class="templatequotecite">— <cite>Plutarch, <i>Life of Theseus</i> 23.1</cite></div></blockquote>
 
-// import wiki from './showdown-wiki'
-declare var wiki: any
+import { wiki } from './showdown-wiki'
 
-// showdown.extension('wiki', wiki)
+// Register the wiki extension with Showdown
+showdown.extension('wiki', wiki)
 
 var md = new showdown.Converter({
   openLinksInNewWindow: true,
-  // extensions: ['wiki'],
+  extensions: ['wiki'],
 })
 
 var raw = new showdown.Converter({
   openLinksInNewWindow: true,
-  // extensions: ['wiki'],
+  extensions: ['wiki'],
 })
 
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/diff-match-patch/20121119/diff_match_patch.js"></script>
