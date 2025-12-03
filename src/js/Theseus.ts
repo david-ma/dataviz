@@ -135,9 +135,21 @@ d3.json('/ship_of_theseus_revisions.json')
           .style('font-size', '0.9em')
           .text(revision.content)
       } else {
-        // Show parsed HTML
-        const renderedHtml = md.makeHtml(revision.content)
-        d3.select('#main').html(renderedHtml)
+        // Show parsed HTML with diff highlighting if there's a previous revision
+        if (index > 0) {
+          // @ts-ignore
+          const dmp = new diff_match_patch()
+          var diffs = dmp.diff_main(data[index - 1].content, revision.content)
+          dmp.diff_cleanupSemantic(diffs)
+
+          var result = parseDiffs(diffs)
+          const renderedHtml = md.makeHtml(result)
+          d3.select('#main').html(renderedHtml)
+        } else {
+          // First revision - no diff to show
+          const renderedHtml = md.makeHtml(revision.content)
+          d3.select('#main').html(renderedHtml)
+        }
       }
       
       // Update slider highlight (only if slider exists)
