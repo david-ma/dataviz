@@ -111,10 +111,8 @@ d3.json('/ship_of_theseus_revisions.json')
       currentIndex = index
       const revision = data[index]
       
-      // Update revision info
-      const date = new Date(revision.timestamp)
-      const dateStr = date.toLocaleString()
-      d3.select('#revision-info').text(`Revision ${revision.id} • ${dateStr} • ${revision.user}`)
+      // Update revision info (date is already shown in date input)
+      d3.select('#revision-info').text(`Revision ${revision.id} • ${revision.user}`)
       
       // Update button states
       d3.select('#btn-back').property('disabled', index === 0)
@@ -207,6 +205,26 @@ d3.json('/ship_of_theseus_revisions.json')
       d3.select('#date-input').property('value', dateValue)
     }
     
+    // Mobile sidebar toggle
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('theseus-sidebar')
+      const overlay = document.getElementById('theseus-sidebar-overlay')
+      if (sidebar && overlay) {
+        sidebar.classList.toggle('mobile-open')
+        overlay.classList.toggle('mobile-open')
+      }
+    }
+    
+    // Close sidebar when clicking overlay
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('theseus-sidebar')
+      const overlay = document.getElementById('theseus-sidebar-overlay')
+      if (sidebar && overlay) {
+        sidebar.classList.remove('mobile-open')
+        overlay.classList.remove('mobile-open')
+      }
+    }
+    
     // Set up event handlers
     d3.select('#btn-back').on('click', goBack)
     d3.select('#btn-forward').on('click', goForward)
@@ -221,39 +239,93 @@ d3.json('/ship_of_theseus_revisions.json')
       }
     })
     
+    // Mobile menu handlers
+    const mobileMenuToggle = document.getElementById('theseus-mobile-menu-toggle')
+    const mobileCloseSidebar = document.getElementById('theseus-mobile-close-sidebar')
+    const sidebarOverlay = document.getElementById('theseus-sidebar-overlay')
+    if (mobileMenuToggle) {
+      mobileMenuToggle.addEventListener('click', toggleMobileSidebar)
+    }
+    if (mobileCloseSidebar) {
+      mobileCloseSidebar.addEventListener('click', closeMobileSidebar)
+    }
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', closeMobileSidebar)
+    }
+    
+    // Close sidebar when clicking links inside it (mobile)
+    const sidebar = document.getElementById('theseus-sidebar')
+    if (sidebar) {
+      const sidebarLinks = sidebar.querySelectorAll('a')
+      sidebarLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 768) {
+            closeMobileSidebar()
+          }
+        })
+      })
+    }
+    
     // Initial display
     updateDisplay(0)
 
+    // Calculate slider dimensions based on screen size
+    const isMobile = window.innerWidth <= 768
+    const barWidth = isMobile ? 20 : 10
+    const barHeight = isMobile ? 100 : 80
+    const totalSliderWidth = data.length * barWidth
+    const sliderWidth = Math.min(totalSliderWidth, Math.max(1800, window.innerWidth - 40))
+    
     var slider = d3
       .select('#slider')
       .append('svg')
-      .attr('width', 1800)
+      .attr('width', sliderWidth)
       .attr('height', 120)
-      .attr('viewBox', [0, 0, 1800, 120])
+      .attr('viewBox', [0, 0, totalSliderWidth, 120])
+      .attr('preserveAspectRatio', 'none')
+      .style('max-width', '100%')
+      .style('height', 'auto')
     slider
       .append('rect')
       .attr('width', 1000)
       .attr('height', 80)
       .attr('fill', 'red')
-
+    
     slider
       .selectAll('rect')
       .data(data)
       .enter()
       .append('rect')
-      .attr('width', 10)
-      .attr('height', 80)
+      .attr('width', barWidth)
+      .attr('height', barHeight)
       .attr('data-revision-index', (d: any, i: number) => i)
       .attr('fill', (d, i) => {
         d.pos = i
         return i % 2 === 0 ? 'blue' : 'green'
       })
-      .attr('x', (d, i) => i)
+      .attr('x', (d, i) => i * barWidth)
       .attr('y', 0)
       .style('cursor', 'pointer')
+      .style('touch-action', 'none')
       .on('click', (event, d: any) => {
         // Click to jump to this revision
+        event.preventDefault()
+        event.stopPropagation()
         updateDisplay(d.pos)
+        // Close mobile sidebar if open
+        if (isMobile) {
+          closeMobileSidebar()
+        }
+      })
+      .on('touchend', (event, d: any) => {
+        // Touch support for mobile
+        event.preventDefault()
+        event.stopPropagation()
+        updateDisplay(d.pos)
+        // Close mobile sidebar if open
+        if (isMobile) {
+          closeMobileSidebar()
+        }
       })
       .on('mouseover', (event, d: any) => {
         // Update date input on hover

@@ -1,10 +1,334 @@
 <link rel="stylesheet" href="/css/wiki.css" />
+<style>
+  /* Mobile-friendly styles */
+  @media (max-width: 768px) {
+    /* Fix padding issues from Bootstrap columns */
+    #content_reactive_wrapper {
+      padding-left: 15px !important;
+      padding-right: 15px !important;
+    }
+    
+    #contentBox {
+      margin-left: -15px !important;
+      margin-right: -15px !important;
+      padding-left: 15px !important;
+      padding-right: 15px !important;
+    }
+    
+    #theseus-sidebar {
+      position: fixed;
+      left: -100%;
+      top: 0;
+      width: 80%;
+      max-width: 300px;
+      height: 100vh;
+      background: white;
+      z-index: 1002;
+      transition: left 0.3s ease;
+      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      padding-top: 50px;
+    }
+    
+    #theseus-sidebar.mobile-open {
+      left: 0;
+    }
+    
+    #theseus-sidebar.mobile-open .mobile-close-btn {
+      display: block !important;
+    }
+    
+    #theseus-sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1001;
+    }
+    
+    #theseus-sidebar-overlay.mobile-open {
+      display: block;
+    }
+    
+    #content-main {
+      width: 100%;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    
+    #controls {
+      padding: 8px !important;
+      margin-bottom: 10px !important;
+    }
+    
+    #controls-row-1 {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+      align-items: center !important;
+      margin-bottom: 8px !important;
+    }
+    
+    #controls-row-1 > button {
+      flex: 0 0 auto;
+      padding: 6px 12px !important;
+      font-size: 14px !important;
+    }
+    
+    #date-revision-group {
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      flex-wrap: wrap !important;
+    }
+    
+    #date-revision-group > label {
+      flex-shrink: 0;
+      font-size: 0.9em;
+      margin: 0 !important;
+    }
+    
+    #date-revision-group > label span {
+      font-size: 0.85em;
+      white-space: nowrap;
+    }
+    
+    #date-revision-group input[type="datetime-local"] {
+      font-size: 0.9em;
+      padding: 4px 6px !important;
+    }
+    
+    #revision-info {
+      font-size: 0.8em !important;
+      color: #666;
+      flex-shrink: 0;
+    }
+    
+    #controls-row-2 {
+      display: flex !important;
+      align-items: center !important;
+    }
+    
+    #controls-row-2 > label {
+      font-size: 0.9em;
+      margin: 0 !important;
+    }
+    
+    #controls-row-2 input[type="checkbox"] {
+      margin: 0;
+    }
+    
+    #header h1 {
+      font-size: 1.3em;
+      margin-bottom: 8px;
+    }
+    
+    #slider {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    #slider svg {
+      min-width: 1800px;
+    }
+    
+    .theseus-mobile-menu-btn {
+      display: block !important;
+      position: fixed;
+      top: 60px;
+      right: 10px;
+      z-index: 1003;
+      padding: 8px 12px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    #theseus-sidebar {
+      position: relative;
+      left: auto;
+      padding-right: 10px;
+    }
+    
+    #theseus-sidebar-overlay {
+      display: none !important;
+    }
+    
+    .theseus-mobile-menu-btn {
+      display: none !important;
+    }
+    
+    /* Tighter desktop controls */
+    #controls {
+      padding: 8px !important;
+      margin-bottom: 12px !important;
+    }
+    
+    #controls-row-1 {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      gap: 8px !important;
+      align-items: center !important;
+      margin-bottom: 6px !important;
+    }
+    
+    #controls-row-1 > button {
+      padding: 6px 12px !important;
+      font-size: 14px !important;
+      flex-shrink: 0 !important;
+    }
+    
+    #date-revision-group {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+      gap: 8px !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+    }
+    
+    #date-revision-group > label {
+      flex-shrink: 0 !important;
+      white-space: nowrap !important;
+    }
+    
+    #date-revision-group > label span {
+      font-size: 0.85em;
+      white-space: nowrap !important;
+    }
+    
+    #date-revision-group input[type="datetime-local"] {
+      flex-shrink: 0 !important;
+    }
+    
+    #revision-info {
+      font-size: 0.85em !important;
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+    }
+    
+    #header h1 {
+      font-size: 1.5em;
+      margin-bottom: 8px;
+    }
+    
+    #logo-replacement {
+      margin-top: 10px !important;
+    }
+    
+    #logo-replacement h1 {
+      font-size: 1.3em !important;
+    }
+    
+    #logo-replacement h2 {
+      font-size: 0.9em !important;
+    }
+    
+    #sideinfo {
+      margin-top: 10px;
+    }
+  }
+  
+  .theseus-mobile-menu-btn:hover {
+    background: #555;
+  }
+  
+  #controls label {
+    white-space: nowrap;
+  }
+  
+  #controls label span {
+    font-size: 0.9em;
+  }
+  
+  /* Touch-friendly buttons */
+  @media (max-width: 768px) {
+    #btn-back, #btn-forward {
+      min-height: 44px;
+      min-width: 44px;
+      font-size: 16px;
+    }
+    
+    #main {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    
+    #main img {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    #main table {
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    #date-revision-group > label span:first-child {
+      display: none;
+    }
+    
+    #date-input {
+      width: 100%;
+      min-height: 36px;
+      font-size: 0.85em;
+    }
+    
+    #controls-row-1 {
+      gap: 4px !important;
+    }
+    
+    #controls-row-1 > button {
+      padding: 6px 10px !important;
+      font-size: 13px !important;
+    }
+    
+    #date-revision-group {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      margin-top: 15px;
+    }
+    
+    #revision-info {
+      width: 100%;
+      text-align: left;
+    }
+  }
+  
+  /* Improve slider touch targets */
+  #slider rect {
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    #slider rect {
+      min-width: 20px;
+      min-height: 60px;
+    }
+  }
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
 {{!-- <script src="/js/wiki.js" type="module"></script> --}}
 
 <section id="example" class="blogpost">
+  <button class="theseus-mobile-menu-btn" id="theseus-mobile-menu-toggle" aria-label="Toggle sidebar">☰</button>
+  <div id="theseus-sidebar-overlay"></div>
   <div class="row" id="contentBox">
-    <div class="col-xs-2">
+    <div class="col-xs-2" id="theseus-sidebar">
+      <button class="mobile-close-btn" id="theseus-mobile-close-sidebar" aria-label="Close sidebar" style="display: none; position: absolute; top: 10px; right: 10px; background: #333; color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 18px;">✕</button>
       <div id="logo-replacement">
         <a href="/">
           <img class="mw-logo-icon" src="https://en.wikipedia.org/static/images/icons/wikipedia.png" alt=""
@@ -24,22 +348,26 @@
       <div id="sideinfo"></div>
 
     </div>
-    <div class="col-xs-8">
+    <div class="col-xs-8" id="content-main">
       <div id="header">
         <h1>Ship of Theseus</h1>
         <div id="controls" style="margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
-          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <button id="btn-back" style="padding: 8px 16px; cursor: pointer;">← Back</button>
-            <button id="btn-forward" style="padding: 8px 16px; cursor: pointer;">Forward →</button>
-            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+          <div id="controls-row-1" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
+            <button id="btn-back" style="padding: 8px 16px; cursor: pointer; flex-shrink: 0;">← Back</button>
+            <div id="date-revision-group" style="display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0;">
+              <label style="display: flex; align-items: center; gap: 5px; flex-shrink: 0; margin: 0; white-space: nowrap;">
+                <span style="white-space: nowrap;">Jump to date:</span>
+                <input type="datetime-local" id="date-input" style="padding: 4px 8px; flex-shrink: 0;" />
+              </label>
+              <span id="revision-info" style="font-size: 0.9em; color: #666; flex-shrink: 0; white-space: nowrap;"></span>
+            </div>
+            <button id="btn-forward" style="padding: 8px 16px; cursor: pointer; flex-shrink: 0;">Forward →</button>
+          </div>
+          <div id="controls-row-2" style="display: flex; align-items: center;">
+            <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; margin: 0;">
               <input type="checkbox" id="toggle-raw" />
               <span>Show raw wikimarkdown</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 5px;">
-              <span>Jump to date:</span>
-              <input type="datetime-local" id="date-input" style="padding: 4px 8px;" />
-            </label>
-            <span id="revision-info" style="margin-left: auto; font-size: 0.9em; color: #666;"></span>
           </div>
         </div>
         <div id="slider"></div>
