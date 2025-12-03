@@ -341,11 +341,38 @@
 
       </div>
 
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vitae dolorum aliquam tempore quasi aperiam magni
-        soluta. Voluptates rem voluptate culpa repellendus voluptas unde, dignissimos veritatis, doloremque porro rerum,
-        suscipit nihil.</p>
-
-      <div id="sideinfo"></div>
+      <div id="project-description">
+        <h3>About</h3>
+        <p>This visualization explores the evolution of the Wikipedia article "Ship of Theseus" over time. Scrub through revisions to see how the article has changed, with diff highlighting showing additions (green) and deletions (red).</p>
+        
+        <h3>Completed</h3>
+        <ul>
+          <li>Mobile friendly version</li>
+          <li>Add info on hover when scrubbing</li>
+          <li>Highlight differences when changing versions</li>
+          <li>MediaWiki markup parser using Showdown.js</li>
+          <li>Interactive timeline scrubber with hover preview</li>
+          <li>Diff highlighting for text changes</li>
+          <li>Mobile-responsive design with collapsible sidebar</li>
+          <li>Date-based navigation and revision jumping</li>
+          <li>Raw markdown toggle for debugging</li>
+          <li>Wikipedia image URL resolution</li>
+          <li>Template handling (About, Main, citations, etc.)</li>
+        </ul>
+        
+        <h3>Todo</h3>
+        <ul>
+          <li>Fix citation references showing as [0]</li>
+          <li>Fix invalid HTML from diff highlighting (div inside span)</li>
+          <li>Fix the references in wiki markdown</li>
+          <li>Smoother transition, animations</li>
+          <li>Add a link to the original article</li>
+          <li>Add a link to the source code</li>
+          <li>Add a link to the data (or how to download data)</li>
+          <li>Put a table of contents here</li>
+          <li>Publish ShowdownJS wiki plugin?</li>
+        </ul>
+      </div>
 
     </div>
     <div class="col-xs-8" id="content-main">
@@ -383,24 +410,4 @@
 
 <script>
   console.log("hey?")
-
-  var md = new showdown.Converter({ openLinksInNewWindow: true });
-
-  $("#sideinfo").html(md.makeHtml(
-`##Todo:
-- Mobile friendly version
-- Add better axis to the scrubber
-- Add info on hover when scrubbing
-- Fix all the wiki markup
-- Publish ShowdownJS wiki plugin?
-- Add a link to the original article
-- Add a link to the source code
-- Add a link to the data (or how to download data)
-- Fix the references in wiki markdown?
-- Put a table of contents here?
-- Highlight differences when changing versions?
-- Smoother transition, animations?
-`
-  ));
-
 </script>

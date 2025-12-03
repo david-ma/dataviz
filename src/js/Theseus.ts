@@ -272,7 +272,8 @@ d3.json('/ship_of_theseus_revisions.json')
     // Calculate slider dimensions based on screen size
     const isMobile = window.innerWidth <= 768
     const barWidth = isMobile ? 20 : 10
-    const barHeight = isMobile ? 100 : 80
+    const barHeight = isMobile ? 70 : 80  // 30% shorter on mobile (100 * 0.7 = 70)
+    const sliderHeight = isMobile ? 84 : 120  // 30% shorter on mobile (120 * 0.7 = 84)
     const totalSliderWidth = data.length * barWidth
     const sliderWidth = Math.min(totalSliderWidth, Math.max(1800, window.innerWidth - 40))
     
@@ -280,16 +281,11 @@ d3.json('/ship_of_theseus_revisions.json')
       .select('#slider')
       .append('svg')
       .attr('width', sliderWidth)
-      .attr('height', 120)
-      .attr('viewBox', [0, 0, totalSliderWidth, 120])
+      .attr('height', sliderHeight)
+      .attr('viewBox', [0, 0, totalSliderWidth, sliderHeight])
       .attr('preserveAspectRatio', 'none')
       .style('max-width', '100%')
       .style('height', 'auto')
-    slider
-      .append('rect')
-      .attr('width', 1000)
-      .attr('height', 80)
-      .attr('fill', 'red')
     
     slider
       .selectAll('rect')
@@ -304,7 +300,7 @@ d3.json('/ship_of_theseus_revisions.json')
         return i % 2 === 0 ? 'blue' : 'green'
       })
       .attr('x', (d, i) => i * barWidth)
-      .attr('y', 0)
+      .attr('y', isMobile ? (sliderHeight - barHeight) / 2 : 0)  // Center vertically on mobile
       .style('cursor', 'pointer')
       .style('touch-action', 'none')
       .on('click', (event, d: any) => {
@@ -328,8 +324,10 @@ d3.json('/ship_of_theseus_revisions.json')
         }
       })
       .on('mouseover', (event, d: any) => {
-        // Update date input on hover
+        // Update date input and revision info on hover
         updateDateInput(d.pos)
+        const revision = data[d.pos]
+        d3.select('#revision-info').text(`Revision ${revision.id} • ${revision.user}`)
         
         // Update display based on toggle state
         if (showRaw) {
@@ -377,13 +375,7 @@ d3.json('/ship_of_theseus_revisions.json')
       .attr('stroke', 'yellow')
       .attr('stroke-width', 3)
 
-    // Add an x axis
-    var x = d3.scaleLinear().domain([0, data.length]).range([0, 1800])
-
-    slider
-      .append('g')
-      .attr('transform', 'translate(0, 100)')
-      .call(d3.axisBottom(x))
+    // Axis removed - not readable
 
     // d3.select('#raw').html(getIntro(first.content))
 
