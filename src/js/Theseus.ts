@@ -86,7 +86,14 @@ d3.json('/ship_of_theseus_revisions.json')
     console.log('data', data)
     const first = data[0]
 
-    d3.select('#main').html(md.makeHtml(first.content))
+    const renderedHtml = md.makeHtml(first.content)
+    const timestamp = new Date().toISOString()
+    console.log(`[${timestamp}] Rendered HTML for revision ${first.id} (${first.timestamp}):`)
+    console.log('=== START HTML OUTPUT ===')
+    console.log(renderedHtml)
+    console.log('=== END HTML OUTPUT ===')
+    
+    d3.select('#main').html(renderedHtml)
 
     var slider = d3
       .select('#slider')
@@ -129,8 +136,14 @@ d3.json('/ship_of_theseus_revisions.json')
         dmp.diff_cleanupSemantic(diffs)
 
         var result = parseDiffs(diffs)
+        const renderedHtml = md.makeHtml(result)
+        const timestamp = new Date().toISOString()
+        console.log(`[${timestamp}] Rendered HTML for revision ${d.id} (${d.timestamp}) on hover:`)
+        console.log('=== START HTML OUTPUT ===')
+        console.log(renderedHtml)
+        console.log('=== END HTML OUTPUT ===')
 
-        d3.select('#main').html(md.makeHtml(result))
+        d3.select('#main').html(renderedHtml)
 
         // d3.select('#main').html(md.makeHtml(d.content))
       })

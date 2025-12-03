@@ -1,12 +1,17 @@
 // This is a ShowdownJS extension for Wiki Markup
 // By David Ma, for the Ship of Theseus project
-// See:
+//
+// MediaWiki Template Documentation:
+// - Templates: https://www.mediawiki.org/wiki/Help:Templates
+// - Template syntax: {{TemplateName|param1|param2}} or {{TemplateName|name=value}}
+// - Common templates: navbox, infobox, sidebar, citation templates
+//
+// See also:
 // - https://www.mediawiki.org/wiki/Parsoid
 // - https://www.mediawiki.org/wiki/Markup_spec
 // - https://www.mediawiki.org/wiki/Help:Wikitext_examples
 // - https://www.mediawiki.org/wiki/Help:Formatting
 // - https://www.mediawiki.org/wiki/Help:Links
-// - https://www.mediawiki.org/wiki/Help:Templates
 // - https://github.com/showdownjs/showdown
 
 const citations = []
@@ -265,30 +270,109 @@ const cite = [
 // Export the wiki extension function
 export function wiki() {
   return [
+    // Handle {{!}} FIRST - this must come before all other templates
+    // It's used to escape pipe characters in templates
+    {
+      type: 'lang',
+      regex: /\{\{!\}\}/g,
+      replace: function () {
+        return '|'
+      },
+    },
+
     ...cite,
 
     // [[File: ]]
     // Display an image
     // Must come BEFORE regular [[links]] to avoid conflicts
+    // Example: [[File:Teseo e Arianna, Pompei.jpg|thumb|200px|A [[Fresco]] from [[Pompeii]]]]
+    // Wikipedia URL structure: /thumb/{first_char}/{first_two_chars}/{filename}/{width}px-{filename}
+    // Note: We need to handle nested [[links]] in captions, so we parse carefully
     {
       type: 'lang',
-      regex: /\[\[File:([^|\]]+)(?:\|thumb)?(?:\|(\d+)px)?(?:\|([^\]]+))?\]\]/g,
-      replace: function (match, filename, width, caption) {
+      regex: /\[\[File:([^\]]+)\]\]/g,
+      replace: function (match, allParams) {
+        // Parse parameters carefully, handling nested [[links]] in caption
+        // We can't just split by | because nested links might contain |
+        // Strategy: Find the filename (first part), then look for width pattern, rest is caption
+        let filename = ''
+        let imgWidth = 200
+        let caption = ''
+        
+        // Find the first | that's not inside [[ ]]
+        let bracketDepth = 0
+        let parts: string[] = []
+        let currentPart = ''
+        
+        for (let i = 0; i < allParams.length; i++) {
+          const char = allParams[i]
+          if (char === '[' && i < allParams.length - 1 && allParams[i + 1] === '[') {
+            bracketDepth++
+            currentPart += char
+            i++ // Skip next [
+            currentPart += '['
+          } else if (char === ']' && i < allParams.length - 1 && allParams[i + 1] === ']') {
+            bracketDepth--
+            currentPart += char
+            i++ // Skip next ]
+            currentPart += ']'
+          } else if (char === '|' && bracketDepth === 0) {
+            parts.push(currentPart.trim())
+            currentPart = ''
+          } else {
+            currentPart += char
+          }
+        }
+        if (currentPart) {
+          parts.push(currentPart.trim())
+        }
+        
+        filename = parts[0] || ''
         const link = filename.trim().replace(/\s/g, '_')
         const url = `https://en.wikipedia.org/wiki/File:${encodeURIComponent(link)}`
+        
+        // Wikipedia uses MD5 hash: first char + first two chars as directory structure
         const hash = md5(link)
-        const imgWidth = width || 200
-        const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hash}/${encodeURIComponent(link)}/${imgWidth}px-${encodeURIComponent(link)}`
+        const hashDir1 = hash.charAt(0)
+        const hashDir2 = hash.substring(0, 2)
+        
+        // Find width (look for "200px" pattern) - skip "thumb" if present
+        const widthMatch = parts.find(p => /^\d+px$/.test(p))
+        if (widthMatch) {
+          imgWidth = parseInt(widthMatch.replace('px', ''), 10)
+        }
+        
+        // Everything after width (or after filename if no width) is the caption
+        const widthIndex = widthMatch ? parts.indexOf(widthMatch) : -1
+        const captionStartIndex = widthIndex >= 0 ? widthIndex + 1 : (parts[0] === 'thumb' ? 2 : 1)
+        caption = parts.slice(captionStartIndex).join('|')
+        
+        const encodedFilename = encodeURIComponent(link)
+        const img = `https://upload.wikimedia.org/wikipedia/commons/thumb/${hashDir1}/${hashDir2}/${encodedFilename}/${imgWidth}px-${encodedFilename}`
+        
+        // Process caption to convert [[links]] to HTML links
+        // We need to do this manually since the caption won't go through the [[link]] handler
+        let processedCaption = caption || ''
+        if (processedCaption) {
+          // Convert [[Link]] or [[Link|Display]] to HTML links
+          processedCaption = processedCaption.replace(/\[\[([^\]]+)\]\]/g, function(linkMatch, linkContent) {
+            const linkParts = linkContent.split('|')
+            const linkTarget = linkParts[0].trim()
+            const linkText = linkParts[1] ? linkParts[1].trim() : linkTarget
+            const encodedLink = encodeURIComponent(linkTarget.replace(/ /g, '_'))
+            return `<a href="https://en.wikipedia.org/wiki/${encodedLink}" title="${linkTarget}">${linkText}</a>`
+          })
+        }
         
         let figureContent = `<figure style="width: ${imgWidth}px;">
   <a href="${url}">
-  <img src="${img}" alt="${caption || link}" style="max-width: 100%; height: auto;">
+  <img src="${img}" alt="${processedCaption || link}" style="max-width: 100%; height: auto;">
   </a>`
         
-        if (caption) {
+        if (processedCaption) {
           figureContent += `
   <figcaption>
-  ${caption}
+  ${processedCaption}
   </figcaption>`
         }
         
@@ -418,11 +502,47 @@ export function wiki() {
     // {{About|the thought experiment|the film|Ship of Theseus (film){{!}}''Ship of Theseus'' (film)}} {{Use dmy dates|date=February 2023}}
     // <div role="note" class="hatnote navigation-not-searchable">This article is about the thought experiment. For the film, see <a href="/wiki/Ship_of_Theseus_(film)" title="Ship of Theseus (film)"><i>Ship of Theseus</i> (film)</a>.</div>
     // Be sure to handle this weird syntax: (film){{!}}''Ship of Theseus'' (film)
+    // Note: {{!}} should already be converted to | by the first extension handler
+    // We match the template content up to the closing }}, handling nested templates carefully
     {
       type: 'lang',
-      regex: /{{About\|([^|]+)\|([^|]+)\|([^|]+)}}/g,
-      replace: function (match, content, about, link) {
-        return `<div role="note" class="hatnote navigation-not-searchable">This article is about ${content}. For ${about}, see <a href="/wiki/${link}" title="${link}"><i>${link}</i></a>.</div>`
+      regex: /{{About\|([^}]+?)}}/g,
+      replace: function (match, allParams) {
+        // {{!}} should already be converted to | by now, so we can safely split
+        const parts = allParams.split('|').map(p => p.trim())
+        
+        if (parts.length < 3) {
+          console.warn('{{About}} template has fewer than 3 parameters:', match)
+          return match // Return unchanged if malformed
+        }
+        
+        let content = parts[0] || ''
+        let about = parts[1] || ''
+        // Join remaining parts - the link might contain | characters
+        let link = parts.slice(2).join('|')
+        
+        // Clean up the parameters
+        content = content.trim()
+        about = about.trim()
+        link = link.trim()
+        
+        // Clean up any remaining template syntax (shouldn't happen if {{!}} was processed first)
+        link = link.replace(/\{\{!\}\}/g, '|')
+        link = link.replace(/\{\{[^}]*\}\}/g, '').trim()
+        
+        // Clean up italic markup: ''text'' becomes text
+        link = link.replace(/''([^']*)''/g, '$1')
+        link = link.replace(/''/g, '') // Remove any remaining single quotes
+        
+        // Remove any trailing artifacts
+        link = link.replace(/\}\}+$/, '').trim()
+        link = link.replace(/^\(film\)\s*/, '').trim() // Remove leading "(film)" if present
+        
+        // Encode the link for URL (spaces become underscores in Wikipedia URLs)
+        const linkForUrl = link.replace(/ /g, '_')
+        const encodedLink = encodeURIComponent(linkForUrl)
+        
+        return `<div role="note" class="hatnote navigation-not-searchable">This article is about ${content}. For ${about}, see <a href="/wiki/${encodedLink}" title="${link}"><i>${link}</i></a>.</div>`
       },
     },
 
@@ -458,15 +578,6 @@ export function wiki() {
       },
     },
 
-    // Handle {{!}} which is used to escape pipe characters in templates
-    // Must come early to process before other templates
-    {
-      type: 'lang',
-      regex: /\{\{!\}\}/g,
-      replace: function () {
-        return '|'
-      },
-    },
 
     // Handle external links: [url text] or [url]
     {
@@ -483,6 +594,117 @@ export function wiki() {
       regex: /\{\{ISBN\|([^}]+)}}/g,
       replace: function (match, isbn) {
         return `<a href="/wiki/Special:BookSources/${isbn}" title="Special:BookSources/${isbn}"><bdi>${isbn}</bdi></a>`
+      },
+    },
+
+    // {{longcite SEP|title=Material Constitution|url-id=material-constitution|author-last1=Wasserman|author-first1=Ryan|year=2009}}
+    // Stanford Encyclopedia of Philosophy citation
+    {
+      type: 'lang',
+      regex: /\{\{longcite SEP(?:\s*\|\s*[^\s=]+=[^|}]+)*\}\}/gi,
+      replace: function (match) {
+        const fields = match
+          .replace(/\{\{/g, '')
+          .replace(/\}\}/g, '')
+          .split('|')
+          .map((field) => field.trim())
+          .filter(f => f.includes('='))
+
+        const getField = (name) => {
+          const field = fields.find(f => f.startsWith(name + '='))
+          return field ? field.split('=').slice(1).join('=').trim() : ''
+        }
+
+        const title = getField('title')
+        const urlId = getField('url-id')
+        const authorLast = getField('author-last1')
+        const authorFirst = getField('author-first1')
+        const year = getField('year')
+
+        const url = urlId ? `https://plato.stanford.edu/entries/${urlId}/` : ''
+        const authorName = authorFirst && authorLast ? `${authorFirst} ${authorLast}` : authorLast || ''
+
+        return `<cite class="citation">${authorName ? `${authorName} ` : ''}(${year || ''}). "${title ? `<a href="${url}" class="external text">${title}</a>` : ''}". <i>Stanford Encyclopedia of Philosophy</i>.</cite>`
+      },
+    },
+
+    // {{Wikiquote}} - Link to Wikiquote page
+    {
+      type: 'lang',
+      regex: /\{\{Wikiquote\}\}/gi,
+      replace: function () {
+        // This would need the article title to generate the link, but we don't have context
+        // For now, just remove it silently or render as a comment
+        return '<!-- Wikiquote link -->'
+      },
+    },
+
+    // {{DEFAULTSORT:Ship Of Theseus}} - Category sorting key, should be removed
+    {
+      type: 'lang',
+      regex: /\{\{DEFAULTSORT:([^}]+)\}\}/gi,
+      replace: function () {
+        return '' // Remove silently
+      },
+    },
+
+    // Generic template handler - catches any remaining templates
+    // This must come LAST after all specific template handlers
+    // Handles templates like {{Philosophy-sidebar}}, {{Philosophy sidebar}}, {{Template|param1|param2}}, etc.
+    // Note: This uses a non-greedy match to avoid conflicts with nested templates
+    {
+      type: 'lang',
+      regex: /\{\{([A-Za-z0-9_\-\s]+)(?:\|([^}]*?))?\}\}/g,
+      replace: function (match, templateName, params) {
+        const name = templateName.trim()
+        
+        // Skip if this looks like it's already been processed or is a known template pattern
+        // Check for templates we've already handled specifically
+        const knownPatterns = [
+          'cite', 'longcite', 'Quote', 'About', 'Short description',
+          'main', 'sfn', 'Reflist', 'Div col', 'ISBN', 'Use dmy dates',
+          'refbegin', 'refend', 'Wikiquote', 'DEFAULTSORT'
+        ]
+        
+        if (knownPatterns.some(pattern => name.toLowerCase().includes(pattern.toLowerCase()))) {
+          return match // Return unchanged, let other handlers process it
+        }
+        
+        // List of templates that should be silently removed (navigation, metadata, etc.)
+        // Note: Check for both "Philosophy-sidebar" and "Philosophy sidebar" (with space)
+        // DEFAULTSORT is handled explicitly above, but keep it here as a fallback
+        const silentTemplates = [
+          'Philosophy-sidebar',
+          'Philosophy sidebar',
+          'Philosophy navigation',
+          'navbox',
+          'sidebar',
+          'infobox',
+          'DISPLAYTITLE',
+          'Category',
+          'Stub',
+          'Cleanup',
+          'Refimprove',
+          'Citation needed',
+          'Authority control',
+          'Portal',
+        ]
+        
+        // Check if this is a template we should silently remove
+        // Use more flexible matching for sidebar templates
+        const shouldRemove = silentTemplates.some(t => {
+          const templateLower = name.toLowerCase().replace(/[_\s-]/g, '')
+          const silentLower = t.toLowerCase().replace(/[_\s-]/g, '')
+          return templateLower.includes(silentLower) || silentLower.includes(templateLower)
+        })
+        
+        if (shouldRemove) {
+          return '' // Remove silently
+        }
+        
+        // For other unknown templates, render as a comment or placeholder
+        // You can change this to render them differently if needed
+        return `<!-- Template: ${name}${params ? ' | ' + params : ''} -->`
       },
     },
   ]
