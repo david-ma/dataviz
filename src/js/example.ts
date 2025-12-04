@@ -1,15 +1,12 @@
-import { Chart, decorateTable } from './chart'
-// import * as d3 from 'd3'
-// import $ from 'jquery'
-// import 'datatables.net'
+import { Chart } from './chart'
 
 console.log('Running example.ts')
 
 $.when($.ready).then(function () {
   const chart = new Chart({
-    // eslint-disable-line
-    element: 'exampleDiv',
-    margin: 20,
+    element: 'chart',
+    title: 'Example Chart',
+    margin: 50,
     width: 800,
     height: 600,
     nav: false,
