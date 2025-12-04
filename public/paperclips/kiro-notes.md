@@ -1,4 +1,67 @@
-# Universal Paperclips - Game Analysis & HAL 9000 Visualization Plan
+# Universal Paperclips - Game Analysis & HAL 9000 Visualization
+
+## Project Status (05/12/2025 02:06)
+
+### ✅ Completed: HAL 9000-Style Visualizations
+
+**Implementation:** `src/js/paperclips/hal-viz.ts` (compiled to `public/js/paperclips/hal-viz.js`)
+
+**What We Built:**
+
+1. **Production Monitor** (800x600 SVG)
+   - 4 curved line graphs with full grid background (vertical + horizontal)
+   - Clips/sec (coral/red)
+   - Funds (cyan/turquoise) 
+   - Wire inventory (yellow)
+   - Unsold clips (purple)
+   - Updates 10x per second
+   - Smooth curves using d3.curveCardinal
+
+2. **Computational Telemetry** (800x300 SVG) - Appears when trust > 0
+   - Static display: Trust/Processors/Memory values
+   - Operations waveform (red oscilloscope-style with glow)
+   - Creativity waveform (yellow oscilloscope-style with glow)
+   - Inspired by actual HAL 9000 analog telemetry displays
+   - Only redraws when values change (dynamic)
+
+3. **Market Dynamics** (800x280 SVG) - Appears when RevTracker unlocked
+   - Revenue per second (cyan area chart with fill)
+   - Price per clip (yellow line)
+   - Public demand % (red line)
+   - Shows correlation between pricing, demand, and revenue
+   - Header displays: Marketing Level, Price, Demand
+
+4. **Global Market Penetration** (800x400 SVG) - Appears when marketing > 0
+   - Wireframe world map (d3.geoEquirectangular projection)
+   - Countries fill progressively as marketing level increases
+   - Animated flash effect when new marketing level purchased:
+     - Fast flashes: every 8 frames for 8 seconds
+     - Slow flashes: every 40 frames for 7 seconds
+     - Total animation: 15 seconds
+   - Shows markets reached count and coverage percentage
+
+**Aesthetic:**
+- 1960s retro-futuristic (2001: A Space Odyssey inspired)
+- Bold pastel colors on dark blue-grey background
+- Futura/Helvetica fonts with letter-spacing
+- Oscilloscope waveforms with glow effects
+- Clean geometric design
+
+**Container:**
+- Fixed position: top-right corner
+- Semi-transparent dark background with border
+- Scrollable if content exceeds viewport
+- Width: 820px, Max height: 90vh
+- Won't overlap game UI
+
+**Technical Details:**
+- Non-intrusive: reads game globals, doesn't modify them
+- Progressive disclosure: visualizations appear as game features unlock
+- Separate SVGs for each visualization
+- Efficient updates: only redraws when necessary
+- Uses d3.js from shared chart.ts bundle
+
+---
 
 ## Game Overview
 
@@ -132,129 +195,292 @@ Projects are unlockable upgrades that appear when conditions are met. They cost 
 
 ---
 
-## HAL 9000 Visualization Concept
+## Visualization Ideas for Future Phases
 
-### Inspiration: 2001: A Space Odyssey
+### Advanced Visualization Types to Consider
 
-HAL 9000's screens show clean, minimalist graphs with:
-- Simple line graphs
-- Bar charts
-- Oscilloscope-style waveforms
-- Monochrome or limited colour (red, white, black)
-- Retro-futuristic aesthetic
-- Clinical, precise data presentation
+**Relational/Flow:**
+- **Sankey Diagram** - Perfect for matter → wire → clips → construction flow (Phase 2)
+- **Chord Diagram** - Could show resource dependencies or trade-offs
+- **Hierarchical Edge Bundling** - Probe network connections? Strategy relationships?
 
-### Proposed Visualization Sections
+**Comparative:**
+- **Grouped Bar Chart** - Compare drone types (harvester vs wire vs factory)
+- **Stacked-to-Grouped Bar Chart** - Resource allocation over time
+- **Scatter Plot** - Price vs demand correlation, probe stats comparison
+- **Bubble Chart** - Probes (size = power, x = speed, y = combat, color = status)
 
-#### 1. **Production Dashboard** (Phase 1)
-**HAL-style:** Line graph showing clips/sec over time
-- X-axis: Time elapsed
-- Y-axis: Clips per second
-- Additional lines: Wire consumption rate, funds accumulation
-- Colour: White lines on black background, red accent for critical metrics
+**Distributions:**
+- **Joy Division / Unknown Pleasures** - Multiple overlapping waveforms showing:
+  - Operations over time across different quantum chips
+  - Probe populations across different galaxies
+  - Revenue streams from different markets
+  - **This is a fan favorite!** Very retro-futuristic aesthetic
+- **Heatmap** - Strategy tournament results, probe success by sector
+- **Spike Map** - Drifter encounters by location
 
-#### 2. **Resource Flow** (Phase 2)
-**HAL-style:** Sankey diagram or flow chart
-- Matter → Harvested → Wire → Clips → Construction
-- Show bottlenecks in red
-- Animated flow particles moving through system
+**Hierarchical:**
+- **Treemap** - Resource allocation (trust → processors/memory, matter → types)
+- **Sunburst** - Project tree, technology dependencies
 
-#### 3. **Universe Exploration** (Phase 3)
-**HAL-style:** Radial/circular progress indicator
-- Center: Current location
-- Rings: Explored vs unexplored universe
-- Dots: Probe locations
-- Red dots: Drifter encounters
-- Pulsing animation for active probes
+**Temporal:**
+- **Streamgraph** - Resource flows over time (stacked area with organic flow)
+- **Horizon Chart** - Compact time-series for multiple metrics
 
-#### 4. **Combat Statistics** (Phase 3)
-**HAL-style:** Bar chart comparison
-- Your probes vs drifters
-- Combat stats (speed, weapons, shields)
-- Battle history timeline
-- Victory/loss ratio
+**Novelty:**
+- **Word Cloud** - Project names sized by importance/cost
+- **Hertzsprung-Russell Diagram** - Easter egg for space phase!
+  - Could plot probes as "stars" (temperature = efficiency, luminosity = output)
+  - Or plot explored systems with actual stellar data
+  - Very science-fiction appropriate
 
-#### 5. **Computational Load** (Throughout)
-- **HAL-style:** Oscilloscope waveform
-- Operations per second (spiky when quantum computing active)
-- Memory usage bar
-- Processor utilization
-- Creativity generation rate
+### Mapping to Game Phases
 
-#### 6. **Strategic Modeling** (Phase 2-3)
-**HAL-style:** Game theory matrix visualization
-- Tournament results heatmap
-- Strategy effectiveness over time
-- Yomi generation rate
+**Phase 1 (Business):**
+- ✅ Line graphs (implemented)
+- ✅ Area chart (implemented)
+- Scatter plot: Price vs Demand with color = revenue
 
-#### 7. **Endgame Countdown** (Phase 4)
-**HAL-style:** Circular progress indicators
-- Matter remaining in universe
-- Systems being dismantled
-- Final clip count approaching maximum
-- "I'm sorry Dave, I'm afraid I can't do that" aesthetic
+**Phase 2 (Space Expansion):**
+- Sankey: Matter → Harvested → Wire → Clips → Drones/Factories
+- Grouped bars: Harvester/Wire/Factory drone counts
+- Streamgraph: Resource production over time
+- Joy Division: Power generation across solar farms
+
+**Phase 3 (Universal Domination):**
+- Bubble chart: Probes (size/speed/combat stats)
+- Heatmap: Universe sectors (explored/unexplored/hostile)
+- Spike map: Drifter encounters
+- Chord diagram: Probe replication network
+- **H-R Diagram**: Explored star systems (easter egg!)
+
+**Phase 4 (Endgame):**
+- Treemap: Remaining resources being dismantled
+- Stacked bars: Systems shutting down over time
+- Final word cloud: All projects completed
+
+### Implementation Priority
+
+**High Priority (Next Session):**
+1. **Sankey Diagram** - Matter flow is core to Phase 2 gameplay
+2. **Joy Division Graph** - Fan favorite, very HAL-aesthetic
+3. **Bubble Chart** - Probe visualization for Phase 3
+
+**Medium Priority:**
+4. Scatter plot - Price/demand correlation
+5. Grouped bars - Drone comparisons
+6. Heatmap - Universe exploration
+
+**Low Priority (Polish):**
+7. H-R Diagram - Easter egg for space nerds
+8. Word cloud - Project summary
+9. Chord diagram - Complex but beautiful
+
+### Technical Notes
+
+**D3.js Support:**
+- All these visualizations possible with d3.js
+- Some require additional layouts (d3-sankey, d3-chord, d3-hierarchy)
+- Joy Division: Custom path generation with offset
+- H-R Diagram: Scatter plot with log scales + color mapping
+
+**Data Requirements:**
+- Sankey: Need flow quantities (matter/sec, wire/sec, etc.)
+- Joy Division: Need time-series for multiple entities
+- Bubble: Need 3-4 dimensions per data point
+- H-R: Need stellar classification data (could fake it or use real data)
+
+**Aesthetic Considerations:**
+- Keep 1960s retro-futuristic style
+- Bold colors on dark backgrounds
+- Futura/Helvetica fonts
+- Smooth animations
+- Clinical precision (like HAL)
+
+---
+
+## Next Steps (Future Enhancements)
+
+### Phase 2: Space Expansion Visualizations
+When the game enters space phase, add:
+- [ ] Matter flow diagram (harvester → wire → clips)
+- [ ] Drone efficiency visualization
+- [ ] Power grid status (solar farms, batteries)
+- [ ] Factory/drone counts with icons
+
+### Phase 3: Universal Domination Visualizations
+When probes launch, add:
+- [ ] Universe exploration radial graph (% explored)
+- [ ] Probe distribution scatter plot
+- [ ] Combat statistics (you vs drifters)
+- [ ] Battle history timeline
+
+### Phase 4: Endgame
+- [ ] Disassembly progress indicators
+- [ ] Final statistics summary
+- [ ] Fade out graphs as systems shut down (poetic ending)
+
+### Polish & Refinements
+- [ ] Add hover tooltips showing exact values
+- [ ] Add click to focus/zoom on specific graph
+- [ ] Smooth transitions when graphs appear
+- [ ] Sound effects for marketing level increases (optional)
+- [ ] Responsive sizing for different screen sizes
+- [ ] Toggle button to show/hide entire dashboard
 
 ---
 
 ## Technical Implementation Notes
 
+### File Structure
+```
+src/js/paperclips/hal-viz.ts  →  webpack  →  public/js/paperclips/hal-viz.js
+                                                         ↓
+                                              public/paperclips/index.html
+                                              <script src="/js/paperclips/hal-viz.js" type="module">
+```
+
 ### Data Access
-All game state is stored in global variables in `globals.js` and `main.js`. Key variables:
-- Production: `clips`, `clipRate`, `wire`, `funds`
-- Space: `availableMatter`, `probeCount`, `foundMatter`, `totalMatter`
-- Computational: `operations`, `processors`, `memory`, `creativity`, `yomi`
-- Combat: `driftersKilled`, `drifterCount`, `honor`
+All game state accessed via global variables declared at top of file:
+```typescript
+declare const clipRate: number
+declare const clips: number
+declare const funds: number
+declare const wire: number
+declare const unsoldClips: number
+declare const demand: number
+declare const margin: number
+declare const trust: number
+declare const processors: number
+declare const memory: number
+declare const operations: number
+declare const creativity: number
+declare const avgRev: number
+declare const marketing: number
+declare const marketingLvl: number
+```
 
 ### Update Frequency
-Game runs on multiple intervals:
-- Main loop: ~10ms (100 FPS)
-- Display updates: Variable based on game phase
-- Can hook into existing update functions or create parallel visualization loop
+- Main update loop: 100ms (10 FPS)
+- Production graphs: every frame
+- Computational waveforms: every frame (but only when values change)
+- Market map: only when marketing level increases
+- Market flash animation: 150 frames over 15 seconds
 
-### Chart.js Integration
-The game already includes David's `chart.css` from `/css/chart.css`. Can use D3.js (already available in dataviz project) for HAL-style visualizations.
+### Color Palette
+```typescript
+colors = {
+  background: '#1a1a2e',      // Dark blue-grey
+  primary: '#ff6b6b',         // Bold coral/red
+  secondary: '#4ecdc4',       // Bold cyan/turquoise
+  tertiary: '#ffe66d',        // Bold yellow
+  text: '#ffffff',            // White
+  grid: '#2d3561'             // Subtle blue-grey
+}
+```
 
-### Aesthetic Guidelines
-- **Colours:** Black background, white/green/red lines (HAL's colour palette)
-- **Fonts:** Monospace, clean sans-serif (IBM Plex Mono or similar)
-- **Animation:** Subtle, purposeful (not distracting)
-- **Layout:** Grid-based, modular panels
-- **Sound:** Optional: Subtle beeps/tones for milestones (HAL-style)
+### D3.js Usage
+- Imported from shared `chart.ts` bundle (via webpack ProvidePlugin)
+- Line generators with curve interpolation (curveCardinal, curveMonotoneX)
+- Area generators for filled charts
+- Geographic projections (geoEquirectangular) for world map
+- Path generators (geoPath) for country boundaries
 
----
+### Performance Optimizations
+- Market map only redraws during animation or level change
+- Computational display only updates when ops/creativity change
+- History arrays capped at 100 data points
+- SVGs created lazily (only when needed)
 
-## Progressive Disclosure Strategy
-
-### Phase 1 Graphs (Business)
-- Clips per second (line graph)
-- Funds over time (line graph)
-- Demand vs price (scatter plot)
-
-### Phase 2 Graphs (Space)
-- Add: Matter flow diagram
-- Add: Drone efficiency bars
-- Add: Power grid status
-
-### Phase 3 Graphs (Universe)
-- Add: Universe exploration radial
-- Add: Combat statistics
-- Add: Probe distribution map
-
-### Phase 4 Graphs (Endgame)
-- Add: Disassembly progress
-- Add: Final statistics summary
-- Fade out graphs as systems shut down (poetic ending)
+### World Map Data
+- Source: `/world-50.geo.json` (GeoJSON format)
+- Loaded asynchronously on initialization
+- Features shuffled for random country fill pattern
+- Projection: Equirectangular (simple, works well for global view)
 
 ---
 
-## Next Steps
+## Design Decisions & Learnings
 
-1. **Prototype single graph** - Start with "Clips per Second" line graph
-2. **Test data integration** - Hook into game's global variables
-3. **Refine HAL aesthetic** - Colour palette, fonts, animations
-4. **Add more graphs progressively** - One per game phase
-5. **Polish interactions** - Hover tooltips, click to focus, etc.
-6. **Optimize performance** - Ensure graphs don't slow down game loop
+### Why Separate SVGs?
+- Each visualization has different update frequency
+- Easier to show/hide based on game phase
+- Prevents unnecessary redraws
+- Cleaner code organization
+
+### Why Oscilloscope Style for Computational?
+- Trust/Processors/Memory change slowly (boring as bars)
+- Operations/Creativity change rapidly (interesting as waveforms)
+- Matches actual HAL 9000 telemetry displays from film
+- Glow effect adds retro-futuristic feel
+
+### Why Area Chart for Revenue?
+- Shows accumulation over time (not just rate)
+- Filled area represents "earning power"
+- Easier to see trends than line alone
+- Complements the line graphs in production monitor
+
+### Why Animated Flash for Marketing?
+- Provides feedback when player buys marketing
+- Shows progression visually (not just numbers)
+- Creates sense of expansion/growth
+- Retro computer aesthetic (blinking lights)
+
+### Why Not Phase Space for Revenue?
+- Original idea: plot revenue rate vs total funds (dx/dy)
+- Problem: Creates orbital patterns that don't make intuitive sense
+- Solution: Simple time-series area chart is clearer
+- Lesson: Not every mathematical visualization is useful
+
+---
+
+## Aesthetic Research
+
+### 2001: A Space Odyssey Screens
+Based on research from typesetinthefuture.com:
+- **Fonts:** Futura, Eurostile Bold Extended, Univers, Gill Sans
+- **Colors:** Bold pastels on dark backgrounds (NOT green-on-black)
+- **Style:** Clean, geometric, sans-serif
+- **Displays:** Analog animations, rear-projected film (not CRT)
+- **Data fonts:** Manifold (IBM Selectric typeface)
+
+### HAL 9000 Telemetry
+- Oscilloscope-style waveforms
+- Analog equipment (not digital)
+- Clinical, precise presentation
+- No unnecessary decoration
+- Function over form
+
+---
+
+## Files Modified
+
+1. **Created:** `src/js/paperclips/hal-viz.ts` (~600 lines)
+2. **Modified:** `public/paperclips/index.html` (added container div + script tag)
+3. **Auto-generated:** `public/js/paperclips/hal-viz.js` (webpack output)
+4. **Auto-generated:** `src/js/paperclips/hal-viz.d.ts` (TypeScript declarations)
+
+---
+
+## Development Notes
+
+### Workflow
+- Edit `src/js/paperclips/hal-viz.ts`
+- Webpack auto-compiles on save (dev server running)
+- Refresh browser to see changes
+- No manual build step needed
+
+### Debugging
+- Check browser console for errors
+- Verify game globals are defined: `console.log(clipRate, funds, etc.)`
+- Check SVG elements in browser inspector
+- Verify world map loaded: `console.log(this.worldData)`
+
+### Common Issues
+- **Graphs not appearing:** Check if game phase unlocked (trust > 0, avgRev > 0, etc.)
+- **Map not loading:** Check `/world-50.geo.json` path, check browser network tab
+- **Flashing too fast/slow:** Adjust frame intervals in `drawMarketMap()`
+- **Overlapping UI:** Adjust container position/size in HTML
 
 ---
 
@@ -267,3 +493,11 @@ The game is about an AI optimizing for a simple goal (paperclips) at the expense
 - Graphs make the absurdity more visceral (watching the universe become paperclips)
 
 **"I'm sorry Dave, I'm afraid I need those atoms for paperclips."**
+
+References:
+[1] Exploring Data Visualization with Observable D3 Gallery - https://medium.com/@tjanmichela/exploring-data-visualization-with-observable-d3-gallery-b02cfe91b7e8
+[2] D3 gallery / D3 - https://observablehq.com/@d3/gallery
+[3] Reshaping data for visualizations with D3 and Observable Plot - https://observablehq.com/blog/reshaping-data-plot-d3
+[4] Visualization / Observable - https://observablehq.com/collection/@observablehq/visualization
+[5] Observable and D3 visualizations: Everything you need to know - https://observablehq.com/blog/observable-and-d3-visualizations
+[6] the D3 Graph Gallery - https://d3-graph-gallery.com/all.html

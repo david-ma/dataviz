@@ -1,65 +1,73 @@
 # HAL 9000 Visualization - Status
 
-## ✅ Completed (2025-12-05 01:23)
+## ✅ Completed (2025-12-05)
 
-### Files Created
-1. **src/js/paperclips/hal-viz.ts** - HAL-style visualization module
+### Phase 1: Core Dashboard (01:23)
+**Files Created:**
+1. **src/js/paperclips/hal-viz.ts** - HAL-style visualization module (~600 lines)
 2. **public/js/paperclips/hal-viz.js** - Compiled output (3.0 KB)
 
-### Files Modified
-1. **public/paperclips/index.html** - Added:
-   - `<div id="hal-dashboard">` container
-   - `<script src="/js/paperclips/hal-viz.js" type="module">`
+**Files Modified:**
+1. **public/paperclips/index.html** - Added dashboard container and script
 
-### What It Does
-- Creates a fixed-position SVG dashboard (top-right corner)
-- Shows two line graphs:
-  - **Green line**: Clips per second (production rate)
-  - **White line**: Funds over time
-- Shows real-time stats:
-  - Total clips
-  - Production rate
-  - Funds
-  - Wire inventory
-  - Unsold clips
-  - Demand percentage
-  - Price per clip
+**Features:**
+- Fixed-position SVG dashboard (top-right, scrollable)
+- Production Monitor: 4 curved line graphs (clips/sec, funds, wire, inventory)
+- Computational Telemetry: Oscilloscope-style waveforms (operations, creativity)
+- Market Dynamics: Area chart (revenue), line graphs (price, demand)
+- Global Market Penetration: World map with animated country-filling
+- HAL 9000 aesthetic: Bold pastels (#ff6b6b, #4ecdc4, #ffe66d) on dark background (#1a1a2e)
 - Updates 10 times per second
-- HAL 9000 aesthetic (black background, green/white text, monospace font)
+- Progressive reveal: SVGs appear as game features unlock
 
-### How to View
-1. Navigate to: http://localhost:1337/paperclips/
-2. Look for black dashboard in top-right corner
-3. Start playing the game - graphs will update automatically
+### Phase 2: Research & Documentation (02:19)
+**Research Completed:**
+- Investigated D3 Gallery on Observable for future visualization ideas
+- Documented Observable resources in kiro-notes.md
+- Identified potential chart types for future game phases:
+  - Network graphs (Space Expansion)
+  - Hierarchical visualizations (Universal Domination)
+  - Advanced interactive patterns
+
+**Documentation Updated:**
+- Added D3/Observable resources section to kiro-notes.md
+- Links to D3 Gallery, D3 Graph Gallery, Observable Visualization Collection
+- Notes on data reshaping patterns (tidy, wide, nested, aggregated)
 
 ### Technical Details
-- **Non-intrusive**: Reads game state, doesn't modify it
-- **Scalable**: Works with any production rate (millions/sec)
-- **Separate update loop**: Doesn't interfere with game logic
+- **Non-intrusive**: Read-only access to game globals
+- **Scalable**: Handles millions/sec production rates
+- **Separate update loop**: 100ms interval, doesn't interfere with game
 - **Uses d3.js**: Shared bundle via webpack
 - **TypeScript**: Full type safety
+- **Responsive**: Semi-transparent background, fixed positioning prevents UI overlap
 
 ## Next Steps
 
-### Phase 2 Enhancements
-- [ ] Add toggle button to show/hide dashboard
-- [ ] Add more graphs for Phase 2 (space exploration)
-- [ ] Add resource flow diagram (matter → wire → clips)
-- [ ] Add grid lines and axis labels
-- [ ] Add hover tooltips showing exact values
+### Space Expansion Phase (Phase 2)
+- [ ] Sankey diagram: Matter → Wire → Clips flow
+- [ ] Network graph: Factory/drone connections
+- [ ] Radial progress: Solar system exploration
+- [ ] Bubble chart: Resource distribution across planets
 
-### Phase 3 Enhancements
-- [ ] Add universe exploration radial graph
-- [ ] Add combat statistics
-- [ ] Add probe distribution visualization
-- [ ] Add drifter encounter alerts
+### Universal Domination Phase (Phase 3)
+- [ ] Joy Division plot: Universe exploration waves
+- [ ] Hierarchical edge bundling: Probe communication network
+- [ ] Force-directed graph: Drifter encounters
+- [ ] H-R diagram style: Probe types and capabilities
 
-### Polish
+### Polish & Interaction
+- [ ] Toggle button to show/hide dashboard
 - [ ] Smooth transitions between data points
-- [ ] Add subtle animations
-- [ ] Add sound effects (optional)
-- [ ] Responsive sizing
-- [ ] Better positioning options
+- [ ] Hover tooltips with exact values
+- [ ] Grid lines and axis labels
+- [ ] Responsive sizing options
+- [ ] Sound effects (optional, HAL-themed)
+
+### Observable Exploration
+- [ ] Review D3 Gallery for additional chart types
+- [ ] Experiment with Observable Plot for rapid prototyping
+- [ ] Test data reshaping patterns for complex visualizations
 
 ## Known Issues
 None currently.
