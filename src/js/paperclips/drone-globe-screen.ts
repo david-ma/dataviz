@@ -21,7 +21,6 @@ export class DroneGlobeScreen extends HalScreen {
   private projection: d3.GeoProjection | null = null
   private globeGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null = null
   private landGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null = null
-  private statesGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null = null
   private graticulePath: d3.Selection<SVGPathElement, unknown, HTMLElement, any> | null = null
   private agents: DroneAgent[] = []
   private factories: { id: number; lon: number; lat: number }[] = []
@@ -32,7 +31,6 @@ export class DroneGlobeScreen extends HalScreen {
   private lastUpdate = Date.now()
   private timer: d3.Timer | null = null
   private landData: any = null
-  private usaData: any = null
   private mapLoading = false
   private spinSpeed = 10  // degrees per second
 
@@ -94,7 +92,6 @@ export class DroneGlobeScreen extends HalScreen {
       .attr('d', path)
 
     this.landGroup = this.globeGroup.append('g').attr('id', 'globe-land')
-    this.statesGroup = this.globeGroup.append('g').attr('id', 'globe-states')
     this.globeGroup.append('g').attr('id', 'globe-agents')
     this.globeGroup.append('g').attr('id', 'globe-factories')
 
@@ -122,13 +119,9 @@ export class DroneGlobeScreen extends HalScreen {
   private ensureMapLoaded() {
     if (this.mapLoading || this.landData) return
     this.mapLoading = true
-    d3.json('/world-50.geo.json')
+    d3.json('/dataviz/world.110m.geojson')
       .then((world) => {
         this.landData = world
-        return d3.json('/gz_2010_us_040_00_5m.json')
-      })
-      .then((usa) => {
-        this.usaData = usa
         this.renderMap()
       })
       .catch((err) => {
@@ -161,19 +154,6 @@ export class DroneGlobeScreen extends HalScreen {
       landSel.exit().remove()
     }
 
-    if (this.statesGroup && this.usaData && this.usaData.features) {
-      const stateSel = this.statesGroup.selectAll<SVGPathElement, any>('path.state').data(this.usaData.features)
-      stateSel.enter()
-        .append('path')
-        .attr('class', 'state')
-        .attr('fill', 'none')
-        .attr('stroke', 'rgba(255,255,255,0.18)')
-        .attr('stroke-width', 0.35)
-        .attr('d', path)
-      stateSel
-        .attr('d', path)
-      stateSel.exit().remove()
-    }
   }
 
   private updateAgents(data: DroneGlobeData) {
