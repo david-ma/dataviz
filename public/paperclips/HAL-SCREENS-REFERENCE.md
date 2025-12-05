@@ -321,6 +321,14 @@ Cross-links:
 11. **11-polar-chart-multi-curve-chart.html** ⭐⭐⭐⭐ — Polar chart + overlapping curves; good for multi-metric overlays (demand/price/revenue) or probe capabilities.
 
 12. **18-draggable-globe-in-d3** ⭐⭐⭐⭐ — Draggable orthographic globe; informs current Drone Globe (spin, drag, culling).
+
+### Additional Observable Examples (13–17)
+
+- **13-geotiff-contours-ii/6ac0a38a2ff5829c@149.js** — GeoTIFF contours with gradient fills; could surface planetary elevation/power density maps in Phase 2–3 or visualize exploration heat for probes. Good for “terrain-esque” overlays behind probe/drifter encounters.
+- **14-word-cloud/dc13673d7b6884c8@249.js** — Word cloud; lightweight for project summary, strategy frequency, or endgame epitaphs. Use sparingly to stay HAL-clean.
+- **15-psr-b1919-21/d36a9f60c5e143f3@215.js** — Pulsar-style signal plot; perfect for radio telemetry (probe beacons, distress pings) or quantum noise alternates.
+- **16-phases-of-the-moon/d023ca6992ad3177@460.js** — Lunar phases; a ready metaphor for phase progression or cycle-based resource bonuses; could drive a small “cycle” indicator tile.
+- **17-streamgraph-transitions/9422bec5e8b2d675@167.js** — Streamgraph with smooth transitions; ideal for stacked production flows (matter → wire → clips → drones) or energy mix over time.
     - Single node with line connector
     - Too basic, but shows edge drawing pattern
     - **Use for:** Building network graphs later
