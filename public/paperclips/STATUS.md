@@ -61,6 +61,28 @@
 - Identified best patterns for each game phase
 - Documented authentic HAL color palette
 
+### Phase 4: Split Screen & Advanced Panels (13:08)
+**Layout Changes:**
+- Split screen 50/50: Game on left, HAL dashboard on right
+- Removed fixed positioning overlay
+- Full-height scrollable panels
+- Game buttons no longer hidden
+
+**New Visualizations:**
+3. **Quantum Computing Panel** (400×300px)
+   - Purple background (#54336F) - authentic HAL waveform color
+   - Oscilloscope-style quantum noise waveform
+   - Scales with operations count
+   - Shows operations total
+   - Appears when operations > 0
+
+4. **Strategic Modeling Panel** (400×300px)
+   - Burgundy background (#6B2424) - authentic HAL color
+   - Grid with convex optimization curve
+   - Shows strategic landscape
+   - Displays yomi total
+   - Appears when yomi > 0
+
 **Technical Details:**
 - Non-intrusive: Read-only access to game globals
 - Scalable: Handles millions/sec production rates

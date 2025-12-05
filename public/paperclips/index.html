@@ -1,12 +1,44 @@
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="interface.css" />
+        <link rel="stylesheet" type="text/css" href="/paperclips/interface.css" />
 
         <!-- David's chart.css -->
         <link rel="stylesheet" type="text/css" href="/css/chart.css" />
+        
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            #container {
+                display: flex;
+                width: 100vw;
+                height: 100vh;
+            }
+            #game-panel {
+                width: 50%;
+                height: 100vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            #hal-panel {
+                width: 50%;
+                height: 100vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                background: #0f1112;
+            }
+            #hal-dashboard {
+                padding: 20px;
+            }
+        </style>
     </head>
     
     <body>
+    
+    <div id="container">
+        <div id="game-panel">
         
 <!--     <audio id="threnody1">
         <source src="test.mp3" type="audio/mpeg">
@@ -892,7 +924,13 @@
 
         <div id="chart" class="chart"></div>
         
-        <div id="hal-dashboard" style="position: fixed; top: 10px; right: 10px; width: 820px; max-height: 90vh; overflow-y: auto; z-index: 1000; padding: 10px; background: rgba(26, 26, 46, 0.95); border: 1px solid #2d3561;"></div>
+        </div> <!-- end game-panel -->
+        
+        <div id="hal-panel">
+            <div id="hal-dashboard"></div>
+        </div>
+        
+        </div> <!-- end container -->
             
 <!--
         <div class=engine2 id="battleReportsDiv">
@@ -905,7 +943,7 @@
 -->
             
             
-        </div>
+        
         <script type="text/javascript" src="/paperclips/combat.js?v2"></script>     
         <script type="text/javascript" src="/paperclips/globals.js?v2"></script>      
         <script type="text/javascript" src="/paperclips/projects.js?v2"></script>   

@@ -1,5 +1,7 @@
 import { d3 } from '../chart'
 
+console.log("Running hal-viz.ts")
+
 // Game state globals
 declare const clipRate: number
 declare const clips: number
@@ -16,6 +18,9 @@ declare const creativity: number
 declare const avgRev: number
 declare const marketing: number
 declare const marketingLvl: number
+declare const yomi: number
+declare const strategyEngineFlag: number
+declare const qChipCost: number
 
 class HalViz {
   private svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>
@@ -39,6 +44,8 @@ class HalViz {
   
   private matrixSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
   private phaseIndicatorSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
+  private quantumSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
+  private strategySvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
   
   private colors = {
     background: '#1a1a2e',      // Dark blue-grey (like 2001 screens)
@@ -157,6 +164,16 @@ class HalViz {
     if (typeof trust !== 'undefined' && trust > 0) {
       this.drawComputationalResources()
       this.drawNumericMatrix()
+    }
+    
+    // Show quantum computing if operations exist
+    if (typeof operations !== 'undefined' && operations > 0) {
+      this.drawQuantumComputing()
+    }
+    
+    // Show strategic modeling if yomi exists
+    if (typeof yomi !== 'undefined' && yomi > 0) {
+      this.drawStrategicModeling()
     }
     
     // Always show phase indicator
@@ -603,78 +620,6 @@ class HalViz {
     })
   }
   
-  drawMarketMap() {
-    // Create SVG if it doesn't exist
-    if (!this.marketSvg) {
-      this.marketSvg = d3.select('#hal-dashboard')
-        .append('svg')
-        .attr('width', 800)
-        .attr('height', 400)
-        .style('background', this.colors.background)
-        .style('margin-top', '10px')
-    }
-    
-    // Clear previous
-    this.marketSvg.selectAll('*').remove()
-    
-    // Title
-    this.marketSvg.append('text')
-      .attr('x', 20)
-      .attr('y', 30)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 18)
-      .attr('font-weight', 'bold')
-      .attr('letter-spacing', '2px')
-      .text('GLOBAL MARKET PENETRATION')
-    
-    this.marketSvg.append('text')
-      .attr('x', 500)
-      .attr('y', 30)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 12)
-      .text(`MARKETING LEVEL: ${marketingLvl}`)
-    
-    // Create projection
-    const projection = d3.geoEquirectangular()
-      .scale(120)
-      .translate([400, 200])
-    
-    const path = d3.geoPath().projection(projection)
-    
-    // Calculate how many countries to fill based on marketing level
-    const features = this.worldData.features
-    const totalCountries = features.length
-    const fillCount = Math.floor((marketingLvl / 100) * totalCountries)
-    
-    // Shuffle countries for random fill pattern
-    const shuffled = [...features].sort(() => Math.random() - 0.5)
-    
-    // Draw countries
-    shuffled.forEach((feature: any, i: number) => {
-      const isFilled = i < fillCount
-      
-      this.marketSvg!.append('path')
-        .datum(feature)
-        .attr('d', path)
-        .attr('fill', isFilled ? this.colors.primary : 'none')
-        .attr('stroke', this.colors.grid)
-        .attr('stroke-width', 0.5)
-        .attr('opacity', isFilled ? 0.7 : 1)
-    })
-    
-    // Stats
-    const coverage = (fillCount / totalCountries * 100).toFixed(1)
-    this.marketSvg.append('text')
-      .attr('x', 20)
-      .attr('y', 380)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 11)
-      .text(`MARKETS REACHED: ${fillCount}/${totalCountries} (${coverage}%)`)
-  }
-  
   startFlashAnimation(newCountries: number) {
     // Add new countries to flash queue
     const features = this.worldData.features
@@ -909,6 +854,161 @@ class HalViz {
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'middle')
       .text(phaseText)
+  }
+  
+  drawQuantumComputing() {
+    // Create SVG if it doesn't exist
+    if (!this.quantumSvg) {
+      this.quantumSvg = d3.select('#hal-dashboard')
+        .append('svg')
+        .attr('width', 400)
+        .attr('height', 300)
+        .style('background', '#54336F') // Purple from 9-tiles waveform
+        .style('margin-top', '10px')
+    }
+    
+    // Clear previous
+    this.quantumSvg.selectAll('*').remove()
+    
+    // Title
+    this.quantumSvg.append('text')
+      .attr('x', 20)
+      .attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 18)
+      .attr('font-weight', 'bold')
+      .attr('letter-spacing', '2px')
+      .text('QUANTUM COMPUTING')
+    
+    // Operations waveform (reuse existing oscilloscope style)
+    const margin = {left: 34, right: 26, top: 60, bottom: 44}
+    const w = 400 - margin.left - margin.right
+    const h = 300 - margin.top - margin.bottom
+    
+    const g = this.quantumSvg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`)
+    
+    // Baseline
+    g.append('line')
+      .attr('x1', 0)
+      .attr('x2', w)
+      .attr('y1', h/2)
+      .attr('y2', h/2)
+      .attr('stroke', 'rgba(255,255,255,0.06)')
+    
+    // Generate quantum noise waveform
+    const points: [number, number][] = d3.range(0, 100).map(i => {
+      const x = i / 99
+      const noise = Math.sin(i * 0.5) * 0.3 + Math.sin(i * 0.17) * 0.2
+      const y = 0.5 + noise * (operations / 10000) // Scale by operations
+      return [x, Math.max(0, Math.min(1, y))] as [number, number]
+    })
+    
+    const xScale = d3.scaleLinear().domain([0, 1]).range([0, w])
+    const yScale = d3.scaleLinear().domain([0, 1]).range([h, 0])
+    
+    const line = d3.line<[number, number]>()
+      .x(d => xScale(d[0]))
+      .y(d => yScale(d[1]))
+      .curve(d3.curveBasis)
+    
+    g.append('path')
+      .datum(points)
+      .attr('d', line)
+      .attr('fill', 'none')
+      .attr('stroke', 'rgba(255,255,255,0.92)')
+      .attr('stroke-width', 1.2)
+    
+    // Stats
+    this.quantumSvg.append('text')
+      .attr('x', 20)
+      .attr('y', 270)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 12)
+      .text(`OPERATIONS: ${(operations || 0).toLocaleString()}`)
+  }
+  
+  drawStrategicModeling() {
+    // Create SVG if it doesn't exist
+    if (!this.strategySvg) {
+      this.strategySvg = d3.select('#hal-dashboard')
+        .append('svg')
+        .attr('width', 400)
+        .attr('height', 300)
+        .style('background', '#6B2424') // Burgundy from 9-tiles
+        .style('margin-top', '10px')
+    }
+    
+    // Clear previous
+    this.strategySvg.selectAll('*').remove()
+    
+    // Title
+    this.strategySvg.append('text')
+      .attr('x', 20)
+      .attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 18)
+      .attr('font-weight', 'bold')
+      .attr('letter-spacing', '2px')
+      .text('STRATEGIC MODELING')
+    
+    // Grid
+    const margin = {left: 44, right: 44, top: 60, bottom: 48}
+    const w = 400 - margin.left - margin.right
+    const h = 300 - margin.top - margin.bottom
+    
+    const g = this.strategySvg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`)
+    
+    // Grid lines
+    const cols = 10, rows = 10
+    for (let i = 0; i <= cols; i++) {
+      g.append('line')
+        .attr('x1', i * w/cols)
+        .attr('x2', i * w/cols)
+        .attr('y1', 0)
+        .attr('y2', h)
+        .attr('stroke', 'rgba(255,230,230,0.07)')
+    }
+    for (let j = 0; j <= rows; j++) {
+      g.append('line')
+        .attr('y1', j * h/rows)
+        .attr('y2', j * h/rows)
+        .attr('x1', 0)
+        .attr('x2', w)
+        .attr('stroke', 'rgba(255,230,230,0.07)')
+    }
+    
+    // Convex curve (strategic optimization landscape)
+    const xScale = d3.scaleLinear().domain([0, 1]).range([0, w])
+    const yScale = d3.scaleLinear().domain([0, 1]).range([h, 0])
+    const power = 2.4
+    
+    const curvePts: [number, number][] = d3.range(0, 81).map(t => {
+      const xx = t / 80
+      const yy = 0.02 + 0.96 * Math.pow(xx, power)
+      return [xScale(xx), yScale(yy)] as [number, number]
+    })
+    
+    g.append('path')
+      .attr('d', d3.line<[number, number]>()(curvePts))
+      .attr('fill', 'none')
+      .attr('stroke', 'rgba(255,255,255,0.95)')
+      .attr('stroke-width', 2.2)
+      .attr('stroke-linejoin', 'round')
+      .attr('stroke-linecap', 'round')
+    
+    // Yomi display
+    this.strategySvg.append('text')
+      .attr('x', 20)
+      .attr('y', 270)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 12)
+      .text(`YOMI: ${(yomi || 0).toLocaleString()}`)
   }
 }
 
