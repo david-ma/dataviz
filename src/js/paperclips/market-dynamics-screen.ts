@@ -1,9 +1,26 @@
 import { d3 } from '../chart'
-import { HalScreen } from './hal-screen-base'
+import { HalScreen, HalColors } from './hal-screen-base'
 import './hal-screen-types'
 
+type MarketDynamicsData = {
+  revenueHistory: number[]
+  priceHistory: number[]
+  demandHistory: number[]
+  avgRev: number
+}
+
+type ChartOptions = {
+  history: number[]
+  y: number
+  height: number
+  color: string
+  label: string
+  area: boolean
+  xScale: d3.ScaleLinear<number, number, never>
+}
+
 export class MarketDynamicsScreen extends HalScreen {
-  constructor(opts: { container: string; colors: any }) {
+  constructor(opts: { container: string; colors: HalColors }) {
     super({
       id: 'hal-market-dynamics',
       container: opts.container,
@@ -14,7 +31,7 @@ export class MarketDynamicsScreen extends HalScreen {
     this.svg.style('background', this.colors.grey)  // Grey for market/engineering
   }
 
-  update(data: { revenueHistory: number[]; priceHistory: number[]; demandHistory: number[]; avgRev: number }) {
+  update(data: MarketDynamicsData): void {
     this.svg.selectAll('*').remove()
     
     // Title
@@ -47,7 +64,7 @@ export class MarketDynamicsScreen extends HalScreen {
     this.drawChart({ history: data.demandHistory, y: 200, height, color: this.colors.primary, label: 'DEMAND (%)', area: false, xScale })
   }
 
-  private drawChart(opts: { history: number[]; y: number; height: number; color: string; label: string; area: boolean; xScale: any }) {
+  private drawChart(opts: ChartOptions): void {
     const yScale = d3.scaleLinear()
       .domain([0, d3.max(opts.history) || 1])
       .range([opts.y + opts.height, opts.y])

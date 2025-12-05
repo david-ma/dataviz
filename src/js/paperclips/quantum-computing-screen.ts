@@ -1,5 +1,5 @@
 import { d3 } from '../chart'
-import { HalScreen } from './hal-screen-base'
+import { HalScreen, HalColors } from './hal-screen-base'
 import './hal-screen-types'
 
 export class QuantumComputingScreen extends HalScreen {
@@ -16,7 +16,7 @@ export class QuantumComputingScreen extends HalScreen {
   private ringExpandRate = 26       // px per second
   private ringGroup: d3.Selection<SVGGElement, unknown, null, undefined> | null = null
   
-  constructor(opts: { container: string; colors: any }) {
+  constructor(opts: { container: string; colors: HalColors }) {
     super({
       id: 'hal-quantum-computing',
       container: opts.container,
@@ -27,7 +27,7 @@ export class QuantumComputingScreen extends HalScreen {
     this.svg.style('background', this.colors.violet)  // Violet for quantum/waveforms
   }
   
-  draw() {
+  draw(): void {
     const now = Date.now()
     const deltaMs = this.lastTimestamp ? now - this.lastTimestamp : 16
     this.lastTimestamp = now

@@ -1,17 +1,39 @@
 import { d3 } from '../chart'
-import { HalScreen } from './hal-screen-base'
+import { HalScreen, HalColors } from './hal-screen-base'
 import './hal-screen-types'
 
+type StockDatum = {
+  id: number
+  symbol: string
+  price: number
+  profit: number
+  amount?: number
+}
+
+type StockUpdatePayload = {
+  stocks: StockDatum[]
+  bankroll: number
+  portTotal: number
+}
+
+type Candle = {
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
 export class StockMarketScreen extends HalScreen {
-  private candleData: Map<number, any[]> = new Map()
-  private currentCandle: Map<number, any> = new Map()
+  private candleData: Map<number, Candle[]> = new Map()
+  private currentCandle: Map<number, Candle> = new Map()
   private profitHistory: number[] = []
   private tickCount = 0
   private readonly CANDLE_SIZE = 20
   private readonly MAX_CANDLES = 30
   private readonly MAX_PROFIT_HISTORY = 100
   
-  constructor(opts: { container: string; colors: any }) {
+  constructor(opts: { container: string; colors: HalColors }) {
     super({
       id: 'hal-stock-market',
       container: opts.container,
@@ -22,7 +44,7 @@ export class StockMarketScreen extends HalScreen {
     this.svg.style('background', this.colors.darkNavy)
   }
 
-  update(data: { stocks: any[]; bankroll: number; portTotal: number }) {
+  update(data: StockUpdatePayload): void {
     this.tickCount++
     const shouldCloseCandle = this.tickCount % this.CANDLE_SIZE === 0
     
@@ -81,7 +103,7 @@ export class StockMarketScreen extends HalScreen {
     this.draw(data)
   }
 
-  draw(data: { stocks: any[]; bankroll: number; portTotal: number }) {
+  draw(data: StockUpdatePayload): void {
     this.svg.selectAll('*').remove()
     
     // Title
@@ -133,8 +155,8 @@ export class StockMarketScreen extends HalScreen {
     }
   }
 
-  private drawProfitSummary(x: number, y: number, width: number, height: number, data: any) {
-    const totalProfit = data.stocks.reduce((sum: number, s: any) => sum + s.profit, 0)
+  private drawProfitSummary(x: number, y: number, width: number, height: number, data: StockUpdatePayload): void {
+    const totalProfit = data.stocks.reduce((sum: number, s: StockDatum) => sum + s.profit, 0)
     const profitColor = totalProfit >= 0 ? this.colors.green : this.colors.red
     
     // Header
@@ -194,7 +216,7 @@ export class StockMarketScreen extends HalScreen {
     }
   }
 
-  private drawStockCell(x: number, y: number, width: number, height: number, stock: any) {
+  private drawStockCell(x: number, y: number, width: number, height: number, stock: StockDatum): void {
     const profitColor = stock.profit >= 0 ? this.colors.green : this.colors.red
     
     // Header

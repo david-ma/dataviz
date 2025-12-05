@@ -1,4 +1,24 @@
 import { d3 } from '../chart';
+export type HalColors = {
+    background: string;
+    text: string;
+    labelGrey?: string;
+    grid?: string;
+    primary?: string;
+    secondary?: string;
+    tertiary?: string;
+    teal?: string;
+    navy?: string;
+    grey?: string;
+    burgundy?: string;
+    violet?: string;
+    matrixBlue?: string;
+    green?: string;
+    red?: string;
+    white?: string;
+    darkNavy?: string;
+    [key: string]: string | undefined;
+};
 export declare class HalScreenManager {
     private static instance;
     private screens;
@@ -20,14 +40,14 @@ export declare abstract class HalScreen {
     protected width: number;
     protected height: number;
     protected background: string;
-    protected colors: any;
+    protected colors: HalColors;
     protected visible: boolean;
     constructor(opts: {
         id: string;
         container: string;
         width: number;
         height: number;
-        colors: any;
+        colors: HalColors;
     });
     draw(...args: any[]): void;
     getId(): string;

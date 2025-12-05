@@ -1,5 +1,14 @@
-import { HalScreen } from './hal-screen-base';
+import { HalScreen, HalColors } from './hal-screen-base';
 import './hal-screen-types';
+type StrategicModelingData = {
+    yomi?: number;
+    strats?: Array<{
+        name?: string;
+        currentScore?: number;
+    }>;
+    rounds?: number;
+    currentRound?: number;
+};
 export declare class StrategicModelingScreen extends HalScreen {
     private lastPayoffValues;
     private lastCurrentRound;
@@ -12,17 +21,12 @@ export declare class StrategicModelingScreen extends HalScreen {
     private lastStratsHash;
     constructor(opts: {
         container: string;
-        colors: any;
+        colors: HalColors;
     });
     cancelFlashAnimation(): void;
     startFlashAnimation(roundsData: number): void;
     testAnimation(rounds?: number): void;
-    draw(data?: {
-        yomi?: number;
-        strats?: any[];
-        rounds?: number;
-        currentRound?: number;
-    }): void;
+    draw(data?: StrategicModelingData): void;
     private initializeStaticElements;
     private updateDynamicContent;
     private updatePayoffMatrix;
@@ -30,3 +34,4 @@ export declare class StrategicModelingScreen extends HalScreen {
     private updateTournamentProgress;
     private drawButton;
 }
+export {};

@@ -1,4 +1,4 @@
-import { HalScreen } from './hal-screen-base'
+import { HalScreen, HalColors } from './hal-screen-base'
 import './hal-screen-types'
 
 const DEV_MODE = true  // Set to false for production
@@ -12,7 +12,7 @@ export class HypnoDronesScreen extends HalScreen {
   private lastHumanFlag = -1
   private lastProject35Flag = -1
   
-  constructor(opts: { container: string; colors: any }) {
+  constructor(opts: { container: string; colors: HalColors }) {
     // In dev mode, use normal screen size. In production, use full-screen overlay
     const isDevMode = DEV_MODE
     const width = isDevMode ? 800 : window.innerWidth
@@ -49,7 +49,7 @@ export class HypnoDronesScreen extends HalScreen {
     }
   }
   
-  draw() {
+  draw(): void {
     // Check if hypnodrones have been released
     const currentHumanFlag = typeof humanFlag !== 'undefined' ? humanFlag : 1
     const currentProject35Flag = typeof project35 !== 'undefined' && project35.flag === 1 ? 1 : 0

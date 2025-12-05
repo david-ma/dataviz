@@ -1,11 +1,11 @@
-import { HalScreen } from './hal-screen-base'
+import { HalScreen, HalColors } from './hal-screen-base'
 import './hal-screen-types'
 
 export class NumericMatrixScreen extends HalScreen {
   private initialized = false
   private lastValues = {trust: -1, processors: -1, memory: -1, operations: -1, creativity: -1}
   
-  constructor(opts: { container: string; colors: any }) {
+  constructor(opts: { container: string; colors: HalColors }) {
     super({
       id: 'hal-numeric-matrix',
       container: opts.container,
@@ -16,7 +16,7 @@ export class NumericMatrixScreen extends HalScreen {
     this.svg.style('background', this.colors.matrixBlue)  // Matrix blue for data
   }
   
-  draw() {
+  draw(): void {
     const currentValues = {
       trust: trust || 0,
       processors: processors || 0,

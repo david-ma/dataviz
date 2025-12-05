@@ -1,4 +1,4 @@
-import { HalScreen } from './hal-screen-base';
+import { HalScreen, HalColors } from './hal-screen-base';
 import './hal-screen-types';
 export declare class QuantumComputingScreen extends HalScreen {
     private initialized;
@@ -15,7 +15,7 @@ export declare class QuantumComputingScreen extends HalScreen {
     private ringGroup;
     constructor(opts: {
         container: string;
-        colors: any;
+        colors: HalColors;
     });
     draw(): void;
     private spawnRing;

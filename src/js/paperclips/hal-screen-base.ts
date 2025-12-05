@@ -1,5 +1,26 @@
 import { d3 } from '../chart'
 
+export type HalColors = {
+  background: string
+  text: string
+  labelGrey?: string
+  grid?: string
+  primary?: string
+  secondary?: string
+  tertiary?: string
+  teal?: string
+  navy?: string
+  grey?: string
+  burgundy?: string
+  violet?: string
+  matrixBlue?: string
+  green?: string
+  red?: string
+  white?: string
+  darkNavy?: string
+  [key: string]: string | undefined
+}
+
 // Global screen manager
 export class HalScreenManager {
   private static instance: HalScreenManager
@@ -56,10 +77,10 @@ export abstract class HalScreen {
   protected width: number
   protected height: number
   protected background: string
-  protected colors: any
+  protected colors: HalColors
   protected visible: boolean = true
   
-  constructor(opts: { id: string; container: string; width: number; height: number; colors: any }) {
+  constructor(opts: { id: string; container: string; width: number; height: number; colors: HalColors }) {
     this.id = opts.id
     this.width = opts.width
     this.height = opts.height

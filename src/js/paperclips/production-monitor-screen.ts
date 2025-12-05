@@ -1,5 +1,5 @@
 import { d3 } from '../chart'
-import { HalScreen } from './hal-screen-base'
+import { HalScreen, HalColors } from './hal-screen-base'
 import './hal-screen-types'
 
 export class ProductionMonitorScreen extends HalScreen {
@@ -10,7 +10,7 @@ export class ProductionMonitorScreen extends HalScreen {
   private maxHistory = 500
   private maxHistoryShort = 100
   
-  constructor(opts: { container: string; colors: any }) {
+  constructor(opts: { container: string; colors: HalColors }) {
     super({
       id: 'hal-production-monitor',
       container: opts.container,
@@ -21,7 +21,7 @@ export class ProductionMonitorScreen extends HalScreen {
     this.svg.style('background', this.colors.teal)  // Teal for production/engineering
   }
   
-  update() {
+  update(): void {
     if (typeof clipRate === 'undefined') return
     
     this.clipHistory.push(clips || 0)
@@ -45,7 +45,7 @@ export class ProductionMonitorScreen extends HalScreen {
     this.draw()
   }
   
-  draw() {
+  draw(): void {
     this.clear()
     
     // Grid and title
@@ -62,7 +62,7 @@ export class ProductionMonitorScreen extends HalScreen {
     this.drawStats()
   }
   
-  private drawGrid() {
+  private drawGrid(): void {
     for (let i = 0; i <= 10; i++) {
       this.svg.append('line')
         .attr('x1', 20 + i * 76).attr('x2', 20 + i * 76)
@@ -77,7 +77,7 @@ export class ProductionMonitorScreen extends HalScreen {
     }
   }
   
-  private drawTitle() {
+  private drawTitle(): void {
     this.svg.append('text')
       .attr('x', 20).attr('y', 30)
       .attr('fill', this.colors.text)
@@ -87,7 +87,7 @@ export class ProductionMonitorScreen extends HalScreen {
       .text('PRODUCTION MONITOR')
   }
   
-  private drawGraph(history: number[], yMax: number, yMin: number, color: string, label: string, labelY: number) {
+  private drawGraph(history: number[], yMax: number, yMin: number, color: string, label: string, labelY: number): void {
     if (history.length < 2) return
     
     const xScale = d3.scaleLinear().domain([0, history.length]).range([20, 780])
@@ -113,7 +113,7 @@ export class ProductionMonitorScreen extends HalScreen {
       .text(label)
   }
   
-  private drawStats() {
+  private drawStats(): void {
     const stats = [
       `CLIPS: ${(clips || 0).toLocaleString()}`,
       `RATE: ${(clipRate || 0).toFixed(1)}/sec`,

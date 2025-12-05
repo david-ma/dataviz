@@ -1,9 +1,25 @@
 import { d3 } from '../chart'
-import { HalScreen } from './hal-screen-base'
+import { HalScreen, HalColors } from './hal-screen-base'
 import './hal-screen-types'
 
+type ComputationalTelemetryData = {
+  trust: number
+  processors: number
+  memory: number
+  opsHistory: number[]
+  creatHistory: number[]
+}
+
+type WaveformOptions = {
+  history: number[]
+  y: number
+  height: number
+  color: string
+  label: string
+}
+
 export class ComputationalTelemetryScreen extends HalScreen {
-  constructor(opts: { container: string; colors: any }) {
+  constructor(opts: { container: string; colors: HalColors }) {
     super({
       id: 'hal-computational-telemetry',
       container: opts.container,
@@ -14,7 +30,7 @@ export class ComputationalTelemetryScreen extends HalScreen {
     this.svg.style('background', this.colors.navy)  // Navy for computational/memory
   }
 
-  update(data: { trust: number; processors: number; memory: number; opsHistory: number[]; creatHistory: number[] }) {
+  update(data: ComputationalTelemetryData): void {
     this.svg.selectAll('*').remove()
     
     // Title
@@ -60,7 +76,7 @@ export class ComputationalTelemetryScreen extends HalScreen {
     }
   }
 
-  private drawWaveform(opts: { history: number[]; y: number; height: number; color: string; label: string }) {
+  private drawWaveform(opts: WaveformOptions): void {
     this.svg.append('text')
       .attr('x', 20)
       .attr('y', opts.y - 10)

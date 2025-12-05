@@ -1,5 +1,17 @@
-import { HalScreen } from './hal-screen-base';
+import { HalScreen, HalColors } from './hal-screen-base';
 import './hal-screen-types';
+type StockDatum = {
+    id: number;
+    symbol: string;
+    price: number;
+    profit: number;
+    amount?: number;
+};
+type StockUpdatePayload = {
+    stocks: StockDatum[];
+    bankroll: number;
+    portTotal: number;
+};
 export declare class StockMarketScreen extends HalScreen {
     private candleData;
     private currentCandle;
@@ -10,18 +22,11 @@ export declare class StockMarketScreen extends HalScreen {
     private readonly MAX_PROFIT_HISTORY;
     constructor(opts: {
         container: string;
-        colors: any;
+        colors: HalColors;
     });
-    update(data: {
-        stocks: any[];
-        bankroll: number;
-        portTotal: number;
-    }): void;
-    draw(data: {
-        stocks: any[];
-        bankroll: number;
-        portTotal: number;
-    }): void;
+    update(data: StockUpdatePayload): void;
+    draw(data: StockUpdatePayload): void;
     private drawProfitSummary;
     private drawStockCell;
 }
+export {};

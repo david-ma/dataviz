@@ -1,8 +1,15 @@
 import { d3 } from '../chart'
-import { HalScreen } from './hal-screen-base'
+import { HalScreen, HalColors } from './hal-screen-base'
 import './hal-screen-types'
 
 const DEV_MODE = true  // Set to false for production
+
+type StrategicModelingData = {
+  yomi?: number
+  strats?: Array<{ name?: string; currentScore?: number }>
+  rounds?: number
+  currentRound?: number
+}
 
 export class StrategicModelingScreen extends HalScreen {
   private lastPayoffValues = {aa: '', ab: '', ba: '', bb: ''}
@@ -10,12 +17,12 @@ export class StrategicModelingScreen extends HalScreen {
   private lastRounds = 0
   private tournamentRunning = false
   private flashAnimationId: number | null = null
-  private cellRects: Map<string, any> = new Map()
+  private cellRects: Map<string, d3.Selection<d3.BaseType, unknown, HTMLElement, any>> = new Map()
   private initialized = false
   private lastYomi = -1
   private lastStratsHash = ''
   
-  constructor(opts: { container: string; colors: any }) {
+  constructor(opts: { container: string; colors: HalColors }) {
     super({
       id: 'hal-strategic-modeling',
       container: opts.container,
@@ -32,14 +39,14 @@ export class StrategicModelingScreen extends HalScreen {
     }
   }
   
-  cancelFlashAnimation() {
+  cancelFlashAnimation(): void {
     if (this.flashAnimationId !== null) {
       clearTimeout(this.flashAnimationId)
       this.flashAnimationId = null
     }
   }
   
-  startFlashAnimation(roundsData: number) {
+  startFlashAnimation(roundsData: number): void {
     this.cancelFlashAnimation()
     
     // Ensure cellRects are populated before starting animation
@@ -88,17 +95,18 @@ export class StrategicModelingScreen extends HalScreen {
   }
   
   // Public method for testing animation
-  testAnimation(rounds: number = 8) {
+  testAnimation(rounds: number = 8): void {
     console.log(`[StrategicModelingScreen] Testing animation with ${rounds} rounds`)
     this.startFlashAnimation(rounds)
   }
   
-  draw(data?: { yomi?: number; strats?: any[]; rounds?: number; currentRound?: number }) {
-    const colors = {
+  draw(data?: StrategicModelingData): void {
+    const colors: HalColors = {
       text: '#ffffff',
       labelGrey: '#cfe8ff',
       yellow: '#ffe66d',
-      cyan: '#4ecdc4'
+      cyan: '#4ecdc4',
+      background: this.colors.background
     }
     
     // Use passed data or fall back to globals
@@ -146,7 +154,7 @@ export class StrategicModelingScreen extends HalScreen {
     this.lastStratsHash = JSON.stringify(stratsData)
   }
   
-  private initializeStaticElements(colors: any) {
+  private initializeStaticElements(colors: HalColors): void {
     // Title
     this.svg.append('text')
       .attr('id', 'title')
@@ -235,7 +243,7 @@ export class StrategicModelingScreen extends HalScreen {
     }
   }
   
-  private updateDynamicContent(colors: any, yomiValue: number, stratsData: any[], roundsData: number, currentRoundData: number) {
+  private updateDynamicContent(colors: HalColors, yomiValue: number, stratsData: Array<{ name?: string; currentScore?: number }>, roundsData: number, currentRoundData: number): void {
     // Update tournament status indicator
     let statusIndicator = this.svg.select('#tournament-status')
     if (this.tournamentRunning) {
@@ -265,7 +273,7 @@ export class StrategicModelingScreen extends HalScreen {
     yomiDisplay.text(`YOMI: ${yomiValue.toLocaleString()}`)
   }
   
-  private updatePayoffMatrix(colors: any): boolean {
+  private updatePayoffMatrix(colors: HalColors): boolean {
     const startY = 220  // btnY + 100 + 60
     let payoffLabel = this.svg.select('#payoff-label')
     
@@ -373,7 +381,7 @@ export class StrategicModelingScreen extends HalScreen {
     element.text(text)
   }
   
-  private updateTournamentProgress(colors: any, stratsData: any[], roundsData: number, currentRoundData: number) {
+  private updateTournamentProgress(colors: HalColors, stratsData: Array<{ name?: string; currentScore?: number }>, roundsData: number, currentRoundData: number): void {
     const startY = 460  // btnY + 100 + 300
     let progressLabel = this.svg.select('#tournament-progress-label')
     
@@ -442,7 +450,7 @@ export class StrategicModelingScreen extends HalScreen {
     }
   }
   
-  private drawButton(x: number, y: number, w: number, h: number, text: string, color: string, onClick: () => void) {
+  private drawButton(x: number, y: number, w: number, h: number, text: string, color: string, onClick: () => void): void {
     const btn = this.svg.append('g').style('cursor', 'pointer')
     btn.append('rect')
       .attr('x', x).attr('y', y).attr('width', w).attr('height', h)

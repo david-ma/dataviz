@@ -1,11 +1,11 @@
-import { HalScreen } from './hal-screen-base'
+import { HalScreen, HalColors } from './hal-screen-base'
 import './hal-screen-types'
 
 export class PhaseIndicatorScreen extends HalScreen {
   private lastPhase: string | null = null
   private initialized = false
   
-  constructor(opts: { container: string; colors: any }) {
+  constructor(opts: { container: string; colors: HalColors }) {
     super({
       id: 'hal-phase-indicator',
       container: opts.container,
@@ -17,7 +17,7 @@ export class PhaseIndicatorScreen extends HalScreen {
     this.svg.style('margin-bottom', '10px').style('margin-top', '0')
   }
   
-  draw(phaseText: string) {
+  draw(phaseText: string): void {
     // Only update if phase actually changed
     if (this.lastPhase === phaseText && this.initialized) {
       return

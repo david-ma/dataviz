@@ -1,15 +1,17 @@
-import { HalScreen } from './hal-screen-base';
+import { HalScreen, HalColors } from './hal-screen-base';
 import './hal-screen-types';
+type MarketDynamicsData = {
+    revenueHistory: number[];
+    priceHistory: number[];
+    demandHistory: number[];
+    avgRev: number;
+};
 export declare class MarketDynamicsScreen extends HalScreen {
     constructor(opts: {
         container: string;
-        colors: any;
+        colors: HalColors;
     });
-    update(data: {
-        revenueHistory: number[];
-        priceHistory: number[];
-        demandHistory: number[];
-        avgRev: number;
-    }): void;
+    update(data: MarketDynamicsData): void;
     private drawChart;
 }
+export {};
