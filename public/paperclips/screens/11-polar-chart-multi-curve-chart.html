@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HAL Panels – D3 Visuals</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+    body {
+        background:black;
+        font-family: monospace;
+        color:white;
+    }
+    .panel {
+        display: inline-block;
+        margin: 30px;
+    }
+</style>
+</head>
+<body>
+
+<!-- PANEL 1 -->
+<div class="panel">
+    <h3 style="text-align:center;">DMG 1.0 — Polar Chart</h3>
+    <svg id="polarChart" width="400" height="400"></svg>
+</div>
+
+<!-- PANEL 2 -->
+<div class="panel">
+    <h3 style="text-align:center;">IO/POS — Overlapping Curves</h3>
+    <svg id="curveChart" width="500" height="400"></svg>
+</div>
+
+<script>
+// ================================
+// PANEL 1 — POLAR CHART (DMG 1.0)
+// ================================
+const svg1 = d3.select("#polarChart");
+const w1 = 400, h1 = 400;
+const cx = w1/2, cy = h1/2;
+const maxR = 170;
+
+// background gradient
+let defs1 = svg1.append("defs");
+let grad1 = defs1.append("radialGradient")
+    .attr("id","pinkRadial");
+grad1.append("stop").attr("offset","0%").attr("stop-color","#ffccd9");
+grad1.append("stop").attr("offset","100%").attr("stop-color","#a03550");
+svg1.append("rect")
+    .attr("width",w1)
+    .attr("height",h1)
+    .attr("fill","url(#pinkRadial)");
+
+// concentric circles
+for (let r = 20; r <= maxR; r += 20) {
+    svg1.append("circle")
+        .attr("cx",cx)
+        .attr("cy",cy)
+        .attr("r",r)
+        .attr("stroke","white")
+        .attr("stroke-opacity",0.5)
+        .attr("fill","none");
+}
+
+// radial lines
+for (let a = 0; a < 360; a += 22.5) {
+    let rad = a * Math.PI/180;
+    svg1.append("line")
+        .attr("x1",cx)
+        .attr("y1",cy)
+        .attr("x2",cx + Math.cos(rad)*maxR)
+        .attr("y2",cy + Math.sin(rad)*maxR)
+        .attr("stroke","white")
+        .attr("stroke-opacity",0.4);
+}
+
+// curve #1 (stylised parametric)
+let curve1 = d3.range(0,Math.PI*2,0.02).map(t => {
+    let r = maxR*0.6 * (1 - 0.6*Math.sin(t));
+    return [cx + r*Math.cos(t), cy + r*Math.sin(t)];
+});
+
+svg1.append("path")
+    .attr("d", d3.line()(curve1))
+    .attr("stroke","white")
+    .attr("stroke-width",2)
+    .attr("fill","none");
+
+// curve #2 (simple bezier visual)
+svg1.append("path")
+    .attr("d","M 40 220 C 200 -20 200 420 360 180")
+    .attr("stroke","white")
+    .attr("stroke-width",2)
+    .attr("fill","none")
+    .attr("opacity",0.8);
+
+// DMG label
+svg1.append("rect")
+    .attr("x",260).attr("y",330)
+    .attr("width",110).attr("height",40)
+    .attr("rx",5)
+    .attr("fill","#ffbacc");
+svg1.append("text")
+    .attr("x",315).attr("y",357)
+    .attr("text-anchor","middle")
+    .attr("font-size","20px")
+    .attr("fill","black")
+    .text("DMG 1.0");
+
+
+// ================================
+// PANEL 2 — MULTI CURVE CHART
+// ================================
+const svg2 = d3.select("#curveChart");
+const w2 = 500, h2 = 400;
+
+// background gradient
+let defs2 = svg2.append("defs");
+let grad2 = defs2.append("linearGradient")
+    .attr("id","lavGrad")
+    .attr("x1","0%").attr("x2","0%")
+    .attr("y1","0%").attr("y2","100%");
+grad2.append("stop").attr("offset","0%").attr("stop-color","#e3c3ff");
+grad2.append("stop").attr("offset","100%").attr("stop-color","#b04d8c");
+
+svg2.append("rect")
+    .attr("width",w2)
+    .attr("height",h2)
+    .attr("fill","url(#lavGrad)");
+
+// grid lines
+for (let y = 20; y < h2; y += 20) {
+    svg2.append("line")
+        .attr("x1",0).attr("x2",w2)
+        .attr("y1",y).attr("y2",y)
+        .attr("stroke","white")
+        .attr("stroke-opacity",0.2);
+}
+
+for (let x = 20; x < w2; x += 40) {
+    svg2.append("line")
+        .attr("x1",x).attr("x2",x)
+        .attr("y1",0).attr("y2",h2)
+        .attr("stroke","white")
+        .attr("stroke-opacity",0.15);
+}
+
+// main hump curve
+let hump = d3.range(0,1,0.01).map(t => {
+    let y = Math.exp(-Math.pow((t-0.5)*3,2))*150;
+    return [50 + t*400, 300 - y];
+});
+svg2.append("path")
+    .attr("d", d3.line()(hump))
+    .attr("stroke","white")
+    .attr("fill","none")
+    .attr("stroke-width",2);
+
+// falling curve
+let fall = d3.range(0,1,0.01).map(t => {
+    return [50 + t*400, 120 + t*200];
+});
+svg2.append("path")
+    .attr("d", d3.line()(fall))
+    .attr("stroke","#ffe3ff")
+    .attr("stroke-width",2)
+    .attr("fill","none");
+
+// diagonal emphasis line
+svg2.append("line")
+    .attr("x1",80).attr("x2",480)
+    .attr("y1",340).attr("y2",40)
+    .attr("stroke","white")
+    .attr("stroke-width",1)
+    .attr("opacity",0.3);
+
+// I/O labels
+svg2.append("text")
+    .attr("x",20).attr("y",360)
+    .attr("fill","white").attr("font-size","16px")
+    .text("IO/POS   82.946.220   .0433");
+svg2.append("text")
+    .attr("x",20).attr("y",380)
+    .attr("fill","white").attr("font-size","16px")
+    .text("IO/NFG   96.486.404   .0020");
+
+</script>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 import { d3 } from '../chart'
 
-const HAL_VIZ_VERSION = 'v1.0.13-all-screens-classes-20251205-1430'
+const HAL_VIZ_VERSION = 'v1.0.15-all-screens-converted-20251205-1500'
 console.log(`[HAL-VIZ] Version: ${HAL_VIZ_VERSION}`)
 
 // Global screen manager
@@ -83,28 +83,32 @@ abstract class HalScreen {
   protected width: number
   protected height: number
   protected background: string
+  protected colors: any
   protected visible: boolean = true
   
-  constructor(container: string, id: string, width: number, height: number, background: string) {
-    this.id = id
-    this.width = width
-    this.height = height
-    this.background = background
+  constructor(opts: { id: string; container: string; width: number; height: number; colors: any }) {
+    this.id = opts.id
+    this.width = opts.width
+    this.height = opts.height
+    this.colors = opts.colors
+    this.background = opts.colors.background
     
-    this.svg = d3.select(container)
+    this.svg = d3.select(opts.container)
       .append('svg')
-      .attr('id', id)
-      .attr('width', width)
-      .attr('height', height)
-      .style('background', background)
+      .attr('id', opts.id)
+      .attr('width', opts.width)
+      .attr('height', opts.height)
+      .style('background', this.background)
       .style('margin-top', '10px')
     
     // Register with global manager
-    console.log(`[HalScreen] Registering screen: ${id}`)
+    console.log(`[HalScreen] Registering screen: ${opts.id}`)
     HalScreenManager.getInstance().register(this)
   }
   
-  abstract draw(): void
+  draw(...args: any[]) {
+    // Optional - override in subclass
+  }
   
   getId(): string {
     return this.id
@@ -142,11 +146,15 @@ class ProductionMonitorScreen extends HalScreen {
   private inventoryHistory: number[] = []
   private maxHistory = 500
   private maxHistoryShort = 100
-  private colors: any
   
-  constructor(container: string, colors: any) {
-    super(container, 'hal-production-monitor', 800, 600, colors.background)
-    this.colors = colors
+  constructor(opts: { container: string; colors: any }) {
+    super({
+      id: 'hal-production-monitor',
+      container: opts.container,
+      width: 800,
+      height: 600,
+      colors: opts.colors
+    })
   }
   
   update() {
@@ -265,15 +273,18 @@ class ProductionMonitorScreen extends HalScreen {
 
 // Phase Indicator Screen
 class PhaseIndicatorScreen extends HalScreen {
-  private colors: any
-  
-  constructor(container: string, colors: any) {
-    super(container, 'hal-phase-indicator', 200, 200, colors.navy)
-    this.colors = colors
+  constructor(opts: { container: string; colors: any }) {
+    super({
+      id: 'hal-phase-indicator',
+      container: opts.container,
+      width: 200,
+      height: 200,
+      colors: opts.colors
+    })
     this.svg.style('margin-bottom', '10px').style('margin-top', '0')
   }
   
-  draw() {
+  draw(phaseText: string) {
     this.clear()
     
     this.svg.append('text')
@@ -282,11 +293,6 @@ class PhaseIndicatorScreen extends HalScreen {
       .attr('font-family', 'Consolas, "Fira Mono", monospace')
       .attr('font-size', 11).attr('opacity', 0.65)
       .text('PHASE: 01')
-    
-    let phaseText = 'BIZ'
-    if (typeof trust !== 'undefined' && trust > 0) {
-      phaseText = 'MFG'
-    }
     
     this.svg.append('text')
       .attr('x', 100).attr('y', 100)
@@ -302,11 +308,14 @@ class PhaseIndicatorScreen extends HalScreen {
 
 // Numeric Matrix Screen
 class NumericMatrixScreen extends HalScreen {
-  private colors: any
-  
-  constructor(container: string, colors: any) {
-    super(container, 'hal-numeric-matrix', 400, 300, colors.matrixBlue)
-    this.colors = colors
+  constructor(opts: { container: string; colors: any }) {
+    super({
+      id: 'hal-numeric-matrix',
+      container: opts.container,
+      width: 400,
+      height: 300,
+      colors: opts.colors
+    })
   }
   
   draw() {
@@ -351,90 +360,16 @@ class NumericMatrixScreen extends HalScreen {
   }
 }
 
-// Computational Telemetry Screen (waveforms)
-class ComputationalTelemetryScreen extends HalScreen {
-  private opsHistory: number[] = []
-  private creatHistory: number[] = []
-  private maxHistory = 100
-  private colors: any
-  
-  constructor(container: string, colors: any) {
-    super(container, 'hal-computational-telemetry', 800, 300, colors.background)
-    this.colors = colors
-  }
-  
-  update() {
-    if (typeof operations !== 'undefined') {
-      this.opsHistory.push(operations)
-      if (this.opsHistory.length > this.maxHistory) {
-        this.opsHistory.shift()
-      }
-    }
-    
-    if (typeof creativity !== 'undefined' && creativity > 0) {
-      this.creatHistory.push(creativity)
-      if (this.creatHistory.length > this.maxHistory) {
-        this.creatHistory.shift()
-      }
-    }
-    
-    this.draw()
-  }
-  
-  draw() {
-    this.clear()
-    
-    this.svg.append('text')
-      .attr('x', 20).attr('y', 30)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 18).attr('font-weight', 'bold')
-      .attr('letter-spacing', '2px')
-      .text('COMPUTATIONAL TELEMETRY')
-    
-    // Operations waveform
-    if (this.opsHistory.length > 1) {
-      this.drawWaveform(this.opsHistory, 60, 140, this.colors.secondary, 'OPERATIONS')
-    }
-    
-    // Creativity waveform
-    if (this.creatHistory.length > 1) {
-      this.drawWaveform(this.creatHistory, 160, 240, this.colors.tertiary, 'CREATIVITY')
-    }
-  }
-  
-  private drawWaveform(history: number[], yTop: number, yBottom: number, color: string, label: string) {
-    const xScale = d3.scaleLinear().domain([0, history.length]).range([20, 780])
-    const yScale = d3.scaleLinear().domain([0, d3.max(history) || 1]).range([yBottom, yTop])
-    const line = d3.line<number>()
-      .x((d, i) => xScale(i))
-      .y(d => yScale(d))
-      .curve(d3.curveBasis)
-    
-    this.svg.append('path')
-      .datum(history)
-      .attr('fill', 'none')
-      .attr('stroke', color)
-      .attr('stroke-width', 4)
-      .attr('opacity', 0.3)
-      .attr('d', line)
-    
-    this.svg.append('text')
-      .attr('x', 20).attr('y', yTop - 10)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Consolas, "Fira Mono", monospace')
-      .attr('font-size', 11)
-      .text(label)
-  }
-}
-
 // Quantum Computing Screen
 class QuantumComputingScreen extends HalScreen {
-  private colors: any
-  
-  constructor(container: string, colors: any) {
-    super(container, 'hal-quantum-computing', 400, 300, '#54336F')
-    this.colors = colors
+  constructor(opts: { container: string; colors: any }) {
+    super({
+      id: 'hal-quantum-computing',
+      container: opts.container,
+      width: 400,
+      height: 300,
+      colors: opts.colors
+    })
   }
   
   draw() {
@@ -496,8 +431,14 @@ class StrategicModelingScreen extends HalScreen {
   private lastPayoffValues = {aa: '', ab: '', ba: '', bb: ''}
   private payoffObserver: MutationObserver | null = null
   
-  constructor(container: string) {
-    super(container, 'hal-strategic-modeling', 600, 600, '#6B2424')
+  constructor(opts: { container: string; colors: any }) {
+    super({
+      id: 'hal-strategic-modeling',
+      container: opts.container,
+      width: 600,
+      height: 600,
+      colors: opts.colors
+    })
     this.setupPayoffObserver()
   }
   
@@ -743,11 +684,205 @@ class StrategicModelingScreen extends HalScreen {
 }
 
 
+class ComputationalTelemetryScreen extends HalScreen {
+  constructor(opts: { container: string; colors: any }) {
+    super({
+      id: 'hal-computational-telemetry',
+      container: opts.container,
+      width: 800,
+      height: 300,
+      colors: opts.colors
+    })
+  }
+
+  update(data: { trust: number; processors: number; memory: number; opsHistory: number[]; creatHistory: number[] }) {
+    this.svg.selectAll('*').remove()
+    
+    // Title
+    this.svg.append('text')
+      .attr('x', 20)
+      .attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 18)
+      .attr('font-weight', 'bold')
+      .attr('letter-spacing', '2px')
+      .text('COMPUTATIONAL TELEMETRY')
+    
+    // Static display
+    this.svg.append('text')
+      .attr('x', 20)
+      .attr('y', 60)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 12)
+      .text(`TRUST: ${data.trust || 0}  |  PROC: ${data.processors || 0}  |  MEM: ${data.memory || 0}`)
+    
+    // Operations waveform
+    if (data.opsHistory.length > 1) {
+      this.drawWaveform({
+        history: data.opsHistory,
+        y: 120,
+        height: 60,
+        color: this.colors.primary,
+        label: `OPERATIONS: ${data.opsHistory[data.opsHistory.length - 1]?.toLocaleString() || 0}`
+      })
+    }
+    
+    // Creativity waveform
+    if (data.creatHistory.length > 1) {
+      this.drawWaveform({
+        history: data.creatHistory,
+        y: 220,
+        height: 60,
+        color: this.colors.tertiary,
+        label: `CREATIVITY: ${data.creatHistory[data.creatHistory.length - 1]?.toLocaleString() || 0}`
+      })
+    }
+  }
+
+  private drawWaveform(opts: { history: number[]; y: number; height: number; color: string; label: string }) {
+    this.svg.append('text')
+      .attr('x', 20)
+      .attr('y', opts.y - 10)
+      .attr('fill', opts.color)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 11)
+      .attr('font-weight', 'bold')
+      .text(opts.label)
+    
+    const xScale = d3.scaleLinear()
+      .domain([0, opts.history.length])
+      .range([20, 780])
+    
+    const yScale = d3.scaleLinear()
+      .domain([d3.min(opts.history) || 0, d3.max(opts.history) || 1])
+      .range([opts.y + opts.height, opts.y])
+    
+    const line = d3.line<number>()
+      .x((d, i) => xScale(i))
+      .y(d => yScale(d))
+      .curve(d3.curveMonotoneX)
+    
+    // Waveform
+    this.svg.append('path')
+      .datum(opts.history)
+      .attr('fill', 'none')
+      .attr('stroke', opts.color)
+      .attr('stroke-width', 2)
+      .attr('d', line)
+    
+    // Glow
+    this.svg.append('path')
+      .datum(opts.history)
+      .attr('fill', 'none')
+      .attr('stroke', opts.color)
+      .attr('stroke-width', 4)
+      .attr('opacity', 0.3)
+      .attr('d', line)
+  }
+}
+
+class MarketDynamicsScreen extends HalScreen {
+  constructor(opts: { container: string; colors: any }) {
+    super({
+      id: 'hal-market-dynamics',
+      container: opts.container,
+      width: 800,
+      height: 280,
+      colors: opts.colors
+    })
+  }
+
+  update(data: { revenueHistory: number[]; priceHistory: number[]; demandHistory: number[]; avgRev: number }) {
+    this.svg.selectAll('*').remove()
+    
+    // Title
+    this.svg.append('text')
+      .attr('x', 20).attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 18).attr('font-weight', 'bold')
+      .attr('letter-spacing', '2px')
+      .text('MARKET DYNAMICS')
+    
+    // Current values
+    this.svg.append('text')
+      .attr('x', 400).attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 11)
+      .text(`AVG REVENUE: ${data.avgRev.toFixed(2)} $/sec`)
+    
+    const startX = 20, width = 760, height = 60
+    const xScale = d3.scaleLinear().domain([0, data.revenueHistory.length]).range([startX, startX + width])
+    
+    // Revenue area chart
+    this.drawChart({ history: data.revenueHistory, y: 60, height, color: this.colors.secondary, label: `REVENUE: ${data.avgRev.toFixed(2)} $/sec`, area: true, xScale })
+    
+    // Price line chart
+    this.drawChart({ history: data.priceHistory, y: 130, height, color: this.colors.tertiary, label: 'PRICE ($)', area: false, xScale })
+    
+    // Demand line chart
+    this.drawChart({ history: data.demandHistory, y: 200, height, color: this.colors.primary, label: 'DEMAND (%)', area: false, xScale })
+  }
+
+  private drawChart(opts: { history: number[]; y: number; height: number; color: string; label: string; area: boolean; xScale: any }) {
+    const yScale = d3.scaleLinear()
+      .domain([0, d3.max(opts.history) || 1])
+      .range([opts.y + opts.height, opts.y])
+    
+    const line = d3.line<number>()
+      .x((d, i) => opts.xScale(i))
+      .y(d => yScale(d))
+      .curve(d3.curveMonotoneX)
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', opts.y - 5)
+      .attr('fill', opts.color)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 10).attr('font-weight', 'bold')
+      .text(opts.label)
+    
+    if (opts.area) {
+      const area = d3.area<number>()
+        .x((d, i) => opts.xScale(i))
+        .y0(opts.y + opts.height)
+        .y1(d => yScale(d))
+        .curve(d3.curveMonotoneX)
+      
+      this.svg.append('path')
+        .datum(opts.history)
+        .attr('fill', opts.color)
+        .attr('opacity', 0.3)
+        .attr('d', area)
+    }
+    
+    this.svg.append('path')
+      .datum(opts.history)
+      .attr('fill', 'none')
+      .attr('stroke', opts.color)
+      .attr('stroke-width', 2)
+      .attr('d', line)
+    
+    // Baseline
+    this.svg.append('line')
+      .attr('x1', 20).attr('x2', 780)
+      .attr('y1', opts.y + opts.height).attr('y2', opts.y + opts.height)
+      .attr('stroke', this.colors.grid)
+      .attr('stroke-width', 1)
+      .attr('opacity', 0.3)
+  }
+}
+
 class HalViz {
   private svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>
-  private compSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
-  private phaseSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
-  private marketSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
+  private computationalTelemetryScreen: ComputationalTelemetryScreen | null = null
+  private phaseIndicatorScreen: PhaseIndicatorScreen | null = null
+  private numericMatrixScreen: NumericMatrixScreen | null = null
+  private quantumComputingScreen: QuantumComputingScreen | null = null
+  private marketDynamicsScreen: MarketDynamicsScreen | null = null
+  private marketSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null  // World map
   private clipHistory: number[] = []
   private fundsHistory: number[] = []
   private wireHistory: number[] = []
@@ -764,9 +899,6 @@ class HalViz {
   private flashingCountries: number[] = []
   private flashTimer = 0
   
-  private matrixSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
-  private phaseIndicatorSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
-  private quantumSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
   private strategicModelingScreen: StrategicModelingScreen | null = null
   private payoffObserver: MutationObserver | null = null
   private lastPayoffValues = {aa: '', ab: '', ba: '', bb: ''}
@@ -910,7 +1042,10 @@ class HalViz {
     // Show strategic modeling if yomi exists
     if (typeof yomi !== 'undefined' && yomi > 0) {
       if (!this.strategicModelingScreen) {
-        this.strategicModelingScreen = new StrategicModelingScreen('#hal-dashboard')
+        this.strategicModelingScreen = new StrategicModelingScreen({
+          container: '#hal-dashboard',
+          colors: this.colors
+        })
       }
       this.strategicModelingScreen.draw()
     }
@@ -1086,278 +1221,36 @@ class HalViz {
   }
   
   drawComputationalResources() {
-    // Create SVG if it doesn't exist
-    if (!this.compSvg) {
-      this.compSvg = d3.select('#hal-dashboard')
-        .append('svg')
-        .attr('id', 'hal-computational-telemetry')
-        .attr('width', 800)
-        .attr('height', 300)
-        .style('background', this.colors.background)
-        .style('margin-top', '10px')
+    if (!this.computationalTelemetryScreen) {
+      this.computationalTelemetryScreen = new ComputationalTelemetryScreen({
+        container: '#hal-dashboard',
+        colors: this.colors
+      })
+      HalScreenManager.getInstance().register(this.computationalTelemetryScreen)
     }
     
-    // Clear previous
-    this.compSvg.selectAll('*').remove()
-    
-    // Title
-    this.compSvg.append('text')
-      .attr('x', 20)
-      .attr('y', 30)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 18)
-      .attr('font-weight', 'bold')
-      .attr('letter-spacing', '2px')
-      .text('COMPUTATIONAL TELEMETRY')
-    
-    // Trust/Processor/Memory static display
-    const staticY = 60
-    this.compSvg.append('text')
-      .attr('x', 20)
-      .attr('y', staticY)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 12)
-      .text(`TRUST: ${trust || 0}  |  PROC: ${processors || 0}  |  MEM: ${memory || 0}`)
-    
-    // Operations waveform
-    if (this.opsHistory.length > 1) {
-      const opsY = 120
-      const opsHeight = 60
-      
-      this.compSvg.append('text')
-        .attr('x', 20)
-        .attr('y', opsY - 10)
-        .attr('fill', this.colors.primary)
-        .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-        .attr('font-size', 11)
-        .attr('font-weight', 'bold')
-        .text(`OPERATIONS: ${operations.toLocaleString()}`)
-      
-      const xScale = d3.scaleLinear()
-        .domain([0, this.opsHistory.length])
-        .range([20, 780])
-      
-      const yScale = d3.scaleLinear()
-        .domain([d3.min(this.opsHistory) || 0, d3.max(this.opsHistory) || 1])
-        .range([opsY + opsHeight, opsY])
-      
-      const line = d3.line<number>()
-        .x((d, i) => xScale(i))
-        .y(d => yScale(d))
-        .curve(d3.curveMonotoneX)
-      
-      // Oscilloscope-style waveform
-      this.compSvg.append('path')
-        .datum(this.opsHistory)
-        .attr('fill', 'none')
-        .attr('stroke', this.colors.primary)
-        .attr('stroke-width', 2)
-        .attr('d', line)
-      
-      // Glow effect
-      this.compSvg.append('path')
-        .datum(this.opsHistory)
-        .attr('fill', 'none')
-        .attr('stroke', this.colors.primary)
-        .attr('stroke-width', 4)
-        .attr('opacity', 0.3)
-        .attr('d', line)
-    }
-    
-    // Creativity waveform
-    if (this.creatHistory.length > 1) {
-      const creatY = 220
-      const creatHeight = 60
-      
-      this.compSvg.append('text')
-        .attr('x', 20)
-        .attr('y', creatY - 10)
-        .attr('fill', this.colors.tertiary)
-        .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-        .attr('font-size', 11)
-        .attr('font-weight', 'bold')
-        .text(`CREATIVITY: ${creativity.toLocaleString()}`)
-      
-      const xScale = d3.scaleLinear()
-        .domain([0, this.creatHistory.length])
-        .range([20, 780])
-      
-      const yScale = d3.scaleLinear()
-        .domain([d3.min(this.creatHistory) || 0, d3.max(this.creatHistory) || 1])
-        .range([creatY + creatHeight, creatY])
-      
-      const line = d3.line<number>()
-        .x((d, i) => xScale(i))
-        .y(d => yScale(d))
-        .curve(d3.curveMonotoneX)
-      
-      // Oscilloscope-style waveform
-      this.compSvg.append('path')
-        .datum(this.creatHistory)
-        .attr('fill', 'none')
-        .attr('stroke', this.colors.tertiary)
-        .attr('stroke-width', 2)
-        .attr('d', line)
-      
-      // Glow effect
-      this.compSvg.append('path')
-        .datum(this.creatHistory)
-        .attr('fill', 'none')
-        .attr('stroke', this.colors.tertiary)
-        .attr('stroke-width', 4)
-        .attr('opacity', 0.3)
-        .attr('d', line)
-    }
+    this.computationalTelemetryScreen.update({
+      trust,
+      processors,
+      memory,
+      opsHistory: this.opsHistory,
+      creatHistory: this.creatHistory
+    })
   }
   
   drawRevenueChart() {
-    // Create SVG if it doesn't exist
-    if (!this.phaseSvg) {
-      this.phaseSvg = d3.select('#hal-dashboard')
-        .append('svg')
-        .attr('id', 'hal-market-dynamics')
-        .attr('width', 800)
-        .attr('height', 280)
-        .style('background', this.colors.background)
-        .style('margin-top', '10px')
+    if (!this.marketDynamicsScreen) {
+      this.marketDynamicsScreen = new MarketDynamicsScreen({
+        container: '#hal-dashboard',
+        colors: this.colors
+      })
     }
     
-    const startX = 20
-    const startY = 60
-    const width = 760
-    const height = 60
-    
-    // Clear previous
-    this.phaseSvg.selectAll('*').remove()
-    
-    // Title
-    this.phaseSvg.append('text')
-      .attr('x', 20)
-      .attr('y', 30)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 18)
-      .attr('font-weight', 'bold')
-      .attr('letter-spacing', '2px')
-      .text('MARKET DYNAMICS')
-    
-    // Current values
-    this.phaseSvg.append('text')
-      .attr('x', 400)
-      .attr('y', 30)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 11)
-      .text(`MARKETING LVL: ${marketingLvl || 1}  |  PRICE: $${margin.toFixed(2)}  |  DEMAND: ${demand.toFixed(1)}%`)
-    
-    const xScale = d3.scaleLinear()
-      .domain([0, this.revenueHistory.length])
-      .range([startX, startX + width])
-    
-    // Revenue area chart
-    const revenueY = startY
-    const revenueScale = d3.scaleLinear()
-      .domain([0, d3.max(this.revenueHistory) || 1])
-      .range([revenueY + height, revenueY])
-    
-    const revenueArea = d3.area<number>()
-      .x((d, i) => xScale(i))
-      .y0(revenueY + height)
-      .y1(d => revenueScale(d))
-      .curve(d3.curveMonotoneX)
-    
-    const revenueLine = d3.line<number>()
-      .x((d, i) => xScale(i))
-      .y(d => revenueScale(d))
-      .curve(d3.curveMonotoneX)
-    
-    this.phaseSvg.append('text')
-      .attr('x', startX)
-      .attr('y', revenueY - 5)
-      .attr('fill', this.colors.secondary)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 10)
-      .attr('font-weight', 'bold')
-      .text(`REVENUE: ${avgRev.toFixed(2)} $/sec`)
-    
-    this.phaseSvg.append('path')
-      .datum(this.revenueHistory)
-      .attr('fill', this.colors.secondary)
-      .attr('opacity', 0.3)
-      .attr('d', revenueArea)
-    
-    this.phaseSvg.append('path')
-      .datum(this.revenueHistory)
-      .attr('fill', 'none')
-      .attr('stroke', this.colors.secondary)
-      .attr('stroke-width', 2)
-      .attr('d', revenueLine)
-    
-    // Price line
-    const priceY = startY + 90
-    const priceScale = d3.scaleLinear()
-      .domain([0, d3.max(this.priceHistory) || 1])
-      .range([priceY + height, priceY])
-    
-    const priceLine = d3.line<number>()
-      .x((d, i) => xScale(i))
-      .y(d => priceScale(d))
-      .curve(d3.curveMonotoneX)
-    
-    this.phaseSvg.append('text')
-      .attr('x', startX)
-      .attr('y', priceY - 5)
-      .attr('fill', this.colors.tertiary)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 10)
-      .attr('font-weight', 'bold')
-      .text('PRICE ($)')
-    
-    this.phaseSvg.append('path')
-      .datum(this.priceHistory)
-      .attr('fill', 'none')
-      .attr('stroke', this.colors.tertiary)
-      .attr('stroke-width', 2)
-      .attr('d', priceLine)
-    
-    // Demand line
-    const demandY = startY + 180
-    const demandScale = d3.scaleLinear()
-      .domain([0, 100])
-      .range([demandY + height, demandY])
-    
-    const demandLine = d3.line<number>()
-      .x((d, i) => xScale(i))
-      .y(d => demandScale(d))
-      .curve(d3.curveMonotoneX)
-    
-    this.phaseSvg.append('text')
-      .attr('x', startX)
-      .attr('y', demandY - 5)
-      .attr('fill', this.colors.primary)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 10)
-      .attr('font-weight', 'bold')
-      .text('DEMAND (%)')
-    
-    this.phaseSvg.append('path')
-      .datum(this.demandHistory)
-      .attr('fill', 'none')
-      .attr('stroke', this.colors.primary)
-      .attr('stroke-width', 2)
-      .attr('d', demandLine)
-    
-    // Baselines
-    ;[revenueY, priceY, demandY].forEach(y => {
-      this.phaseSvg!.append('line')
-        .attr('x1', startX)
-        .attr('x2', startX + width)
-        .attr('y1', y + height)
-        .attr('y2', y + height)
-        .attr('stroke', this.colors.grid)
-        .attr('stroke-width', 1)
+    this.marketDynamicsScreen.update({
+      revenueHistory: this.revenueHistory,
+      priceHistory: this.priceHistory,
+      demandHistory: this.demandHistory,
+      avgRev
     })
   }
   
@@ -1493,186 +1386,41 @@ class HalViz {
   }
   
   drawNumericMatrix() {
-    // Create SVG if it doesn't exist
-    if (!this.matrixSvg) {
-      this.matrixSvg = d3.select('#hal-dashboard')
-        .append('svg')
-        .attr('id', 'hal-numeric-matrix')
-        .attr('width', 400)
-        .attr('height', 300)
-        .style('background', this.colors.matrixBlue)
-        .style('margin-top', '10px')
+    if (!this.numericMatrixScreen) {
+      this.numericMatrixScreen = new NumericMatrixScreen({
+        container: '#hal-dashboard',
+        colors: this.colors
+      })
     }
     
-    // Clear previous
-    this.matrixSvg.selectAll('*').remove()
-    
-    // Section label
-    this.matrixSvg.append('text')
-      .attr('x', 20)
-      .attr('y', 25)
-      .attr('fill', this.colors.labelGrey)
-      .attr('font-family', 'Consolas, "Fira Mono", monospace')
-      .attr('font-size', 12)
-      .attr('opacity', 0.65)
-      .attr('letter-spacing', '1px')
-      .text('COMPUTATIONAL RESOURCES')
-    
-    // Data rows
-    const data = [
-      ['TRUST', trust || 0],
-      ['PROCESSORS', processors || 0],
-      ['MEMORY', memory || 0],
-      ['OPERATIONS', operations || 0],
-      ['CREATIVITY', creativity || 0]
-    ]
-    
-    const startY = 60
-    const lineHeight = 35
-    
-    data.forEach((row, i) => {
-      const y = startY + i * lineHeight
-      
-      // Label
-      this.matrixSvg!.append('text')
-        .attr('x', 30)
-        .attr('y', y)
-        .attr('fill', this.colors.text)
-        .attr('font-family', 'Consolas, "Fira Mono", monospace')
-        .attr('font-size', 16)
-        .attr('opacity', 0.92)
-        .text(row[0])
-      
-      // Value
-      this.matrixSvg!.append('text')
-        .attr('x', 250)
-        .attr('y', y)
-        .attr('fill', this.colors.text)
-        .attr('font-family', 'Consolas, "Fira Mono", monospace')
-        .attr('font-size', 16)
-        .attr('opacity', 0.92)
-        .text(typeof row[1] === 'number' ? row[1].toLocaleString() : row[1])
-    })
+    this.numericMatrixScreen.draw()
   }
   
   drawPhaseIndicator() {
-    // Create SVG if it doesn't exist
-    if (!this.phaseIndicatorSvg) {
-      this.phaseIndicatorSvg = d3.select('#hal-dashboard')
-        .insert('svg', ':first-child')
-        .attr('id', 'hal-phase-indicator')
-        .attr('width', 200)
-        .attr('height', 200)
-        .style('background', this.colors.navy)
-        .style('margin-bottom', '10px')
+    if (!this.phaseIndicatorScreen) {
+      this.phaseIndicatorScreen = new PhaseIndicatorScreen({
+        container: '#hal-dashboard',
+        colors: this.colors
+      })
     }
     
-    // Clear previous
-    this.phaseIndicatorSvg.selectAll('*').remove()
-    
-    // Small header
-    this.phaseIndicatorSvg.append('text')
-      .attr('x', 20)
-      .attr('y', 25)
-      .attr('fill', this.colors.labelGrey)
-      .attr('font-family', 'Consolas, "Fira Mono", monospace')
-      .attr('font-size', 11)
-      .attr('opacity', 0.65)
-      .text('PHASE: 01')
-    
-    // Determine phase based on game state
     let phaseText = 'BIZ'
     if (typeof trust !== 'undefined' && trust > 0) {
       phaseText = 'MFG'
     }
     
-    // Large phase text
-    this.phaseIndicatorSvg.append('text')
-      .attr('x', 100)
-      .attr('y', 100)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Inter, "Segoe UI", sans-serif')
-      .attr('font-size', 64)
-      .attr('font-weight', 'bold')
-      .attr('letter-spacing', '8px')
-      .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'middle')
-      .text(phaseText)
+    this.phaseIndicatorScreen.draw(phaseText)
   }
   
   drawQuantumComputing() {
-    // Create SVG if it doesn't exist
-    if (!this.quantumSvg) {
-      this.quantumSvg = d3.select('#hal-dashboard')
-        .append('svg')
-        .attr('id', 'hal-quantum-computing')
-        .attr('width', 400)
-        .attr('height', 300)
-        .style('background', '#54336F') // Purple from 9-tiles waveform
-        .style('margin-top', '10px')
+    if (!this.quantumComputingScreen) {
+      this.quantumComputingScreen = new QuantumComputingScreen({
+        container: '#hal-dashboard',
+        colors: this.colors
+      })
     }
     
-    // Clear previous
-    this.quantumSvg.selectAll('*').remove()
-    
-    // Title
-    this.quantumSvg.append('text')
-      .attr('x', 20)
-      .attr('y', 30)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 18)
-      .attr('font-weight', 'bold')
-      .attr('letter-spacing', '2px')
-      .text('QUANTUM COMPUTING')
-    
-    // Operations waveform (reuse existing oscilloscope style)
-    const margin = {left: 34, right: 26, top: 60, bottom: 44}
-    const w = 400 - margin.left - margin.right
-    const h = 300 - margin.top - margin.bottom
-    
-    const g = this.quantumSvg.append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`)
-    
-    // Baseline
-    g.append('line')
-      .attr('x1', 0)
-      .attr('x2', w)
-      .attr('y1', h/2)
-      .attr('y2', h/2)
-      .attr('stroke', 'rgba(255,255,255,0.06)')
-    
-    // Generate quantum noise waveform
-    const points: [number, number][] = d3.range(0, 100).map(i => {
-      const x = i / 99
-      const noise = Math.sin(i * 0.5) * 0.3 + Math.sin(i * 0.17) * 0.2
-      const y = 0.5 + noise * (operations / 10000) // Scale by operations
-      return [x, Math.max(0, Math.min(1, y))] as [number, number]
-    })
-    
-    const xScale = d3.scaleLinear().domain([0, 1]).range([0, w])
-    const yScale = d3.scaleLinear().domain([0, 1]).range([h, 0])
-    
-    const line = d3.line<[number, number]>()
-      .x(d => xScale(d[0]))
-      .y(d => yScale(d[1]))
-      .curve(d3.curveBasis)
-    
-    g.append('path')
-      .datum(points)
-      .attr('d', line)
-      .attr('fill', 'none')
-      .attr('stroke', 'rgba(255,255,255,0.92)')
-      .attr('stroke-width', 1.2)
-    
-    // Stats
-    this.quantumSvg.append('text')
-      .attr('x', 20)
-      .attr('y', 270)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Consolas, "Fira Mono", monospace')
-      .attr('font-size', 12)
-      .text(`OPERATIONS: ${(operations || 0).toLocaleString()}`)
+    this.quantumComputingScreen.draw()
   }
 }
 

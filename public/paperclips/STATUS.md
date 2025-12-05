@@ -130,6 +130,38 @@
 - [ ] Experiment with Observable Plot for rapid prototyping
 - [ ] Test data reshaping patterns for complex visualizations
 
+## Architecture Refactoring (Completed - 2025-12-05 15:00)
+
+### Class-Based Screen Architecture ✅
+Successfully converted all screens from direct SVG manipulation to class-based architecture.
+
+**Pattern:**
+- Each screen extends `HalScreen` base class
+- Registered with `HalScreenManager` singleton
+- Accessible via `window.halScreens` for runtime inspection
+- Unique SVG IDs for each screen
+- Options object constructor pattern: `{ container, colors }`
+
+**Completed Conversions (v1.0.15):**
+- ✅ `HalScreen` base class - Options object, colors storage, flexible draw()
+- ✅ `ComputationalTelemetryScreen` - Converted from `compSvg` (v1.0.14)
+- ✅ `PhaseIndicatorScreen` - Converted from `phaseIndicatorSvg`
+- ✅ `NumericMatrixScreen` - Converted from `matrixSvg`
+- ✅ `QuantumComputingScreen` - Converted from `quantumSvg`
+- ✅ `MarketDynamicsScreen` - Converted from `phaseSvg` (was misnamed)
+- ✅ `StrategicModelingScreen` - Already class-based
+- ✅ `ProductionMonitorScreen` - Constructor updated
+
+**Remaining Direct SVG:**
+- `marketSvg` - World map (intentionally kept, complex animation state)
+
+**Benefits:**
+- Runtime control via `window.halScreens`
+- Easier testing and debugging
+- Better separation of concerns
+- Consistent API across all screens
+- Simpler to add new screens
+
 ## Known Issues
 None currently.
 

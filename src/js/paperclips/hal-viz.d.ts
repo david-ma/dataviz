@@ -20,9 +20,16 @@ declare abstract class HalScreen {
     protected width: number;
     protected height: number;
     protected background: string;
+    protected colors: any;
     protected visible: boolean;
-    constructor(container: string, id: string, width: number, height: number, background: string);
-    abstract draw(): void;
+    constructor(opts: {
+        id: string;
+        container: string;
+        width: number;
+        height: number;
+        colors: any;
+    });
+    draw(...args: any[]): void;
     getId(): string;
     clear(): void;
     show(): void;
