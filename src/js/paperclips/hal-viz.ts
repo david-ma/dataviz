@@ -1,6 +1,6 @@
 import { d3 } from '../chart'
 
-const HAL_VIZ_VERSION = 'v1.0.15-all-screens-converted-20251205-1500'
+const HAL_VIZ_VERSION = 'v1.0.17-candlestick-charts-20251205-1525'
 console.log(`[HAL-VIZ] Version: ${HAL_VIZ_VERSION}`)
 
 // Global screen manager
@@ -75,6 +75,11 @@ declare const currentRound: number
 declare const rounds: number
 declare const strats: any[]
 declare const payoffGrid: any
+declare const stocks: any[]
+declare const bankroll: number
+declare const portTotal: number
+declare const investLevel: number
+
 
 // Base class for HAL screens
 abstract class HalScreen {
@@ -875,6 +880,204 @@ class MarketDynamicsScreen extends HalScreen {
   }
 }
 
+class StockMarketScreen extends HalScreen {
+  private candleData: Map<number, any[]> = new Map()  // stockId -> candle array
+  private currentCandle: Map<number, any> = new Map()  // stockId -> current candle
+  private tickCount = 0
+  private readonly CANDLE_SIZE = 20  // Ticks per candle (easy to change)
+  private readonly MAX_CANDLES = 30  // Keep last 30 candles
+  
+  constructor(opts: { container: string; colors: any }) {
+    super({
+      id: 'hal-stock-market',
+      container: opts.container,
+      width: 800,
+      height: 400,
+      colors: opts.colors
+    })
+  }
+
+  update(data: { stocks: any[]; bankroll: number; portTotal: number }) {
+    this.tickCount++
+    const shouldCloseCandle = this.tickCount % this.CANDLE_SIZE === 0
+    
+    data.stocks.forEach(stock => {
+      // Initialize candle data structures
+      if (!this.candleData.has(stock.id)) {
+        this.candleData.set(stock.id, [])
+      }
+      if (!this.currentCandle.has(stock.id)) {
+        this.currentCandle.set(stock.id, {
+          open: stock.price,
+          high: stock.price,
+          low: stock.price,
+          close: stock.price,
+          volume: 0
+        })
+      }
+      
+      const candle = this.currentCandle.get(stock.id)!
+      
+      // Update current candle
+      candle.high = Math.max(candle.high, stock.price)
+      candle.low = Math.min(candle.low, stock.price)
+      candle.close = stock.price
+      // Synthetic volume: jiggle based on price and amount
+      candle.volume += Math.floor(stock.price * 0.1 + Math.random() * stock.amount * 0.01)
+      
+      // Close candle and start new one
+      if (shouldCloseCandle) {
+        const candles = this.candleData.get(stock.id)!
+        candles.push({ ...candle })
+        if (candles.length > this.MAX_CANDLES) {
+          candles.shift()
+        }
+        
+        // Start new candle
+        this.currentCandle.set(stock.id, {
+          open: stock.price,
+          high: stock.price,
+          low: stock.price,
+          close: stock.price,
+          volume: 0
+        })
+      }
+    })
+    
+    // Clean up sold stocks
+    const activeIds = new Set(data.stocks.map(s => s.id))
+    for (const id of this.candleData.keys()) {
+      if (!activeIds.has(id)) {
+        this.candleData.delete(id)
+        this.currentCandle.delete(id)
+      }
+    }
+    
+    this.draw(data)
+  }
+
+  draw(data: { stocks: any[]; bankroll: number; portTotal: number }) {
+    this.svg.selectAll('*').remove()
+    
+    // Title
+    this.svg.append('text')
+      .attr('x', 20).attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 18).attr('font-weight', 'bold')
+      .attr('letter-spacing', '2px')
+      .text('INVESTMENT ENGINE')
+    
+    // Portfolio stats
+    this.svg.append('text')
+      .attr('x', 400).attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 11)
+      .text(`CASH: $${data.bankroll.toLocaleString()}  |  PORTFOLIO: $${data.portTotal.toLocaleString()}  |  CANDLE: ${this.CANDLE_SIZE} ticks`)
+    
+    if (data.stocks.length === 0) {
+      this.svg.append('text')
+        .attr('x', 400).attr('y', 200)
+        .attr('fill', this.colors.text)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 14).attr('opacity', 0.5)
+        .attr('text-anchor', 'middle')
+        .text('NO ACTIVE POSITIONS')
+      return
+    }
+    
+    // Draw candlestick charts for each stock
+    const chartWidth = 180
+    const chartHeight = 80
+    const startY = 60
+    const spacing = 110
+    
+    data.stocks.forEach((stock, i) => {
+      const x = 20 + (i % 4) * 200
+      const y = startY + Math.floor(i / 4) * spacing
+      
+      // Stock header
+      this.svg.append('text')
+        .attr('x', x).attr('y', y)
+        .attr('fill', this.colors.primary)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 12).attr('font-weight', 'bold')
+        .text(stock.symbol)
+      
+      this.svg.append('text')
+        .attr('x', x + 50).attr('y', y)
+        .attr('fill', this.colors.text)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 11)
+        .text(`$${stock.price.toFixed(2)}`)
+      
+      // Profit/loss
+      const profitColor = stock.profit >= 0 ? this.colors.secondary : this.colors.tertiary
+      const profitSign = stock.profit >= 0 ? '+' : ''
+      this.svg.append('text')
+        .attr('x', x + 120).attr('y', y)
+        .attr('fill', profitColor)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 10)
+        .text(`${profitSign}$${stock.profit.toFixed(0)}`)
+      
+      // Candlestick chart
+      const candles = this.candleData.get(stock.id) || []
+      if (candles.length > 0) {
+        const allPrices = candles.flatMap(c => [c.high, c.low])
+        const minPrice = Math.min(...allPrices)
+        const maxPrice = Math.max(...allPrices)
+        const priceRange = maxPrice - minPrice || 1
+        
+        const xScale = d3.scaleLinear()
+          .domain([0, candles.length])
+          .range([x, x + chartWidth])
+        
+        const yScale = d3.scaleLinear()
+          .domain([minPrice - priceRange * 0.1, maxPrice + priceRange * 0.1])
+          .range([y + chartHeight, y + 10])
+        
+        const candleWidth = chartWidth / candles.length * 0.7
+        
+        candles.forEach((candle, idx) => {
+          const cx = xScale(idx + 0.5)
+          const isGreen = candle.close >= candle.open
+          const color = isGreen ? this.colors.secondary : this.colors.tertiary
+          
+          // Wick (high-low line)
+          this.svg.append('line')
+            .attr('x1', cx).attr('x2', cx)
+            .attr('y1', yScale(candle.high))
+            .attr('y2', yScale(candle.low))
+            .attr('stroke', color)
+            .attr('stroke-width', 1)
+          
+          // Body (open-close rect)
+          const bodyTop = Math.min(yScale(candle.open), yScale(candle.close))
+          const bodyHeight = Math.abs(yScale(candle.open) - yScale(candle.close)) || 1
+          
+          this.svg.append('rect')
+            .attr('x', cx - candleWidth / 2)
+            .attr('y', bodyTop)
+            .attr('width', candleWidth)
+            .attr('height', bodyHeight)
+            .attr('fill', isGreen ? color : 'none')
+            .attr('stroke', color)
+            .attr('stroke-width', 1)
+        })
+        
+        // Baseline
+        this.svg.append('line')
+          .attr('x1', x).attr('x2', x + chartWidth)
+          .attr('y1', y + chartHeight).attr('y2', y + chartHeight)
+          .attr('stroke', this.colors.grid)
+          .attr('stroke-width', 1).attr('opacity', 0.3)
+      }
+    })
+  }
+}
+
 class HalViz {
   private svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>
   private computationalTelemetryScreen: ComputationalTelemetryScreen | null = null
@@ -882,6 +1085,7 @@ class HalViz {
   private numericMatrixScreen: NumericMatrixScreen | null = null
   private quantumComputingScreen: QuantumComputingScreen | null = null
   private marketDynamicsScreen: MarketDynamicsScreen | null = null
+  private stockMarketScreen: StockMarketScreen | null = null
   private marketSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null  // World map
   private clipHistory: number[] = []
   private fundsHistory: number[] = []
@@ -1037,6 +1241,11 @@ class HalViz {
     // Show quantum computing if operations exist
     if (typeof operations !== 'undefined' && operations > 0) {
       this.drawQuantumComputing()
+    }
+    
+    // Show stock market if investment engine active
+    if (typeof stocks !== 'undefined' && typeof investLevel !== 'undefined' && investLevel > 0) {
+      this.drawStockMarket()
     }
     
     // Show strategic modeling if yomi exists
@@ -1421,6 +1630,21 @@ class HalViz {
     }
     
     this.quantumComputingScreen.draw()
+  }
+  
+  drawStockMarket() {
+    if (!this.stockMarketScreen) {
+      this.stockMarketScreen = new StockMarketScreen({
+        container: '#hal-dashboard',
+        colors: this.colors
+      })
+    }
+    
+    this.stockMarketScreen.update({
+      stocks: stocks || [],
+      bankroll: bankroll || 0,
+      portTotal: portTotal || 0
+    })
   }
 }
 
