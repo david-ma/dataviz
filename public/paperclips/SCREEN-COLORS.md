@@ -17,6 +17,20 @@ Each screen now uses a solid background color from the authentic HAL palette, wi
 | **Market Dynamics** | Grey | `#7B7B7B` | Market/Engineering |
 | **Stock Market** | Dark Navy | `#0A1130` | Critical financial systems |
 
+
+### Color Palette
+```typescript
+colors = {
+  background: '#1a1a2e',      // Dark blue-grey
+  primary: '#ff6b6b',         // Bold coral/red
+  secondary: '#4ecdc4',       // Bold cyan/turquoise
+  tertiary: '#ffe66d',        // Bold yellow
+  text: '#ffffff',            // White
+  grid: '#2d3561'             // Subtle blue-grey
+}
+```
+
+
 ## Color Palette Reference
 
 From 2001: A Space Odyssey HAL 9000 interface reference screens:
@@ -42,6 +56,7 @@ const palette = {
 
 ### 1. Solid Backgrounds
 - Each screen = ONE solid color
+- The background should be a solid muted pastel color
 - No gradients
 - No textures
 - Clean, flat design

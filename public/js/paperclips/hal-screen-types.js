@@ -1,0 +1,1 @@
+export const __webpack_id__=1555;export const __webpack_ids__=[1555];export const __webpack_modules__={7059:()=>{}};import _ from"../chart.js";import*as o from"./hal-screen-types.js";_.C(o),_(_.s=7059);
