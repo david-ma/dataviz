@@ -677,6 +677,34 @@ Open `http://localhost:1337/paperclips/` and you should see a green line graph i
 
 ---
 
+## Recent Work (2025-12-06)
+
+- Added **Drone Globe Screen** (teal) with spinning/dragging orthographic globe, land + US states, back-side culling, static factories, and steady-velocity drone agents.
+- Simplified **Drone Operations Screen** to metrics/bars only (no embedded globe).
+- Softened Production Monitor colors per SCREEN-COLORS; neon limited to investment engine profit/loss.
+- Extended type coverage for drone globals and screen options; ensured graticule redraws on spin/drag.
+
+## Updated Next Steps
+
+### Space Expansion Phase (Phase 2)
+- [ ] Sankey diagram: Matter → Wire → Clips flow
+- [ ] Network graph: Factory/drone connections
+- [ ] Radial progress: Solar system exploration
+- [ ] Bubble chart: Resource distribution across planets
+- [ ] Joy Division / streamgraph for solar/battery output (pairs with drone globe)
+
+### Universal Domination Phase (Phase 3)
+- [ ] Bubble/heatmap for probes/drifter encounters
+- [ ] Combat stats matrix
+
+### Polish
+- [ ] Hover tooltips and smoother transitions
+- [ ] Toggle dashboard visibility
+
+Cross-links: see `STATUS.md` for milestones, `HAL-SCREENS-REFERENCE.md` for screen inspiration, and `kiro-notes.md` for Observable/D3 references.
+
+---
+
 ## Summary
 
 **Recommended approach:**

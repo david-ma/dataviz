@@ -210,14 +210,18 @@ Source: ChatGPT analysis of 2001: A Space Odyssey HAL interface panels
 ## Design Principles for Implementation
 
 ### Color Palette (Authentic HAL)
-- Navy blue: `#1a2332` (desaturated)
-- Electric blue: `#0066cc`
-- Purple/magenta: `#4a1a4a`, `#6a2a6a`
-- Teal green: `#1a4a4a`
-- Blueprint blue: `#2a4a6a`
-- Sapphire blue: `#1a3a6a`
-- Cobalt blue: `#2a4acc`
-- White lines/text: `#ffffff`, `#f0f0f0`
+- Purple: `#532B78`
+- Teal: `#1C6B74`
+- Navy: `#143962`
+- Grey: `#7B7B7B`
+- Dark Navy: `#0A1130`
+- Burgundy: `#6B2424`
+- Violet: `#54336F`
+- Matrix Blue: `#0d2c55`
+- White: `#FFFFFF`
+- Grid light: `rgba(255,255,255,0.06)`
+- Grid mid: `rgba(255,255,255,0.15)`
+- Text dim: `rgba(255,255,255,0.65)`
 
 ### Typography
 - Monospace fonts (Courier, Consolas, Monaco)
@@ -237,17 +241,22 @@ Source: ChatGPT analysis of 2001: A Space Odyssey HAL interface panels
 - No flashy transitions
 - Subtle data point additions
 - Smooth curve drawing
+
+Cross-links:
+- Palette usage in `SCREEN-COLORS.md`
+- Current state in `STATUS.md`
+- Roadmap in `implementation-plan.md`
 - Clinical precision
 
 ---
 
 ## Analysis of Screen Examples (05/12/2025)
 
-### Best Examples for Paperclips Implementation
+### Best Examples for Paperclips Implementation (with `/screens` references)
 
 **🌟 Tier 1 - Immediately Useful:**
 
-1. **2-numeric-matrix-panel.html** ⭐⭐⭐⭐⭐
+1. **2-numeric-matrix-panel.html** ⭐⭐⭐⭐⭐ — Numeric matrix panel; authentic HAL blue, monospace grid. We mirror this in `NumericMatrixScreen`.
    - Perfect for trust/processors/memory stats
    - Clean monospace telemetry display
    - Click-to-copy rows (great UX)
@@ -255,7 +264,7 @@ Source: ChatGPT analysis of 2001: A Space Odyssey HAL interface panels
    - Two-section layout (main + secondary data)
    - **Use for:** Phase 1 computational resources, Phase 2 probe stats
 
-2. **9-tiles.html** ⭐⭐⭐⭐⭐
+2. **9-tiles.html** ⭐⭐⭐⭐⭐ — Master HAL palette (purple/teal/navy/grey/burgundy/violet); word tiles, decay curves, waveforms. Palette and layout guide for all screens.
    - Complete HAL aesthetic showcase
    - 7 different tile types in authentic colors
    - Word panels (NAV, MEM, NUC) - perfect for phase indicators
@@ -265,14 +274,14 @@ Source: ChatGPT analysis of 2001: A Space Odyssey HAL interface panels
    - Convex curve (burgundy) - optimization landscapes
    - **Use as:** Master reference for color palette and layout
 
-3. **1-radial-orbital-plot.html** ⭐⭐⭐⭐
+3. **1-radial-orbital-plot.html** ⭐⭐⭐⭐ — Radial/orbital plot; useful for space exploration/probe orbit display.
    - Draggable marker on elliptical orbit
    - Concentric circles with angular grid
    - Perfect for space exploration visualization
    - Tooltip shows angle and radius
    - **Use for:** Phase 2 solar system exploration, probe positioning
 
-4. **8-heatmap-grid.html** ⭐⭐⭐⭐
+4. **8-heatmap-grid.html** ⭐⭐⭐⭐ — Heatmap grid; good for factory/drone efficiency or universe sectors.
    - 7×7 grid with color intensity
    - Smooth fade-in animation
    - Hover tooltips
@@ -280,34 +289,38 @@ Source: ChatGPT analysis of 2001: A Space Odyssey HAL interface panels
 
 **🔧 Tier 2 - Specialized Use:**
 
-5. **7-radar-spider-chart.html** ⭐⭐⭐
+5. **7-radar-spider-chart.html** ⭐⭐⭐ — Radar chart for probe capabilities/strategy comparison.
    - Pentagon radar chart with 5 axes
    - Good for comparing multiple attributes
    - **Use for:** Probe capabilities (speed/power/accuracy/stamina/focus), strategic modeling dimensions
 
-6. **6-semi-circular-donut-gauge.html** ⭐⭐⭐
+6. **6-semi-circular-donut-gauge.html** ⭐⭐⭐ — Gauge for project/phase completion or power utilization.
    - Half-circle progress gauge
    - Animated fill
    - **Use for:** Project completion percentage, phase progress, trust level
 
-7. **5-dual-curve-mini-line-chart.html** ⭐⭐
+7. **5-dual-curve-mini-line-chart.html** ⭐⭐ — Mini dual curves; lightweight comparison widget.
    - Two overlaid curves with tooltip
    - Simple time-series
    - **Use for:** Comparing two metrics (already have better version implemented)
 
 **📚 Tier 3 - Reference Only:**
 
-8. **10-hertzprung-russell-diagram.html** ⭐⭐
+8. **10-hertzprung-russell-diagram.html** ⭐⭐ — Inspiration for probe/star scatter; likely Phase 3/4 easter egg.
    - Scatter plot with color-coded points
    - Complex astronomical data visualization
    - Beautiful but too specific for Paperclips
    - **Use for:** Inspiration only - shows how to handle large datasets with color mapping
 
-9. **3-d3-svg-starter.html** ⭐
+9. **3-d3-svg-starter.html** ⭐ — Basic starter; minimal reference now.
    - Basic tile template
    - Too simple, already surpassed
 
-10. **4-basic-node-with-connector.html** ⭐
+10. **4-basic-node-with-connector.html** ⭐ — Node/edge pattern; could seed future network graph.
+
+11. **11-polar-chart-multi-curve-chart.html** ⭐⭐⭐⭐ — Polar chart + overlapping curves; good for multi-metric overlays (demand/price/revenue) or probe capabilities.
+
+12. **18-draggable-globe-in-d3** ⭐⭐⭐⭐ — Draggable orthographic globe; informs current Drone Globe (spin, drag, culling).
     - Single node with line connector
     - Too basic, but shows edge drawing pattern
     - **Use for:** Building network graphs later

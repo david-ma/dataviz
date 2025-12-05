@@ -104,7 +104,6 @@
 - Responsive: Semi-transparent background, fixed positioning prevents UI overlap
 
 ## Next Steps
-
 ### Space Expansion Phase (Phase 2)
 - [ ] Sankey diagram: Matter → Wire → Clips flow
 - [ ] Network graph: Factory/drone connections
@@ -124,6 +123,33 @@
 - [ ] Grid lines and axis labels
 - [ ] Responsive sizing options
 - [ ] Sound effects (optional, HAL-themed)
+
+---
+
+## ✅ New Work (2025-12-06)
+
+### Phase 2 Drone Visuals
+- Added **Drone Globe Screen** (teal, 420×420) with:
+  - Orthographic globe, graticule/land/US states from `/world-50.geo.json` and `/gz_2010_us_040_00_5m.json`
+  - Slow spin + drag to rotate; no wheel zoom
+  - Back-side culling for agents/factories
+  - Static factories; steady-velocity drone agents
+- Kept **Drone Operations Screen** (metrics/bars) and removed its globe content to avoid duplication.
+
+### Color/Aesthetic Alignment
+- Restored Production Monitor to soft HAL whites/blues (no neon outside investment engine).
+- Applied SCREEN-COLORS guidance across new screens.
+
+### Technical
+- Added type coverage for new drone fields.
+- Ensured graticule/paths re-render on rotation/drag for smoothness.
+
+---
+
+## Cross References
+- See `HAL-SCREENS-REFERENCE.md` for panel inspirations and mapping to `/public/paperclips/screens`.
+- See `implementation-plan.md` for updated roadmap and screen inspirations.
+- See `kiro-notes.md` for links to Observable/D3 resources and HAL color palette.
 
 ### Observable Exploration
 - [ ] Review D3 Gallery for additional chart types

@@ -61,6 +61,12 @@
 - Efficient updates: only redraws when necessary
 - Uses d3.js from shared chart.ts bundle
 
+**Cross-links:**
+- `STATUS.md` — milestone log and latest work (e.g., drone globe updates).
+- `implementation-plan.md` — roadmap and recent changes.
+- `HAL-SCREENS-REFERENCE.md` — palette, screen mappings, and `/screens` inspirations.
+- `SCREEN-COLORS.md` — detailed HAL palette guidance.
+
 ---
 
 ## Game Overview
