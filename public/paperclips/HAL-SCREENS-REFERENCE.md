@@ -406,6 +406,120 @@ const halPalette = {
 
 ---
 
+## Implementation Recommendations
+
+### Immediate Next Steps (Phase 1 Polish)
+
+1. **Add Numeric Matrix Panel** (30 mins)
+   - Copy code from 2-numeric-matrix-panel.html
+   - Show: Trust, Processors, Memory, Ops, Creativity
+   - Second section: Current project requirements
+   - Position: Below existing charts
+
+2. **Add Phase Indicator Panel** (15 mins)
+   - Copy word panel style from 9-tiles.html (NAV/MEM)
+   - Show current phase: "BIZ", "SPACE", "UNIV", "END"
+   - Small header with phase number
+   - Position: Top-left corner
+
+3. **Migrate to Authentic Color Palette** (1 hour)
+   - Replace warm colors with cool HAL blues/purples
+   - Update all existing visualizations
+   - Test contrast and readability
+
+### Phase 2 Additions (When Space Unlocks)
+
+1. **Orbital Plot** (1-2 hours)
+   - Adapt 1-radial-orbital-plot.html
+   - Show solar system exploration
+   - Update as matter sources unlock
+
+2. **Factory Heatmap** (1 hour)
+   - Adapt 8-heatmap-grid.html
+   - Show factory/drone efficiency
+   - Animate as factories built
+
+3. **Probe Radar Chart** (1 hour)
+   - Adapt 7-radar-spider-chart.html
+   - Show probe capabilities
+   - Update as upgrades purchased
+
+### Technical Notes
+
+**From 9-tiles.html:**
+- Uses 360×360px tiles (perfect squares)
+- Responsive with viewBox
+- Monospace fonts for data (Fira Mono, Consolas)
+- Sans-serif for labels (Inter, Helvetica Neue)
+- Subtle animations (fade-in, stroke-dasharray)
+- Minimal stroke widths (1-2px)
+
+**From 2-numeric-matrix-panel.html:**
+- Click-to-copy functionality (navigator.clipboard)
+- Row hover highlights
+- Flash effect on copy
+- Monospace alignment for numbers
+
+**From 1-radial-orbital-plot.html:**
+- Draggable elements with d3.drag()
+- Parametric ellipse calculations
+- Tooltip follows cursor
+- Smooth transitions on update
+
+---
+
+## Code Reuse Strategy
+
+### Create Shared Components
+
+```typescript
+// hal-components.ts
+export class NumericMatrix {
+  constructor(svg, data, position) { /* ... */ }
+  update(newData) { /* ... */ }
+}
+
+export class WordPanel {
+  constructor(svg, text, label, color, position) { /* ... */ }
+}
+
+export class OrbitalPlot {
+  constructor(svg, radii, ellipse, position) { /* ... */ }
+  setMarker(angle) { /* ... */ }
+}
+
+export class HeatmapGrid {
+  constructor(svg, rows, cols, position) { /* ... */ }
+  update(data) { /* ... */ }
+}
+```
+
+### Progressive Enhancement
+
+1. **Phase 1:** Add matrix + word panel (simple, static)
+2. **Phase 2:** Add orbital + heatmap (interactive)
+3. **Phase 3:** Add network graph (complex)
+4. **Phase 4:** Add completion gauge (dramatic)
+
+Each phase adds 2-3 new visualizations, building on previous work.
+
+---
+
+## Key Insights from Examples
+
+1. **9-tiles.html is the master reference** - Shows complete HAL aesthetic with 7 different panel types
+2. **Authentic colors are cooler** - Blues, purples, teals, not warm pastels
+3. **Monospace is essential** - All numeric data uses monospace fonts
+4. **Perfect squares work best** - 360×360px or 720×720px tiles
+5. **Subtle animations** - Fade-in, stroke-dasharray, not flashy
+6. **Thin lines** - 1-2px stroke widths, not thick
+7. **Click-to-copy is great UX** - From numeric matrix panel
+8. **Draggable elements add interactivity** - From orbital plot
+9. **Heatmaps scale well** - Can show 7×7 or larger grids
+10. **Word panels are valid** - Not everything needs to be a chart
+
+---
+
 ## Implementation Priority for Paperclips
 
 ### Already Implemented ✅
