@@ -1,0 +1,14 @@
+{
+  "name": "@mbostock/phases-of-the-moon",
+  "main": "d023ca6992ad3177@460.js",
+  "version": "460.0.0",
+  "homepage": "https://observablehq.com/@mbostock/phases-of-the-moon",
+  "author": {
+    "name": "Mike Bostock",
+    "url": "https://observablehq.com/@mbostock"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4 - 5"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@d3/psr-b1919-21",
+  "main": "d36a9f60c5e143f3@215.js",
+  "version": "215.0.0",
+  "homepage": "https://observablehq.com/@d3/psr-b1919-21",
+  "author": {
+    "name": "D3",
+    "url": "https://observablehq.com/@d3"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4 - 5"
+  }
+}
