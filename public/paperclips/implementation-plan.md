@@ -296,49 +296,270 @@ function update() {
 
 ## D3.js + SVG Approach
 
-### HAL-Style Aesthetic
+### HAL-Style Aesthetic (Authentic)
+
+Based on reference screens from 2001: A Space Odyssey HAL 9000 interface.
+
+#### Color Palette
+
+**Authentic HAL colors** (from reference tiles):
 
 ```typescript
-// Black background, white/green/red lines
-const colors = {
-  background: '#000000',
-  primary: '#00ff00',    // Green (HAL's eye)
-  secondary: '#ffffff',  // White
-  alert: '#ff0000',      // Red
-  grid: '#333333'        // Dark grey
+const palette = {
+  // Primary backgrounds (solid colors per screen)
+  purple: '#532B78',      // Rich purple (NAV screens)
+  teal: '#1C6B74',        // Teal-blue (engineering curves)
+  navy: '#143962',        // Deep blue (memory/data)
+  grey: '#7B7B7B',        // Mid-grey (engineering background)
+  darkNavy: '#0A1130',    // Very dark navy (nuclear/critical)
+  burgundy: '#6B2424',    // Brick red (strategic/alert)
+  violet: '#54336F',      // Violet-purple (waveforms)
+  matrixBlue: '#0d2c55',  // Matrix screen blue
+  
+  // Standard colors
+  white: '#FFFFFF',       // Text, lines, labels
+  
+  // Stock market specific
+  green: '#00FF00',       // Profit/bullish
+  red: '#FF0000',         // Loss/bearish
+  
+  // Grid/subtle elements
+  gridLight: 'rgba(255,255,255,0.06)',  // Very subtle grid
+  gridMedium: 'rgba(255,255,255,0.15)', // Medium grid
+  textDim: 'rgba(255,255,255,0.65)',    // Dimmed text
+  textBright: 'rgba(255,255,255,0.95)'  // Bright text
 }
+```
 
-// Monospace font
-const font = 'IBM Plex Mono, Courier New, monospace'
+#### Typography
 
-// Create SVG
+**Two font families:**
+
+```typescript
+const fonts = {
+  sans: 'Inter, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
+  mono: '"Fira Mono", Consolas, "Courier New", monospace'
+}
+```
+
+**Usage:**
+- **Sans-serif** (Inter) - Large titles, phase indicators, big words
+- **Monospace** (Fira Mono) - All data, numbers, labels, technical readouts
+
+**Font sizes:**
+```typescript
+const sizes = {
+  bigWord: '64px - 92px',    // Phase indicators (BIZ, NAV, MFG)
+  title: '18px',             // Screen titles
+  data: '12px',              // Numeric data
+  label: '11px',             // Axis labels, small text
+  tiny: '10px'               // Footnotes
+}
+```
+
+#### Visual Style Rules
+
+**1. Solid Background Colors**
+- Each screen has ONE solid background color
+- No gradients (reference screens use flat colors)
+- Choose from palette based on screen purpose:
+  - Purple → Navigation/phase
+  - Teal → Engineering/production
+  - Navy → Memory/computational
+  - Dark Navy → Critical systems
+  - Burgundy → Strategic/combat
+  - Violet → Quantum/waveforms
+
+**2. White-First Design**
+- Primary color for ALL text: white
+- Primary color for ALL lines: white
+- Only use other colors when necessary (profit/loss, alerts)
+- Opacity variations for hierarchy:
+  - 0.95 → Primary text/lines
+  - 0.65 → Secondary labels
+  - 0.06 → Grid lines
+
+**3. Grid Lines**
+- Very subtle: `rgba(255,255,255,0.06)`
+- Thin lines (1px)
+- Evenly spaced
+- Both horizontal and vertical
+
+**4. Line Graphs**
+```typescript
+// Authentic HAL line style
+svg.append('path')
+  .datum(data)
+  .attr('fill', 'none')
+  .attr('stroke', 'rgba(255,255,255,0.95)')  // White, not colored
+  .attr('stroke-width', 1.1)  // Thin lines
+  .attr('d', line)
+```
+
+**5. Labels and Text**
+```typescript
+// Small technical labels
+svg.append('text')
+  .attr('class', 'small-label')
+  .attr('font-family', fonts.mono)
+  .attr('font-size', '12px')
+  .attr('fill', 'rgba(255,255,255,0.9)')
+  .text('CLIPS/SEC: 1,234')
+
+// Big phase words
+svg.append('text')
+  .attr('class', 'big-word')
+  .attr('font-family', fonts.sans)
+  .attr('font-weight', '700')
+  .attr('font-size', '64px')
+  .attr('fill', '#FFFFFF')
+  .attr('letter-spacing', '8px')
+  .attr('text-anchor', 'middle')
+  .text('MFG')
+```
+
+**6. Curves and Waveforms**
+- Smooth curves using `d3.curveMonotoneX` or `d3.curveBasis`
+- Multiple overlapping curves OK
+- All white (or single accent color)
+- Thin stroke-width (1-2px)
+
+**7. Candlestick Charts**
+```typescript
+// Green = bullish (filled)
+// Red = bearish (hollow)
+const color = isGreen ? palette.green : palette.red
+
+svg.append('rect')
+  .attr('fill', isGreen ? color : 'none')  // Filled or hollow
+  .attr('stroke', color)
+  .attr('stroke-width', 1)
+```
+
+#### Screen Layout Patterns
+
+**Pattern 1: Single Large Word**
+```
+┌─────────────────┐
+│ RTE: 09-EF      │  ← Small label (top-left)
+│                 │
+│      NAV        │  ← Big word (center)
+│                 │
+└─────────────────┘
+```
+
+**Pattern 2: Multi-Curve Chart**
+```
+┌─────────────────┐
+│ TITLE           │  ← Title (top-left)
+│ ┌─────────────┐ │
+│ │ ╱╲  ╱╲  ╱╲  │ │  ← Multiple curves
+│ │╱  ╲╱  ╲╱  ╲ │ │
+│ └─────────────┘ │
+│ LABEL: 123.456  │  ← Data label (bottom)
+└─────────────────┘
+```
+
+**Pattern 3: Numeric Matrix**
+```
+┌─────────────────┐
+│ COMPUTATIONAL   │  ← Section label
+│                 │
+│ TRUST      100  │  ← Data rows
+│ PROCESSORS  12  │
+│ MEMORY      8   │
+│ OPERATIONS  1.2M│
+└─────────────────┘
+```
+
+**Pattern 4: Grid of Cells**
+```
+┌─────┬─────┬─────┐
+│ P/L │ STK1│ STK2│  ← 3x2 grid
+├─────┼─────┼─────┤
+│ STK3│ STK4│ STK5│
+└─────┴─────┴─────┘
+```
+
+#### Anti-Patterns (Don't Do This)
+
+❌ **Gradients** - Reference screens use solid colors
+❌ **Colored text everywhere** - Use white, only color for semantic meaning
+❌ **Thick lines** - HAL uses thin lines (1-2px)
+❌ **Sans-serif for data** - Use monospace for all numbers
+❌ **Busy backgrounds** - Keep backgrounds solid and simple
+❌ **Multiple background colors per screen** - One color per screen
+
+#### Example: Authentic HAL Screen
+
+```typescript
+// Create screen with solid background
 const svg = d3.select('#hal-dashboard')
   .append('svg')
-  .attr('width', 400)
-  .attr('height', 600)
-  .style('background', colors.background)
+  .attr('width', 360)
+  .attr('height', 360)
+  .style('background', palette.teal)  // Solid color
+  .style('border-radius', '9px')
 
-// Line graph example
+// Title (white, monospace)
+svg.append('text')
+  .attr('x', 20)
+  .attr('y', 30)
+  .attr('fill', 'rgba(255,255,255,0.9)')
+  .attr('font-family', fonts.mono)
+  .attr('font-size', '12px')
+  .text('PRODUCTION RATE')
+
+// Grid lines (very subtle)
+const gridLines = d3.range(0, 11).map(i => i * 30)
+svg.append('g')
+  .selectAll('line')
+  .data(gridLines)
+  .join('line')
+  .attr('x1', d => d)
+  .attr('x2', d => d)
+  .attr('y1', 50)
+  .attr('y2', 340)
+  .attr('stroke', 'rgba(255,255,255,0.06)')
+  .attr('stroke-width', 1)
+
+// Data curve (white, thin)
 const line = d3.line()
   .x((d, i) => xScale(i))
   .y(d => yScale(d))
+  .curve(d3.curveMonotoneX)
 
 svg.append('path')
   .datum(data)
   .attr('fill', 'none')
-  .attr('stroke', colors.primary)
-  .attr('stroke-width', 2)
+  .attr('stroke', 'rgba(255,255,255,0.95)')
+  .attr('stroke-width', 1.1)
   .attr('d', line)
 
-// Labels
+// Current value (white, monospace)
 svg.append('text')
-  .attr('x', 10)
-  .attr('y', 20)
-  .attr('fill', colors.secondary)
-  .attr('font-family', font)
-  .attr('font-size', 12)
-  .text('CLIPS/SEC')
+  .attr('x', 20)
+  .attr('y', 350)
+  .attr('fill', 'rgba(255,255,255,0.9)')
+  .attr('font-family', fonts.mono)
+  .attr('font-size', '12px')
+  .text(`CURRENT: ${clipRate.toLocaleString()} /sec`)
 ```
+
+#### Reference Screens
+
+Study these for authentic HAL aesthetic:
+- `/screens/9-tiles.html` - Master reference with 10 different panel types
+- `/screens/11-polar-chart-multi-curve-chart.html` - Polar charts and multi-curve overlays
+
+**Key observations:**
+- Solid background colors (purple, teal, navy, burgundy, violet)
+- White lines and text (with opacity variations)
+- Thin lines (1-2px stroke-width)
+- Monospace fonts for all data
+- Very subtle grids (0.06 opacity)
+- Clean, minimal aesthetic
+- No gradients or textures
 
 ### Data Buffering
 
