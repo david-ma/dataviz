@@ -75,7 +75,12 @@ class HalViz {
       this.worldData = data
     })
     
-    setInterval(() => this.update(), 100)
+    // Use requestAnimationFrame for smoother updates
+    const animate = () => {
+      this.update()
+      requestAnimationFrame(animate)
+    }
+    requestAnimationFrame(animate)
   }
   
   createLayout() {
