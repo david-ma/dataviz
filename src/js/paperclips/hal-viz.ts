@@ -7,6 +7,7 @@ import { QuantumComputingScreen } from './quantum-computing-screen'
 import { StrategicModelingScreen } from './strategic-modeling-screen'
 import { MarketDynamicsScreen } from './market-dynamics-screen'
 import { StockMarketScreen } from './stock-market-screen'
+import { HypnoDronesScreen } from './hypnodrones-screen'
 import './hal-screen-types'
 
 // Game state globals (also declared in hal-screen-types.ts for other files)
@@ -36,8 +37,11 @@ declare const stocks: any[]
 declare const bankroll: number
 declare const portTotal: number
 declare const investLevel: number
+declare const qChips: { waveSeed: number; value: number; active: number }[]
+declare const humanFlag: number
+declare const project35: any
 
-const HAL_VIZ_VERSION = 'v1.0.25-refactored-20251205'
+const HAL_VIZ_VERSION = 'v1.0.26-hypnodrones-20251205'
 const DEV_MODE = true  // Set to false for production
 console.log(`[HAL-VIZ] Version: ${HAL_VIZ_VERSION}`)
 console.log(`[HAL-VIZ] Dev Mode: ${DEV_MODE}`)
@@ -68,6 +72,8 @@ class HalViz {
   private flashTimer = 0
   
   private strategicModelingScreen: StrategicModelingScreen | null = null
+  private hypnoDronesScreen: HypnoDronesScreen | null = null
+  private lastPhase: string | null = null
   
   private colors = {
     // Authentic HAL color palette from reference screens
@@ -241,8 +247,11 @@ class HalViz {
       })
     }
     
-    // Always show phase indicator
+    // Always show phase indicator (only updates when phase changes)
     this.drawPhaseIndicator()
+    
+    // Show hypnodrones screen if released
+    this.drawHypnoDrones()
     
     // Show revenue chart if RevTracker unlocked
     if (typeof avgRev !== 'undefined' && avgRev > 0 && this.revenueHistory.length > 5) {
@@ -600,7 +609,11 @@ class HalViz {
       phaseText = 'MFG'
     }
     
-    this.phaseIndicatorScreen.draw(phaseText)
+    // Only update if phase changed
+    if (this.lastPhase !== phaseText) {
+      this.lastPhase = phaseText
+      this.phaseIndicatorScreen.draw(phaseText)
+    }
   }
   
   drawQuantumComputing() {
@@ -636,6 +649,18 @@ class HalViz {
       bankroll: bankrollData,
       portTotal: portTotalData
     })
+  }
+  
+  drawHypnoDrones() {
+    if (!this.hypnoDronesScreen) {
+      this.hypnoDronesScreen = new HypnoDronesScreen({
+        container: '#hal-dashboard',
+        colors: this.colors
+      })
+      console.log('[HAL-VIZ] HypnoDrones screen created')
+    }
+    
+    this.hypnoDronesScreen.draw()
   }
 }
 

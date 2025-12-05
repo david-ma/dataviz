@@ -24,3 +24,10 @@ declare const stocks: any[];
 declare const bankroll: number;
 declare const portTotal: number;
 declare const investLevel: number;
+declare const qChips: {
+    waveSeed: number;
+    value: number;
+    active: number;
+}[];
+declare const humanFlag: number;
+declare const project35: any;
