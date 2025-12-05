@@ -1,6 +1,6 @@
 import { d3 } from '../chart'
 
-const HAL_VIZ_VERSION = 'v1.0.18-authentic-colors-grid-layout-20251205-1535'
+const HAL_VIZ_VERSION = 'v1.0.19-authentic-hal-backgrounds-20251205-1545'
 const DEV_MODE = true  // Set to false for production
 console.log(`[HAL-VIZ] Version: ${HAL_VIZ_VERSION}`)
 console.log(`[HAL-VIZ] Dev Mode: ${DEV_MODE}`)
@@ -162,6 +162,7 @@ class ProductionMonitorScreen extends HalScreen {
       height: 600,
       colors: opts.colors
     })
+    this.svg.style('background', this.colors.teal)  // Teal for production/engineering
   }
   
   update() {
@@ -288,6 +289,7 @@ class PhaseIndicatorScreen extends HalScreen {
       height: 200,
       colors: opts.colors
     })
+    this.svg.style('background', this.colors.purple)  // Purple for navigation/phase
     this.svg.style('margin-bottom', '10px').style('margin-top', '0')
   }
   
@@ -323,6 +325,7 @@ class NumericMatrixScreen extends HalScreen {
       height: 300,
       colors: opts.colors
     })
+    this.svg.style('background', this.colors.matrixBlue)  // Matrix blue for data
   }
   
   draw() {
@@ -377,6 +380,7 @@ class QuantumComputingScreen extends HalScreen {
       height: 300,
       colors: opts.colors
     })
+    this.svg.style('background', this.colors.violet)  // Violet for quantum/waveforms
   }
   
   draw() {
@@ -446,6 +450,7 @@ class StrategicModelingScreen extends HalScreen {
       height: 600,
       colors: opts.colors
     })
+    this.svg.style('background', this.colors.burgundy)  // Burgundy for strategic/combat
     this.setupPayoffObserver()
   }
   
@@ -700,6 +705,7 @@ class ComputationalTelemetryScreen extends HalScreen {
       height: 300,
       colors: opts.colors
     })
+    this.svg.style('background', this.colors.navy)  // Navy for computational/memory
   }
 
   update(data: { trust: number; processors: number; memory: number; opsHistory: number[]; creatHistory: number[] }) {
@@ -799,6 +805,7 @@ class MarketDynamicsScreen extends HalScreen {
       height: 280,
       colors: opts.colors
     })
+    this.svg.style('background', this.colors.grey)  // Grey for market/engineering
   }
 
   update(data: { revenueHistory: number[]; priceHistory: number[]; demandHistory: number[]; avgRev: number }) {
