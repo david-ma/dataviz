@@ -8,21 +8,27 @@ type DroneGlobeData = {
 export declare class DroneGlobeScreen extends HalScreen {
     private projection;
     private globeGroup;
+    private landGroup;
+    private statesGroup;
     private agents;
-    private solarPatches;
+    private factories;
     private nextAgentId;
-    private nextPatchId;
     private globeRadius;
     private centerX;
     private centerY;
     private lastUpdate;
     private timer;
+    private landData;
+    private usaData;
+    private mapLoading;
     constructor(opts: {
         container: string;
         colors: HalColors;
     });
     update(data: DroneGlobeData): void;
     private initializeGlobe;
+    private ensureMapLoaded;
+    private renderMap;
     private updateAgents;
     private tick;
 }

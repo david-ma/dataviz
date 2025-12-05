@@ -12,17 +12,6 @@ type DroneMetrics = {
 };
 export declare class DroneOperationsScreen extends HalScreen {
     private initialized;
-    private projection;
-    private globeGroup;
-    private agents;
-    private solarPatches;
-    private nextAgentId;
-    private nextPatchId;
-    private globeRadius;
-    private centerX;
-    private centerY;
-    private timer;
-    private lastUpdate;
     constructor(opts: {
         container: string;
         colors: HalColors;
@@ -31,8 +20,6 @@ export declare class DroneOperationsScreen extends HalScreen {
     private initializeLayout;
     private updateMetrics;
     private updateBars;
-    private updateGlobeAgents;
-    private tickAgents;
     private drawBar;
 }
 export {};
