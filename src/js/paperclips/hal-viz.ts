@@ -37,13 +37,21 @@ class HalViz {
   private flashingCountries: number[] = []
   private flashTimer = 0
   
+  private matrixSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
+  private phaseIndicatorSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
+  
   private colors = {
     background: '#1a1a2e',      // Dark blue-grey (like 2001 screens)
     primary: '#ff6b6b',         // Bold coral/red
     secondary: '#4ecdc4',       // Bold cyan/turquoise
     tertiary: '#ffe66d',        // Bold yellow
     text: '#ffffff',            // White text
-    grid: '#2d3561'             // Subtle grid
+    grid: '#2d3561',            // Subtle grid
+    
+    // Authentic HAL colors
+    matrixBlue: '#0d2c55',      // Numeric matrix background
+    navy: '#143962',            // Phase indicator background
+    labelGrey: '#cfe8ff'        // Section labels
   }
   
   constructor() {
@@ -148,7 +156,11 @@ class HalViz {
     // Show computational resources if trust exists
     if (typeof trust !== 'undefined' && trust > 0) {
       this.drawComputationalResources()
+      this.drawNumericMatrix()
     }
+    
+    // Always show phase indicator
+    this.drawPhaseIndicator()
     
     // Show revenue chart if RevTracker unlocked
     if (typeof avgRev !== 'undefined' && avgRev > 0 && this.revenueHistory.length > 5) {
@@ -791,6 +803,112 @@ class HalViz {
         .attr('font-weight', '500')
         .text(stat)
     })
+  }
+  
+  drawNumericMatrix() {
+    // Create SVG if it doesn't exist
+    if (!this.matrixSvg) {
+      this.matrixSvg = d3.select('#hal-dashboard')
+        .append('svg')
+        .attr('width', 400)
+        .attr('height', 300)
+        .style('background', this.colors.matrixBlue)
+        .style('margin-top', '10px')
+    }
+    
+    // Clear previous
+    this.matrixSvg.selectAll('*').remove()
+    
+    // Section label
+    this.matrixSvg.append('text')
+      .attr('x', 20)
+      .attr('y', 25)
+      .attr('fill', this.colors.labelGrey)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 12)
+      .attr('opacity', 0.65)
+      .attr('letter-spacing', '1px')
+      .text('COMPUTATIONAL RESOURCES')
+    
+    // Data rows
+    const data = [
+      ['TRUST', trust || 0],
+      ['PROCESSORS', processors || 0],
+      ['MEMORY', memory || 0],
+      ['OPERATIONS', operations || 0],
+      ['CREATIVITY', creativity || 0]
+    ]
+    
+    const startY = 60
+    const lineHeight = 35
+    
+    data.forEach((row, i) => {
+      const y = startY + i * lineHeight
+      
+      // Label
+      this.matrixSvg!.append('text')
+        .attr('x', 30)
+        .attr('y', y)
+        .attr('fill', this.colors.text)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 16)
+        .attr('opacity', 0.92)
+        .text(row[0])
+      
+      // Value
+      this.matrixSvg!.append('text')
+        .attr('x', 250)
+        .attr('y', y)
+        .attr('fill', this.colors.text)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 16)
+        .attr('opacity', 0.92)
+        .text(typeof row[1] === 'number' ? row[1].toLocaleString() : row[1])
+    })
+  }
+  
+  drawPhaseIndicator() {
+    // Create SVG if it doesn't exist
+    if (!this.phaseIndicatorSvg) {
+      this.phaseIndicatorSvg = d3.select('#hal-dashboard')
+        .insert('svg', ':first-child')
+        .attr('width', 200)
+        .attr('height', 200)
+        .style('background', this.colors.navy)
+        .style('margin-bottom', '10px')
+    }
+    
+    // Clear previous
+    this.phaseIndicatorSvg.selectAll('*').remove()
+    
+    // Small header
+    this.phaseIndicatorSvg.append('text')
+      .attr('x', 20)
+      .attr('y', 25)
+      .attr('fill', this.colors.labelGrey)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 11)
+      .attr('opacity', 0.65)
+      .text('PHASE: 01')
+    
+    // Determine phase based on game state
+    let phaseText = 'BIZ'
+    if (typeof trust !== 'undefined' && trust > 0) {
+      phaseText = 'MFG'
+    }
+    
+    // Large phase text
+    this.phaseIndicatorSvg.append('text')
+      .attr('x', 100)
+      .attr('y', 100)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Inter, "Segoe UI", sans-serif')
+      .attr('font-size', 64)
+      .attr('font-weight', 'bold')
+      .attr('letter-spacing', '8px')
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle')
+      .text(phaseText)
   }
 }
 
