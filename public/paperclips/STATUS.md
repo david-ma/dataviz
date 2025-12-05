@@ -76,12 +76,24 @@
    - Shows operations total
    - Appears when operations > 0
 
-4. **Strategic Modeling Panel** (400×300px)
+4. **Strategic Modeling Panel** (600×550px) - INTERACTIVE
    - Burgundy background (#6B2424) - authentic HAL color
-   - Grid with convex optimization curve
-   - Shows strategic landscape
+   - 8 strategy selector buttons (4×2 grid):
+     - RANDOM, A100, B100, GREEDY
+     - GENEROUS, MINIMAX, TIT FOR TAT, BEAT LAST
+   - Click strategy to select it
+   - "RUN TOURNAMENT" button (yellow) - triggers game tournament
+   - "NEW TOURNAMENT" button (cyan) - starts new tournament
+   - **Live tournament grid visualization**:
+     - Shows all rounds as small squares (8×8 grid)
+     - Cyan = completed rounds
+     - Yellow = current round
+     - Grey = pending rounds
+     - Progress counter (e.g., "24 / 64 ROUNDS")
+   - Strategy scores displayed below grid
    - Displays yomi total
    - Appears when yomi > 0
+   - **Fully functional** - drives actual game mechanics
 
 **Technical Details:**
 - Non-intrusive: Read-only access to game globals
