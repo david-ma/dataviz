@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    .tile-bg {
+      fill: #f7f7f7;
+      stroke: #ddd;
+      rx: 12;
+      ry: 12;
+    }
+
+    .cell {
+      stroke: none;
+      rx: 4;
+      ry: 4;
+      transition: 0.15s;
+    }
+
+    .cell-hover {
+      stroke: #333;
+      stroke-width: 1;
+    }
+
+    .tooltip {
+      font-family: sans-serif;
+      font-size: 12px;
+      fill: #333;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<svg id="svg" width="360" height="280"></svg>
+
+<script>
+// ------------------------------------------------------------
+// TILE SETUP
+// ------------------------------------------------------------
+const svg = d3.select("#svg");
+const TILE_WIDTH = 360;
+const TILE_HEIGHT = 280;
+
+const tile = svg.append("g").attr("transform", "translate(0,0)");
+
+tile.append("rect")
+  .attr("class", "tile-bg")
+  .attr("width", TILE_WIDTH)
+  .attr("height", TILE_HEIGHT);
+
+// ------------------------------------------------------------
+// HEATMAP CONFIG
+// ------------------------------------------------------------
+const rows = 7;
+const cols = 7;
+const cellSize = 28;
+const padding = 22;
+
+const startX = (TILE_WIDTH - (cols * cellSize)) / 2;
+const startY = 40;
+
+// Generate example data (0–1)
+const data = d3.range(rows * cols).map(() => Math.random());
+
+// Colour scale
+const color = d3.scaleLinear()
+  .domain([0, 1])
+  .range(["#e3f2fd", "#1565c0"]);  // light blue → deep blue
+
+// Tooltip
+const tooltip = tile.append("text")
+  .attr("class", "tooltip")
+  .attr("opacity", 0);
+
+// ------------------------------------------------------------
+// DRAW CELLS
+// ------------------------------------------------------------
+const cells = tile.selectAll("rect.cell")
+  .data(data)
+  .enter()
+  .append("rect")
+  .attr("class", "cell")
+  .attr("width", cellSize)
+  .attr("height", cellSize)
+  .attr("x", (d, i) => startX + (i % cols) * cellSize)
+  .attr("y", (d, i) => startY + Math.floor(i / cols) * cellSize)
+  .attr("fill", d => color(d))
+  .attr("opacity", 0)
+  .on("mousemove", function(event, d) {
+    // Highlight
+    d3.select(this).classed("cell-hover", true);
+
+    const [mx, my] = d3.pointer(event, svg.node());
+    tooltip
+      .attr("x", mx + 12)
+      .attr("y", my - 12)
+      .attr("opacity", 1)
+      .text(d.toFixed(2));
+  })
+  .on("mouseleave", function() {
+    d3.select(this).classed("cell-hover", false);
+    tooltip.attr("opacity", 0);
+  });
+
+// Fade-in animation
+cells.transition()
+  .delay((d, i) => i * 20)
+  .duration(300)
+  .attr("opacity", 1);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Numeric Telemetry Tile — D3</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { background:#0f1416; color:#fff; font-family:Inter, monospace; }
+  .tile { width:720px; height:720px; background:#0f1416; padding:12px; }
+
+  .matrix-bg {
+    fill:#0d2c55;
+  }
+
+  text.matrix-cell {
+    fill:#ffffff;
+    font-family: "Fira Mono", Consolas, monospace;
+    font-size:18px;
+    opacity:0.92;
+    user-select:none;
+  }
+
+  text.section-label {
+    fill:#cfe8ff;
+    font-size:14px;
+    opacity:0.65;
+    letter-spacing:1px;
+    font-family:Inter, sans-serif;
+  }
+
+  .row-highlight {
+    fill:rgba(255,255,255,0.10);
+  }
+
+  .copy-flash {
+    fill:rgba(255,255,255,0.35);
+    transition: opacity 0.6s ease-out;
+  }
+</style>
+</head>
+<body>
+
+<div class="tile" id="matrixTile"></div>
+
+<script>
+(function() {
+  const size = 720;
+  const svg = d3.select("#matrixTile")
+    .append("svg")
+    .attr("viewBox", `0 0 ${size} ${size}`)
+    .attr("width", size)
+    .attr("height", size);
+
+  // background panel
+  svg.append("rect")
+     .attr("x",0)
+     .attr("y",0)
+     .attr("width",size)
+     .attr("height",size)
+     .attr("class","matrix-bg");
+
+  // --- NUMERIC DATA (you can change these freely) ------------------------------
+
+  const blockA = [
+    ["360776013973495", "3705", "22397", "---"],
+    ["203957219373922", "2310", "17991", "564"],
+    ["005377129292020", "2310", "29890", "001"],
+    ["230059210020019", "1599", "89917", "992"],
+    ["192002349991002", "8842", "00883", "827"],
+    ["172093330099010", "0090", "12600", "998"],
+  ];
+
+  const blockB = [
+    ["203", "598", "193"],
+    ["129", "283", "004"],
+    ["581", "882", "219"],
+    ["991", "100", "433"],
+  ];
+
+  // ---------------------------------------------------------------------------
+
+  const leftMargin = 60;
+  const topMargin = 80;
+  const lineHeight = 44;
+  const charSpacing = 90;
+
+  // Section label for block A
+  svg.append("text")
+     .attr("x", leftMargin)
+     .attr("y", topMargin - 30)
+     .attr("class","section-label")
+     .text("TELEMETRY A");
+
+  const groupA = svg.append("g").attr("transform",`translate(${leftMargin},${topMargin})`);
+
+  // row highlight rects
+  const rowA = groupA.selectAll("g.rowA")
+    .data(blockA)
+    .enter()
+    .append("g")
+    .attr("class","rowA")
+    .attr("transform",(d,i)=>`translate(0,${i*lineHeight})`);
+
+  rowA.append("rect")
+      .attr("x",-20)
+      .attr("y",-24)
+      .attr("width",600)
+      .attr("height",lineHeight)
+      .attr("rx",6)
+      .attr("ry",6)
+      .attr("fill","transparent")
+      .classed("row-highlight", false);
+
+  // text cells
+  rowA.each(function(row, i) {
+    d3.select(this)
+      .selectAll("text")
+      .data(row)
+      .enter()
+      .append("text")
+      .attr("class","matrix-cell")
+      .attr("x",(d,j)=>j*charSpacing)
+      .attr("y",0)
+      .attr("dy","0.32em")
+      .text(d=>d);
+  });
+
+  // Section label for block B
+  const blockBstart = topMargin + blockA.length*lineHeight + 80;
+
+  svg.append("text")
+     .attr("x", leftMargin)
+     .attr("y", blockBstart - 30)
+     .attr("class","section-label")
+     .text("TELEMETRY B");
+
+  const groupB = svg.append("g").attr("transform",`translate(${leftMargin},${blockBstart})`);
+
+  const rowB = groupB.selectAll("g.rowB")
+    .data(blockB)
+    .enter()
+    .append("g")
+    .attr("class","rowB")
+    .attr("transform",(d,i)=>`translate(0,${i*lineHeight})`);
+
+  rowB.append("rect")
+      .attr("x",-20)
+      .attr("y",-24)
+      .attr("width",400)
+      .attr("height",lineHeight)
+      .attr("rx",6)
+      .attr("ry",6)
+      .attr("fill","transparent");
+
+  rowB.each(function(row) {
+    d3.select(this)
+      .selectAll("text")
+      .data(row)
+      .enter()
+      .append("text")
+      .attr("class","matrix-cell")
+      .attr("x",(d,j)=>j*charSpacing)
+      .attr("y",0)
+      .attr("dy","0.32em")
+      .text(d=>d);
+  });
+
+
+  // --- INTERACTION: Hover + click-to-select + copy ----------------------------
+
+  function attachRowInteraction(rowSel) {
+    rowSel
+      .on("mouseover", function() {
+        d3.select(this).select("rect").attr("fill","rgba(255,255,255,0.10)");
+      })
+      .on("mouseout", function() {
+        d3.select(this).select("rect").attr("fill","transparent");
+      })
+      .on("click", function(event, rowData) {
+        const str = rowData.join(" ");
+        navigator.clipboard.writeText(str);
+
+        // flash effect
+        const g = d3.select(this);
+        const r = g.append("rect")
+          .attr("x",-20)
+          .attr("y",-24)
+          .attr("width",600)
+          .attr("height",lineHeight)
+          .attr("class","copy-flash")
+          .attr("rx",6).attr("ry",6)
+          .style("opacity",1);
+
+        r.transition().duration(600).style("opacity",0).remove();
+      });
+  }
+
+  attachRowInteraction(rowA);
+  attachRowInteraction(rowB);
+
+})();
+</script>
+
+</body>
+</html>

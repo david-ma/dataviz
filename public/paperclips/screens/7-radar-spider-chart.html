@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    .tile-bg {
+      fill: #f7f7f7;
+      stroke: #ddd;
+      rx: 12;
+      ry: 12;
+    }
+
+    .grid-line {
+      fill: none;
+      stroke: #e5e5e5;
+      stroke-width: 1;
+    }
+
+    .axis-line {
+      stroke: #cccccc;
+      stroke-width: 1.5;
+    }
+
+    .axis-label {
+      font-family: sans-serif;
+      font-size: 13px;
+      fill: #555;
+      text-anchor: middle;
+    }
+
+    .radar-area {
+      fill: #4a90e2;
+      opacity: 0.35;
+      stroke: none;
+    }
+
+    .radar-stroke {
+      fill: none;
+      stroke: #4a90e2;
+      stroke-width: 3;
+    }
+  </style>
+</head>
+
+<body>
+
+<svg id="svg" width="360" height="280"></svg>
+
+<script>
+// ------------------------------------------------------------
+// TILE SETUP
+// ------------------------------------------------------------
+const svg = d3.select("#svg");
+const TILE_WIDTH = 360;
+const TILE_HEIGHT = 280;
+
+const tile = svg.append("g").attr("transform", "translate(0,0)");
+
+tile.append("rect")
+  .attr("class", "tile-bg")
+  .attr("width", TILE_WIDTH)
+  .attr("height", TILE_HEIGHT);
+
+// ------------------------------------------------------------
+// RADAR CONFIG
+// ------------------------------------------------------------
+const centerX = TILE_WIDTH / 2;
+const centerY = TILE_HEIGHT / 2 + 10;
+
+const radius = 90;
+
+const axes = ["Speed", "Power", "Accuracy", "Stamina", "Focus"];
+const axisCount = axes.length;
+const angleSlice = (Math.PI * 2) / axisCount;
+
+// Example values (0–1)
+const values = [0.65, 0.80, 0.55, 0.72, 0.60];
+
+// Scale for the radius
+const rScale = d3.scaleLinear().domain([0, 1]).range([0, radius]);
+
+// ------------------------------------------------------------
+// RADIAL GRID
+// ------------------------------------------------------------
+const gridLevels = 4;
+
+for (let lv = 1; lv <= gridLevels; lv++) {
+  const levelRadius = (radius / gridLevels) * lv;
+  const points = d3.range(axisCount).map(i => {
+    const angle = i * angleSlice - Math.PI / 2;
+    return [
+      centerX + levelRadius * Math.cos(angle),
+      centerY + levelRadius * Math.sin(angle)
+    ];
+  });
+
+  tile.append("path")
+    .attr("class", "grid-line")
+    .attr("d", d3.line()(points) + "Z");
+}
+
+// ------------------------------------------------------------
+// AXES
+// ------------------------------------------------------------
+axes.forEach((axis, i) => {
+  const angle = i * angleSlice - Math.PI / 2;
+
+  const x = centerX + radius * Math.cos(angle);
+  const y = centerY + radius * Math.sin(angle);
+
+  // axis line
+  tile.append("line")
+    .attr("class", "axis-line")
+    .attr("x1", centerX)
+    .attr("y1", centerY)
+    .attr("x2", x)
+    .attr("y2", y);
+
+  // axis label
+  tile.append("text")
+    .attr("class", "axis-label")
+    .attr("x", centerX + (radius + 18) * Math.cos(angle))
+    .attr("y", centerY + (radius + 18) * Math.sin(angle) + 5)
+    .text(axis);
+});
+
+// ------------------------------------------------------------
+// RADAR POLYGON
+// ------------------------------------------------------------
+const radarPoints = values.map((v, i) => {
+  const angle = i * angleSlice - Math.PI / 2;
+  return [
+    centerX + rScale(v) * Math.cos(angle),
+    centerY + rScale(v) * Math.sin(angle)
+  ];
+});
+
+// Area (filled)
+tile.append("path")
+  .attr("class", "radar-area")
+  .attr("d", d3.line().curve(d3.curveLinearClosed)(radarPoints))
+  .attr("opacity", 0)
+  .transition()
+  .duration(800)
+  .attr("opacity", 0.35);
+
+// Outline stroke
+tile.append("path")
+  .attr("class", "radar-stroke")
+  .attr("d", d3.line().curve(d3.curveLinearClosed)(radarPoints))
+  .attr("stroke-dasharray", "400")
+  .attr("stroke-dashoffset", 400)
+  .transition()
+  .duration(900)
+  .ease(d3.easeCubicOut)
+  .attr("stroke-dashoffset", 0);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .node {
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .node-circle {
+      transition: 0.15s;
+    }
+    .edge {
+      stroke: #999;
+      stroke-width: 2;
+      transition: 0.15s;
+    }
+    .active-edge {
+      stroke-width: 4 !important;
+    }
+  </style>
+</head>
+
+<body>
+
+<svg id="svg" width="400" height="200"></svg>
+
+<script>
+// -------------------------------------------------------------------
+// SVG ROOT
+// -------------------------------------------------------------------
+const svg = d3.select("#svg");
+
+// -------------------------------------------------------------------
+// TILE 4 GROUP
+// -------------------------------------------------------------------
+const tile = svg.append("g")
+  .attr("class", "node")
+  .attr("transform", "translate(60,80)");
+
+// -------------------------------------------------------------------
+// OUTGOING CONNECTOR
+// -------------------------------------------------------------------
+const edge = tile.append("line")
+  .attr("class", "edge")
+  .attr("x1", 60)   // start near the node
+  .attr("y1", 0)
+  .attr("x2", 200)  // end further out
+  .attr("y2", 0)
+  .attr("stroke-linecap", "round");
+
+// -------------------------------------------------------------------
+// CENTRAL NODE
+// -------------------------------------------------------------------
+const circle = tile.append("circle")
+  .attr("class", "node-circle")
+  .attr("cx", 0)
+  .attr("cy", 0)
+  .attr("r", 30)
+  .attr("fill", "#ffd166");
+
+// -------------------------------------------------------------------
+// LABEL
+// -------------------------------------------------------------------
+tile.append("text")
+  .attr("x", 0)
+  .attr("y", 5)
+  .attr("text-anchor", "middle")
+  .attr("font-size", "18px")
+  .attr("font-family", "sans-serif")
+  .text("Tile 4");
+
+// -------------------------------------------------------------------
+// INTERACTIONS
+// -------------------------------------------------------------------
+tile.on("mouseenter", function() {
+  circle.transition().attr("r", 36);
+  edge.classed("active-edge", true);
+});
+
+tile.on("mouseleave", function() {
+  circle.transition().attr("r", 30);
+  edge.classed("active-edge", false);
+});
+
+tile.on("click", function() {
+  // Expand the node outward on click (just a demo)
+  const current = d3.select(this).attr("transform");
+  const n = parseInt(current.match(/translate\((\d+)/)[1]);
+  d3.select(this).attr("transform", `translate(${n + 20},80)`);
+});
+</script>
+
+</body>
+</html>

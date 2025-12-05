@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Orbital / Radial Plot — D3</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  body { background:#0f1416; color:#fff; font-family: Inter, "Helvetica Neue", Arial; -webkit-font-smoothing:antialiased; }
+  .tile { background:#1b2430; border-radius:6px; padding:12px; display:inline-block; }
+  svg { display:block; }
+  .orbit { fill: none; stroke: rgba(255,255,255,0.14); stroke-width:1.2px; }
+  .orbit-major { stroke: rgba(255,255,255,0.22); stroke-width:1.6px; }
+  .axis-line { stroke: rgba(255,255,255,0.18); stroke-width:1px; stroke-dasharray:4 3; }
+  .ellipse-orbit { fill:none; stroke: rgba(255,200,200,0.95); stroke-width:1.8px; }
+  .marker { fill: #fff4e6; stroke: #ff8c00; stroke-width:1.2px; r:6px; cursor:grab; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
+  .label { fill: #e8f1ff; font-size:12px; opacity:0.9; }
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(10,12,14,0.92);
+    color:#e8f1ff;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding:8px 10px;
+    font-size:12px;
+    border-radius:6px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    transform: translate(-50%, -120%);
+    white-space:nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="tile" id="orbitalTile">
+  <!-- svg will be injected here -->
+</div>
+
+<div id="tooltip" class="tooltip" style="display:none;"></div>
+
+<script>
+(function() {
+  const container = d3.select('#orbitalTile');
+  const width = 720;      // default tile width (px)
+  const height = 720;     // default tile height (px)
+  const cx = width / 2;
+  const cy = height / 2;
+
+  // Orbit radii (px)
+  const radii = [60, 120, 180, 240, 300];
+
+  // Ellipse params (semi-major a, semi-minor b, rotation degrees)
+  const ellipse = { a: 320, b: 180, rotation: -23 }; // tuned to look like the reference
+
+  // Create SVG with viewBox so it scales nicely
+  const svg = container.append('svg')
+    .attr('viewBox', `0 0 ${width} ${height}`)
+    .attr('width', width)
+    .attr('height', height)
+    .style('background', '#10161a');
+
+  // group for all plotting elements
+  const g = svg.append('g');
+
+  // Concentric orbits
+  const orbitGroup = g.append('g').attr('class','orbits');
+  orbitGroup.selectAll('circle.orbit')
+    .data(radii)
+    .join('circle')
+    .attr('class', (d,i) => i === radii.length-1 ? 'orbit orbit-major' : 'orbit')
+    .attr('cx', cx)
+    .attr('cy', cy)
+    .attr('r', d => d)
+    .attr('stroke-linecap','round');
+
+  // Angular grid: draw radial tick lines every 30 degrees
+  const angles = d3.range(0,360,30);
+  const angleGroup = g.append('g').attr('class','angles');
+  angleGroup.selectAll('line')
+    .data(angles)
+    .join('line')
+    .attr('class','axis-line')
+    .attr('x1', d => cx + Math.cos((d*Math.PI)/180) * 12)
+    .attr('y1', d => cy + Math.sin((d*Math.PI)/180) * 12)
+    .attr('x2', d => cx + Math.cos((d*Math.PI)/180) * (radii[radii.length-1]+12))
+    .attr('y2', d => cy + Math.sin((d*Math.PI)/180) * (radii[radii.length-1]+12));
+
+  // Axis labels (N, E, S, W) at cardinal directions
+  const cardinals = [
+    {label: 'N', angle: -90},
+    {label: 'E', angle: 0},
+    {label: 'S', angle: 90},
+    {label: 'W', angle: 180}
+  ];
+  g.selectAll('text.cardinal')
+    .data(cardinals)
+    .join('text')
+    .attr('class','label cardinal')
+    .attr('x', d => cx + Math.cos((d.angle*Math.PI)/180) * (radii[radii.length-1]+22))
+    .attr('y', d => cy + Math.sin((d.angle*Math.PI)/180) * (radii[radii.length-1]+22) + 4)
+    .attr('text-anchor','middle')
+    .text(d => d.label)
+    .style('font-size','13px')
+    .style('opacity',0.85);
+
+  // Draw a rotated ellipse (the orbit path)
+  // Use an SVG <ellipse> with transform rotate at center
+  const ellipseElem = g.append('ellipse')
+    .attr('class','ellipse-orbit')
+    .attr('cx', cx)
+    .attr('cy', cy)
+    .attr('rx', ellipse.a)
+    .attr('ry', ellipse.b)
+    .attr('transform', `rotate(${ellipse.rotation}, ${cx}, ${cy})`)
+    .attr('stroke-linecap','round');
+
+  // A small dashed focal line for aesthetics
+  g.append('line')
+    .attr('x1', cx - 12)
+    .attr('y1', cy)
+    .attr('x2', cx + 12)
+    .attr('y2', cy)
+    .attr('stroke', 'rgba(255,255,255,0.06)')
+    .attr('stroke-width', 2);
+
+  // A small marker on the ellipse (initial angle in degrees)
+  let markerAngle = -40; // degrees
+  const tooltip = d3.select('#tooltip');
+
+  function ellipsePoint(angleDeg) {
+    // compute point on rotated ellipse parametric form
+    const t = angleDeg * Math.PI / 180;
+    // point on non-rotated ellipse (centered at origin)
+    const x0 = ellipse.a * Math.cos(t);
+    const y0 = ellipse.b * Math.sin(t);
+    // rotate by rotation angle (radians)
+    const rot = ellipse.rotation * Math.PI / 180;
+    const xr = x0 * Math.cos(rot) - y0 * Math.sin(rot);
+    const yr = x0 * Math.sin(rot) + y0 * Math.cos(rot);
+    return [cx + xr, cy + yr];
+  }
+
+  // marker group
+  const markerGroup = g.append('g').attr('class','markerGroup');
+
+  // outer halo ring
+  markerGroup.append('circle')
+    .attr('cx', cx)
+    .attr('cy', cy)
+    .attr('r', 0) // will be positioned later
+
+  // draggable marker
+  const marker = markerGroup.append('circle')
+    .attr('class','marker')
+    .attr('r', 7)
+    .attr('stroke', '#ff8c00')
+    .call(d3.drag()
+      .on('start', dragStarted)
+      .on('drag', dragged)
+      .on('end', dragEnded)
+    );
+
+  // label for the marker with small readout
+  const readout = g.append('text')
+    .attr('class','label')
+    .attr('x', cx + 12)
+    .attr('y', cy + 12)
+    .style('font-size','11px')
+    .style('opacity', 0.88)
+    .text('');
+
+  // initial positioning
+  updateMarker(markerAngle);
+
+  // functions for drag
+  function dragStarted(event) {
+    d3.select(this).attr('cursor','grabbing');
+    tooltip.style('display', 'block');
+  }
+
+  function dragged(event) {
+    // compute angle from center to pointer, then project to nearest point on ellipse (by solving param eqn via iterative search)
+    const [mx, my] = d3.pointer(event, svg.node());
+    // approximate angle around ellipse by using atan2 of transformed coords into ellipse space (inverse rotate)
+    const rot = -ellipse.rotation * Math.PI/180;
+    const ux = mx - cx, uy = my - cy;
+    // rotate back by -rotation
+    const xLocal = ux * Math.cos(rot) - uy * Math.sin(rot);
+    const yLocal = ux * Math.sin(rot) + uy * Math.cos(rot);
+    // compute param angle t = atan2(yLocal/b, xLocal/a)
+    const t = Math.atan2(yLocal/ellipse.b, xLocal/ellipse.a);
+    const angleDeg = t * 180 / Math.PI;
+    markerAngle = angleDeg;
+    updateMarker(markerAngle);
+  }
+
+  function dragEnded(event) {
+    d3.select(this).attr('cursor','grab');
+    tooltip.style('display', 'none');
+  }
+
+  function updateMarker(angleDeg) {
+    const [mx, my] = ellipsePoint(angleDeg);
+    marker.attr('cx', mx).attr('cy', my);
+
+    // compute polar distance (distance from center)
+    const dx = mx - cx;
+    const dy = my - cy;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+
+    // update small readout text placed near marker
+    readout
+      .attr('x', mx + 12)
+      .attr('y', my + 4)
+      .text(`θ ${Math.round(angleDeg)}°  r ${Math.round(dist)}px`);
+
+    // update tooltip position and content
+    tooltip
+      .style('left', (mx + 10) + 'px')
+      .style('top', (my - 10) + 'px')
+      .html(`<strong>Angle:</strong> ${angleDeg.toFixed(1)}°<br/><strong>Radius:</strong> ${dist.toFixed(1)} px`)
+      .style('display','block');
+
+    // small pulsing animation on marker (optional)
+    marker.transition().duration(250).attr('r', 9).transition().duration(250).attr('r', 7);
+  }
+
+  // interactive hover to move marker to nearest point
+  svg.on('mousemove', function(event) {
+    // when not dragging, show a faint preview on hover: compute angle from pointer and show a faint dot
+    if (d3.select('.marker').node().__dragging__) return;
+    const [mx, my] = d3.pointer(event, svg.node());
+    const rot = -ellipse.rotation * Math.PI/180;
+    const ux = mx - cx, uy = my - cy;
+    const xLocal = ux * Math.cos(rot) - uy * Math.sin(rot);
+    const yLocal = ux * Math.sin(rot) + uy * Math.cos(rot);
+    const t = Math.atan2(yLocal/ellipse.b, xLocal/ellipse.a);
+    const previewAngle = t * 180 / Math.PI;
+    const [px, py] = ellipsePoint(previewAngle);
+    // show tooltip following mouse
+    tooltip
+      .style('left', (mx + 10) + 'px')
+      .style('top', (my - 12) + 'px')
+      .html(`<strong>Preview</strong><br/>θ ${previewAngle.toFixed(1)}°`);
+  });
+
+  svg.on('mouseleave', () => tooltip.style('display','none'));
+
+  // Expose a simple API to update ellipse params if you want to animate or change
+  window.orbitalPlot = {
+    setEllipse: function(a,b,rot) {
+      ellipse.a = a; ellipse.b = b; ellipse.rotation = rot;
+      ellipseElem.attr('rx', ellipse.a).attr('ry', ellipse.b)
+                 .attr('transform', `rotate(${ellipse.rotation}, ${cx}, ${cy})`);
+      updateMarker(markerAngle);
+    },
+    setRadii: function(newRadii) {
+      // replace radii visually (must be same scale)
+      orbitGroup.selectAll('circle').data(newRadii).join('circle')
+        .attr('class', (d,i) => i === newRadii.length-1 ? 'orbit orbit-major' : 'orbit')
+        .attr('cx', cx)
+        .attr('cy', cy)
+        .attr('r', d => d);
+    }
+  };
+
+  // Prevent text selection while dragging
+  d3.select(window).on('selectstart', () => false);
+
+})();
+</script>
+</body>
+</html>

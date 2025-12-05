@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    .tile-bg {
+      fill: #f7f7f7;
+      stroke: #ddd;
+      rx: 12;
+      ry: 12;
+    }
+
+    .arc-bg {
+      fill: none;
+      stroke: #e5e5e5;
+      stroke-width: 22;
+    }
+
+    .arc-fg {
+      fill: none;
+      stroke: #4a90e2;
+      stroke-width: 22;
+      stroke-linecap: round;
+    }
+
+    .label {
+      font-family: sans-serif;
+      font-size: 28px;
+      fill: #333;
+      text-anchor: middle;
+    }
+
+    .title {
+      font-family: sans-serif;
+      font-size: 14px;
+      fill: #777;
+      text-anchor: middle;
+    }
+  </style>
+</head>
+
+<body>
+
+<svg id="svg" width="360" height="240"></svg>
+
+<script>
+// ------------------------------------------------------------
+// TILE SETUP
+// ------------------------------------------------------------
+const svg = d3.select("#svg");
+const TILE_WIDTH = 360;
+const TILE_HEIGHT = 240;
+
+const tile = svg.append("g")
+  .attr("transform", "translate(0,0)");
+
+tile.append("rect")
+  .attr("class", "tile-bg")
+  .attr("width", TILE_WIDTH)
+  .attr("height", TILE_HEIGHT);
+
+// ------------------------------------------------------------
+// GAUGE CONFIG
+// ------------------------------------------------------------
+const centerX = TILE_WIDTH / 2;
+const centerY = TILE_HEIGHT / 1.25;
+
+const radius = 90;
+
+const startAngle = -Math.PI;       // 180° start (left)
+const endAngle   = 0;              // 180° end (right)
+
+// Example value: 0 to 1
+let value = 0.73;
+
+// ------------------------------------------------------------
+// ARC GENERATORS
+// ------------------------------------------------------------
+const arc = d3.arc()
+  .innerRadius(radius - 22)
+  .outerRadius(radius)
+  .startAngle(startAngle);
+
+const arcBg = d3.arc()
+  .innerRadius(radius - 22)
+  .outerRadius(radius)
+  .startAngle(startAngle)
+  .endAngle(endAngle);
+
+// ------------------------------------------------------------
+// DRAW BACKGROUND ARC
+// ------------------------------------------------------------
+tile.append("path")
+  .attr("class", "arc-bg")
+  .attr("d", arcBg)
+  .attr("transform", `translate(${centerX},${centerY})`);
+
+// ------------------------------------------------------------
+// DRAW FOREGROUND ARC
+// ------------------------------------------------------------
+const fg = tile.append("path")
+  .attr("class", "arc-fg")
+  .attr("transform", `translate(${centerX},${centerY})`)
+  .datum({ endAngle: startAngle });
+
+// Animate to the current value
+fg.transition()
+  .duration(1000)
+  .attrTween("d", function(d) {
+    const interpolate = d3.interpolate(
+      startAngle,
+      startAngle + (endAngle - startAngle) * value
+    );
+    return function(t) {
+      d.endAngle = interpolate(t);
+      return arc(d);
+    };
+  });
+
+// ------------------------------------------------------------
+// LABELS
+// ------------------------------------------------------------
+tile.append("text")
+  .attr("class", "label")
+  .attr("x", centerX)
+  .attr("y", centerY - 15)
+  .text(Math.round(value * 100) + "%");
+
+tile.append("text")
+  .attr("class", "title")
+  .attr("x", centerX)
+  .attr("y", centerY + 10)
+  .text("Completion");
+
+</script>
+
+</body>
+</html>

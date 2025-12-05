@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .tile-bg {
+      fill: #f7f7f7;
+      stroke: #ddd;
+      rx: 12;
+      ry: 12;
+    }
+
+    .line-primary {
+      fill: none;
+      stroke: #4a90e2;
+      stroke-width: 3;
+    }
+
+    .line-secondary {
+      fill: none;
+      stroke: #f5a623;
+      stroke-width: 3;
+      opacity: 0.8;
+    }
+
+    .tooltip {
+      pointer-events: none;
+      font-family: sans-serif;
+      font-size: 12px;
+      fill: #333;
+    }
+  </style>
+</head>
+
+<body>
+
+<svg id="svg" width="400" height="250"></svg>
+
+<script>
+// ------------------------------------------------------------
+// TILE 5 SETUP
+// ------------------------------------------------------------
+const svg = d3.select("#svg");
+const tile = svg.append("g").attr("transform", "translate(20,20)");
+const TILE_WIDTH = 360;
+const TILE_HEIGHT = 200;
+
+// Background
+tile.append("rect")
+  .attr("class", "tile-bg")
+  .attr("width", TILE_WIDTH)
+  .attr("height", TILE_HEIGHT);
+
+// ------------------------------------------------------------
+// DATA (example curves)
+// ------------------------------------------------------------
+const xValues = d3.range(0, 40);
+
+const data1 = xValues.map(x => ({
+  x,
+  y: 60 + 20 * Math.sin(x / 4)
+}));
+
+const data2 = xValues.map(x => ({
+  x,
+  y: 50 + 25 * Math.cos(x / 5)
+}));
+
+// ------------------------------------------------------------
+// SCALES
+// ------------------------------------------------------------
+const margin = { top: 30, right: 20, bottom: 30, left: 30 };
+
+const x = d3.scaleLinear()
+  .domain([0, 39])
+  .range([margin.left, TILE_WIDTH - margin.right]);
+
+const y = d3.scaleLinear()
+  .domain([0, 100])
+  .range([TILE_HEIGHT - margin.bottom, margin.top]);
+
+// ------------------------------------------------------------
+// LINE GENERATORS
+// ------------------------------------------------------------
+const lineMaker = d3.line()
+  .x(d => x(d.x))
+  .y(d => y(d.y))
+  .curve(d3.curveCatmullRom.alpha(0.4)); // smoother & modern
+
+// ------------------------------------------------------------
+// DRAW LINES
+// ------------------------------------------------------------
+tile.append("path")
+  .datum(data1)
+  .attr("class", "line-primary")
+  .attr("d", lineMaker);
+
+tile.append("path")
+  .datum(data2)
+  .attr("class", "line-secondary")
+  .attr("d", lineMaker);
+
+// ------------------------------------------------------------
+// TOOLTIP
+// ------------------------------------------------------------
+const tooltip = tile.append("text")
+  .attr("class", "tooltip")
+  .attr("opacity", 0);
+
+// Hover target overlay
+tile.append("rect")
+  .attr("width", TILE_WIDTH)
+  .attr("height", TILE_HEIGHT)
+  .attr("fill", "transparent")
+  .on("mousemove", function(event) {
+    const mouseX = d3.pointer(event)[0];
+    const xValue = x.invert(mouseX);
+
+    const i = Math.round(xValue);
+    if (i < 0 || i >= xValues.length) return;
+
+    const d1 = data1[i];
+
+    tooltip
+      .attr("x", x(d1.x) + 10)
+      .attr("y", y(d1.y) - 10)
+      .attr("opacity", 1)
+      .text(`x: ${d1.x}, y: ${d1.y.toFixed(1)}`);
+  })
+  .on("mouseleave", () => tooltip.attr("opacity", 0));
+
+</script>
+
+</body>
+</html>
