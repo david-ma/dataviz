@@ -1,6 +1,7 @@
 import { d3 } from '../chart'
 
-console.log("Running hal-viz.ts")
+const HAL_VIZ_VERSION = 'v1.0.6-class-based-20251205-1406'
+console.log(`[HAL-VIZ] Version: ${HAL_VIZ_VERSION}`)
 
 // Game state globals
 declare const clipRate: number
@@ -26,6 +27,307 @@ declare const rounds: number
 declare const strats: any[]
 declare const payoffGrid: any
 
+// Base class for HAL screens
+abstract class HalScreen {
+  protected svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>
+  protected id: string
+  protected width: number
+  protected height: number
+  protected background: string
+  protected visible: boolean = true
+  
+  constructor(container: string, id: string, width: number, height: number, background: string) {
+    this.id = id
+    this.width = width
+    this.height = height
+    this.background = background
+    
+    this.svg = d3.select(container)
+      .append('svg')
+      .attr('id', id)
+      .attr('width', width)
+      .attr('height', height)
+      .style('background', background)
+      .style('margin-top', '10px')
+  }
+  
+  abstract draw(): void
+  
+  clear() {
+    this.svg.selectAll('*').remove()
+  }
+  
+  show() {
+    this.visible = true
+    this.svg.style('display', 'block')
+  }
+  
+  hide() {
+    this.visible = false
+    this.svg.style('display', 'none')
+  }
+  
+  isVisible(): boolean {
+    return this.visible
+  }
+  
+  destroy() {
+    this.svg.remove()
+  }
+}
+
+// Strategic Modeling Screen
+class StrategicModelingScreen extends HalScreen {
+  private lastPayoffValues = {aa: '', ab: '', ba: '', bb: ''}
+  private payoffObserver: MutationObserver | null = null
+  
+  constructor(container: string) {
+    super(container, 'hal-strategic-modeling', 600, 600, '#6B2424')
+    this.setupPayoffObserver()
+  }
+  
+  setupPayoffObserver() {
+    console.log('[StrategicModeling] Setting up payoff observer...')
+    const cells = ['aaPayoffH', 'aaPayoffV', 'abPayoffH', 'abPayoffV', 
+                   'baPayoffH', 'baPayoffV', 'bbPayoffH', 'bbPayoffV']
+    
+    cells.forEach(id => {
+      const elem = document.getElementById(id)
+      if (elem) {
+        if (!this.payoffObserver) {
+          this.payoffObserver = new MutationObserver(() => {
+            console.log('[StrategicModeling] Payoff changed, redrawing...')
+            this.draw()
+          })
+        }
+        this.payoffObserver.observe(elem, { 
+          childList: true, 
+          characterData: true, 
+          subtree: true 
+        })
+      }
+    })
+  }
+  
+  draw() {
+    this.clear()
+    
+    const colors = {
+      text: '#ffffff',
+      labelGrey: '#cfe8ff',
+      yellow: '#ffe66d',
+      cyan: '#4ecdc4'
+    }
+    
+    // Title
+    this.svg.append('text')
+      .attr('x', 20).attr('y', 30)
+      .attr('fill', colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 18).attr('font-weight', 'bold')
+      .attr('letter-spacing', '2px')
+      .text('STRATEGIC MODELING')
+    
+    // Yomi display
+    this.svg.append('text')
+      .attr('x', 450).attr('y', 30)
+      .attr('fill', colors.text)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 14)
+      .text(`YOMI: ${(typeof yomi !== 'undefined' ? yomi : 0).toLocaleString()}`)
+    
+    // Strategy buttons
+    const strategies = ['RANDOM', 'A100', 'B100', 'GREEDY', 'GENEROUS', 'MINIMAX', 'TIT FOR TAT', 'BEAT LAST']
+    const pickerY = 60
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', pickerY)
+      .attr('fill', colors.labelGrey)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 12)
+      .text('SELECT STRATEGY:')
+    
+    strategies.forEach((strat, i) => {
+      const x = 20 + (i % 4) * 140
+      const y = pickerY + 20 + Math.floor(i / 4) * 40
+      
+      const btn = this.svg.append('g').style('cursor', 'pointer')
+      
+      btn.append('rect')
+        .attr('x', x).attr('y', y)
+        .attr('width', 130).attr('height', 30)
+        .attr('fill', 'rgba(255,255,255,0.1)')
+        .attr('stroke', 'rgba(255,255,255,0.3)')
+        .attr('rx', 3)
+      
+      btn.append('text')
+        .attr('x', x + 65).attr('y', y + 19)
+        .attr('fill', colors.text)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 10).attr('text-anchor', 'middle')
+        .text(strat)
+      
+      btn.on('mouseover', function() {
+        d3.select(this).select('rect').attr('fill', 'rgba(255,255,255,0.2)')
+      })
+      .on('mouseout', function() {
+        d3.select(this).select('rect').attr('fill', 'rgba(255,255,255,0.1)')
+      })
+      .on('click', () => {
+        const picker = document.getElementById('stratPicker') as HTMLSelectElement
+        if (picker) {
+          for (let j = 0; j < picker.options.length; j++) {
+            if (picker.options[j].text === strat) {
+              picker.selectedIndex = j
+              break
+            }
+          }
+        }
+      })
+    })
+    
+    // Run/New buttons
+    const btnY = pickerY + 100
+    this.drawButton(20, btnY, 150, 35, 'RUN TOURNAMENT', colors.yellow, () => {
+      const btn = document.getElementById('btnRunTournament') as HTMLButtonElement
+      if (btn && !btn.disabled) {
+        btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      }
+    })
+    
+    this.drawButton(190, btnY, 150, 35, 'NEW TOURNAMENT', colors.cyan, () => {
+      const btn = document.getElementById('btnNewTournament') as HTMLButtonElement
+      if (btn) {
+        btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      }
+    })
+    
+    // Payoff Matrix
+    this.drawPayoffMatrix(btnY + 60, colors)
+    
+    // Tournament Progress
+    this.drawTournamentProgress(btnY + 300, colors)
+  }
+  
+  private drawButton(x: number, y: number, w: number, h: number, text: string, color: string, onClick: () => void) {
+    const btn = this.svg.append('g').style('cursor', 'pointer')
+    btn.append('rect')
+      .attr('x', x).attr('y', y).attr('width', w).attr('height', h)
+      .attr('fill', `${color}33`).attr('stroke', color).attr('rx', 4)
+    btn.append('text')
+      .attr('x', x + w/2).attr('y', y + h/2 + 5)
+      .attr('fill', color).attr('font-family', 'Futura, sans-serif')
+      .attr('font-size', 14).attr('font-weight', 'bold').attr('text-anchor', 'middle')
+      .text(text)
+    btn.on('click', onClick)
+  }
+  
+  private drawPayoffMatrix(startY: number, colors: any) {
+    this.svg.append('text')
+      .attr('x', 20).attr('y', startY)
+      .attr('fill', colors.labelGrey)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 11).text('PAYOFF MATRIX')
+    
+    const cellSize = 80
+    const matrixStartX = 120
+    const matrixStartY = startY + 30
+    
+    // Get values from DOM
+    const getVal = (id: string) => document.getElementById(id)?.textContent || '0'
+    const aa = [getVal('aaPayoffH'), getVal('aaPayoffV')]
+    const ab = [getVal('abPayoffH'), getVal('abPayoffV')]
+    const ba = [getVal('baPayoffH'), getVal('baPayoffV')]
+    const bb = [getVal('bbPayoffH'), getVal('bbPayoffV')]
+    
+    const currentValues = {
+      aa: aa.join(','), ab: ab.join(','),
+      ba: ba.join(','), bb: bb.join(',')
+    }
+    
+    // Headers
+    this.svg.append('text')
+      .attr('x', matrixStartX + cellSize/2).attr('y', matrixStartY - 10)
+      .attr('fill', colors.text).attr('font-family', 'Consolas, monospace')
+      .attr('font-size', 12).attr('text-anchor', 'middle').text('Move A')
+    this.svg.append('text')
+      .attr('x', matrixStartX + cellSize + cellSize/2).attr('y', matrixStartY - 10)
+      .attr('fill', colors.text).attr('font-family', 'Consolas, monospace')
+      .attr('font-size', 12).attr('text-anchor', 'middle').text('Move B')
+    this.svg.append('text')
+      .attr('x', matrixStartX - 10).attr('y', matrixStartY + cellSize/2 + 5)
+      .attr('fill', colors.text).attr('font-family', 'Consolas, monospace')
+      .attr('font-size', 12).attr('text-anchor', 'end').text('Move A')
+    this.svg.append('text')
+      .attr('x', matrixStartX - 10).attr('y', matrixStartY + cellSize + cellSize/2 + 5)
+      .attr('fill', colors.text).attr('font-family', 'Consolas, monospace')
+      .attr('font-size', 12).attr('text-anchor', 'end').text('Move B')
+    
+    // Cells
+    const cells = [
+      {x: 0, y: 0, values: aa, key: 'aa'},
+      {x: 1, y: 0, values: ab, key: 'ab'},
+      {x: 0, y: 1, values: ba, key: 'ba'},
+      {x: 1, y: 1, values: bb, key: 'bb'}
+    ]
+    
+    cells.forEach(cell => {
+      const x = matrixStartX + cell.x * cellSize
+      const y = matrixStartY + cell.y * cellSize
+      const changed = this.lastPayoffValues[cell.key as keyof typeof this.lastPayoffValues] !== currentValues[cell.key as keyof typeof currentValues]
+      
+      const rect = this.svg.append('rect')
+        .attr('x', x).attr('y', y)
+        .attr('width', cellSize).attr('height', cellSize)
+        .attr('fill', changed ? 'rgba(255,230,100,0.4)' : 'rgba(0,0,0,0.3)')
+        .attr('stroke', 'rgba(255,255,255,0.4)')
+      
+      if (changed) {
+        rect.transition().duration(300).attr('fill', 'rgba(0,0,0,0.3)')
+      }
+      
+      this.svg.append('text')
+        .attr('x', x + cellSize/2).attr('y', y + cellSize/2 + 5)
+        .attr('fill', colors.text)
+        .attr('font-family', 'Consolas, monospace')
+        .attr('font-size', 16).attr('font-weight', 'bold')
+        .attr('text-anchor', 'middle')
+        .text(`${cell.values[0]}, ${cell.values[1]}`)
+    })
+    
+    this.lastPayoffValues = currentValues
+  }
+  
+  private drawTournamentProgress(startY: number, colors: any) {
+    if (typeof strats === 'undefined' || !strats.length || typeof rounds === 'undefined') return
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', startY)
+      .attr('fill', colors.labelGrey)
+      .attr('font-family', 'Consolas, monospace')
+      .attr('font-size', 11).text('TOURNAMENT PROGRESS')
+    
+    const progress = typeof currentRound !== 'undefined' ? currentRound : 0
+    this.svg.append('text')
+      .attr('x', 20).attr('y', startY + 25)
+      .attr('fill', colors.text)
+      .attr('font-family', 'Consolas, monospace')
+      .attr('font-size', 14)
+      .text(`Round ${progress} / ${rounds}`)
+    
+    const sorted = [...strats].sort((a, b) => (b.currentScore || 0) - (a.currentScore || 0))
+    sorted.slice(0, 3).forEach((strat, i) => {
+      this.svg.append('text')
+        .attr('x', 20).attr('y', startY + 50 + i * 18)
+        .attr('fill', colors.text)
+        .attr('font-family', 'Consolas, monospace')
+        .attr('font-size', 11)
+        .text(`${i+1}. ${strat.name}: ${strat.currentScore || 0}`)
+    })
+  }
+}
+
+
 class HalViz {
   private svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>
   private compSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
@@ -49,7 +351,7 @@ class HalViz {
   private matrixSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
   private phaseIndicatorSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
   private quantumSvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
-  private strategySvg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any> | null = null
+  private strategicModelingScreen: StrategicModelingScreen | null = null
   private payoffObserver: MutationObserver | null = null
   private lastPayoffValues = {aa: '', ab: '', ba: '', bb: ''}
   
@@ -81,38 +383,12 @@ class HalViz {
       this.worldData = data
     })
     
-    // Setup MutationObserver for payoff matrix changes
-    setTimeout(() => this.setupPayoffObserver(), 1000)
-    
     // Use requestAnimationFrame for smoother updates
     const animate = () => {
       this.update()
       requestAnimationFrame(animate)
     }
     requestAnimationFrame(animate)
-  }
-  
-  setupPayoffObserver() {
-    // Watch for changes in payoff cells to trigger flash animation
-    const cells = ['aaPayoffH', 'aaPayoffV', 'abPayoffH', 'abPayoffV', 
-                   'baPayoffH', 'baPayoffV', 'bbPayoffH', 'bbPayoffV']
-    
-    cells.forEach(id => {
-      const elem = document.getElementById(id)
-      if (elem && !this.payoffObserver) {
-        this.payoffObserver = new MutationObserver(() => {
-          // Trigger redraw when payoff values change
-          if (typeof yomi !== 'undefined' && yomi > 0) {
-            this.drawStrategicModeling()
-          }
-        })
-        this.payoffObserver.observe(elem, { 
-          childList: true, 
-          characterData: true, 
-          subtree: true 
-        })
-      }
-    })
   }
   
   createLayout() {
@@ -210,7 +486,10 @@ class HalViz {
     
     // Show strategic modeling if yomi exists
     if (typeof yomi !== 'undefined' && yomi > 0) {
-      this.drawStrategicModeling()
+      if (!this.strategicModelingScreen) {
+        this.strategicModelingScreen = new StrategicModelingScreen('#hal-dashboard')
+      }
+      this.strategicModelingScreen.draw()
     }
     
     // Always show phase indicator
@@ -965,252 +1244,6 @@ class HalViz {
       .attr('font-family', 'Consolas, "Fira Mono", monospace')
       .attr('font-size', 12)
       .text(`OPERATIONS: ${(operations || 0).toLocaleString()}`)
-  }
-  
-  drawStrategicModeling() {
-    // Create SVG if it doesn't exist
-    if (!this.strategySvg) {
-      this.strategySvg = d3.select('#hal-dashboard')
-        .append('svg')
-        .attr('width', 600)
-        .attr('height', 600)
-        .style('background', '#6B2424')
-        .style('margin-top', '10px')
-    }
-    
-    // Clear previous
-    this.strategySvg.selectAll('*').remove()
-    
-    // Title
-    this.strategySvg.append('text')
-      .attr('x', 20)
-      .attr('y', 30)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
-      .attr('font-size', 18)
-      .attr('font-weight', 'bold')
-      .attr('letter-spacing', '2px')
-      .text('STRATEGIC MODELING')
-    
-    // Yomi display
-    this.strategySvg.append('text')
-      .attr('x', 450)
-      .attr('y', 30)
-      .attr('fill', this.colors.text)
-      .attr('font-family', 'Consolas, "Fira Mono", monospace')
-      .attr('font-size', 14)
-      .text(`YOMI: ${(yomi || 0).toLocaleString()}`)
-    
-    // Strategy picker dropdown
-    const strategies = ['RANDOM', 'A100', 'B100', 'GREEDY', 'GENEROUS', 'MINIMAX', 'TIT FOR TAT', 'BEAT LAST']
-    const pickerY = 60
-    
-    this.strategySvg.append('text')
-      .attr('x', 20)
-      .attr('y', pickerY)
-      .attr('fill', this.colors.labelGrey)
-      .attr('font-family', 'Consolas, "Fira Mono", monospace')
-      .attr('font-size', 12)
-      .text('SELECT STRATEGY:')
-    
-    // Strategy buttons in a row
-    strategies.forEach((strat, i) => {
-      const x = 20 + (i % 4) * 140
-      const y = pickerY + 20 + Math.floor(i / 4) * 40
-      
-      const btn = this.strategySvg!.append('g')
-        .style('cursor', 'pointer')
-      
-      btn.append('rect')
-        .attr('x', x)
-        .attr('y', y)
-        .attr('width', 130)
-        .attr('height', 30)
-        .attr('fill', 'rgba(255,255,255,0.1)')
-        .attr('stroke', 'rgba(255,255,255,0.3)')
-        .attr('rx', 3)
-      
-      btn.append('text')
-        .attr('x', x + 65)
-        .attr('y', y + 19)
-        .attr('fill', this.colors.text)
-        .attr('font-family', 'Consolas, "Fira Mono", monospace')
-        .attr('font-size', 10)
-        .attr('text-anchor', 'middle')
-        .text(strat)
-      
-      btn.on('mouseover', function() {
-        d3.select(this).select('rect').attr('fill', 'rgba(255,255,255,0.2)')
-      })
-      .on('mouseout', function() {
-        d3.select(this).select('rect').attr('fill', 'rgba(255,255,255,0.1)')
-      })
-      .on('click', () => {
-        const picker = document.getElementById('stratPicker') as HTMLSelectElement
-        if (picker) {
-          for (let j = 0; j < picker.options.length; j++) {
-            if (picker.options[j].text === strat) {
-              picker.selectedIndex = j
-              break
-            }
-          }
-        }
-      })
-    })
-    
-    // Run/New buttons
-    const btnY = pickerY + 100
-    const runBtn = this.strategySvg.append('g').style('cursor', 'pointer')
-    runBtn.append('rect')
-      .attr('x', 20).attr('y', btnY).attr('width', 150).attr('height', 35)
-      .attr('fill', 'rgba(255,230,100,0.2)').attr('stroke', '#ffe66d').attr('rx', 4)
-    runBtn.append('text')
-      .attr('x', 95).attr('y', btnY + 22)
-      .attr('fill', '#ffe66d').attr('font-family', 'Futura, sans-serif')
-      .attr('font-size', 14).attr('font-weight', 'bold').attr('text-anchor', 'middle')
-      .text('RUN TOURNAMENT')
-    runBtn.on('click', () => {
-      const btn = document.getElementById('btnRunTournament') as HTMLButtonElement
-      if (btn && !btn.disabled) {
-        btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
-      }
-    })
-    
-    const newBtn = this.strategySvg.append('g').style('cursor', 'pointer')
-    newBtn.append('rect')
-      .attr('x', 190).attr('y', btnY).attr('width', 150).attr('height', 35)
-      .attr('fill', 'rgba(100,200,255,0.2)').attr('stroke', '#4ecdc4').attr('rx', 4)
-    newBtn.append('text')
-      .attr('x', 265).attr('y', btnY + 22)
-      .attr('fill', '#4ecdc4').attr('font-family', 'Futura, sans-serif')
-      .attr('font-size', 14).attr('font-weight', 'bold').attr('text-anchor', 'middle')
-      .text('NEW TOURNAMENT')
-    newBtn.on('click', () => {
-      const btn = document.getElementById('btnNewTournament') as HTMLButtonElement
-      if (btn) {
-        btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
-      }
-    })
-    
-    // Payoff Matrix
-    const matrixY = btnY + 60
-    this.strategySvg.append('text')
-      .attr('x', 20).attr('y', matrixY)
-      .attr('fill', this.colors.labelGrey)
-      .attr('font-family', 'Consolas, "Fira Mono", monospace')
-      .attr('font-size', 11).text('PAYOFF MATRIX')
-    
-    const cellSize = 80
-    const matrixStartX = 120
-    const matrixStartY = matrixY + 30
-    
-    // Get payoff values from DOM
-    const getPayoffValue = (id: string) => {
-      const elem = document.getElementById(id)
-      return elem ? elem.textContent || '0' : '0'
-    }
-    
-    const aa = [getPayoffValue('aaPayoffH'), getPayoffValue('aaPayoffV')]
-    const ab = [getPayoffValue('abPayoffH'), getPayoffValue('abPayoffV')]
-    const ba = [getPayoffValue('baPayoffH'), getPayoffValue('baPayoffV')]
-    const bb = [getPayoffValue('bbPayoffH'), getPayoffValue('bbPayoffV')]
-    
-    // Check if values changed (for flashing)
-    const currentValues = {
-      aa: aa.join(','),
-      ab: ab.join(','),
-      ba: ba.join(','),
-      bb: bb.join(',')
-    }
-    
-    // Column headers
-    this.strategySvg.append('text')
-      .attr('x', matrixStartX + cellSize/2).attr('y', matrixStartY - 10)
-      .attr('fill', this.colors.text).attr('font-family', 'Consolas, monospace')
-      .attr('font-size', 12).attr('text-anchor', 'middle').text('Move A')
-    this.strategySvg.append('text')
-      .attr('x', matrixStartX + cellSize + cellSize/2).attr('y', matrixStartY - 10)
-      .attr('fill', this.colors.text).attr('font-family', 'Consolas, monospace')
-      .attr('font-size', 12).attr('text-anchor', 'middle').text('Move B')
-    
-    // Row headers
-    this.strategySvg.append('text')
-      .attr('x', matrixStartX - 10).attr('y', matrixStartY + cellSize/2 + 5)
-      .attr('fill', this.colors.text).attr('font-family', 'Consolas, monospace')
-      .attr('font-size', 12).attr('text-anchor', 'end').text('Move A')
-    this.strategySvg.append('text')
-      .attr('x', matrixStartX - 10).attr('y', matrixStartY + cellSize + cellSize/2 + 5)
-      .attr('fill', this.colors.text).attr('font-family', 'Consolas, monospace')
-      .attr('font-size', 12).attr('text-anchor', 'end').text('Move B')
-    
-    // Draw cells with flashing
-    const cells = [
-      {x: 0, y: 0, values: aa, label: 'AA', key: 'aa'},
-      {x: 1, y: 0, values: ab, label: 'AB', key: 'ab'},
-      {x: 0, y: 1, values: ba, label: 'BA', key: 'ba'},
-      {x: 1, y: 1, values: bb, label: 'BB', key: 'bb'}
-    ]
-    
-    cells.forEach(cell => {
-      const x = matrixStartX + cell.x * cellSize
-      const y = matrixStartY + cell.y * cellSize
-      
-      // Check if this cell changed
-      const changed = this.lastPayoffValues[cell.key as keyof typeof this.lastPayoffValues] !== currentValues[cell.key as keyof typeof currentValues]
-      
-      const rect = this.strategySvg!.append('rect')
-        .attr('x', x).attr('y', y)
-        .attr('width', cellSize).attr('height', cellSize)
-        .attr('fill', changed ? 'rgba(255,230,100,0.4)' : 'rgba(0,0,0,0.3)')
-        .attr('stroke', 'rgba(255,255,255,0.4)')
-        .attr('stroke-width', 1)
-      
-      // Flash animation
-      if (changed) {
-        rect.transition().duration(300)
-          .attr('fill', 'rgba(0,0,0,0.3)')
-      }
-      
-      this.strategySvg!.append('text')
-        .attr('x', x + cellSize/2).attr('y', y + cellSize/2 + 5)
-        .attr('fill', this.colors.text)
-        .attr('font-family', 'Consolas, monospace')
-        .attr('font-size', 16).attr('font-weight', 'bold')
-        .attr('text-anchor', 'middle')
-        .text(`${cell.values[0]}, ${cell.values[1]}`)
-    })
-    
-    // Update last values
-    this.lastPayoffValues = currentValues
-    
-    // Tournament progress
-    const progressY = matrixStartY + cellSize * 2 + 40
-    if (typeof strats !== 'undefined' && strats.length > 0 && typeof rounds !== 'undefined') {
-      this.strategySvg.append('text')
-        .attr('x', 20).attr('y', progressY)
-        .attr('fill', this.colors.labelGrey)
-        .attr('font-family', 'Consolas, monospace')
-        .attr('font-size', 11).text('TOURNAMENT PROGRESS')
-      
-      const progress = typeof currentRound !== 'undefined' ? currentRound : 0
-      this.strategySvg.append('text')
-        .attr('x', 20).attr('y', progressY + 25)
-        .attr('fill', this.colors.text)
-        .attr('font-family', 'Consolas, monospace')
-        .attr('font-size', 14)
-        .text(`Round ${progress} / ${rounds}`)
-      
-      // Top scores
-      const sorted = [...strats].sort((a, b) => (b.currentScore || 0) - (a.currentScore || 0))
-      sorted.slice(0, 3).forEach((strat, i) => {
-        this.strategySvg!.append('text')
-          .attr('x', 20).attr('y', progressY + 50 + i * 18)
-          .attr('fill', this.colors.text)
-          .attr('font-family', 'Consolas, monospace')
-          .attr('font-size', 11)
-          .text(`${i+1}. ${strat.name}: ${strat.currentScore || 0}`)
-      })
-    }
   }
 }
 
