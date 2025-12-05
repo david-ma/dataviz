@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "baseUrl": "src",
-    // "outDir": "public",
+    "outDir": "dist",
     "declaration": true,
     "declarationMap": false,
     "skipDefaultLibCheck": true,
