@@ -8,6 +8,7 @@ import { StrategicModelingScreen } from './strategic-modeling-screen'
 import { MarketDynamicsScreen } from './market-dynamics-screen'
 import { StockMarketScreen } from './stock-market-screen'
 import { DroneOperationsScreen } from './drone-operations-screen'
+import { DroneGlobeScreen } from './drone-globe-screen'
 import { HypnoDronesScreen } from './hypnodrones-screen'
 import './hal-screen-types'
 
@@ -84,6 +85,7 @@ class HalViz {
   
   private strategicModelingScreen: StrategicModelingScreen | null = null
   private droneOperationsScreen: DroneOperationsScreen | null = null
+  private droneGlobeScreen: DroneGlobeScreen | null = null
   private hypnoDronesScreen: HypnoDronesScreen | null = null
   private lastPhase: string | null = null
   
@@ -250,6 +252,7 @@ class HalViz {
       (typeof wireDroneFlag !== 'undefined' && wireDroneFlag === 1)
     ) {
       this.drawDroneOperations()
+      this.drawDroneGlobe()
     }
     
     // Show strategic modeling if yomi exists OR dev mode
@@ -633,7 +636,7 @@ class HalViz {
     // Only update if phase changed
     if (this.lastPhase !== phaseText) {
       this.lastPhase = phaseText
-      this.phaseIndicatorScreen.draw(phaseText)
+    this.phaseIndicatorScreen.draw(phaseText)
     }
   }
   
@@ -688,10 +691,29 @@ class HalViz {
       wireDroneCost: typeof wireDroneCost !== 'undefined' ? wireDroneCost : 0,
       availableMatter: typeof availableMatter !== 'undefined' ? availableMatter : 0,
       unusedClips: typeof unusedClips !== 'undefined' ? unusedClips : 0,
-      droneRatio: typeof droneRatio !== 'undefined' ? droneRatio : 0
+      droneRatio: typeof droneRatio !== 'undefined' ? droneRatio : 0,
+      factoryCount: Math.max(1, Math.floor((harvesterLevel || 0 + wireDroneLevel || 0) / 2) || 1)
     }
 
     this.droneOperationsScreen.update(data)
+  }
+
+  drawDroneGlobe() {
+    if (!this.droneGlobeScreen) {
+      this.droneGlobeScreen = new DroneGlobeScreen({
+        container: '#hal-dashboard',
+        colors: this.colors
+      })
+      console.log('[HAL-VIZ] Drone globe screen created')
+    }
+
+    const data = {
+      harvesterLevel: typeof harvesterLevel !== 'undefined' ? harvesterLevel : 0,
+      wireDroneLevel: typeof wireDroneLevel !== 'undefined' ? wireDroneLevel : 0,
+      factoryCount: Math.max(1, Math.floor((harvesterLevel || 0 + wireDroneLevel || 0) / 2) || 1)
+    }
+
+    this.droneGlobeScreen.update(data)
   }
 
   drawHypnoDrones() {

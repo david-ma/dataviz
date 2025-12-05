@@ -52,9 +52,9 @@ export class ProductionMonitorScreen extends HalScreen {
     this.drawGrid()
     this.drawTitle()
     
-    // Graphs
-    this.drawGraph(this.clipHistory, 140, 80, this.colors.primary, 'TOTAL CLIPS', 70)
-    this.drawGraph(this.fundsHistory, 200, 140, this.colors.secondary, 'FUNDS', 130)
+    // Graphs (use softer HAL palette – no neon)
+    this.drawGraph(this.clipHistory, 140, 80, '#ffffff', 'TOTAL CLIPS', 70)
+    this.drawGraph(this.fundsHistory, 200, 140, '#cfe8ff', 'FUNDS', 130)
     this.drawGraph(this.wireHistory, 260, 200, '#74b9ff', 'WIRE', 190)
     this.drawGraph(this.inventoryHistory, 320, 260, '#a29bfe', 'INVENTORY', 250)
     

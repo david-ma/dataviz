@@ -1,17 +1,11 @@
 import { HalScreen, HalColors } from './hal-screen-base';
 import './hal-screen-types';
-type DroneMetrics = {
+type DroneGlobeData = {
     harvesterLevel: number;
     wireDroneLevel: number;
-    harvesterCost: number;
-    wireDroneCost: number;
-    availableMatter: number;
-    unusedClips: number;
-    droneRatio: number;
     factoryCount?: number;
 };
-export declare class DroneOperationsScreen extends HalScreen {
-    private initialized;
+export declare class DroneGlobeScreen extends HalScreen {
     private projection;
     private globeGroup;
     private agents;
@@ -21,18 +15,15 @@ export declare class DroneOperationsScreen extends HalScreen {
     private globeRadius;
     private centerX;
     private centerY;
-    private timer;
     private lastUpdate;
+    private timer;
     constructor(opts: {
         container: string;
         colors: HalColors;
     });
-    update(data: DroneMetrics): void;
-    private initializeLayout;
-    private updateMetrics;
-    private updateBars;
-    private updateGlobeAgents;
-    private tickAgents;
-    private drawBar;
+    update(data: DroneGlobeData): void;
+    private initializeGlobe;
+    private updateAgents;
+    private tick;
 }
 export {};
