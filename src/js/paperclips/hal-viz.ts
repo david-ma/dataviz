@@ -1,7 +1,56 @@
 import { d3 } from '../chart'
 
-const HAL_VIZ_VERSION = 'v1.0.6-class-based-20251205-1406'
+const HAL_VIZ_VERSION = 'v1.0.13-all-screens-classes-20251205-1430'
 console.log(`[HAL-VIZ] Version: ${HAL_VIZ_VERSION}`)
+
+// Global screen manager
+class HalScreenManager {
+  private static instance: HalScreenManager
+  private screens: Map<string, HalScreen> = new Map()
+  
+  static getInstance(): HalScreenManager {
+    if (!HalScreenManager.instance) {
+      HalScreenManager.instance = new HalScreenManager()
+    }
+    return HalScreenManager.instance
+  }
+  
+  register(screen: HalScreen) {
+    this.screens.set(screen.getId(), screen)
+  }
+  
+  unregister(id: string) {
+    this.screens.delete(id)
+  }
+  
+  getScreen(id: string): HalScreen | undefined {
+    return this.screens.get(id)
+  }
+  
+  getAllScreens(): HalScreen[] {
+    return Array.from(this.screens.values())
+  }
+  
+  reportCard() {
+    console.log('\n=== HAL SCREEN REPORT CARD ===')
+    console.log(`Total Screens: ${this.screens.size}`)
+    console.log('\nScreen Status:')
+    this.screens.forEach((screen, id) => {
+      const status = screen.isVisible() ? '✓ ACTIVE' : '✗ HIDDEN'
+      console.log(`  ${status} | ${id}`)
+    })
+    console.log('=============================\n')
+  }
+}
+
+// Make it globally accessible
+declare global {
+  interface Window {
+    halScreens: HalScreenManager
+  }
+}
+
+window.halScreens = HalScreenManager.getInstance()
 
 // Game state globals
 declare const clipRate: number
@@ -49,9 +98,17 @@ abstract class HalScreen {
       .attr('height', height)
       .style('background', background)
       .style('margin-top', '10px')
+    
+    // Register with global manager
+    console.log(`[HalScreen] Registering screen: ${id}`)
+    HalScreenManager.getInstance().register(this)
   }
   
   abstract draw(): void
+  
+  getId(): string {
+    return this.id
+  }
   
   clear() {
     this.svg.selectAll('*').remove()
@@ -72,7 +129,365 @@ abstract class HalScreen {
   }
   
   destroy() {
+    HalScreenManager.getInstance().unregister(this.id)
     this.svg.remove()
+  }
+}
+
+// Production Monitor Screen
+class ProductionMonitorScreen extends HalScreen {
+  private clipHistory: number[] = []
+  private fundsHistory: number[] = []
+  private wireHistory: number[] = []
+  private inventoryHistory: number[] = []
+  private maxHistory = 500
+  private maxHistoryShort = 100
+  private colors: any
+  
+  constructor(container: string, colors: any) {
+    super(container, 'hal-production-monitor', 800, 600, colors.background)
+    this.colors = colors
+  }
+  
+  update() {
+    if (typeof clipRate === 'undefined') return
+    
+    this.clipHistory.push(clips || 0)
+    this.fundsHistory.push(funds || 0)
+    this.wireHistory.push(wire || 0)
+    this.inventoryHistory.push(unsoldClips || 0)
+    
+    if (this.clipHistory.length > this.maxHistory) {
+      this.clipHistory.shift()
+      this.fundsHistory.shift()
+    }
+    
+    if (this.wireHistory.length > this.maxHistoryShort) {
+      this.wireHistory.shift()
+    }
+    
+    if (this.inventoryHistory.length > this.maxHistoryShort) {
+      this.inventoryHistory.shift()
+    }
+    
+    this.draw()
+  }
+  
+  draw() {
+    this.clear()
+    
+    // Grid and title
+    this.drawGrid()
+    this.drawTitle()
+    
+    // Graphs
+    this.drawGraph(this.clipHistory, 140, 80, this.colors.primary, 'TOTAL CLIPS', 70)
+    this.drawGraph(this.fundsHistory, 200, 140, this.colors.secondary, 'FUNDS', 130)
+    this.drawGraph(this.wireHistory, 260, 200, '#74b9ff', 'WIRE', 190)
+    this.drawGraph(this.inventoryHistory, 320, 260, '#a29bfe', 'INVENTORY', 250)
+    
+    // Stats
+    this.drawStats()
+  }
+  
+  private drawGrid() {
+    for (let i = 0; i <= 10; i++) {
+      this.svg.append('line')
+        .attr('x1', 20 + i * 76).attr('x2', 20 + i * 76)
+        .attr('y1', 60).attr('y2', 380)
+        .attr('stroke', this.colors.grid).attr('stroke-width', 1)
+    }
+    for (let i = 0; i < 6; i++) {
+      this.svg.append('line')
+        .attr('x1', 20).attr('x2', 780)
+        .attr('y1', 80 + i * 60).attr('y2', 80 + i * 60)
+        .attr('stroke', this.colors.grid).attr('stroke-width', 1)
+    }
+  }
+  
+  private drawTitle() {
+    this.svg.append('text')
+      .attr('x', 20).attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 18).attr('font-weight', 'bold')
+      .attr('letter-spacing', '2px')
+      .text('PRODUCTION MONITOR')
+  }
+  
+  private drawGraph(history: number[], yMax: number, yMin: number, color: string, label: string, labelY: number) {
+    if (history.length < 2) return
+    
+    const xScale = d3.scaleLinear().domain([0, history.length]).range([20, 780])
+    const yScale = d3.scaleLinear().domain([0, d3.max(history) || 1]).range([yMax, yMin])
+    const line = d3.line<number>()
+      .x((d, i) => xScale(i))
+      .y(d => yScale(d))
+      .curve(d3.curveCardinal)
+    
+    this.svg.append('path')
+      .datum(history)
+      .attr('fill', 'none')
+      .attr('stroke', color)
+      .attr('stroke-width', 3)
+      .attr('d', line)
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', labelY)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 11).attr('font-weight', 'bold')
+      .attr('letter-spacing', '1px')
+      .text(label)
+  }
+  
+  private drawStats() {
+    const stats = [
+      `CLIPS: ${(clips || 0).toLocaleString()}`,
+      `RATE: ${(clipRate || 0).toFixed(1)}/sec`,
+      `FUNDS: $${(funds || 0).toFixed(2)}`,
+      `WIRE: ${(wire || 0).toLocaleString()} inches`,
+      `INVENTORY: ${(unsoldClips || 0).toLocaleString()}`,
+      `DEMAND: ${(demand || 0).toFixed(1)}%`,
+      `PRICE: $${(margin || 0).toFixed(2)}`
+    ]
+    
+    stats.forEach((stat, i) => {
+      this.svg.append('text')
+        .attr('x', 20).attr('y', 360 + i * 20)
+        .attr('fill', this.colors.text)
+        .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+        .attr('font-size', 12).attr('font-weight', '500')
+        .text(stat)
+    })
+  }
+}
+
+// Phase Indicator Screen
+class PhaseIndicatorScreen extends HalScreen {
+  private colors: any
+  
+  constructor(container: string, colors: any) {
+    super(container, 'hal-phase-indicator', 200, 200, colors.navy)
+    this.colors = colors
+    this.svg.style('margin-bottom', '10px').style('margin-top', '0')
+  }
+  
+  draw() {
+    this.clear()
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', 25)
+      .attr('fill', this.colors.labelGrey)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 11).attr('opacity', 0.65)
+      .text('PHASE: 01')
+    
+    let phaseText = 'BIZ'
+    if (typeof trust !== 'undefined' && trust > 0) {
+      phaseText = 'MFG'
+    }
+    
+    this.svg.append('text')
+      .attr('x', 100).attr('y', 100)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Inter, "Segoe UI", sans-serif')
+      .attr('font-size', 64).attr('font-weight', 'bold')
+      .attr('letter-spacing', '8px')
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle')
+      .text(phaseText)
+  }
+}
+
+// Numeric Matrix Screen
+class NumericMatrixScreen extends HalScreen {
+  private colors: any
+  
+  constructor(container: string, colors: any) {
+    super(container, 'hal-numeric-matrix', 400, 300, colors.matrixBlue)
+    this.colors = colors
+  }
+  
+  draw() {
+    this.clear()
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', 25)
+      .attr('fill', this.colors.labelGrey)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 12).attr('opacity', 0.65)
+      .attr('letter-spacing', '1px')
+      .text('COMPUTATIONAL RESOURCES')
+    
+    const data = [
+      ['TRUST', trust || 0],
+      ['PROCESSORS', processors || 0],
+      ['MEMORY', memory || 0],
+      ['OPERATIONS', operations || 0],
+      ['CREATIVITY', creativity || 0]
+    ]
+    
+    const startY = 60
+    const lineHeight = 35
+    
+    data.forEach((row, i) => {
+      const y = startY + i * lineHeight
+      
+      this.svg.append('text')
+        .attr('x', 30).attr('y', y)
+        .attr('fill', this.colors.text)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 16).attr('opacity', 0.92)
+        .text(row[0] as string)
+      
+      this.svg.append('text')
+        .attr('x', 250).attr('y', y)
+        .attr('fill', this.colors.text)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 16).attr('opacity', 0.92)
+        .text(typeof row[1] === 'number' ? row[1].toLocaleString() : row[1])
+    })
+  }
+}
+
+// Computational Telemetry Screen (waveforms)
+class ComputationalTelemetryScreen extends HalScreen {
+  private opsHistory: number[] = []
+  private creatHistory: number[] = []
+  private maxHistory = 100
+  private colors: any
+  
+  constructor(container: string, colors: any) {
+    super(container, 'hal-computational-telemetry', 800, 300, colors.background)
+    this.colors = colors
+  }
+  
+  update() {
+    if (typeof operations !== 'undefined') {
+      this.opsHistory.push(operations)
+      if (this.opsHistory.length > this.maxHistory) {
+        this.opsHistory.shift()
+      }
+    }
+    
+    if (typeof creativity !== 'undefined' && creativity > 0) {
+      this.creatHistory.push(creativity)
+      if (this.creatHistory.length > this.maxHistory) {
+        this.creatHistory.shift()
+      }
+    }
+    
+    this.draw()
+  }
+  
+  draw() {
+    this.clear()
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 18).attr('font-weight', 'bold')
+      .attr('letter-spacing', '2px')
+      .text('COMPUTATIONAL TELEMETRY')
+    
+    // Operations waveform
+    if (this.opsHistory.length > 1) {
+      this.drawWaveform(this.opsHistory, 60, 140, this.colors.secondary, 'OPERATIONS')
+    }
+    
+    // Creativity waveform
+    if (this.creatHistory.length > 1) {
+      this.drawWaveform(this.creatHistory, 160, 240, this.colors.tertiary, 'CREATIVITY')
+    }
+  }
+  
+  private drawWaveform(history: number[], yTop: number, yBottom: number, color: string, label: string) {
+    const xScale = d3.scaleLinear().domain([0, history.length]).range([20, 780])
+    const yScale = d3.scaleLinear().domain([0, d3.max(history) || 1]).range([yBottom, yTop])
+    const line = d3.line<number>()
+      .x((d, i) => xScale(i))
+      .y(d => yScale(d))
+      .curve(d3.curveBasis)
+    
+    this.svg.append('path')
+      .datum(history)
+      .attr('fill', 'none')
+      .attr('stroke', color)
+      .attr('stroke-width', 4)
+      .attr('opacity', 0.3)
+      .attr('d', line)
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', yTop - 10)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 11)
+      .text(label)
+  }
+}
+
+// Quantum Computing Screen
+class QuantumComputingScreen extends HalScreen {
+  private colors: any
+  
+  constructor(container: string, colors: any) {
+    super(container, 'hal-quantum-computing', 400, 300, '#54336F')
+    this.colors = colors
+  }
+  
+  draw() {
+    this.clear()
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', 30)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
+      .attr('font-size', 18).attr('font-weight', 'bold')
+      .attr('letter-spacing', '2px')
+      .text('QUANTUM COMPUTING')
+    
+    // Quantum noise waveform
+    const margin = {left: 34, right: 26, top: 60, bottom: 44}
+    const w = 400 - margin.left - margin.right
+    const h = 300 - margin.top - margin.bottom
+    
+    const g = this.svg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`)
+    
+    g.append('line')
+      .attr('x1', 0).attr('x2', w)
+      .attr('y1', h/2).attr('y2', h/2)
+      .attr('stroke', 'rgba(255,255,255,0.06)')
+    
+    const points: [number, number][] = d3.range(0, 100).map(i => {
+      const x = i / 99
+      const noise = Math.sin(i * 0.5) * 0.3 + Math.sin(i * 0.17) * 0.2
+      const y = 0.5 + noise * (operations / 10000)
+      return [x, Math.max(0, Math.min(1, y))] as [number, number]
+    })
+    
+    const xScale = d3.scaleLinear().domain([0, 1]).range([0, w])
+    const yScale = d3.scaleLinear().domain([0, 1]).range([h, 0])
+    const line = d3.line<[number, number]>()
+      .x(d => xScale(d[0]))
+      .y(d => yScale(d[1]))
+      .curve(d3.curveBasis)
+    
+    g.append('path')
+      .datum(points)
+      .attr('d', line)
+      .attr('fill', 'none')
+      .attr('stroke', 'rgba(255,255,255,0.92)')
+      .attr('stroke-width', 1.2)
+    
+    this.svg.append('text')
+      .attr('x', 20).attr('y', 270)
+      .attr('fill', this.colors.text)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 12)
+      .text(`OPERATIONS: ${(operations || 0).toLocaleString()}`)
   }
 }
 
@@ -342,7 +757,8 @@ class HalViz {
   private demandHistory: number[] = []
   private opsHistory: number[] = []
   private creatHistory: number[] = []
-  private maxHistory = 100
+  private maxHistory = 500  // Show longer timeline (50 seconds at 10fps)
+  private maxHistoryShort = 100  // Shorter timeline for wire/inventory
   private worldData: any = null
   private lastMarketingLvl = 0
   private flashingCountries: number[] = []
@@ -372,6 +788,7 @@ class HalViz {
   constructor() {
     this.svg = d3.select('#hal-dashboard')
       .append('svg')
+      .attr('id', 'hal-production-monitor')
       .attr('width', 800)
       .attr('height', 600)
       .style('background', this.colors.background)
@@ -429,7 +846,7 @@ class HalViz {
   update() {
     if (typeof clipRate === 'undefined') return
     
-    this.clipHistory.push(clipRate)
+    this.clipHistory.push(clips || 0)  // Track total clips instead of rate
     this.fundsHistory.push(funds || 0)
     this.wireHistory.push(wire || 0)
     this.inventoryHistory.push(unsoldClips || 0)
@@ -464,7 +881,13 @@ class HalViz {
     if (this.clipHistory.length > this.maxHistory) {
       this.clipHistory.shift()
       this.fundsHistory.shift()
+    }
+    
+    if (this.wireHistory.length > this.maxHistoryShort) {
       this.wireHistory.shift()
+    }
+    
+    if (this.inventoryHistory.length > this.maxHistoryShort) {
       this.inventoryHistory.shift()
     }
     
@@ -548,7 +971,7 @@ class HalViz {
       .attr('font-size', 11)
       .attr('font-weight', 'bold')
       .attr('letter-spacing', '1px')
-      .text('CLIPS/SEC')
+      .text('TOTAL CLIPS')
   }
   
   drawFundsGraph() {
@@ -667,6 +1090,7 @@ class HalViz {
     if (!this.compSvg) {
       this.compSvg = d3.select('#hal-dashboard')
         .append('svg')
+        .attr('id', 'hal-computational-telemetry')
         .attr('width', 800)
         .attr('height', 300)
         .style('background', this.colors.background)
@@ -793,6 +1217,7 @@ class HalViz {
     if (!this.phaseSvg) {
       this.phaseSvg = d3.select('#hal-dashboard')
         .append('svg')
+        .attr('id', 'hal-market-dynamics')
         .attr('width', 800)
         .attr('height', 280)
         .style('background', this.colors.background)
@@ -958,6 +1383,7 @@ class HalViz {
     if (!this.marketSvg) {
       this.marketSvg = d3.select('#hal-dashboard')
         .append('svg')
+        .attr('id', 'hal-market-penetration')
         .attr('width', 800)
         .attr('height', 400)
         .style('background', this.colors.background)
@@ -1071,6 +1497,7 @@ class HalViz {
     if (!this.matrixSvg) {
       this.matrixSvg = d3.select('#hal-dashboard')
         .append('svg')
+        .attr('id', 'hal-numeric-matrix')
         .attr('width', 400)
         .attr('height', 300)
         .style('background', this.colors.matrixBlue)
@@ -1133,6 +1560,7 @@ class HalViz {
     if (!this.phaseIndicatorSvg) {
       this.phaseIndicatorSvg = d3.select('#hal-dashboard')
         .insert('svg', ':first-child')
+        .attr('id', 'hal-phase-indicator')
         .attr('width', 200)
         .attr('height', 200)
         .style('background', this.colors.navy)
@@ -1177,6 +1605,7 @@ class HalViz {
     if (!this.quantumSvg) {
       this.quantumSvg = d3.select('#hal-dashboard')
         .append('svg')
+        .attr('id', 'hal-quantum-computing')
         .attr('width', 400)
         .attr('height', 300)
         .style('background', '#54336F') // Purple from 9-tiles waveform
@@ -1248,3 +1677,9 @@ class HalViz {
 }
 
 new HalViz()
+
+// Show initial report card after a delay to let screens initialize
+setTimeout(() => {
+  window.halScreens.reportCard()
+  console.log('[HAL-VIZ] Type window.halScreens.reportCard() to see screen status anytime')
+}, 2000)
