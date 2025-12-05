@@ -10,6 +10,7 @@ export declare class DroneGlobeScreen extends HalScreen {
     private globeGroup;
     private landGroup;
     private statesGroup;
+    private graticulePath;
     private agents;
     private factories;
     private nextAgentId;
@@ -21,6 +22,7 @@ export declare class DroneGlobeScreen extends HalScreen {
     private landData;
     private usaData;
     private mapLoading;
+    private spinSpeed;
     constructor(opts: {
         container: string;
         colors: HalColors;
@@ -31,5 +33,7 @@ export declare class DroneGlobeScreen extends HalScreen {
     private renderMap;
     private updateAgents;
     private tick;
+    private updateAgentPositions;
+    private updateFactoryPositions;
 }
 export {};

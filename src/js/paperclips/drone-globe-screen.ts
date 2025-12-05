@@ -22,6 +22,7 @@ export class DroneGlobeScreen extends HalScreen {
   private globeGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null = null
   private landGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null = null
   private statesGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null = null
+  private graticulePath: d3.Selection<SVGPathElement, unknown, HTMLElement, any> | null = null
   private agents: DroneAgent[] = []
   private factories: { id: number; lon: number; lat: number }[] = []
   private nextAgentId = 0
@@ -33,6 +34,7 @@ export class DroneGlobeScreen extends HalScreen {
   private landData: any = null
   private usaData: any = null
   private mapLoading = false
+  private spinSpeed = 10  // degrees per second
 
   constructor(opts: { container: string; colors: HalColors }) {
     super({
@@ -76,8 +78,9 @@ export class DroneGlobeScreen extends HalScreen {
       .attr('stroke', 'rgba(255,255,255,0.12)')
       .attr('stroke-width', 1)
 
-    this.globeGroup.append('path')
+    this.graticulePath = this.globeGroup.append('path')
       .datum(graticule())
+      .attr('id', 'globe-graticule')
       .attr('fill', 'none')
       .attr('stroke', 'rgba(255,255,255,0.12)')
       .attr('stroke-width', 0.9)
@@ -95,7 +98,25 @@ export class DroneGlobeScreen extends HalScreen {
     this.globeGroup.append('g').attr('id', 'globe-agents')
     this.globeGroup.append('g').attr('id', 'globe-factories')
 
+    // Spin + animate
     this.timer = d3.timer(() => this.tick())
+
+    // Drag controls (no wheel zoom)
+    const sensitivity = 75
+    const drag = d3.drag<SVGSVGElement, unknown>().on('drag', (event) => {
+      if (!this.projection) return
+      const rotate = this.projection.rotate()
+      const k = sensitivity / this.projection.scale()
+      this.projection.rotate([
+        rotate[0] + event.dx * k,
+        rotate[1] - event.dy * k
+      ])
+      this.renderMap()
+      this.updateAgentPositions()
+      this.updateFactoryPositions()
+    })
+
+    this.svg.call(drag as any)
   }
 
   private ensureMapLoaded() {
@@ -121,6 +142,10 @@ export class DroneGlobeScreen extends HalScreen {
   private renderMap() {
     if (!this.projection || !this.globeGroup || !this.landData) return
     const path = d3.geoPath(this.projection)
+
+    if (this.graticulePath) {
+      this.graticulePath.attr('d', path)
+    }
 
     if (this.landGroup) {
       const landSel = this.landGroup.selectAll<SVGPathElement, any>('path.land').data(this.landData.features || [])
@@ -154,8 +179,8 @@ export class DroneGlobeScreen extends HalScreen {
   private updateAgents(data: DroneGlobeData) {
     if (!this.projection || !this.globeGroup) return
 
-    const desiredHarvesters = Math.min(80, Math.max(3, data.harvesterLevel))
-    const desiredWire = Math.min(80, Math.max(3, data.wireDroneLevel))
+    const desiredHarvesters = Math.min(50, Math.max(3, data.harvesterLevel))
+    const desiredWire = Math.min(50, Math.max(3, data.wireDroneLevel))
     const desiredFactories = Math.max(1, data.factoryCount || Math.floor((data.harvesterLevel + data.wireDroneLevel) / 2) || 1)
 
     const syncAgents = (count: number, type: 'harvester' | 'wire') => {
@@ -238,6 +263,13 @@ export class DroneGlobeScreen extends HalScreen {
     const deltaSec = (now - this.lastUpdate) / 1000
     this.lastUpdate = now
 
+    // Spin globe
+    const rotate = this.projection.rotate()
+    const spinDelta = this.spinSpeed * deltaSec
+    this.projection.rotate([rotate[0] + spinDelta, rotate[1], rotate[2]])
+    this.renderMap()
+    this.updateFactoryPositions()
+
     // Move agents steadily along arcs (no per-tick random jitter)
     this.agents.forEach(agent => {
       const speedFactor = agent.type === 'harvester' ? 0.45 : 0.6
@@ -248,7 +280,25 @@ export class DroneGlobeScreen extends HalScreen {
       agent.lat = Math.max(-85, Math.min(85, agent.lat))
     })
 
-    // Update positions
+    // Update positions and hide back-side points
+    this.updateAgentPositions()
+    this.updateFactoryPositions()
+  }
+
+  private updateAgentPositions() {
+    if (!this.projection || !this.globeGroup) return
+    const rotate = this.projection.rotate()
+    const rotLambda = rotate[0]
+    const rotPhi = rotate[1]
+    const deg2rad = Math.PI / 180
+
+    const isFront = (lon: number, lat: number) => {
+      const lambda = (lon + rotLambda) * deg2rad
+      const phi = (lat + rotPhi) * deg2rad
+      // gamma (rotate[2]) ignored for simplicity; good enough for visibility
+      return Math.cos(phi) * Math.cos(lambda) > 0
+    }
+
     const agentGroup = this.globeGroup.select<SVGGElement>('#globe-agents')
     agentGroup.selectAll<SVGCircleElement, DroneAgent>('circle.agent')
       .attr('cx', d => {
@@ -257,7 +307,31 @@ export class DroneGlobeScreen extends HalScreen {
       .attr('cy', d => {
         const p = this.projection!([d.lon, d.lat]); return p ? p[1] : -999
       })
+      .attr('opacity', d => {
+        return isFront(d.lon, d.lat) ? 0.9 : 0
+      })
+  }
 
+  private updateFactoryPositions() {
+    if (!this.projection || !this.globeGroup) return
+    const rotate = this.projection.rotate()
+    const rotLambda = rotate[0]
+    const rotPhi = rotate[1]
+    const deg2rad = Math.PI / 180
+
+    const isFront = (lon: number, lat: number) => {
+      const lambda = (lon + rotLambda) * deg2rad
+      const phi = (lat + rotPhi) * deg2rad
+      return Math.cos(phi) * Math.cos(lambda) > 0
+    }
+
+    const factoryGroup = this.globeGroup.select<SVGGElement>('#globe-factories')
+    factoryGroup.selectAll<SVGCircleElement, any>('circle.factory')
+      .attr('cx', d => this.projection!([d.lon, d.lat])![0])
+      .attr('cy', d => this.projection!([d.lon, d.lat])![1])
+      .attr('opacity', d => {
+        return isFront(d.lon, d.lat) ? 0.95 : 0
+      })
   }
 }
 
