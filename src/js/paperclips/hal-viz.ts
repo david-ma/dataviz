@@ -1,7 +1,9 @@
 import { d3 } from '../chart'
 
-const HAL_VIZ_VERSION = 'v1.0.17-candlestick-charts-20251205-1525'
+const HAL_VIZ_VERSION = 'v1.0.18-authentic-colors-grid-layout-20251205-1535'
+const DEV_MODE = true  // Set to false for production
 console.log(`[HAL-VIZ] Version: ${HAL_VIZ_VERSION}`)
+console.log(`[HAL-VIZ] Dev Mode: ${DEV_MODE}`)
 
 // Global screen manager
 class HalScreenManager {
@@ -881,28 +883,37 @@ class MarketDynamicsScreen extends HalScreen {
 }
 
 class StockMarketScreen extends HalScreen {
-  private candleData: Map<number, any[]> = new Map()  // stockId -> candle array
-  private currentCandle: Map<number, any> = new Map()  // stockId -> current candle
+  private candleData: Map<number, any[]> = new Map()
+  private currentCandle: Map<number, any> = new Map()
+  private profitHistory: number[] = []
   private tickCount = 0
-  private readonly CANDLE_SIZE = 20  // Ticks per candle (easy to change)
-  private readonly MAX_CANDLES = 30  // Keep last 30 candles
+  private readonly CANDLE_SIZE = 20
+  private readonly MAX_CANDLES = 30
+  private readonly MAX_PROFIT_HISTORY = 100
   
   constructor(opts: { container: string; colors: any }) {
     super({
       id: 'hal-stock-market',
       container: opts.container,
       width: 800,
-      height: 400,
+      height: 600,
       colors: opts.colors
     })
+    this.svg.style('background', this.colors.darkNavy)
   }
 
   update(data: { stocks: any[]; bankroll: number; portTotal: number }) {
     this.tickCount++
     const shouldCloseCandle = this.tickCount % this.CANDLE_SIZE === 0
     
+    // Track total profit history
+    const totalProfit = data.stocks.reduce((sum, s) => sum + s.profit, 0)
+    this.profitHistory.push(totalProfit)
+    if (this.profitHistory.length > this.MAX_PROFIT_HISTORY) {
+      this.profitHistory.shift()
+    }
+    
     data.stocks.forEach(stock => {
-      // Initialize candle data structures
       if (!this.candleData.has(stock.id)) {
         this.candleData.set(stock.id, [])
       }
@@ -917,15 +928,11 @@ class StockMarketScreen extends HalScreen {
       }
       
       const candle = this.currentCandle.get(stock.id)!
-      
-      // Update current candle
       candle.high = Math.max(candle.high, stock.price)
       candle.low = Math.min(candle.low, stock.price)
       candle.close = stock.price
-      // Synthetic volume: jiggle based on price and amount
       candle.volume += Math.floor(stock.price * 0.1 + Math.random() * stock.amount * 0.01)
       
-      // Close candle and start new one
       if (shouldCloseCandle) {
         const candles = this.candleData.get(stock.id)!
         candles.push({ ...candle })
@@ -933,7 +940,6 @@ class StockMarketScreen extends HalScreen {
           candles.shift()
         }
         
-        // Start new candle
         this.currentCandle.set(stock.id, {
           open: stock.price,
           high: stock.price,
@@ -944,7 +950,6 @@ class StockMarketScreen extends HalScreen {
       }
     })
     
-    // Clean up sold stocks
     const activeIds = new Set(data.stocks.map(s => s.id))
     for (const id of this.candleData.keys()) {
       if (!activeIds.has(id)) {
@@ -962,7 +967,7 @@ class StockMarketScreen extends HalScreen {
     // Title
     this.svg.append('text')
       .attr('x', 20).attr('y', 30)
-      .attr('fill', this.colors.text)
+      .attr('fill', this.colors.white)
       .attr('font-family', 'Futura, "Trebuchet MS", Arial, sans-serif')
       .attr('font-size', 18).attr('font-weight', 'bold')
       .attr('letter-spacing', '2px')
@@ -971,110 +976,180 @@ class StockMarketScreen extends HalScreen {
     // Portfolio stats
     this.svg.append('text')
       .attr('x', 400).attr('y', 30)
-      .attr('fill', this.colors.text)
+      .attr('fill', this.colors.white)
       .attr('font-family', 'Consolas, "Fira Mono", monospace')
       .attr('font-size', 11)
-      .text(`CASH: $${data.bankroll.toLocaleString()}  |  PORTFOLIO: $${data.portTotal.toLocaleString()}  |  CANDLE: ${this.CANDLE_SIZE} ticks`)
+      .text(`CASH: $${data.bankroll.toLocaleString()}  |  PORTFOLIO: $${data.portTotal.toLocaleString()}`)
+    
+    // 3x2 grid layout
+    const cellWidth = 250
+    const cellHeight = 270
+    const startX = 20
+    const startY = 60
+    const gapX = 10
+    const gapY = 10
+    
+    // Cell 0: Profit/Loss Summary (top-left)
+    this.drawProfitSummary(startX, startY, cellWidth, cellHeight, data)
+    
+    // Cells 1-5: Stock candlestick charts
+    data.stocks.slice(0, 5).forEach((stock, i) => {
+      const col = (i + 1) % 3
+      const row = Math.floor((i + 1) / 3)
+      const x = startX + col * (cellWidth + gapX)
+      const y = startY + row * (cellHeight + gapY)
+      
+      this.drawStockCell(x, y, cellWidth, cellHeight, stock)
+    })
     
     if (data.stocks.length === 0) {
       this.svg.append('text')
-        .attr('x', 400).attr('y', 200)
-        .attr('fill', this.colors.text)
+        .attr('x', 400).attr('y', 300)
+        .attr('fill', this.colors.white)
         .attr('font-family', 'Consolas, "Fira Mono", monospace')
         .attr('font-size', 14).attr('opacity', 0.5)
         .attr('text-anchor', 'middle')
         .text('NO ACTIVE POSITIONS')
-      return
     }
+  }
+
+  private drawProfitSummary(x: number, y: number, width: number, height: number, data: any) {
+    const totalProfit = data.stocks.reduce((sum: number, s: any) => sum + s.profit, 0)
+    const profitColor = totalProfit >= 0 ? this.colors.green : this.colors.red
     
-    // Draw candlestick charts for each stock
-    const chartWidth = 180
-    const chartHeight = 80
-    const startY = 60
-    const spacing = 110
+    // Header
+    this.svg.append('text')
+      .attr('x', x + 10).attr('y', y + 20)
+      .attr('fill', this.colors.white)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 12).attr('font-weight', 'bold')
+      .text('TOTAL P/L')
     
-    data.stocks.forEach((stock, i) => {
-      const x = 20 + (i % 4) * 200
-      const y = startY + Math.floor(i / 4) * spacing
+    // Profit value
+    const profitSign = totalProfit >= 0 ? '+' : ''
+    this.svg.append('text')
+      .attr('x', x + 10).attr('y', y + 45)
+      .attr('fill', profitColor)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 20).attr('font-weight', 'bold')
+      .text(`${profitSign}$${totalProfit.toFixed(0)}`)
+    
+    // Profit history line chart
+    if (this.profitHistory.length > 1) {
+      const chartY = y + 60
+      const chartHeight = height - 70
+      const chartWidth = width - 20
       
-      // Stock header
-      this.svg.append('text')
-        .attr('x', x).attr('y', y)
-        .attr('fill', this.colors.primary)
-        .attr('font-family', 'Consolas, "Fira Mono", monospace')
-        .attr('font-size', 12).attr('font-weight', 'bold')
-        .text(stock.symbol)
+      const xScale = d3.scaleLinear()
+        .domain([0, this.profitHistory.length - 1])
+        .range([x + 10, x + 10 + chartWidth])
       
-      this.svg.append('text')
-        .attr('x', x + 50).attr('y', y)
-        .attr('fill', this.colors.text)
-        .attr('font-family', 'Consolas, "Fira Mono", monospace')
-        .attr('font-size', 11)
-        .text(`$${stock.price.toFixed(2)}`)
+      const minProfit = Math.min(...this.profitHistory, 0)
+      const maxProfit = Math.max(...this.profitHistory, 0)
+      const range = Math.max(Math.abs(minProfit), Math.abs(maxProfit), 1)
       
-      // Profit/loss
-      const profitColor = stock.profit >= 0 ? this.colors.secondary : this.colors.tertiary
-      const profitSign = stock.profit >= 0 ? '+' : ''
-      this.svg.append('text')
-        .attr('x', x + 120).attr('y', y)
-        .attr('fill', profitColor)
-        .attr('font-family', 'Consolas, "Fira Mono", monospace')
-        .attr('font-size', 10)
-        .text(`${profitSign}$${stock.profit.toFixed(0)}`)
+      const yScale = d3.scaleLinear()
+        .domain([-range, range])
+        .range([chartY + chartHeight, chartY])
       
-      // Candlestick chart
-      const candles = this.candleData.get(stock.id) || []
-      if (candles.length > 0) {
-        const allPrices = candles.flatMap(c => [c.high, c.low])
-        const minPrice = Math.min(...allPrices)
-        const maxPrice = Math.max(...allPrices)
-        const priceRange = maxPrice - minPrice || 1
+      // Zero line
+      this.svg.append('line')
+        .attr('x1', x + 10).attr('x2', x + 10 + chartWidth)
+        .attr('y1', yScale(0)).attr('y2', yScale(0))
+        .attr('stroke', this.colors.white)
+        .attr('stroke-width', 1).attr('opacity', 0.3)
+      
+      // Profit line
+      const line = d3.line<number>()
+        .x((d, i) => xScale(i))
+        .y(d => yScale(d))
+        .curve(d3.curveMonotoneX)
+      
+      this.svg.append('path')
+        .datum(this.profitHistory)
+        .attr('fill', 'none')
+        .attr('stroke', profitColor)
+        .attr('stroke-width', 2)
+        .attr('d', line)
+    }
+  }
+
+  private drawStockCell(x: number, y: number, width: number, height: number, stock: any) {
+    const profitColor = stock.profit >= 0 ? this.colors.green : this.colors.red
+    
+    // Header
+    this.svg.append('text')
+      .attr('x', x + 10).attr('y', y + 20)
+      .attr('fill', this.colors.white)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 12).attr('font-weight', 'bold')
+      .text(stock.symbol)
+    
+    this.svg.append('text')
+      .attr('x', x + 60).attr('y', y + 20)
+      .attr('fill', this.colors.white)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 11)
+      .text(`$${stock.price.toFixed(2)}`)
+    
+    // Profit/loss
+    const profitSign = stock.profit >= 0 ? '+' : ''
+    this.svg.append('text')
+      .attr('x', x + 140).attr('y', y + 20)
+      .attr('fill', profitColor)
+      .attr('font-family', 'Consolas, "Fira Mono", monospace')
+      .attr('font-size', 10)
+      .text(`${profitSign}$${stock.profit.toFixed(0)}`)
+    
+    // Candlestick chart
+    const candles = this.candleData.get(stock.id) || []
+    if (candles.length > 0) {
+      const chartY = y + 30
+      const chartHeight = height - 40
+      const chartWidth = width - 20
+      
+      const allPrices = candles.flatMap(c => [c.high, c.low])
+      const minPrice = Math.min(...allPrices)
+      const maxPrice = Math.max(...allPrices)
+      const priceRange = maxPrice - minPrice || 1
+      
+      const xScale = d3.scaleLinear()
+        .domain([0, candles.length])
+        .range([x + 10, x + 10 + chartWidth])
+      
+      const yScale = d3.scaleLinear()
+        .domain([minPrice - priceRange * 0.1, maxPrice + priceRange * 0.1])
+        .range([chartY + chartHeight, chartY])
+      
+      const candleWidth = chartWidth / candles.length * 0.7
+      
+      candles.forEach((candle, idx) => {
+        const cx = xScale(idx + 0.5)
+        const isGreen = candle.close >= candle.open
+        const color = isGreen ? this.colors.green : this.colors.red
         
-        const xScale = d3.scaleLinear()
-          .domain([0, candles.length])
-          .range([x, x + chartWidth])
-        
-        const yScale = d3.scaleLinear()
-          .domain([minPrice - priceRange * 0.1, maxPrice + priceRange * 0.1])
-          .range([y + chartHeight, y + 10])
-        
-        const candleWidth = chartWidth / candles.length * 0.7
-        
-        candles.forEach((candle, idx) => {
-          const cx = xScale(idx + 0.5)
-          const isGreen = candle.close >= candle.open
-          const color = isGreen ? this.colors.secondary : this.colors.tertiary
-          
-          // Wick (high-low line)
-          this.svg.append('line')
-            .attr('x1', cx).attr('x2', cx)
-            .attr('y1', yScale(candle.high))
-            .attr('y2', yScale(candle.low))
-            .attr('stroke', color)
-            .attr('stroke-width', 1)
-          
-          // Body (open-close rect)
-          const bodyTop = Math.min(yScale(candle.open), yScale(candle.close))
-          const bodyHeight = Math.abs(yScale(candle.open) - yScale(candle.close)) || 1
-          
-          this.svg.append('rect')
-            .attr('x', cx - candleWidth / 2)
-            .attr('y', bodyTop)
-            .attr('width', candleWidth)
-            .attr('height', bodyHeight)
-            .attr('fill', isGreen ? color : 'none')
-            .attr('stroke', color)
-            .attr('stroke-width', 1)
-        })
-        
-        // Baseline
+        // Wick
         this.svg.append('line')
-          .attr('x1', x).attr('x2', x + chartWidth)
-          .attr('y1', y + chartHeight).attr('y2', y + chartHeight)
-          .attr('stroke', this.colors.grid)
-          .attr('stroke-width', 1).attr('opacity', 0.3)
-      }
-    })
+          .attr('x1', cx).attr('x2', cx)
+          .attr('y1', yScale(candle.high))
+          .attr('y2', yScale(candle.low))
+          .attr('stroke', color)
+          .attr('stroke-width', 1)
+        
+        // Body
+        const bodyTop = Math.min(yScale(candle.open), yScale(candle.close))
+        const bodyHeight = Math.abs(yScale(candle.open) - yScale(candle.close)) || 1
+        
+        this.svg.append('rect')
+          .attr('x', cx - candleWidth / 2)
+          .attr('y', bodyTop)
+          .attr('width', candleWidth)
+          .attr('height', bodyHeight)
+          .attr('fill', isGreen ? color : 'none')
+          .attr('stroke', color)
+          .attr('stroke-width', 1)
+      })
+    }
   }
 }
 
@@ -1108,17 +1183,32 @@ class HalViz {
   private lastPayoffValues = {aa: '', ab: '', ba: '', bb: ''}
   
   private colors = {
-    background: '#1a1a2e',      // Dark blue-grey (like 2001 screens)
-    primary: '#ff6b6b',         // Bold coral/red
-    secondary: '#4ecdc4',       // Bold cyan/turquoise
-    tertiary: '#ffe66d',        // Bold yellow
-    text: '#ffffff',            // White text
-    grid: '#2d3561',            // Subtle grid
+    // Authentic HAL color palette from reference screens
+    purple: '#532B78',        // Rich purple (Tile 1)
+    teal: '#1C6B74',          // Teal-blue (Tile 2)
+    navy: '#143962',          // Deep blue (Tile 4)
+    grey: '#6C6C6C',          // Grey (Tile 5)
+    midGrey: '#7B7B7B',       // Mid-grey (Tile 6)
+    darkNavy: '#0A1130',      // Very dark navy (Tile 7)
+    burgundy: '#6B2424',      // Brick red (Tile 9)
+    violet: '#54336F',        // Violet-purple (Tile 10)
+    matrixBlue: '#0d2c55',    // Matrix screen blue
     
-    // Authentic HAL colors
-    matrixBlue: '#0d2c55',      // Numeric matrix background
-    navy: '#143962',            // Phase indicator background
-    labelGrey: '#cfe8ff'        // Section labels
+    // Standard colors
+    white: '#FFFFFF',
+    text: '#FFFFFF',
+    
+    // Stock market colors
+    green: '#00FF00',         // Profit/bullish
+    red: '#FF0000',           // Loss/bearish
+    
+    // Legacy (for compatibility)
+    background: '#1a1a2e',
+    primary: '#1C6B74',       // Teal
+    secondary: '#00FF00',     // Green
+    tertiary: '#FF0000',      // Red
+    grid: '#7B7B7B',          // Mid-grey
+    labelGrey: '#7B7B7B'
   }
   
   constructor() {
@@ -1232,24 +1322,24 @@ class HalViz {
     this.drawWireGraph()
     this.drawInventoryGraph()
     
-    // Show computational resources if trust exists
-    if (typeof trust !== 'undefined' && trust > 0) {
+    // Show computational resources if trust exists OR dev mode
+    if (DEV_MODE || (typeof trust !== 'undefined' && trust > 0)) {
       this.drawComputationalResources()
       this.drawNumericMatrix()
     }
     
-    // Show quantum computing if operations exist
-    if (typeof operations !== 'undefined' && operations > 0) {
+    // Show quantum computing if operations exist OR dev mode
+    if (DEV_MODE || (typeof operations !== 'undefined' && operations > 0)) {
       this.drawQuantumComputing()
     }
     
-    // Show stock market if investment engine active
-    if (typeof stocks !== 'undefined' && typeof investLevel !== 'undefined' && investLevel > 0) {
+    // Show stock market if investment engine active OR dev mode
+    if (DEV_MODE || (typeof stocks !== 'undefined' && stocks.length > 0)) {
       this.drawStockMarket()
     }
     
-    // Show strategic modeling if yomi exists
-    if (typeof yomi !== 'undefined' && yomi > 0) {
+    // Show strategic modeling if yomi exists OR dev mode
+    if (DEV_MODE || (typeof yomi !== 'undefined' && yomi > 0)) {
       if (!this.strategicModelingScreen) {
         this.strategicModelingScreen = new StrategicModelingScreen({
           container: '#hal-dashboard',
@@ -1638,12 +1728,21 @@ class HalViz {
         container: '#hal-dashboard',
         colors: this.colors
       })
+      console.log('[HAL-VIZ] Stock market screen created')
+    }
+    
+    const stocksData = typeof stocks !== 'undefined' ? stocks : []
+    const bankrollData = typeof bankroll !== 'undefined' ? bankroll : 0
+    const portTotalData = typeof portTotal !== 'undefined' ? portTotal : 0
+    
+    if (DEV_MODE && stocksData.length === 0) {
+      console.log('[HAL-VIZ] Stock market: No stocks yet (showing empty state)')
     }
     
     this.stockMarketScreen.update({
-      stocks: stocks || [],
-      bankroll: bankroll || 0,
-      portTotal: portTotal || 0
+      stocks: stocksData,
+      bankroll: bankrollData,
+      portTotal: portTotalData
     })
   }
 }
