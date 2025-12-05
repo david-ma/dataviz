@@ -26,6 +26,17 @@ declare const bankroll: number
 declare const portTotal: number
 declare const investLevel: number
 declare const qChips: { waveSeed: number; value: number; active: number }[]
+declare const harvesterLevel: number
+declare const wireDroneLevel: number
+declare const harvesterCost: number
+declare const wireDroneCost: number
+declare const harvesterFlag: number
+declare const wireDroneFlag: number
+declare const availableMatter: number
+declare const unusedClips: number
+declare const droneLevel: number
+declare const droneRatio: number
+declare const spaceFlag: number
 declare const humanFlag: number
 declare const project35: any
 

@@ -14,7 +14,7 @@ export class QuantumComputingScreen extends HalScreen {
   private ringSpawnTimer = 0
   private ringSpawnInterval = 1400  // ms between new rings
   private ringExpandRate = 26       // px per second
-  private ringGroup: d3.Selection<SVGGElement, unknown, null, undefined> | null = null
+  private ringGroup: d3.Selection<SVGGElement, unknown, HTMLElement, any> | null = null
   
   constructor(opts: { container: string; colors: HalColors }) {
     super({

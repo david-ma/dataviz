@@ -7,6 +7,7 @@ import { QuantumComputingScreen } from './quantum-computing-screen'
 import { StrategicModelingScreen } from './strategic-modeling-screen'
 import { MarketDynamicsScreen } from './market-dynamics-screen'
 import { StockMarketScreen } from './stock-market-screen'
+import { DroneOperationsScreen } from './drone-operations-screen'
 import { HypnoDronesScreen } from './hypnodrones-screen'
 import './hal-screen-types'
 
@@ -40,6 +41,16 @@ declare const investLevel: number
 declare const qChips: { waveSeed: number; value: number; active: number }[]
 declare const humanFlag: number
 declare const project35: any
+declare const harvesterLevel: number
+declare const wireDroneLevel: number
+declare const harvesterCost: number
+declare const wireDroneCost: number
+declare const harvesterFlag: number
+declare const wireDroneFlag: number
+declare const availableMatter: number
+declare const unusedClips: number
+declare const droneRatio: number
+declare const spaceFlag: number
 
 const HAL_VIZ_VERSION = 'v1.0.26-hypnodrones-20251205'
 const DEV_MODE = true  // Set to false for production
@@ -72,6 +83,7 @@ class HalViz {
   private flashTimer = 0
   
   private strategicModelingScreen: StrategicModelingScreen | null = null
+  private droneOperationsScreen: DroneOperationsScreen | null = null
   private hypnoDronesScreen: HypnoDronesScreen | null = null
   private lastPhase: string | null = null
   
@@ -229,6 +241,15 @@ class HalViz {
     // Show stock market if investment engine active OR dev mode
     if (DEV_MODE || (typeof stocks !== 'undefined' && stocks.length > 0)) {
       this.drawStockMarket()
+    }
+
+    // Show drone operations in phase 2 (harvester/wire drones active) OR dev mode
+    if (
+      DEV_MODE ||
+      (typeof harvesterFlag !== 'undefined' && harvesterFlag === 1) ||
+      (typeof wireDroneFlag !== 'undefined' && wireDroneFlag === 1)
+    ) {
+      this.drawDroneOperations()
     }
     
     // Show strategic modeling if yomi exists OR dev mode
@@ -651,6 +672,28 @@ class HalViz {
     })
   }
   
+  drawDroneOperations() {
+    if (!this.droneOperationsScreen) {
+      this.droneOperationsScreen = new DroneOperationsScreen({
+        container: '#hal-dashboard',
+        colors: this.colors
+      })
+      console.log('[HAL-VIZ] Drone operations screen created')
+    }
+
+    const data = {
+      harvesterLevel: typeof harvesterLevel !== 'undefined' ? harvesterLevel : 0,
+      wireDroneLevel: typeof wireDroneLevel !== 'undefined' ? wireDroneLevel : 0,
+      harvesterCost: typeof harvesterCost !== 'undefined' ? harvesterCost : 0,
+      wireDroneCost: typeof wireDroneCost !== 'undefined' ? wireDroneCost : 0,
+      availableMatter: typeof availableMatter !== 'undefined' ? availableMatter : 0,
+      unusedClips: typeof unusedClips !== 'undefined' ? unusedClips : 0,
+      droneRatio: typeof droneRatio !== 'undefined' ? droneRatio : 0
+    }
+
+    this.droneOperationsScreen.update(data)
+  }
+
   drawHypnoDrones() {
     if (!this.hypnoDronesScreen) {
       this.hypnoDronesScreen = new HypnoDronesScreen({
