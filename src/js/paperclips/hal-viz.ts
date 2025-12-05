@@ -1,6 +1,6 @@
 import { d3 } from '../chart'
 
-const HAL_VIZ_VERSION = 'v1.0.19-authentic-hal-backgrounds-20251205-1545'
+const HAL_VIZ_VERSION = 'v1.0.24-tournament-flash-sync-20251205-1614'
 const DEV_MODE = true  // Set to false for production
 console.log(`[HAL-VIZ] Version: ${HAL_VIZ_VERSION}`)
 console.log(`[HAL-VIZ] Dev Mode: ${DEV_MODE}`)
@@ -440,7 +440,11 @@ class QuantumComputingScreen extends HalScreen {
 // Strategic Modeling Screen
 class StrategicModelingScreen extends HalScreen {
   private lastPayoffValues = {aa: '', ab: '', ba: '', bb: ''}
-  private payoffObserver: MutationObserver | null = null
+  private lastCurrentRound = 0
+  private lastRounds = 0
+  private tournamentRunning = false
+  private flashAnimationId: number | null = null
+  private cellRects: Map<string, any> = new Map()
   
   constructor(opts: { container: string; colors: any }) {
     super({
@@ -451,33 +455,51 @@ class StrategicModelingScreen extends HalScreen {
       colors: opts.colors
     })
     this.svg.style('background', this.colors.burgundy)  // Burgundy for strategic/combat
-    this.setupPayoffObserver()
   }
   
-  setupPayoffObserver() {
-    console.log('[StrategicModeling] Setting up payoff observer...')
-    const cells = ['aaPayoffH', 'aaPayoffV', 'abPayoffH', 'abPayoffV', 
-                   'baPayoffH', 'baPayoffV', 'bbPayoffH', 'bbPayoffV']
+  cancelFlashAnimation() {
+    if (this.flashAnimationId !== null) {
+      clearTimeout(this.flashAnimationId)
+      this.flashAnimationId = null
+    }
+  }
+  
+  startFlashAnimation(roundsData: number) {
+    this.cancelFlashAnimation()
     
-    cells.forEach(id => {
-      const elem = document.getElementById(id)
-      if (elem) {
-        if (!this.payoffObserver) {
-          this.payoffObserver = new MutationObserver(() => {
-            console.log('[StrategicModeling] Payoff changed, redrawing...')
-            this.draw()
-          })
-        }
-        this.payoffObserver.observe(elem, { 
-          childList: true, 
-          characterData: true, 
-          subtree: true 
-        })
+    // Flash pattern: AA, AB, BA, BB (repeats 10 times per round)
+    const pattern = ['aa', 'ab', 'ba', 'bb']
+    const flashesPerRound = 10
+    const totalFlashes = roundsData * flashesPerRound
+    let flashIndex = 0
+    
+    const doFlash = () => {
+      if (flashIndex >= totalFlashes) {
+        this.tournamentRunning = false
+        return
       }
-    })
+      
+      const cellKey = pattern[flashIndex % pattern.length]
+      const rect = this.cellRects.get(cellKey)
+      
+      if (rect) {
+        // Flash on
+        rect.attr('fill', 'rgba(255,255,255,0.4)')
+        
+        // Flash off after 50ms
+        setTimeout(() => {
+          rect.attr('fill', 'rgba(0,0,0,0.3)')
+        }, 50)
+      }
+      
+      flashIndex++
+      this.flashAnimationId = setTimeout(doFlash, 100) as any
+    }
+    
+    doFlash()
   }
   
-  draw() {
+  draw(data?: { yomi?: number; strats?: any[]; rounds?: number; currentRound?: number }) {
     this.clear()
     
     const colors = {
@@ -486,6 +508,31 @@ class StrategicModelingScreen extends HalScreen {
       yellow: '#ffe66d',
       cyan: '#4ecdc4'
     }
+    
+    // Use passed data or fall back to globals
+    const yomiValue = data?.yomi ?? (typeof yomi !== 'undefined' ? yomi : 0)
+    const stratsData = data?.strats ?? (typeof strats !== 'undefined' ? strats : [])
+    const roundsData = data?.rounds ?? (typeof rounds !== 'undefined' ? rounds : 0)
+    const currentRoundData = data?.currentRound ?? (typeof currentRound !== 'undefined' ? currentRound : 0)
+    
+    // Detect tournament start/stop
+    const wasRunning = this.tournamentRunning
+    if (currentRoundData === 1 && this.lastCurrentRound === 0 && roundsData > 0) {
+      // Tournament just started
+      this.tournamentRunning = true
+      this.startFlashAnimation(roundsData)
+    } else if (currentRoundData >= roundsData && roundsData > 0) {
+      // Tournament finished
+      this.tournamentRunning = false
+      this.cancelFlashAnimation()
+    } else if (currentRoundData === 0 && this.lastCurrentRound > 0) {
+      // Tournament reset
+      this.tournamentRunning = false
+      this.cancelFlashAnimation()
+    }
+    
+    this.lastCurrentRound = currentRoundData
+    this.lastRounds = roundsData
     
     // Title
     this.svg.append('text')
@@ -496,13 +543,23 @@ class StrategicModelingScreen extends HalScreen {
       .attr('letter-spacing', '2px')
       .text('STRATEGIC MODELING')
     
+    // Tournament status indicator
+    if (this.tournamentRunning) {
+      this.svg.append('text')
+        .attr('x', 350).attr('y', 30)
+        .attr('fill', colors.yellow)
+        .attr('font-family', 'Consolas, "Fira Mono", monospace')
+        .attr('font-size', 12)
+        .text('● RUNNING')
+    }
+    
     // Yomi display
     this.svg.append('text')
       .attr('x', 450).attr('y', 30)
       .attr('fill', colors.text)
       .attr('font-family', 'Consolas, "Fira Mono", monospace')
       .attr('font-size', 14)
-      .text(`YOMI: ${(typeof yomi !== 'undefined' ? yomi : 0).toLocaleString()}`)
+      .text(`YOMI: ${yomiValue.toLocaleString()}`)
     
     // Strategy buttons
     const strategies = ['RANDOM', 'A100', 'B100', 'GREEDY', 'GENEROUS', 'MINIMAX', 'TIT FOR TAT', 'BEAT LAST']
@@ -574,7 +631,7 @@ class StrategicModelingScreen extends HalScreen {
     this.drawPayoffMatrix(btnY + 60, colors)
     
     // Tournament Progress
-    this.drawTournamentProgress(btnY + 300, colors)
+    this.drawTournamentProgress(btnY + 300, colors, stratsData, roundsData, currentRoundData)
   }
   
   private drawButton(x: number, y: number, w: number, h: number, text: string, color: string, onClick: () => void) {
@@ -613,23 +670,29 @@ class StrategicModelingScreen extends HalScreen {
       ba: ba.join(','), bb: bb.join(',')
     }
     
+    // Get move labels from DOM
+    const hLabelA = getVal('hLabela') || 'Move A'
+    const hLabelB = getVal('hLabelb') || 'Move B'
+    const vLabelA = getVal('vLabela') || 'Move A'
+    const vLabelB = getVal('vLabelb') || 'Move B'
+    
     // Headers
     this.svg.append('text')
       .attr('x', matrixStartX + cellSize/2).attr('y', matrixStartY - 10)
       .attr('fill', colors.text).attr('font-family', 'Consolas, monospace')
-      .attr('font-size', 12).attr('text-anchor', 'middle').text('Move A')
+      .attr('font-size', 12).attr('text-anchor', 'middle').text(vLabelA)
     this.svg.append('text')
       .attr('x', matrixStartX + cellSize + cellSize/2).attr('y', matrixStartY - 10)
       .attr('fill', colors.text).attr('font-family', 'Consolas, monospace')
-      .attr('font-size', 12).attr('text-anchor', 'middle').text('Move B')
+      .attr('font-size', 12).attr('text-anchor', 'middle').text(vLabelB)
     this.svg.append('text')
       .attr('x', matrixStartX - 10).attr('y', matrixStartY + cellSize/2 + 5)
       .attr('fill', colors.text).attr('font-family', 'Consolas, monospace')
-      .attr('font-size', 12).attr('text-anchor', 'end').text('Move A')
+      .attr('font-size', 12).attr('text-anchor', 'end').text(hLabelA)
     this.svg.append('text')
       .attr('x', matrixStartX - 10).attr('y', matrixStartY + cellSize + cellSize/2 + 5)
       .attr('fill', colors.text).attr('font-family', 'Consolas, monospace')
-      .attr('font-size', 12).attr('text-anchor', 'end').text('Move B')
+      .attr('font-size', 12).attr('text-anchor', 'end').text(hLabelB)
     
     // Cells
     const cells = [
@@ -650,6 +713,9 @@ class StrategicModelingScreen extends HalScreen {
         .attr('fill', changed ? 'rgba(255,230,100,0.4)' : 'rgba(0,0,0,0.3)')
         .attr('stroke', 'rgba(255,255,255,0.4)')
       
+      // Store rect for flash animation
+      this.cellRects.set(cell.key, rect)
+      
       if (changed) {
         rect.transition().duration(300).attr('fill', 'rgba(0,0,0,0.3)')
       }
@@ -666,32 +732,67 @@ class StrategicModelingScreen extends HalScreen {
     this.lastPayoffValues = currentValues
   }
   
-  private drawTournamentProgress(startY: number, colors: any) {
-    if (typeof strats === 'undefined' || !strats.length || typeof rounds === 'undefined') return
-    
+  private drawTournamentProgress(startY: number, colors: any, stratsData: any[], roundsData: number, currentRoundData: number) {
     this.svg.append('text')
       .attr('x', 20).attr('y', startY)
       .attr('fill', colors.labelGrey)
       .attr('font-family', 'Consolas, monospace')
       .attr('font-size', 11).text('TOURNAMENT PROGRESS')
     
-    const progress = typeof currentRound !== 'undefined' ? currentRound : 0
-    this.svg.append('text')
-      .attr('x', 20).attr('y', startY + 25)
-      .attr('fill', colors.text)
-      .attr('font-family', 'Consolas, monospace')
-      .attr('font-size', 14)
-      .text(`Round ${progress} / ${rounds}`)
-    
-    const sorted = [...strats].sort((a, b) => (b.currentScore || 0) - (a.currentScore || 0))
-    sorted.slice(0, 3).forEach((strat, i) => {
+    // If we have strats data, use it
+    if (stratsData && stratsData.length > 0 && roundsData) {
       this.svg.append('text')
-        .attr('x', 20).attr('y', startY + 50 + i * 18)
+        .attr('x', 20).attr('y', startY + 25)
         .attr('fill', colors.text)
         .attr('font-family', 'Consolas, monospace')
-        .attr('font-size', 11)
-        .text(`${i+1}. ${strat.name}: ${strat.currentScore || 0}`)
-    })
+        .attr('font-size', 14)
+        .text(`Round ${currentRoundData} / ${roundsData}`)
+      
+      const sorted = [...stratsData].sort((a, b) => (b.currentScore || 0) - (a.currentScore || 0))
+      sorted.slice(0, 3).forEach((strat, i) => {
+        this.svg.append('text')
+          .attr('x', 20).attr('y', startY + 50 + i * 18)
+          .attr('fill', colors.text)
+          .attr('font-family', 'Consolas, monospace')
+          .attr('font-size', 11)
+          .text(`${i+1}. ${strat.name}: ${strat.currentScore || 0}`)
+      })
+    } else {
+      // Fallback: parse from DOM
+      const results: string[] = []
+      for (let i = 0; i < 8; i++) {
+        const elem = document.getElementById(`results${i}`)
+        if (elem && elem.textContent && elem.textContent.trim()) {
+          results.push(elem.textContent.trim())
+        }
+      }
+      
+      if (results.length > 0) {
+        this.svg.append('text')
+          .attr('x', 20).attr('y', startY + 25)
+          .attr('fill', colors.text)
+          .attr('font-family', 'Consolas, monospace')
+          .attr('font-size', 14)
+          .text('RESULTS')
+        
+        results.slice(0, 3).forEach((result, i) => {
+          this.svg.append('text')
+            .attr('x', 20).attr('y', startY + 50 + i * 18)
+            .attr('fill', colors.text)
+            .attr('font-family', 'Consolas, monospace')
+            .attr('font-size', 11)
+            .text(result)
+        })
+      } else {
+        this.svg.append('text')
+          .attr('x', 20).attr('y', startY + 25)
+          .attr('fill', colors.text)
+          .attr('font-family', 'Consolas, monospace')
+          .attr('font-size', 12)
+          .attr('opacity', 0.5)
+          .text('No tournament data')
+      }
+    }
   }
 }
 
@@ -1353,7 +1454,12 @@ class HalViz {
           colors: this.colors
         })
       }
-      this.strategicModelingScreen.draw()
+      this.strategicModelingScreen.draw({
+        yomi: typeof yomi !== 'undefined' ? yomi : 0,
+        strats: typeof strats !== 'undefined' ? strats : [],
+        rounds: typeof rounds !== 'undefined' ? rounds : 0,
+        currentRound: typeof currentRound !== 'undefined' ? currentRound : 0
+      })
     }
     
     // Always show phase indicator

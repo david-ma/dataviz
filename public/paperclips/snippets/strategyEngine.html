@@ -1,0 +1,101 @@
+<div class="engine2" id="strategyEngine">
+    <p class="engineText">
+        <b>Strategic Modeling</b>
+
+        <select id="stratPicker">
+            <option value="10">Pick a Strat</option>
+            <option value="0">RANDOM</option>
+            <option value="1">A100</option>
+        </select>
+        <button class="button2" id="btnRunTournament" onclick="runTourney()" disabled="">Run</button><br>
+
+    </p>
+    <div id="tournamentLabel">
+        <p class="clean2">
+            <span id="tourneyDisplay">TOURNAMENT RESULTS (roll over for grid)</span><br>
+        </p>
+    </div>
+
+    <div id="tournamentStuff">
+
+        <div id="tournamentTable" style="display: none;">
+
+            <div id="vertPad">
+
+                &nbsp;
+
+            </div>
+
+            <div id="vertStrat">&nbsp;</div>
+
+            <div id="horizStrat">&nbsp;</div>
+
+            <table class="table2">
+
+                <tbody>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th><span id="vLabela">particle</span></th>
+                        <th><span id="vLabelb">wave</span></th>
+                    </tr>
+
+                    <tr>
+                        <td><span id="hLabela">particle</span></td>
+                        <td id="payoffCellAA" style="background-color: white;"><span id="aaPayoffH">7</span>,<span
+                                id="aaPayoffV">7</span>
+                        </td>
+                        <td id="payoffCellAB" style="background-color: white;"><span id="abPayoffH">3</span>,<span
+                                id="abPayoffV">3</span>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td><span id="hLabelb">wave</span></td>
+                        <td id="payoffCellBA" style="background-color: white;"><span id="baPayoffH">3</span>,<span
+                                id="baPayoffV">3</span>
+                        </td>
+                        <td id="payoffCellBB" style="background-color: white;"><span id="bbPayoffH">7</span>,<span
+                                id="bbPayoffV">7</span>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div id="tournamentResultsTable" style="">
+
+            <table class="table3">
+
+                <tbody>
+                    <tr>
+                        <td><span id="results0" style="font-weight: bold;">1. A100: 252</span></td>
+                        <td><span id="results4">&nbsp;</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><span id="results1" style="font-weight: normal;">2. RANDOM: 228</span></td>
+                        <td><span id="results5">&nbsp;</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><span id="results2">&nbsp;</span></td>
+                        <td><span id="results6">&nbsp;</span></td>
+                    </tr>
+
+                    <tr>
+                        <td><span id="results3">&nbsp;</span></td>
+                        <td><span id="results7">&nbsp;</span></td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    <p class="engineText4">Yomi: <span id="yomiDisplay">500</span>
+    </p>
+</div>
