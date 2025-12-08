@@ -1,0 +1,146 @@
+<style>
+  .stream-graph-layout {
+    margin-top: 1rem;
+  }
+
+  #stream-graph-container {
+    position: relative;
+    background: #f7f7f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  #stream-graph svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .stream-controls {
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .metric-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+  }
+
+  #stream-graph-legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 6px 12px;
+    margin-top: 12px;
+  }
+
+  #stream-graph-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+  }
+
+  .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  .stream-tooltip {
+    position: absolute;
+    pointer-events: none;
+    padding: 10px;
+    border-radius: 6px;
+    background: rgba(32, 32, 32, 0.9);
+    color: white;
+    font-size: 0.9rem;
+    min-width: 180px;
+    max-width: 260px;
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  .stream-tooltip.visible {
+    opacity: 1;
+  }
+
+  .stream-tooltip .tooltip-year {
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .stream-tooltip .tooltip-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.3;
+  }
+
+  .merger-label {
+    font-size: 0.75rem;
+    fill: #444;
+  }
+
+  .stream-notes {
+    margin-top: 14px;
+    font-size: 0.9rem;
+    color: #444;
+  }
+</style>
+
+<section class="blogpost stream-graph-layout">
+  <div class="row">
+    <div class="col-md-4 col-lg-3 stream-controls">
+      <h1>Streaming companies and mergers</h1>
+      <p>
+        Stream graph of major streaming platforms. Toggle metrics to compare subscribers, revenue, original title
+        output, and major awards. Merger lines show when catalogues were combined.
+      </p>
+
+      <div class="metric-group" aria-label="Metric toggle">
+        <label>
+          <input type="radio" name="metric-choice" value="subscribers" checked />
+          Subscribers (millions)
+        </label>
+        <label>
+          <input type="radio" name="metric-choice" value="revenue" />
+          Revenue (USD billions)
+        </label>
+        <label>
+          <input type="radio" name="metric-choice" value="originals" />
+          Original titles released
+        </label>
+        <label>
+          <input type="radio" name="metric-choice" value="awards" />
+          Major awards in year
+        </label>
+      </div>
+
+      <div class="stream-notes">
+        <div id="metric-label" aria-live="polite">Subscribers (millions)</div>
+        <p>
+          Data compiled from public filings and press (Netflix, Disney, Amazon, Warner Bros. Discovery, Statista,
+          Variety, company earnings calls). Values rounded; 2024 awards are placeholders until season outcomes.
+        </p>
+      </div>
+
+      <div id="stream-graph-legend" aria-label="Company legend"></div>
+    </div>
+
+    <div class="col-md-8 col-lg-9">
+      <div id="stream-graph-container">
+        <div id="stream-graph"></div>
+        <div id="stream-graph-tooltip" class="stream-tooltip"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{> require}}
+
