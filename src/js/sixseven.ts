@@ -55,6 +55,23 @@ d3.tsv('/twitterAnonymized.tdf')
       (d) => d
     )
 
+    // 10×10 tally: matrix[firstDigit][followingDigit] = count of "first followed by following"
+    const digitPairCounts: number[][] = Array.from({ length: 10 }, () => Array(10).fill(0))
+    rows.forEach((row) => {
+      countColumns.forEach((col) => {
+        const raw = row[col]
+        if (raw == null || raw === '') return
+        const n = parseFloat(String(raw).replace(/,/g, ''))
+        if (!Number.isFinite(n) || n <= 0) return
+        const s = Math.floor(n).toString()
+        for (let i = 0; i < s.length - 1; i++) {
+          const a = parseInt(s[i], 10)
+          const b = parseInt(s[i + 1], 10)
+          if (a >= 0 && a <= 9 && b >= 0 && b <= 9) digitPairCounts[a][b] += 1
+        }
+      })
+    })
+
     const benfordData: BenfordRow[] = DIGITS.map((digit) => {
       const observed = observedCounts.get(digit) ?? 0
       const expectedPct = benfordExpected(digit)
@@ -176,6 +193,74 @@ d3.tsv('/twitterAnonymized.tdf')
         .attr('dominant-baseline', 'middle')
         .style('font-size', '12px')
         .text("Benford's law")
+    })
+
+    // Heatmap: digit i followed by digit j, normalised by row (proportion given leading digit)
+    const rowTotals = digitPairCounts.map((row) => row.reduce((a, b) => a + b, 0))
+    const heatmapData: { i: number; j: number; count: number; proportion: number; scaleInRow: number }[] = []
+    for (let i = 0; i <= 9; i++) {
+      const total = rowTotals[i] || 1
+      const proportions = digitPairCounts[i].map((c) => c / total)
+      const maxInRow = Math.max(...proportions, 1e-9)
+      for (let j = 0; j <= 9; j++) {
+        const count = digitPairCounts[i][j]
+        const proportion = count / total
+        heatmapData.push({ i, j, count, proportion, scaleInRow: proportion / maxInRow })
+      }
+    }
+
+    const heatmapChart = new Chart({
+      element: 'chart-heatmap',
+      title: 'Digit followed by digit (row-normalised: proportion given leading digit)',
+      xLabel: 'Following digit',
+      yLabel: 'Leading digit',
+      width: 960,
+      height: 500,
+      data: heatmapData,
+    })
+
+    heatmapChart.scratchpad((c) => {
+      const plot = c.plot
+      const width = c.innerWidth
+      const height = c.innerHeight
+
+      const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      const x = d3
+        .scaleBand()
+        .domain(digits.map(String))
+        .range([0, width])
+        .padding(0.02)
+      const y = d3
+        .scaleBand()
+        .domain(digits.map(String))
+        .range([0, height])
+        .padding(0.02)
+
+      const colorScale = d3
+        .scaleSequential(d3.interpolateBlues)
+        .domain([0, 1])
+
+      plot
+        .selectAll('.heatmap-cell')
+        .data(heatmapData)
+        .join('rect')
+        .attr('class', 'heatmap-cell')
+        .attr('x', (d) => x(String(d.j)) ?? 0)
+        .attr('y', (d) => y(String(d.i)) ?? 0)
+        .attr('width', x.bandwidth())
+        .attr('height', y.bandwidth())
+        .attr('fill', (d) => colorScale(d.scaleInRow))
+        .attr('title', (d) => `${d.i}→${d.j}: ${d.count} (${(d.proportion * 100).toFixed(1)}%)`)
+        .attr('stroke', (d) => (d.i === 6 && d.j === 7 ? 'black' : 'none'))
+        .attr('stroke-width', (d) => (d.i === 6 && d.j === 7 ? 1 : 0))
+
+      plot
+        .append('g')
+        .attr('class', 'x axis')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(x))
+
+      plot.append('g').attr('class', 'y axis').call(d3.axisLeft(y))
     })
   })
   .catch((err) => {
