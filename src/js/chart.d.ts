@@ -21,6 +21,7 @@ type chartOptions = {
     colours?: string[];
     nav?: boolean;
     renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu' | 'three.js';
+    loading?: boolean;
 };
 type Position = {
     x: number;
@@ -92,6 +93,7 @@ declare class Chart {
     yBand: d3.ScaleBand<string>;
     constructor(opts: chartOptions);
     draw(): void;
+    ready(callback: (chart: Chart) => void): Chart;
     drawNav(): void;
     toggleFullscreen(chart?: Chart): void;
     cumulativeLineChart(): void;

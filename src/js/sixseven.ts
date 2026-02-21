@@ -31,6 +31,27 @@ type BenfordRow = {
 
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+// Show skeleton charts immediately so the page doesn't pop in after data loads
+const chart = new Chart({
+  element: 'chart',
+  title: "First-digit distribution: Twitter counts vs Benford's law",
+  xLabel: 'Leading digit',
+  yLabel: 'Proportion',
+  width: 960,
+  height: 500,
+  loading: true,
+})
+
+const heatmapChart = new Chart({
+  element: 'chart-heatmap',
+  title: 'Digit followed by digit (row-normalised: proportion given leading digit)',
+  xLabel: 'Following digit',
+  yLabel: 'Leading digit',
+  width: 960,
+  height: 500,
+  loading: true,
+})
+
 d3.tsv('/twitterAnonymized.tdf')
   .then((data) => {
     const rows = data as unknown as TwitterData[]
@@ -85,17 +106,7 @@ d3.tsv('/twitterAnonymized.tdf')
       }
     })
 
-    const chart = new Chart({
-      element: 'chart',
-      title: "First-digit distribution: Twitter counts vs Benford's law",
-      xLabel: 'Leading digit',
-      yLabel: 'Proportion',
-      width: 960,
-      height: 500,
-      data: benfordData,
-    })
-
-    chart.scratchpad((c) => {
+    chart.ready((c) => {
       const plot = c.plot
       const width = c.innerWidth
       const height = c.innerHeight
@@ -209,17 +220,7 @@ d3.tsv('/twitterAnonymized.tdf')
       }
     }
 
-    const heatmapChart = new Chart({
-      element: 'chart-heatmap',
-      title: 'Digit followed by digit (row-normalised: proportion given leading digit)',
-      xLabel: 'Following digit',
-      yLabel: 'Leading digit',
-      width: 960,
-      height: 500,
-      data: heatmapData,
-    })
-
-    heatmapChart.scratchpad((c) => {
+    heatmapChart.ready((c) => {
       const plot = c.plot
       const width = c.innerWidth
       const height = c.innerHeight
@@ -236,6 +237,8 @@ d3.tsv('/twitterAnonymized.tdf')
         .range([0, height])
         .padding(0.02)
 
+      // Power curve increases contrast: low values stay light, high values read darker
+      const contrastGamma = 2
       const colorScale = d3
         .scaleSequential(d3.interpolateBlues)
         .domain([0, 1])
@@ -249,7 +252,7 @@ d3.tsv('/twitterAnonymized.tdf')
         .attr('y', (d) => y(String(d.i)) ?? 0)
         .attr('width', x.bandwidth())
         .attr('height', y.bandwidth())
-        .attr('fill', (d) => colorScale(d.scaleInRow))
+        .attr('fill', (d) => colorScale(Math.pow(d.scaleInRow, contrastGamma)))
         .attr('title', (d) => `${d.i}→${d.j}: ${d.count} (${(d.proportion * 100).toFixed(1)}%)`)
         .attr('stroke', (d) => (d.i === 6 && d.j === 7 ? 'black' : 'none'))
         .attr('stroke-width', (d) => (d.i === 6 && d.j === 7 ? 1 : 0))

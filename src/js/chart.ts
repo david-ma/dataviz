@@ -26,6 +26,8 @@ type chartOptions = {
   colours?: string[]
   nav?: boolean
   renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu' | 'three.js'
+  /** When true, draw a skeleton with "<title> loading..." and no data. Call ready(callback) after data loads to draw the real chart. */
+  loading?: boolean
 }
 
 type commit = {
@@ -292,6 +294,38 @@ class Chart {
       .attr('x', 0)
       .attr('y', 0)
       .text(this.title)
+
+    if (this.opts.loading) {
+      const loading = this.plot
+        .append('g')
+        .attr('class', 'chart-loading')
+      loading
+        .append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', this.innerWidth)
+        .attr('height', this.innerHeight)
+        .attr('fill', '#f8f9fa')
+      loading
+        .append('text')
+        .attr('x', this.innerWidth / 2)
+        .attr('y', this.innerHeight / 2)
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'middle')
+        .attr('fill', '#6c757d')
+        .style('font-size', '16px')
+        .text(this.title ? `${this.title} loading…` : 'Loading…')
+    }
+  }
+
+  /**
+   * Remove the loading skeleton and run the callback to draw the real chart.
+   * Call this after data is loaded when the chart was created with loading: true.
+   */
+  ready(callback: (chart: Chart) => void): Chart {
+    this.plot.selectAll('.chart-loading').remove()
+    callback(this)
+    return this
   }
 
   drawNav() {
