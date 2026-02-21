@@ -1,0 +1,211 @@
+{{!--
+  showDataset – reusable partial to display a tabular dataset with DataTables and a download link.
+
+  Usage:
+    {{> showDataset filepath="/twitterAnonymized.tdf"}}
+    {{> showDataset filepath="/data/example.csv" format="csv" title="Source data"}}
+    {{> showDataset filepath="/data/example.tsv" id="my-dataset"}}
+
+  Parameters:
+    filepath (required) – URL path to the dataset file (e.g. /twitterAnonymized.tdf).
+    format   (optional) – "csv" or "tsv". Default: inferred from filepath (.csv → csv, else tsv).
+    title    (optional) – Section heading. Default: "Dataset preview".
+    id       (optional) – Wrapper element id (for multiple datasets per page). Default: "dataset-preview".
+--}}
+<section class="dataset-preview-wrapper" id="{{#if id}}{{id}}{{else}}dataset-preview{{/if}}">
+  <div class="dataset-preview-card">
+    <header class="dataset-preview-header">
+      <h3 class="dataset-preview-title">{{#if title}}{{title}}{{else}}Dataset preview{{/if}}</h3>
+      <a href="{{filepath}}" class="dataset-preview-download" download>
+        Download dataset
+      </a>
+    </header>
+    <div class="dataset-preview-table-wrap">
+      <table class="dataset-preview-table table table-striped table-bordered" width="100%"></table>
+    </div>
+    <p class="dataset-preview-hint">Readers can download the dataset above to reproduce the analysis.</p>
+  </div>
+</section>
+
+<style>
+  .dataset-preview-wrapper {
+    margin: 1.5rem 0;
+  }
+
+  .dataset-preview-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  .dataset-preview-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .dataset-preview-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+  }
+
+  .dataset-preview-download {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #0d6efd;
+    background: #fff;
+    border: 1px solid #0d6efd;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .dataset-preview-download:hover {
+    background: #0d6efd;
+    color: #fff;
+  }
+
+  .dataset-preview-table-wrap {
+    padding: 0.5rem 1rem 1rem;
+    overflow-x: auto;
+  }
+
+  .dataset-preview-table {
+    margin-bottom: 0;
+    font-size: 0.875rem;
+  }
+
+  .dataset-preview-table thead th {
+    background: #e9ecef;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .dataset-preview-table tbody td {
+    padding: 0.4rem 0.75rem;
+    vertical-align: top;
+  }
+
+  .dataset-preview-hint {
+    margin: 0;
+    padding: 0.5rem 1rem 1rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+
+  /* DataTables controls inside this card */
+  .dataset-preview-wrapper .dataTables_wrapper {
+    padding: 0;
+  }
+
+  .dataset-preview-wrapper .dataTables_length,
+  .dataset-preview-wrapper .dataTables_filter {
+    padding: 0.25rem 1rem;
+  }
+
+  .dataset-preview-wrapper .dataTables_info,
+  .dataset-preview-wrapper .dataTables_paginate {
+    padding: 0.5rem 1rem;
+  }
+</style>
+
+<script>
+(function() {
+  var wrapper = document.getElementById('{{#if id}}{{id}}{{else}}dataset-preview{{/if}}');
+  if (!wrapper) return;
+
+  var filepath = '{{{filepath}}}';
+  var format = '{{#if format}}{{format}}{{else}}tsv{{/if}}';
+  if (!format || format === 'tsv') format = /\.csv$/i.test(filepath) ? 'csv' : 'tsv';
+
+  var delimiter = format === 'csv' ? ',' : '\t';
+
+  function parseDSV(text, delim) {
+    var lines = text.split(/\r?\n/).filter(function(l) { return l.length; });
+    if (lines.length === 0) return [];
+    var header = lines[0].split(delim);
+    if (delim === ',') {
+      header = parseCSVLine(lines[0]);
+    } else {
+      header = lines[0].split(delim).map(function(s) { return s.trim(); });
+    }
+    var rows = [];
+    for (var i = 1; i < lines.length; i++) {
+      var values = delim === '\t'
+        ? lines[i].split(delim).map(function(s) { return s.trim(); })
+        : parseCSVLine(lines[i]);
+      var obj = {};
+      header.forEach(function(h, j) { obj[h] = values[j] !== undefined ? values[j] : ''; });
+      rows.push(obj);
+    }
+    return rows;
+  }
+
+  function parseCSVLine(line) {
+    var result = [];
+    var current = '';
+    var inQuotes = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (c === '"') {
+        inQuotes = !inQuotes;
+      } else if (inQuotes) {
+        current += c;
+      } else if (c === ',') {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += c;
+      }
+    }
+    result.push(current.trim());
+    return result;
+  }
+
+  fetch(filepath)
+    .then(function(r) { return r.ok ? r.text() : Promise.reject(new Error('Failed to load ' + filepath)); })
+    .then(function(text) {
+      var data = parseDSV(text, delimiter);
+      var table = wrapper.querySelector('.dataset-preview-table');
+      if (!table || !data.length) return;
+
+      if (typeof $ !== 'undefined' && $.fn.DataTable) {
+        $(table).DataTable({
+          data: data,
+          columns: Object.keys(data[0]).map(function(key) {
+            return { title: key, data: key };
+          }),
+          pageLength: 10,
+          lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']],
+          order: [[0, 'asc']],
+          responsive: true,
+          language: {
+            search: 'Filter:',
+            lengthMenu: 'Show _MENU_ rows',
+            info: '_START_–_END_ of _TOTAL_',
+            infoEmpty: '0 rows',
+            paginate: { first: '«', previous: '‹', next: '›', last: '»' }
+          }
+        });
+      }
+    })
+    .catch(function(err) {
+      var wrap = wrapper.querySelector('.dataset-preview-table-wrap');
+      if (wrap) wrap.innerHTML = '<p class="text-muted">Dataset could not be loaded. Check the file path and CORS.</p>';
+      console.warn('showDataset:', err);
+    });
+})();
+</script>
