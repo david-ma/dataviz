@@ -14,12 +14,14 @@ function getFiles(dir) {
 
     if (stat.isDirectory()) {
       Object.assign(results, getFiles(filePath))
-    } else if (file.endsWith('.ts') && !file.endsWith('.d.ts')) {
+    } else if (file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.endsWith('.test.ts')) {
       // Only include TypeScript files
       const relativePath = path.relative('./src/js', dir)
       const entryName = path
         .join(relativePath, file.replace('.ts', ''))
         .replace(/\\/g, '/')
+
+      if (entryName.includes('.test')) return
 
       results[entryName] = {
         import: `./${path.relative('.', filePath)}`,
@@ -112,6 +114,7 @@ var config = {
       // all files with a `.ts`, `.cts`, `.mts` or `.tsx` extension will be handled by `ts-loader`
       {
         test: /\.([cm]?ts|tsx)$/,
+        exclude: /\.test\.([cm]?ts|tsx)$/,
         loader: 'ts-loader',
         options: {
           configFile: 'tsconfig.json',

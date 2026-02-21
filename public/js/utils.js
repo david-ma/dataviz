@@ -1,1 +1,1 @@
-export const __webpack_id__=738;export const __webpack_ids__=[738];export const __webpack_modules__={};import _ from"./chart.js";import*as o from"./utils.js";_.C(o);const s=_(_.s=2996).P;export{s as camelize};
+export const __webpack_id__=5738;export const __webpack_ids__=[5738];export const __webpack_modules__={};import _ from"./chart.js";import*as o from"./utils.js";_.C(o);const s=_(_.s=2996).P;export{s as camelize};

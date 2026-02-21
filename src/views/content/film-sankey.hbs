@@ -1,0 +1,61 @@
+<style>
+  .sankey-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  #film-sankey-container {
+    position: relative;
+    background: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  #film-sankey-tooltip {
+    position: absolute;
+    pointer-events: none;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: rgba(32, 32, 32, 0.92);
+    color: #fff;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 120ms ease;
+    z-index: 10;
+  }
+
+  #film-sankey-tooltip.visible {
+    opacity: 1;
+  }
+
+  #film-sankey-notes {
+    margin-top: 12px;
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  #film-sankey-notes .note-item {
+    margin-bottom: 6px;
+  }
+</style>
+
+<div class="sankey-shell">
+  <h1>Studio and Streaming M&A (Sankey)</h1>
+  <p>
+    Major media mergers visualized as flows. Link thickness shows deal value (USD billions).
+    Netflix → Warner Bros. Discovery is marked as announced; historical deals include AOL–Time Warner, AT&T–Time Warner,
+    Disney–21st Century Fox, and Sony–Columbia. The Telecommunications Act of 1996 loosened U.S. media ownership caps,
+    accelerating telecom–media combos.
+  </p>
+
+  <div id="film-sankey-container">
+    <div id="film-sankey"></div>
+    <div id="film-sankey-tooltip"></div>
+  </div>
+
+  <div id="film-sankey-notes"></div>
+</div>
+
+{{> require}}

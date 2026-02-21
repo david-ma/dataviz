@@ -1,4 +1,5 @@
-import { Chart } from "chart"
+import { Chart } from './chart'
+import * as d3 from 'd3'
 
 console.log("Six Seven")
 
@@ -12,9 +13,10 @@ type TwitterData = {
   UserID: string,
 }
 
-d3.tsv<TwitterData>('/twitterAnonymized.tdf')
+d3.tsv('/twitterAnonymized.tdf')
   .then((data) => {
-    console.log(data)
+    const rows = data as unknown as TwitterData[]
+    console.log(rows)
     // Draw scatterplot
 
     new Chart({
@@ -22,7 +24,7 @@ d3.tsv<TwitterData>('/twitterAnonymized.tdf')
       title: 'Twitter Follower vs Friend Count',
       xLabel: 'Follower Count',
       yLabel: 'Friend Count',
-      data: data,
+      data: rows,
     })
   })
   .catch(error => {

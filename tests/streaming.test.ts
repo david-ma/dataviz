@@ -1,5 +1,11 @@
 import { expect, test } from 'bun:test'
-import { applyMergers, buildSeries, MetricKey, StreamingRow, MergerEvent } from './streaming'
+import {
+  applyMergers,
+  buildSeries,
+  MetricKey,
+  StreamingRow,
+  MergerEvent,
+} from '../src/js/data/streaming'
 
 test('applyMergers combines acquiree into acquirer from merger year', () => {
   const rows: StreamingRow[] = [
@@ -18,7 +24,9 @@ test('applyMergers combines acquiree into acquirer from merger year', () => {
   ]
 
   const merged = applyMergers(rows, events)
-  const lookup = new Map(merged.map((row) => [`${row.company}-${row.year}`, row.subscribersMillions]))
+  const lookup = new Map(
+    merged.map((row) => [`${row.company}-${row.year}`, row.subscribersMillions])
+  )
 
   expect(lookup.get('Beta-2022')).toBe(5)
   expect(lookup.get('Alpha+-2022')).toBe(10)
@@ -28,7 +36,12 @@ test('applyMergers combines acquiree into acquirer from merger year', () => {
 
 test('buildSeries outputs stack input for selected metric', () => {
   const rows: StreamingRow[] = [
-    { company: 'Alpha+', year: 2022, subscribersMillions: 10, revenueBillions: 1 },
+    {
+      company: 'Alpha+',
+      year: 2022,
+      subscribersMillions: 10,
+      revenueBillions: 1,
+    },
     { company: 'Beta', year: 2022, subscribersMillions: 5, revenueBillions: 0.4 },
     { company: 'Beta', year: 2023, subscribersMillions: 6, revenueBillions: 0.6 },
   ]
@@ -51,4 +64,3 @@ test('buildSeries outputs stack input for selected metric', () => {
   expect(result.stackInput[1]['Alpha+']).toBe(6) // merged Beta in 2023
   expect(result.stackInput[1].Beta).toBe(0)
 })
-
