@@ -1,0 +1,22 @@
+<section class="blogpost">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-lg-8">
+      <div id="description"></div>
+      <div id="chart" class="chart"></div>
+      {{> showSource }}
+    </div>
+  </div>
+</section>
+
+{{> require }}
+
+<script>
+  var md = new showdown.Converter({openLinksInNewWindow: true});
+
+  $("#description").html(md.makeHtml(
+`#Six Seven
+
+[Benford's Law](https://en.wikipedia.org/wiki/Benford%27s_law) is a law of probability that states that in many naturally occurring collections of numbers, the leading digit is likely to be small. This is a visualization of Benford's Law applied to the first digits of the numbers in the [Benford Data](https://github.com/jgolbeck/BenfordData) dataset.`
+  ));
+
+</script>
