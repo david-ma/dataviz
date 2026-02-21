@@ -111,6 +111,14 @@ declare class Chart {
             color: string;
         }[];
     }): void;
+    pieChart(options?: {
+        data?: {
+            label: string;
+            value: number;
+        }[];
+        innerRadius?: number;
+        colours?: string[];
+    }): Chart;
     lineChart(): void;
     barGraph(): this;
     createScales(values: Array<any>): void;

@@ -1,8 +1,17 @@
 /**
  * Chart – shared D3/Three.js chart wrapper for dataviz blog visualisations.
- * Provides a consistent SVG (or canvas) setup, margins, title, and plot area;
- * consumers use scratchpad() or built-in methods (e.g. generalisedLineChart, barGraph)
- * to draw. Supports a loading skeleton via opts.loading and ready(callback).
+ * Provides a consistent SVG (or canvas) setup, margins, title, and plot area.
+ *
+ * **Two ways to use:**
+ * 1. **Sync (data already available):** `new Chart({ element, title, data }).scratchpad((c) => { ... draw into c.plot ... })`
+ * 2. **Async (reserve space, then load):** Create with `loading: true` and no data; after data loads call
+ *    `chart.ready((c) => { ... draw into c.plot ... })`. The skeleton shows "<title> loading…" until then.
+ *
+ * **Data is optional.** Omit `data` (or pass `[]`) when using `loading: true`; you can also omit it for
+ * a chart that will be drawn entirely in scratchpad from another source.
+ *
+ * Use built-in methods (generalisedLineChart, barGraph, pieChart) when they fit; use scratchpad() for
+ * custom one-off visuals.
  */
 
 import * as d3 from 'd3'
@@ -135,11 +144,14 @@ class Chart {
 
   /** Create a chart bound to a DOM element. Calls draw() to set up SVG and plot area; use scratchpad() or ready() to draw content. */
   constructor(opts: chartOptions) {
-    // Set variables...
     this.opts = opts
     this.element = opts.element || 'chart'
     this.renderer = opts.renderer || 'svg'
-    this.data = opts.data || []
+    this.data = opts.data ?? []
+
+    if (typeof document !== 'undefined' && !document.getElementById(this.element)) {
+      console.warn(`Chart: element #${this.element} not found in DOM; chart may not be visible.`)
+    }
     this.title = opts.title || ''
     this.xLabel = opts.xLabel || ''
     this.yLabel = opts.yLabel || ''
@@ -225,9 +237,10 @@ class Chart {
         alpha: true,
       })
 
-      document
-        .getElementById(this.element)
-        .appendChild(this.three_renderer.domElement)
+      const container = document.getElementById(this.element)
+      if (container) {
+        container.appendChild(this.three_renderer.domElement)
+      }
       this.three_renderer.setSize(this.width, this.height)
 
       this.context = this.three_renderer.getContext()
@@ -552,6 +565,65 @@ class Chart {
       .append('g')
       .attr('class', 'axis')
       .call(d3.axisLeft(y).tickFormat(d3.format(options.yFormat || '')))
+  }
+
+  /**
+   * Draw a simple pie (or donut) chart from an array of { label, value }.
+   * Data can be this.data or passed in options. Colours from options or this.colours.
+   */
+  pieChart(options?: {
+    data?: { label: string; value: number }[]
+    innerRadius?: number
+    colours?: string[]
+  }): Chart {
+    const data = options?.data ?? (Array.isArray(this.data) ? this.data : [])
+    const innerRadius = options?.innerRadius ?? 0
+    const colours = options?.colours ?? this.colours
+
+    const midX = this.innerWidth / 2
+    const midY = this.innerHeight / 2
+    const radius = Math.min(this.innerWidth, this.innerHeight) / 2.5
+
+    const pie = d3.pie<{ label: string; value: number }>().sort(null).value((d) => d.value)
+    const arcs = pie(data as { label: string; value: number }[])
+
+    const arc = d3
+      .arc<d3.PieArcDatum<{ label: string; value: number }>>()
+      .innerRadius(radius * innerRadius)
+      .outerRadius(radius * 0.8)
+
+    const g = this.plot
+      .append('g')
+      .attr('transform', `translate(${midX},${midY})`)
+
+    g.selectAll('path')
+      .data(arcs)
+      .join('path')
+      .attr('d', arc)
+      .attr('fill', (_, i) => colours[i % colours.length])
+      .attr('stroke', 'white')
+      .style('stroke-width', '2px')
+
+    const colorScale = d3.scaleOrdinal<string, string>().domain(data.map((d) => d.label)).range(colours)
+    const legendY = 30
+    data.forEach((d, i) => {
+      this.plot
+        .append('rect')
+        .attr('x', 30)
+        .attr('y', legendY + i * 60)
+        .attr('width', 24)
+        .attr('height', 24)
+        .attr('fill', colorScale(d.label))
+      this.plot
+        .append('text')
+        .attr('x', 62)
+        .attr('y', legendY + i * 60 + 16)
+        .attr('dominant-baseline', 'middle')
+        .style('font-size', '14px')
+        .text(d.label)
+    })
+
+    return this
   }
 
   lineChart() {
