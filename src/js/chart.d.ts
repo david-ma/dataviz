@@ -96,6 +96,7 @@ declare class Chart {
     draw(): void;
     ready(callback: (chart: this) => void): this;
     drawNav(): void;
+    exportPNG(filename?: string): void;
     toggleFullscreen(chart?: Chart): void;
     cumulativeLineChart(): void;
     generalisedLineChart(options: {

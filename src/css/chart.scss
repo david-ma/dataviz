@@ -90,7 +90,8 @@
         rgba(255, 255, 255, 0),
         rgba(0, 0, 0, 0.3)
       );
-      .expander {
+      .expander,
+      .chart-download-png {
         display: block;
       }
     }
@@ -103,11 +104,11 @@
     width: 100%;
     height: 50px;
 
-    .expander {
+    .expander,
+    .chart-download-png {
       cursor: pointer;
       height: 100%;
       position: absolute;
-      right: 0;
       bottom: 0;
       background: white;
       padding: 5px;
@@ -121,6 +122,14 @@
       &:hover {
         border: solid 2px black;
       }
+    }
+
+    .expander {
+      right: 0;
+    }
+
+    .chart-download-png {
+      right: 45px;
     }
   }
 

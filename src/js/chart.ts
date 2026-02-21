@@ -348,12 +348,12 @@ class Chart {
   }
 
   drawNav() {
-    const svg = d3
+    const nav = d3
       .select(`#${this.element}`)
       .append('div')
       .classed('chart-nav', true)
 
-    svg
+    nav
       .append('div')
       .datum(this)
       .on('click', this.toggleFullscreen)
@@ -362,7 +362,70 @@ class Chart {
       .append('i')
       .classed('fa fa-lg fa-expand', true)
 
+    nav
+      .append('div')
+      .datum(this)
+      .attr('title', 'Download as PNG')
+      .classed('chart-download-png', true)
+      .on('click', function (this: HTMLElement) {
+        const chart = d3.select(this).datum() as Chart
+        chart.exportPNG()
+      })
+      .append('span')
+      .append('i')
+      .classed('fa fa-download', true)
+
     $(`#${this.element}`).dblclick(() => this.toggleFullscreen())
+  }
+
+  /**
+   * Export the chart as a PNG and trigger a download. Works for SVG and canvas renderers.
+   * No extra dependencies; uses browser Canvas API. Filename defaults to element id or "chart".
+   */
+  exportPNG(filename?: string): void {
+    const name = filename ?? `${this.element || 'chart'}.png`
+
+    if (this.renderer === 'canvas' && this.canvas?.node()) {
+      const dataUrl = (this.canvas.node() as HTMLCanvasElement).toDataURL('image/png')
+      const a = document.createElement('a')
+      a.href = dataUrl
+      a.download = name
+      a.click()
+      return
+    }
+
+    const svgEl = this.svg?.node()
+    if (!svgEl || !(svgEl instanceof SVGElement)) return
+
+    const serializer = new XMLSerializer()
+    const str = serializer.serializeToString(svgEl)
+    const blob = new Blob([str], { type: 'image/svg+xml;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const img = new Image()
+    const w = this.width
+    const h = this.height
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        URL.revokeObjectURL(url)
+        return
+      }
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, w, h)
+      ctx.drawImage(img, 0, 0, w, h)
+      const dataUrl = canvas.toDataURL('image/png')
+      const a = document.createElement('a')
+      a.href = dataUrl
+      a.download = name
+      a.click()
+      URL.revokeObjectURL(url)
+    }
+    img.onerror = () => URL.revokeObjectURL(url)
+    img.src = url
   }
 
   toggleFullscreen(chart?: Chart) {

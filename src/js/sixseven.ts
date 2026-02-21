@@ -168,10 +168,11 @@ d3.tsv('/twitterAnonymized.tdf')
         .attr('class', 'benford-legend')
         .attr('transform', `translate(${width - 160}, 10)`)
 
+      const legendHeight = 54
       legend
         .append('rect')
         .attr('width', 150)
-        .attr('height', 44)
+        .attr('height', legendHeight)
         .attr('fill', 'white')
         .attr('stroke', '#ccc')
 
