@@ -1,39 +1,50 @@
-// @ts-nocheck
-
 import { Chart, _, d3 } from './chart'
 import 'datatables.net'
 
 console.log('Australian Income stuff')
 
-var colors = {
+const colors: Record<string, string> = {
   Male: '#31a885',
   Female: '#fd9e83',
   Total: '#1e1e1e',
 }
 
-var total = {}
-var cumulativePopulation = {
+type IncomeRow = {
+  percentile: number
+  sex: string
+  count: number
+  rawIncome: number[]
+  income: number
+  cumulativePopulation: number
+}
+
+const total: Record<number, IncomeRow> = {}
+const cumulativePopulation: Record<string, number> = {
   Male: 0,
   Female: 0,
   Total: 0,
 }
 
+function parseIncomeRange(raw: string | undefined): number[] {
+  if (raw == null || raw === '') return [0]
+  const matches = raw.replace(/[$,]/g, '').match(/\d+/g)
+  if (!matches) return [0]
+  return matches.map((s) => parseInt(s, 10))
+}
+
 d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
-  var blob = {
-    percentile: parseInt(d.Percentile),
+  const rawIncome = parseIncomeRange(d['Ranged Taxable Income'])
+  const blob: IncomeRow = {
+    percentile: parseInt(d.Percentile, 10),
     sex: d.Sex,
-    count: parseInt(d['Number of individuals ']),
-    rawIncome: d['Ranged Taxable Income']
-      .replace(/[$,]/g, '')
-      .match(/\d+/g)
-      .map((d) => parseInt(d)),
+    count: parseInt(d['Number of individuals '], 10) || 0,
+    rawIncome,
     income: 0,
     cumulativePopulation: 0,
   }
 
-  blob.income = blob.rawIncome[1]
-    ? (blob.rawIncome[0] + blob.rawIncome[1]) / 2
-    : blob.rawIncome[0]
+  blob.income =
+    rawIncome.length > 1 ? (rawIncome[0] + rawIncome[1]) / 2 : rawIncome[0] ?? 0
 
   blob.cumulativePopulation = cumulativePopulation[blob.sex] += blob.count
 
@@ -50,8 +61,9 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
 
   return blob
 })
-  .then((data) => {
-    data = _.union(data, _.flatMap(total)) as any
+  .then((data: IncomeRow[]) => {
+    const totalRows = Object.values(total)
+    data = _.union(data, totalRows) as IncomeRow[]
 
     new Chart({
       element: 'income',
@@ -262,11 +274,13 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
       ]
 
       types.forEach((type) => {
-        var data = chart.data.filter((d) => d[options.filter] === type.label)
+        const filteredData = chart.data.filter(
+          (d) => d[options.filter as keyof IncomeRow] === type.label
+        )
 
         chart.plot
           .append('path')
-          .datum(data)
+          .datum(filteredData)
           .attr('class', 'line')
           .style('stroke', type.color)
           .attr(
@@ -279,13 +293,16 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
             }),
           )
 
-        chart.plot
-          .append('text')
-          .datum(data.pop())
-          .text(type.label)
+        const lastPoint = filteredData[filteredData.length - 1]
+        if (lastPoint) {
+          chart.plot
+            .append('text')
+            .datum(lastPoint)
+            .text(type.label)
           .attr('fill', type.color)
-          .attr('x', (d) => x(d[options.xField]) + 10)
-          .attr('y', (d) => y(d[options.yField]) + 5)
+          .attr('x', (d: IncomeRow) => x(Number((d as unknown as Record<string, number>)[options.xField])) + 10)
+          .attr('y', (d: IncomeRow) => y(Number((d as unknown as Record<string, number>)[options.yField])) + 5)
+        }
       })
 
       chart.plot
@@ -339,7 +356,7 @@ d3.csv('/blogposts/AusIncome.csv', function (d: d3.DSVRowString<string>) {
         .value(function (d: any) {
           return d
         })
-      const dataReady = pie(_.flatMap(pieData))
+      const dataReady = pie([pieData.Male, pieData.Female])
 
       console.log('dataReady', dataReady)
 

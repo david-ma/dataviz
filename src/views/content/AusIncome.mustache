@@ -41,10 +41,25 @@
   var md = new showdown.Converter({ openLinksInNewWindow: true });
 
   $("#explain").html(md.makeHtml(`
-The ABC published [this article](https://www.abc.net.au/news/2021-06-20/are-you-middle-income-see-how-you-compare/100226488) on Australian Incomes, but did not provide a decent graph. They just dumped the data in a table.
+The ABC published [this article](https://www.abc.net.au/news/2021-06-20/are-you-middle-income-see-how-you-compare/100226488) on Australian taxable incomes, but only showed the data in a table—no charts. The underlying figures are from the **Australian Taxation Office (ATO) 2018–19** income statistics, broken down by percentile and sex (male/female).
 
-So I've made some graphs. I don't have a particular story to tell with this data,
-I'm just making graphs for practice and to explore it.`))
+I've turned that dataset into a set of graphs to explore the shape of the distribution and the gender gap. There’s no single story here; it’s an exploratory look at the numbers.
+
+**What each chart shows**
+
+- **Australians in each income percentile** — How many people (male, female, total) fall into each percentile band. The “Total” line is the sum of both sexes; higher counts in the middle percentiles reflect the bulge of the middle class.
+- **Australian income by percentile** — Median taxable income in each percentile (using the midpoint of the ATO’s income ranges). Shows how income rises with percentile and how the male and female lines compare across the distribution.
+- **Australian income by cumulative population** — Same income-by-percentile idea, but the x-axis is cumulative population (headcount) so you see income as you “walk” through the population from lowest to highest earners.
+- **Australian cumulative population by income** — Cumulative headcount (y) vs income (x, log scale). Answers “how many people earn up to \$X?” and makes the long tail of high earners visible.
+- **Australian population by income** — Count of people in each income band (log scale on x). The bump in the middle is the bulk of earners; the right tail is high earners.
+- **Australian income by percentile** (scratchpad version) — Alternative view of income by percentile with cumulative population on the x-axis (as a percentage of each sex).
+- **Income going to Men vs Women** — Pie chart of total taxable income (sum of income × count across percentiles) by sex. A rough snapshot of the aggregate gender gap in taxable income.
+
+**Notes**
+
+- All amounts are **taxable income** for 2018–19, not necessarily salary (includes other assessable income, minus some deductions).
+- Income ranges are ATO percentiles; we use the midpoint of each range for the “income” value in the line charts.
+- The gender breakdown is male vs female as reported by the ATO; the data doesn’t distinguish non-binary or other categories.`))
 
 </script>
 
