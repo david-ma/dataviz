@@ -4,7 +4,7 @@ import $ from 'jquery';
 import 'datatables.net';
 import * as DataTables from 'datatables.net';
 import _ from 'lodash';
-type chartOptions = {
+export type ChartOptions = {
     element?: string;
     data?: any[] | {};
     title?: string;
@@ -23,6 +23,7 @@ type chartOptions = {
     renderer?: 'canvas' | 'svg' | 'canvas-webgl2' | 'webgpu' | 'three.js';
     loading?: boolean;
 };
+type chartOptions = ChartOptions;
 type Position = {
     x: number;
     y: number;
@@ -93,7 +94,7 @@ declare class Chart {
     yBand: d3.ScaleBand<string>;
     constructor(opts: chartOptions);
     draw(): void;
-    ready(callback: (chart: Chart) => void): Chart;
+    ready(callback: (chart: this) => void): this;
     drawNav(): void;
     toggleFullscreen(chart?: Chart): void;
     cumulativeLineChart(): void;

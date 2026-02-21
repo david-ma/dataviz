@@ -1,6 +1,9 @@
-// Language: typescript
-// Path: src/js/chart.ts
-// console.log('Running chart.ts')
+/**
+ * Chart – shared D3/Three.js chart wrapper for dataviz blog visualisations.
+ * Provides a consistent SVG (or canvas) setup, margins, title, and plot area;
+ * consumers use scratchpad() or built-in methods (e.g. generalisedLineChart, barGraph)
+ * to draw. Supports a loading skeleton via opts.loading and ready(callback).
+ */
 
 import * as d3 from 'd3'
 import * as THREE from 'three'
@@ -13,8 +16,8 @@ import _ from 'lodash'
 
 import { camelize } from './utils'
 
-// interface or type?
-type chartOptions = {
+/** Options for the Chart constructor. */
+export type ChartOptions = {
   element?: string
   data?: any[] | {}
   title?: string
@@ -29,6 +32,9 @@ type chartOptions = {
   /** When true, draw a skeleton with "<title> loading..." and no data. Call ready(callback) after data loads to draw the real chart. */
   loading?: boolean
 }
+
+/** @internal Alias for backward compatibility. */
+type chartOptions = ChartOptions
 
 type commit = {
   author: string
@@ -127,7 +133,7 @@ class Chart {
   // @ts-ignore
   yBand: d3.ScaleBand<string>
 
-  // Sets variables
+  /** Create a chart bound to a DOM element. Calls draw() to set up SVG and plot area; use scratchpad() or ready() to draw content. */
   constructor(opts: chartOptions) {
     // Set variables...
     this.opts = opts
@@ -320,9 +326,9 @@ class Chart {
 
   /**
    * Remove the loading skeleton and run the callback to draw the real chart.
-   * Call this after data is loaded when the chart was created with loading: true.
+   * Call after data is loaded when the chart was created with loading: true.
    */
-  ready(callback: (chart: Chart) => void): Chart {
+  ready(callback: (chart: this) => void): this {
     this.plot.selectAll('.chart-loading').remove()
     callback(this)
     return this
@@ -523,13 +529,16 @@ class Chart {
           }),
         )
 
-      chart.plot
-        .append('text')
-        .datum(typeData.pop())
-        .text(type.label)
-        .attr('fill', type.color)
-        .attr('x', (d) => x(d[options.xField]) + 10)
-        .attr('y', (d) => y(d[options.yField]) + 5)
+      const lastPoint = typeData[typeData.length - 1]
+      if (lastPoint) {
+        chart.plot
+          .append('text')
+          .datum(lastPoint)
+          .text(type.label)
+          .attr('fill', type.color)
+          .attr('x', (d: any) => x(d[options.xField]) + 10)
+          .attr('y', (d: any) => y(d[options.yField]) + 5)
+      }
     })
 
     chart.plot
@@ -1320,6 +1329,7 @@ class Chart {
     return callback(this).then(() => this || that)
   }
 
+  /** Run a callback with this chart so the caller can draw into this.plot. Returns this for chaining. */
   scratchpad(callback: (chart: Chart) => Chart | void): Chart {
     return callback(this) || this
   }
@@ -1860,9 +1870,9 @@ export type DataTableDataset = Array<any> & {
 }
 
 /**
- * Draw a datatables.net table, using data
- * Minimal config required
- * 
+ * Draw a DataTables.net table from an array of row objects.
+ * Columns default to Object.keys(dataset[0]); override with options.element, options.columns, etc.
+ *
  * Options:
  * - element: string - the element to draw the table into, defaults to `#dataset table`
  * - titles: string[] - the titles of the columns
@@ -2137,8 +2147,9 @@ function deg2rad(deg: number) {
 
 export { Chart, decorateTable, _, $, d3, classifyName }
 
-// export default Chart
-
+/**
+ * Sanitise a string for use as an HTML id or CSS-friendly class (replace slashes, spaces, punctuation with hyphens).
+ */
 function classifyName(name: string): string {
-  return name.replace(/[\/\\\!\[\]\&\s\(\)\.\']/gi, '-') // eslint-disable-line
+  return name.replace(/[\/\\\!\[\]\&\s\(\)\.\']/gi, '-')
 }
