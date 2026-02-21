@@ -14,9 +14,15 @@
   var md = new showdown.Converter({openLinksInNewWindow: true});
 
   $("#description").html(md.makeHtml(
-`#Six Seven
+`# Six Seven: Benford's Law on Twitter counts
 
-[Benford's Law](https://en.wikipedia.org/wiki/Benford%27s_law) is a law of probability that states that in many naturally occurring collections of numbers, the leading digit is likely to be small. This is a visualization of Benford's Law applied to the first digits of the numbers in the [Benford Data](https://github.com/jgolbeck/BenfordData) dataset.`
+[Benford's law](https://en.wikipedia.org/wiki/Benford%27s_law) says that in many real-world datasets—populations, river lengths, invoice amounts, and so on—the *leading digit* of numbers is far more often small than large. About 30% of numbers start with 1, 18% with 2, down to about 5% starting with 9. The pattern comes from the maths of scale-invariance and multiplicative processes, and it shows up wherever numbers span many orders of magnitude.
+
+Here we test whether that holds for **anonymised Twitter user counts**: follower count, friend count, and status count. For each value we take the first digit (1–9; zeros are ignored), then compare the distribution in the data to the distribution predicted by Benford's law.
+
+The chart below shows **observed** proportions (from the data) next to **expected** proportions (Benford's formula \`log₁₀(1 + 1/d)\` for each digit \`d\`). If the two bars line up reasonably well, the dataset behaves like many natural, “unmanipulated” collections of numbers. (Deviations can sometimes hint at rounding, censoring, or fabrication—though we're not doing that kind of audit here.)
+
+*Later: we'll look at the “6 followed by 7” idea in this same dataset.*`
   ));
 
 </script>

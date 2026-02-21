@@ -75,6 +75,16 @@ export const blogposts = [
     published: true,
   },
   {
+    shortname: 'sixseven',
+    title: "Six Seven: Benford's Law on Twitter counts",
+    category: 'charts',
+    summary:
+      "Testing Benford's law on anonymised Twitter follower, friend and status counts: do first digits follow the classic pattern?",
+    image: 'images/sixseven.png',
+    publish_date: '2025-02-21',
+    published: true,
+  },
+  {
     shortname: 'statues',
     title: 'Statues of Women and Goats in the UK',
     category: 'interactive',
