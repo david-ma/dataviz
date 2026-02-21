@@ -1,0 +1,110 @@
+{{!--
+  datasetAndSourceTabs – Dataset and Source code in a single tab strip to save space.
+
+  Usage:
+    {{> datasetAndSourceTabs filepath="/twitterAnonymized.tdf" title="Twitter anonymised counts (sample)"}}
+    {{> datasetAndSourceTabs filepath="/data/example.csv" format="csv"}}
+
+  Parameters: same as showDataset (filepath required; format, title, id optional).
+  The page context must provide `typescript` for the Source code tab (same as showSource).
+--}}
+<div class="dataset-source-tabs">
+  <div class="dataset-source-tabs__bar">
+    <input type="radio" id="datasetSourceTab--source" name="datasetSourceTabs" value="source" checked>
+    <label for="datasetSourceTab--source">Source code</label>
+    <input type="radio" id="datasetSourceTab--dataset" name="datasetSourceTabs" value="dataset">
+    <label for="datasetSourceTab--dataset">Dataset</label>
+  </div>
+
+  <div id="datasetSourcePanel--source" class="dataset-source-tabs__panel dataset-source-tabs__panel--selected">
+    {{> showSource }}
+  </div>
+
+  <div id="datasetSourcePanel--dataset" class="dataset-source-tabs__panel">
+    {{> showDataset filepath=filepath title=title format=format id=id}}
+  </div>
+</div>
+
+<style>
+  .dataset-source-tabs {
+    margin-top: 1.5rem;
+  }
+
+  .dataset-source-tabs__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 0;
+  }
+
+  .dataset-source-tabs__bar input[type='radio'] {
+    display: none;
+  }
+
+  .dataset-source-tabs__bar label {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    font-weight: 600;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    background: #e9ecef;
+    color: #495057;
+  }
+
+  .dataset-source-tabs__bar label:hover {
+    background: #dee2e6;
+  }
+
+  .dataset-source-tabs__bar input:checked + label {
+    background: #fff;
+    color: #212529;
+    margin-bottom: -1px;
+    padding-bottom: calc(0.5rem + 1px);
+    border-bottom: 1px solid #fff;
+  }
+
+  .dataset-source-tabs__panel {
+    display: none;
+    padding-top: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background: #fff;
+  }
+
+  .dataset-source-tabs__panel--selected {
+    display: block;
+  }
+
+  .dataset-source-tabs__panel .dataset-preview-wrapper {
+    margin: 0;
+  }
+
+  .dataset-source-tabs__panel .dataset-preview-card {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+</style>
+
+<script>
+(function() {
+  var bar = document.querySelector('.dataset-source-tabs__bar');
+  if (!bar) return;
+
+  bar.addEventListener('change', function(e) {
+    var name = e.target.name;
+    if (name !== 'datasetSourceTabs') return;
+    var value = e.target.value;
+    document.querySelectorAll('.dataset-source-tabs__panel').forEach(function(panel) {
+      panel.classList.remove('dataset-source-tabs__panel--selected');
+    });
+    var panel = document.getElementById('datasetSourcePanel--' + value);
+    if (panel) panel.classList.add('dataset-source-tabs__panel--selected');
+  });
+})();
+</script>
