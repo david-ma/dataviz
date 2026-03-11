@@ -1,0 +1,34 @@
+<section>
+  <p>
+    In celebration of The Matrix 4 trailer being released, I was inspired to make recreate the Matrix's "raining code"
+    :)
+  </p>
+  {{!-- <button style="margin-bottom: 5px;" onclick="matrix.write(rabbit, true); $(this).remove();">
+    Follow the white rabbit?
+  </button> --}}
+  <div id="matrix" aria-label="Matrix digital rain animation"></div>
+  <p>
+    This version uses <strong>D3.js</strong> (selection, <code>d3.timer</code>) with the <strong>Canvas 2D API</strong> for
+    drawing. Same behaviour as the pure canvas version; compare with <a href="/blog/matrix">SVG</a> and
+    <a href="/blog/matrix_canvas">canvas-only</a>. Source:
+    <a href="https://github.com/david-ma/dataviz/blob/master/src/js/matrix_d3_canvas.ts">github</a>.
+  </p>
+  <p>Thanks to <a href="https://github.com/dhaiducek">dhaiducek</a>'s <a
+      href="https://gist.github.com/dhaiducek/174cdb04a5a51f016c6ca69ece721b17">bash/awk
+      version</a> for inspiration.</p>
+
+  <p><a href="#screensaver">Screensaver Mode</a></p>
+  {{> showSource}}
+</section>
+<style>
+  #matrix {
+    display: block;
+  }
+
+  #matrix canvas {
+    display: block;
+    vertical-align: top;
+  }
+</style>
+
+{{> require}}

@@ -273,3 +273,7 @@ new Chart({
     }
   }, speed)
 })
+
+if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('benchmark') === '1') {
+  import('./matrix_benchmark').then((m) => m.startMatrixBenchmark())
+}

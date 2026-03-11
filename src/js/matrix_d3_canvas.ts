@@ -1,10 +1,11 @@
 /**
- * Matrix rain effect – canvas-based implementation.
- * Renders the "raining code" with a single 2D canvas for lower DOM and CPU usage
- * than the SVG-based matrix.ts.
+ * Matrix rain effect – D3.js + Canvas 2D.
+ * Uses D3 for DOM (canvas creation, sizing) and animation loop (d3.timer),
+ * and the Canvas 2D API for drawing. Same behaviour and blank start as matrix_canvas.ts.
  */
 
-import _ from 'lodash'
+import { _ } from './chart'
+import * as d3 from 'd3'
 
 const green = '#00c200'
 const brightgreen = '#5ff967'
@@ -253,29 +254,29 @@ function runMatrix(container: HTMLElement, fullScreen: boolean) {
   const width = Math.floor(viewportW / charWidth) * charWidth
   const height = Math.floor(viewportH / lineHeight) * lineHeight
 
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  canvas.id = 'matrix-canvas'
-  container.appendChild(canvas)
+  const canvas = d3
+    .select(container)
+    .append('canvas')
+    .attr('width', width)
+    .attr('height', height)
+    .attr('id', 'matrix-canvas')
+    .node() as HTMLCanvasElement
 
   const matrix = new MatrixCanvas({ canvas, width, height })
   globalThis.matrix = matrix
 
   let lastStep = 0
-  function tick(timestamp: number) {
-    if (timestamp - lastStep >= speed) {
+  d3.timer((elapsed) => {
+    if (elapsed - lastStep >= speed) {
       matrix.animate()
       matrix.addRandomDrop()
       if (Math.random() < 0.01) {
         matrix.write(_.sample(quotes))
       }
-      lastStep = timestamp
+      lastStep = elapsed
     }
     matrix.draw()
-    requestAnimationFrame(tick)
-  }
-  requestAnimationFrame(tick)
+  })
 }
 
 if (typeof window !== 'undefined') {
@@ -287,7 +288,6 @@ if (typeof window !== 'undefined') {
     const mobileNav = document.getElementById('mobile_nav')
     const sidebar = document.querySelector('.sidebar')
     const paras = document.querySelectorAll('p')
-    // Blog layout uses #content_reactive_wrapper; wrapper uses .col-xs-12.col-sm-9
     const main =
       document.getElementById('content_reactive_wrapper') ??
       document.querySelector('div.col-xs-12.col-sm-9')
