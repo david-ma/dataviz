@@ -6,12 +6,10 @@
   {{!-- <button style="margin-bottom: 5px;" onclick="matrix.write(rabbit, true); $(this).remove();">
     Follow the white rabbit?
   </button> --}}
-  <div id="matrix"></div>
+  <div id="matrix" aria-label="Matrix digital rain animation"></div>
   <p>
-    This was built using <a href="https://d3js.org/">d3js</a>, the source code can be found on <a
-      href="https://github.com/david-ma/dataviz/blob/master/src/js/matrix.ts">
-      github
-    </a>.
+    This version uses the <strong>Canvas 2D API</strong> (no SVG/D3) for lower DOM and CPU usage. The source code is on
+    <a href="https://github.com/david-ma/dataviz/blob/master/src/js/matrix_canvas.ts">github</a>.
   </p>
   <p>Thanks to <a href="https://github.com/dhaiducek">dhaiducek</a>'s <a
       href="https://gist.github.com/dhaiducek/174cdb04a5a51f016c6ca69ece721b17">bash/awk
@@ -22,18 +20,12 @@
 </section>
 <style>
   #matrix {
-    font-family: 'Hack', 'Menlo', 'Fira Mono', 'Courier New', Courier, monospace;
-    line-height: 20px;
-    font-size: 9px;
+    display: block;
   }
 
-  .char {
-    opacity: 1;
-  }
-
-  .fadeout {
-    transition: opacity 300ms;
-    opacity: 0;
+  #matrix canvas {
+    display: block;
+    vertical-align: top;
   }
 </style>
 

@@ -1,12 +1,19 @@
-import { Chart, _ } from './chart'
-import * as d3 from 'd3'
+/**
+ * Matrix rain effect – canvas-based implementation.
+ * Renders the "raining code" with a single 2D canvas for lower DOM and CPU usage
+ * than the SVG-based matrix.ts.
+ */
 
-const green = '#00c200',
-  brightgreen = '#5ff967',
-  speed = 40,
-  haltChance = 0.025,
-  eraseChance = 0.05,
-  boldChance = 0.1
+import _ from 'lodash'
+
+const green = '#00c200'
+const brightgreen = '#5ff967'
+const speed = 40
+const haltChance = 0.025
+const eraseChance = 0.05
+const boldChance = 0.1
+const charWidth = 6
+const lineHeight = 10
 
 const charset =
   'ﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍﾘｸﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()'.split(
@@ -14,18 +21,18 @@ const charset =
   )
 
 const rabbit = (globalThis.rabbit = `                              __
- Neo                 /\    .-" /
+ Neo                 /\\    .-" /
  Follow the         /  ; .'  .' 
  white rabbit      :   :/  .'   
-                    \  ;-.'     
+                    \\  ;-.'     
        .--""""--..__/     \`.    
-     .'           .'    \`o  \   
+     .'           .'    \`o  \\   
     /                    \`   ;  
-   :                  \      :  
+   :                  \\      :  
  .-;        -.         \`.__.-'  
-:  ;          \     ,   ;       
+:  ;          \\     ,   ;       
 '._:           ;   :   (        
-    \/  .__    ;    \   \`-.     
+    \\/  .__    ;    \\   \`-.     
  bug ;     "-,/_..--"\`-..__)    
      '""--.._:`)
 
@@ -53,116 +60,91 @@ const quotes = [
   'Everyone falls the first time',
 ]
 
-// type Board = Selection<SVGGElement, any, HTMLElement, any>
-// type Board = Selection<SVGGElement, any, HTMLElement, any>
-type Board = any
+type CellStyle = 'white' | 'brightgreen' | 'green' | 'fade'
 
-class Char {
-  board: Board
-  self: any
-  burndown: number
-  hiddenChar: string
+interface CellState {
+  displayChar: string
+  style: CellStyle
+  bold?: boolean
+  hiddenChar?: string
+  burndown?: number
+  fading?: boolean
+  fadeFrames?: number
+}
 
-  constructor(opts: { board: Board; col: number; line: number }) {
-    this.board = opts.board
-
-    this.self = this.board
-      .append('text')
-      .classed('char', true)
-      .attr('x', 2 + opts.col * 6)
-      .attr('y', 10 * (opts.line + 1))
-      .attr('fill', green)
-  }
-
-  setChar(char: string) {
-    this.hiddenChar = char
-    this.burndown = 10
-  }
-
-  drawChar() {
-    if (this.burndown) {
-      this.self.text(this.hiddenChar)
-      this.burndown--
-    } else {
-      this.self.text(_.sample(charset))
-    }
-    this.self
-      .attr('font-weight', 900)
-      .attr('fill', 'white')
-      .classed('fadeout', false)
-    return this
-  }
-
-  lowlight() {
-    if (Math.random() < boldChance) {
-      this.self.attr('font-weight', 900).attr('fill', brightgreen)
-    } else {
-      this.self.attr('font-weight', 300).attr('fill', green)
-    }
-    return this
-  }
-  fadeout() {
-    this.self.classed('fadeout', true)
-  }
+interface MatrixCanvasOptions {
+  canvas: HTMLCanvasElement
+  width: number
+  height: number
 }
 
 class Column {
-  board: Board
-  lines: number
   col: number
-  curLine: number
-  chars: Array<Char>
-  eraseLine: boolean
+  lines: number
+  curLine: number | null = null
+  eraseLine: boolean = false
+  cells: CellState[] = []
 
-  constructor(opts: { col: number; lines: number; board: Board }) {
+  constructor(opts: { col: number; lines: number }) {
     this.col = opts.col
     this.lines = opts.lines
-    this.board = opts.board
-    this.curLine = null
-
-    this.chars = []
     for (let i = 0; i < this.lines; i++) {
-      this.chars.push(
-        new Char({
-          line: i,
-          col: this.col,
-          board: this.board,
-        }),
-      )
+      this.cells.push({
+        displayChar: _.sample(charset),
+        style: 'green',
+      })
     }
   }
 
   step() {
     if (this.curLine !== null) {
+      const cell = this.cells[this.curLine]
       if (!this.eraseLine) {
-        this.chars[this.curLine].drawChar()
+        if (cell.burndown != null && cell.burndown > 0 && cell.hiddenChar != null) {
+          cell.displayChar = cell.hiddenChar
+          cell.burndown--
+        } else {
+          cell.displayChar = _.sample(charset)
+        }
+        cell.style = 'white'
+        cell.bold = true
+        cell.fading = false
       } else {
-        this.chars[this.curLine].fadeout()
+        cell.fading = true
+        cell.fadeFrames = cell.fadeFrames ?? 8
       }
       if (this.curLine - 1 >= 0) {
-        this.chars[this.curLine - 1].lowlight()
+        const prev = this.cells[this.curLine - 1]
+        prev.bold = Math.random() < boldChance
+        prev.style = prev.bold ? 'brightgreen' : 'green'
       }
       this.curLine++
       if (this.curLine >= this.lines || Math.random() < haltChance) {
         if (this.curLine === this.lines) {
-          this.chars[this.curLine - 1].lowlight()
+          const last = this.cells[this.curLine - 1]
+          last.bold = Math.random() < boldChance
+          last.style = last.bold ? 'brightgreen' : 'green'
         }
         this.curLine = null
       }
     }
+    this.cells.forEach((c) => {
+      if (c.fading && c.fadeFrames != null) {
+        c.fadeFrames--
+        if (c.fadeFrames <= 0) c.fading = false
+      }
+    })
   }
 
-  /**
-   * Set a hidden character, so that it will appear next time it is drawn.
-   * Will also stick around for a set number of ticks
-   */
   setChar(opts: { line: number; char: string }) {
-    this.chars[opts.line].setChar(opts.char)
+    const cell = this.cells[opts.line]
+    cell.hiddenChar = opts.char
+    cell.burndown = 10
   }
 
   start() {
     this.curLine = 0
-    if (this.eraseLine === null || this.eraseLine === true) {
+    if (this.eraseLine === undefined || this.eraseLine === true) {
       this.eraseLine = false
     } else if (Math.random() < eraseChance) {
       this.eraseLine = true
@@ -170,20 +152,29 @@ class Column {
   }
 }
 
-class Matrix {
-  columns: Array<Column>
+class MatrixCanvas {
+  columns: Column[] = []
   nLines: number
+  private ctx: CanvasRenderingContext2D
+  private width: number
+  private height: number
+  private fontBold = '900 9px "Hack", "Menlo", "Fira Mono", "Courier New", Courier, monospace'
+  private fontLight = '300 9px "Hack", "Menlo", "Fira Mono", "Courier New", Courier, monospace'
 
-  constructor(opts: { board: Board; lines: number; cols: number }) {
-    this.columns = []
-    this.nLines = opts.lines
+  constructor(opts: MatrixCanvasOptions) {
+    this.width = opts.width
+    this.height = opts.height
+    this.nLines = Math.floor(opts.height / lineHeight)
+    const cols = Math.floor(opts.width / charWidth)
+    const ctx = opts.canvas.getContext('2d')
+    if (!ctx) throw new Error('Could not get 2D context')
+    this.ctx = ctx
 
-    for (let i = 0; i < opts.cols; i++) {
+    for (let i = 0; i < cols; i++) {
       this.columns.push(
         new Column({
           col: i,
-          lines: opts.lines,
-          board: opts.board,
+          lines: this.nLines,
         }),
       )
     }
@@ -194,82 +185,135 @@ class Matrix {
   }
 
   animate() {
-    this.columns.forEach((col) => {
-      col.step()
-    })
+    this.columns.forEach((col) => col.step())
+  }
+
+  draw() {
+    const { ctx, width, height, columns } = this
+    ctx.fillStyle = 'black'
+    ctx.fillRect(0, 0, width, height)
+    ctx.textBaseline = 'top'
+
+    for (const col of columns) {
+      for (let line = 0; line < col.cells.length; line++) {
+        const cell = col.cells[line]
+        ctx.font = cell.bold ? this.fontBold : this.fontLight
+        let fill: string
+        let alpha = 1
+        if (cell.fading && cell.fadeFrames != null && cell.fadeFrames > 0) {
+          alpha = cell.fadeFrames / 8
+          fill = green
+        } else {
+          switch (cell.style) {
+            case 'white':
+              fill = 'white'
+              break
+            case 'brightgreen':
+              fill = brightgreen
+              break
+            default:
+              fill = green
+          }
+        }
+        const x = 2 + col.col * charWidth
+        const y = lineHeight * (line + 1)
+        ctx.globalAlpha = alpha
+        ctx.fillStyle = fill
+        ctx.fillText(cell.displayChar, x, y)
+        ctx.globalAlpha = 1
+      }
+    }
   }
 
   write(string: string, noTrim?: boolean) {
     const lines = string.split('\n')
-    let line = Math.floor(Math.random() * this.nLines),
-      col = Math.floor(Math.random() * this.columns.length)
+    let line = Math.floor(Math.random() * this.nLines)
+    let col = Math.floor(Math.random() * this.columns.length)
     if (line + lines.length > this.nLines) {
       line = this.nLines - lines.length - 1
     }
-
-    lines.forEach((string, j) => {
-      if (!noTrim) {
-        string = string.trim()
+    lines.forEach((str, j) => {
+      const s = noTrim ? str : str.trim()
+      const array = s.split('')
+      let c = col
+      if (c + array.length > this.columns.length) {
+        c = this.columns.length - array.length - 1
       }
-      const array = string.split('')
-      if (col + array.length > this.columns.length) {
-        col = this.columns.length - array.length - 1
-      }
-
       array.forEach((char, i) => {
-        this.columns[col + i].setChar({
-          line: line + j,
-          char: array[i],
-        })
+        this.columns[c + i].setChar({ line: line + j, char: array[i] })
       })
     })
   }
 }
 
-if (window.location.hash === '#screensaver') {
-  console.log('ok we should do a screensaver mode')
-  d3.select('header').remove()
-  d3.select('footer').remove()
-  d3.select('#mobile_nav').remove()
-  d3.select('.sidebar').remove()
-  d3.selectAll('p').remove()
-  d3.select('div.col-xs-12.col-sm-9.col-md-10')
-    .style('width', '100%')
-    .style('padding', '0px')
-}
+function runMatrix(container: HTMLElement, fullScreen: boolean) {
+  const viewportW = fullScreen ? window.innerWidth : Math.floor(window.screen.width * 0.5)
+  const viewportH = fullScreen ? window.innerHeight : Math.floor(window.screen.height * 0.5)
+  const width = Math.floor(viewportW / charWidth) * charWidth
+  const height = Math.floor(viewportH / lineHeight) * lineHeight
 
-new Chart({
-  element: 'matrix',
-  height: window.screen.height * 0.5,
-  width: window.screen.width * 0.5,
-  margin: 0,
-  nav: false,
-}).scratchpad((chart) => {
-  // set background
-  chart.svg
-    .append('rect')
-    .attr('x', 0)
-    .attr('y', 0)
-    .attr('height', chart.innerHeight)
-    .attr('width', chart.innerWidth)
-    .attr('fill', 'black')
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  canvas.id = 'matrix-canvas'
+  container.appendChild(canvas)
 
-  const lines = Math.floor(chart.innerHeight / 10), // 60
-    cols = Math.floor(chart.innerWidth / 6), // 160
-    board: Board = chart.svg.append('g'),
-    matrix = new Matrix({
-      lines: lines,
-      cols: cols,
-      board: board,
-    })
-
+  const matrix = new MatrixCanvas({ canvas, width, height })
   globalThis.matrix = matrix
 
-  setInterval(function () {
-    matrix.animate()
-    matrix.addRandomDrop()
-    if (Math.random() < 0.01) {
-      matrix.write(_.sample(quotes))
+  let lastStep = 0
+  function tick(timestamp: number) {
+    if (timestamp - lastStep >= speed) {
+      matrix.animate()
+      matrix.addRandomDrop()
+      if (Math.random() < 0.01) {
+        matrix.write(_.sample(quotes))
+      }
+      lastStep = timestamp
     }
-  }, speed)
-})
+    matrix.draw()
+    requestAnimationFrame(tick)
+  }
+  requestAnimationFrame(tick)
+}
+
+if (typeof window !== 'undefined') {
+  const isScreensaver = window.location.hash === '#screensaver'
+
+  if (isScreensaver) {
+    const header = document.querySelector('header')
+    const footer = document.querySelector('footer')
+    const mobileNav = document.getElementById('mobile_nav')
+    const sidebar = document.querySelector('.sidebar')
+    const paras = document.querySelectorAll('p')
+    // Blog layout uses #content_reactive_wrapper; wrapper uses .col-xs-12.col-sm-9
+    const main =
+      document.getElementById('content_reactive_wrapper') ??
+      document.querySelector('div.col-xs-12.col-sm-9')
+    header?.remove()
+    footer?.remove()
+    mobileNav?.remove()
+    sidebar?.remove()
+    paras.forEach((p) => p.remove())
+    if (main instanceof HTMLElement) {
+      main.style.width = '100%'
+      main.style.padding = '0'
+      main.style.margin = '0'
+      main.style.maxWidth = 'none'
+    }
+  }
+
+  const container = document.getElementById('matrix')
+  if (container instanceof HTMLElement) {
+    if (isScreensaver) {
+      container.style.position = 'fixed'
+      container.style.top = '0'
+      container.style.left = '0'
+      container.style.width = '100vw'
+      container.style.height = '100vh'
+      container.style.margin = '0'
+      container.style.padding = '0'
+    }
+    runMatrix(container, isScreensaver)
+  }
+}
