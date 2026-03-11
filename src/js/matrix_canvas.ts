@@ -90,7 +90,7 @@ class Column {
     this.lines = opts.lines
     for (let i = 0; i < this.lines; i++) {
       this.cells.push({
-        displayChar: _.sample(charset),
+        displayChar: '',
         style: 'green',
       })
     }
@@ -197,6 +197,7 @@ class MatrixCanvas {
     for (const col of columns) {
       for (let line = 0; line < col.cells.length; line++) {
         const cell = col.cells[line]
+        if (!cell.displayChar) continue
         ctx.font = cell.bold ? this.fontBold : this.fontLight
         let fill: string
         let alpha = 1
