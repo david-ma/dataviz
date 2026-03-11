@@ -109,6 +109,9 @@ var config = {
     asyncWebAssembly: true,
     topLevelAwait: true,
   },
+  watchOptions: {
+    ignored: /node_modules/,
+  },
   module: {
     rules: [
       // all files with a `.ts`, `.cts`, `.mts` or `.tsx` extension will be handled by `ts-loader`

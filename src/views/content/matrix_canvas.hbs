@@ -1,0 +1,40 @@
+<section>
+  <p>
+    In celebration of The Matrix 4 trailer being released, I was inspired to make recreate the Matrix's "raining code"
+    :)
+  </p>
+  {{!-- <button style="margin-bottom: 5px;" onclick="matrix.write(rabbit, true); $(this).remove();">
+    Follow the white rabbit?
+  </button> --}}
+  <div id="matrix"></div>
+  <p>
+    This was built using <a href="https://d3js.org/">d3js</a>, the source code can be found on <a
+      href="https://github.com/david-ma/dataviz/blob/master/src/js/matrix.ts">
+      github
+    </a>.
+  </p>
+  <p>Thanks to <a href="https://github.com/dhaiducek">dhaiducek</a>'s <a
+      href="https://gist.github.com/dhaiducek/174cdb04a5a51f016c6ca69ece721b17">bash/awk
+      version</a> for inspiration.</p>
+
+  <p><a href="#screensaver">Screensaver Mode</a></p>
+  {{> showSource}}
+</section>
+<style>
+  #matrix {
+    font-family: 'Hack', 'Menlo', 'Fira Mono', 'Courier New', Courier, monospace;
+    line-height: 20px;
+    font-size: 9px;
+  }
+
+  .char {
+    opacity: 1;
+  }
+
+  .fadeout {
+    transition: opacity 300ms;
+    opacity: 0;
+  }
+</style>
+
+{{> require}}

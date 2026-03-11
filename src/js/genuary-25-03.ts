@@ -14,21 +14,13 @@ new Chart({
     const blocks = []
     const gravity = new RAPIER.Vector2(0.0, -9.81)
     let world = new RAPIER.World(gravity)
-    let groundColliderDesc = RAPIER.ColliderDesc.cuboid(
-      chart.width / scale / 2,
-      0.1,
-    )
-    world
-      .createCollider(groundColliderDesc)
-      .setTranslation({ x: 0, y: -chart.height / scale / 2 })
+    let groundColliderDesc = RAPIER.ColliderDesc.cuboid(chart.width / scale / 2, 0.1)
+    world.createCollider(groundColliderDesc).setTranslation({ x: 0, y: -chart.height / scale / 2 })
 
     function spawnBlock() {
       const randX = (Math.random() - 0.5) * (chart.width / scale)
       const rigidBody = world.createRigidBody(
-        RAPIER.RigidBodyDesc.dynamic().setTranslation(
-          randX,
-          chart.height / scale / 2,
-        ),
+        RAPIER.RigidBodyDesc.dynamic().setTranslation(randX, chart.height / scale / 2),
       )
       world.createCollider(RAPIER.ColliderDesc.cuboid(0.5, 0.5), rigidBody)
       blocks.push(rigidBody)
