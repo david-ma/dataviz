@@ -95,22 +95,5 @@ export const blogposts = [
     published: true,
   },
 ]
-
-import { blogpostTable } from '../models/drizzle-schema.js'
-import path from 'path'
-
 const config: any = {}
-if (process.env.NODE_ENV === 'production') {
-  const drizzleConfig = await import(
-    // @ts-ignore
-    path.join(import.meta.dirname, '..', 'drizzle.config.ts')
-  )
-
-  config.database = {
-    schemas: {
-      blogpost: blogpostTable,
-    },
-  }
-}
-
 export { config }

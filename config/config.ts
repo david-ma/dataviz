@@ -3,32 +3,15 @@ import { gitHash } from './utilities.js'
 import path from 'path'
 import fs from 'fs'
 const fsPromise = fs.promises
-import { blogpostTable } from '../models/drizzle-schema.js'
-import { eq, desc } from 'drizzle-orm'
 import { blogposts, config as blogpostConfig } from './blogposts.js'
 let config = {
   controllers: {
     '': (res, req, website, requestInfo) => {
-      if (!website.db) {
-        const html = website.getContentHtml('homepage')({
-          gitHash,
-          blogposts,
-        })
-        res.end(html)
-      } else {
-        website.db.drizzle
-          .select()
-          .from(blogpostTable)
-          .where(eq(blogpostTable.published, true))
-          .orderBy(desc(blogpostTable.publish_date))
-          .then((blogposts) => {
-            const html = website.getContentHtml('homepage')({
-              gitHash,
-              blogposts,
-            })
-            res.end(html)
-          })
-      }
+      const html = website.getContentHtml('homepage')({
+        gitHash,
+        blogposts,
+      })
+      res.end(html)
     },
     blog: (res, req, website, requestInfo) => {
       const shortname = requestInfo.action
@@ -49,10 +32,7 @@ let config = {
         })
         .then((allowedBlogs) => {
           if (!allowedBlogs.includes(shortname)) {
-            const html = website.getContentHtml(
-              '404',
-              'blog',
-            )({
+            const html = website.getContentHtml('404', 'blog')({
               gitHash,
               blogposts,
             })
@@ -60,37 +40,12 @@ let config = {
             return
           }
 
-          if (!website.db) {
-            const html = website.getContentHtml(
-              shortname,
-              'blog',
-            )({
-              gitHash,
-              typescript: `/js/${shortname}.js`,
-              blogposts,
-            })
-            res.end(html)
-          } else {
-            website.db.drizzle
-              .select()
-              .from(blogpostTable)
-              .where(eq(blogpostTable.published, true))
-              .then((blogposts) => {
-                const html = website.getContentHtml(
-                  shortname,
-                  'blog',
-                )({
-                  gitHash,
-                  typescript: `/js/${shortname}.js`,
-                  blogposts,
-                })
-                res.end(html)
-              })
-              .catch((error) => {
-                console.error(error)
-                res.end('Error')
-              })
-          }
+          const html = website.getContentHtml(shortname, 'blog')({
+            gitHash,
+            typescript: `/js/${shortname}.js`,
+            blogposts,
+          })
+          res.end(html)
         })
     },
     source: (res, req, website, requestInfo) => {
