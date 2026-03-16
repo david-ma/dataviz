@@ -37,9 +37,13 @@ const navContext = () => {
 
 export const blogControllers: RawWebsiteConfig['controllers'] = {
   '': (res, req, website, requestInfo) => {
+    const published = publishedBlogposts()
     const html = website.getContentHtml('homepage')({
       ...navContext(),
-      blogposts: publishedBlogposts().sort((a, b) => b.publish_date.localeCompare(a.publish_date)),
+      featuredBlogposts: published.filter((post) => (post as any).featured),
+      blogposts: published
+        .filter((post) => !(post as any).featured && post.category !== 'Genuary 2025')
+        .sort((a, b) => b.publish_date.localeCompare(a.publish_date)),
     })
     res.end(html)
   },

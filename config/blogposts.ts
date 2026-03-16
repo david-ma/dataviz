@@ -1,6 +1,7 @@
 export const blogposts = [
   {
     shortname: 'georgia',
+    featured: true,
     title: 'Which Georgia are you closest to?',
     category: 'interactive',
     summary:
@@ -30,6 +31,7 @@ export const blogposts = [
   },
   {
     shortname: 'breathe',
+    featured: true,
     title: 'Breathing Polygons',
     category: 'animation',
     summary: 'D3.js & maths practice by drawing breathing polygons',
@@ -48,6 +50,7 @@ export const blogposts = [
   },
   {
     shortname: 'matrix',
+    featured: true,
     title: 'Matrix Raining Code',
     category: 'animation',
     summary: 'The raining code from the movie The Matrix (1999)',
@@ -66,6 +69,7 @@ export const blogposts = [
   },
   {
     shortname: 'earthquake',
+    featured: true,
     title: 'Melbourne Earthquake',
     category: 'animation',
     summary:
@@ -176,6 +180,7 @@ export const blogposts = [
   },
   {
     shortname: 'theseus-wiki',
+    featured: true,
     title: 'Theseus Wiki',
     category: 'interactive',
     summary:
@@ -184,6 +189,17 @@ export const blogposts = [
     image: 'images/theseus-wiki.png',
     publish_date: '2024-12-03',
     published: true,
-  },]
+  },
+  {
+    shortname: 'genuary',
+    title: 'Genuary 2025',
+    category: 'Genuary 2025',
+    summary: 'Eight generative art pieces made for Genuary 2025 — one prompt per day.',
+    image: 'images/genuary-25-01.png',
+    publish_date: '2025-01-01',
+    published: true,
+    featured: true,
+  },
+]
 const config: any = {}
 export { config }
