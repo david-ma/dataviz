@@ -33,7 +33,7 @@
         <input class="blogSearch" placeholder="Search">
         <i class="fas fa-search fa-2x"></i>
     </div> --}}
-    <div id="hamburger" onclick=" $('#mobile_nav').toggleClass('hidden-xs'); $('#sidebar').toggleClass('hidden-xs')">
+    <div id="hamburger" onclick=" $('#mobile_nav').toggleClass('hidden-xs'); $('#sidebar').toggleClass('hidden-xs')" aria-label="Toggle navigation">
         <i class="fas fa-bars fa-2x"></i>
     </div>
 </div>
@@ -57,7 +57,7 @@
         <bold>Genuary 2025:</bold>
         <ul id="genuaryList">
             {{#genuaryBlogposts}}
-            <li><a href="/blog/{{shortname}}">{{title}}</a></li>
+            <li><a href="/blog/{{shortname}}">{{shortTitle}}</a></li>
             {{/genuaryBlogposts}}
         </ul>
     </ul>

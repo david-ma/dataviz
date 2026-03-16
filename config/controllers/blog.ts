@@ -20,10 +20,18 @@ export const publishedBlogposts = () => blogposts.filter((post) => post.publishe
 
 const navContext = () => {
   const published = publishedBlogposts()
+  const genuary = published
+    .filter((post) => post.category === 'Genuary 2025')
+    .map((post) => ({
+      ...post,
+      shortTitle: post.title.replace(/^Genuary 2025 – Day \d+: /, ''),
+    }))
   return {
     gitHash,
-    blogposts: published.filter((post) => post.category !== 'Genuary 2025'),
-    genuaryBlogposts: published.filter((post) => post.category === 'Genuary 2025'),
+    blogposts: published
+      .filter((post) => post.category !== 'Genuary 2025')
+      .sort((a, b) => b.publish_date.localeCompare(a.publish_date)),
+    genuaryBlogposts: genuary,
   }
 }
 
@@ -31,7 +39,7 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
   '': (res, req, website, requestInfo) => {
     const html = website.getContentHtml('homepage')({
       ...navContext(),
-      blogposts: publishedBlogposts(),
+      blogposts: publishedBlogposts().sort((a, b) => b.publish_date.localeCompare(a.publish_date)),
     })
     res.end(html)
   },
