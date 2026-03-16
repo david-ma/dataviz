@@ -40,11 +40,11 @@ export const blogposts = [
   {
     shortname: 'AusIncome',
     title: 'Australian Income',
-    category: 'charts',
+    category: 'archive',
     summary: 'Graphs from ATO income stats 2018',
     image: 'images/ausIncome.png',
     publish_date: '2021-08-30',
-    published: true,
+    published: false,
   },
   {
     shortname: 'matrix',
@@ -58,11 +58,11 @@ export const blogposts = [
   {
     shortname: 'winamp',
     title: 'Winamp Animation',
-    category: 'animation',
+    category: 'sandbox',
     summary: 'A simple animation, reminiscent of the old winamp visualisations',
     image: 'images/winamp.jpg',
     publish_date: '2021-09-15',
-    published: true,
+    published: false,
   },
   {
     shortname: 'earthquake',
@@ -77,12 +77,12 @@ export const blogposts = [
   {
     shortname: 'sixseven',
     title: "Six Seven: Benford's Law on Twitter counts",
-    category: 'charts',
+    category: 'archive',
     summary:
       "Testing Benford's law on anonymised Twitter follower, friend and status counts: do first digits follow the classic pattern?",
     image: 'images/sixseven.png',
     publish_date: '2025-02-21',
-    published: true,
+    published: false,
   },
   {
     shortname: 'statues',
