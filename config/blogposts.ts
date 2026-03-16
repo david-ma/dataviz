@@ -94,6 +94,86 @@ export const blogposts = [
     publish_date: '2025-12-03',
     published: true,
   },
+  {
+    shortname: 'genuary-25-01',
+    title: 'Genuary 2025 – Day 1: Vertical or horizontal lines only',
+    category: 'Genuary 2025',
+    summary:
+      'An exploration of strict geometry using only vertical and horizontal lines for the first Genuary 2025 prompt.',
+    image: 'images/genuary-25-01.png',
+    publish_date: '2025-01-01',
+    published: true,
+  },
+  {
+    shortname: 'genuary-25-02',
+    title: 'Genuary 2025 – Day 2: Layers upon layers upon layers',
+    category: 'Genuary 2025',
+    summary:
+      'Stacked generative layers build up depth and texture in response to the second Genuary 2025 prompt.',
+    image: 'images/genuary-25-02.png',
+    publish_date: '2025-01-02',
+    published: true,
+  },
+  {
+    shortname: 'genuary-25-03',
+    title: 'Genuary 2025 – Day 3: Exactly 42 lines of code',
+    category: 'Genuary 2025',
+    summary:
+      'A constrained generative sketch written in exactly forty‑two lines of code for the third Genuary 2025 prompt.',
+    image: 'images/genuary-25-03.png',
+    publish_date: '2025-01-03',
+    published: true,
+  },
+  {
+    shortname: 'genuary-25-04',
+    title: 'Genuary 2025 – Day 4: Black on black',
+    category: 'Genuary 2025',
+    summary:
+      'Low‑contrast textures and light play explore the “black on black” Genuary 2025 prompt.',
+    image: 'images/genuary-25-04.png',
+    publish_date: '2025-01-04',
+    published: true,
+  },
+  {
+    shortname: 'genuary-25-05',
+    title: 'Genuary 2025 – Day 5: Isometric art (no vanishing points)',
+    category: 'Genuary 2025',
+    summary:
+      'An isometric generative scene built without vanishing points for the fifth Genuary 2025 prompt.',
+    image: 'images/genuary-25-05.png',
+    publish_date: '2025-01-05',
+    published: true,
+  },
+  {
+    shortname: 'genuary-25-06',
+    title: 'Genuary 2025 – Day 6: Landscapes from primitive shapes',
+    category: 'Genuary 2025',
+    summary:
+      'Minimalist landscapes assembled solely from primitive shapes for the sixth Genuary 2025 prompt.',
+    image: 'images/genuary-25-06.png',
+    publish_date: '2025-01-06',
+    published: true,
+  },
+  {
+    shortname: 'genuary-25-07',
+    title: 'Genuary 2025 – Day 7: Use software not intended for art',
+    category: 'Genuary 2025',
+    summary:
+      'A physics‑driven sketch inspired by the “use software that is not intended to create art or images” prompt.',
+    image: 'images/genuary-25-07.png',
+    publish_date: '2025-01-07',
+    published: true,
+  },
+  {
+    shortname: 'genuary-25-17',
+    title: 'Genuary 2025 – Day 17: What happens if π = 4?',
+    category: 'Genuary 2025',
+    summary:
+      'An exploration of circles, squares and approximations of π through the lens of the “pi equals four” prompt.',
+    image: 'images/genuary-25-17.png',
+    publish_date: '2025-01-17',
+    published: true,
+  },
 ]
 const config: any = {}
 export { config }

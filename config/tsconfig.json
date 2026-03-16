@@ -10,7 +10,11 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "paths": {
+      "@dataviz/chart": ["../src/js/chart"],
+      "@dataviz/datatable": ["../src/js/datatable"]
+    }
   },
   "ts-node": {
     "esm": true,
