@@ -34,6 +34,20 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
     })
     res.end(html)
   },
+  source: (res, req, website, requestInfo) => {
+    // Show the source code for a typescript file
+    // Created for Genuary 2025
+    const filepath = requestInfo.pathname
+    const regex = /js\/(.*).js/
+    if (regex.test(filepath)) {
+      // @ts-ignore
+      const shortname = regex.exec(filepath)[1]
+      res.setHeader('Content-Type', 'text/javascript')
+      res.end(fs.readFileSync(path.resolve(website.rootPath, 'src', 'js', `${shortname}.ts`)))
+    } else {
+      res.end('404')
+    }
+  },
   blog: (res, req, website, requestInfo) => {
     const shortname = requestInfo.action
     if (!shortname) {
