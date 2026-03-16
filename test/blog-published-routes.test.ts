@@ -56,5 +56,5 @@ describe('Published blogpost routes', () => {
     // allow a little extra time for a cold dev server
     15000,
   )
-}
+})
 

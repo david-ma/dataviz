@@ -1,4 +1,19 @@
-var AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto
+let AwesomePhoto: any
+
+try {
+  // Prefer the real database bootstrap when available (production / manual runs)
+  // but allow this module to be loaded in test environments without a DB.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto
+} catch (err) {
+  console.warn(
+    '[xray_test] db_bootstrap not available; AwesomePhoto operations will be no-ops',
+  )
+  AwesomePhoto = {
+    findOne: () => Promise.resolve(null),
+    create: () => Promise.resolve(),
+  }
+}
 var x = require('x-ray')()
 
 // var fs = require('fs')
