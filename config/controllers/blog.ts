@@ -42,6 +42,8 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
         gitHash,
         blogposts: publishedBlogposts,
       })
+      res.statusCode = 404
+      res.writeHead(404, { 'Content-Type': 'text/html' })
       res.end(html)
       return
     }
