@@ -127,8 +127,8 @@ class Chart {
   mouse_position: Position
 
   // drawMap stuff
-  projection?: any
-  calculate?: Function // recalculate the chart, based on data
+  projection?: d3.GeoProjection
+  calculate?: (chart: Chart, marker: Coordinates) => Coordinates[] // recalculate the chart, based on data
   loadingAnimation?: LoadingAnimation
 
   // svg: Selection<SVGSVGElement, any, HTMLElement, any>
@@ -1968,7 +1968,7 @@ function average(array: Array<any>) {
   }
 }
 
-function injectStyles(rule: any) {
+function injectStyles(rule: string) {
   // eslint-disable-line
   const div = $('<div />', {
     html: '&shy;<style>' + rule + '</style>',
