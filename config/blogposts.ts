@@ -174,6 +174,16 @@ export const blogposts = [
     publish_date: '2025-01-17',
     published: true,
   },
-]
+  {
+    shortname: 'theseus-wiki',
+    title: 'Theseus Wiki',
+    category: 'interactive',
+    summary:
+      'An interactive visualisation of the Ship of Theseus thought experiment, exploring identity and change through Wikipedia edit histories.',
+    image_url: 'https://photos.smugmug.com/Test-album/i-QBJ9Rpn/0/L22T8CRmm3XdMZBsfrJhsgz3CgwkhhTSr6QcX4bgg/X5/theseus-X5.png',
+    image: 'images/theseus-wiki.png',
+    publish_date: '2024-12-03',
+    published: true,
+  },]
 const config: any = {}
 export { config }

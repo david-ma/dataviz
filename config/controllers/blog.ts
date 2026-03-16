@@ -17,11 +17,19 @@ const hasBlogTemplate = (websiteRootPath: string, shortname: string) => {
 }
 
 export const publishedBlogposts = blogposts.filter((post) => post.published)
+export const genuaryBlogposts = publishedBlogposts.filter((post) => post.category === 'Genuary 2025')
+export const nonGenuaryBlogposts = publishedBlogposts.filter((post) => post.category !== 'Genuary 2025')
+
+const navContext = () => ({
+  gitHash,
+  blogposts: nonGenuaryBlogposts,
+  genuaryBlogposts,
+})
 
 export const blogControllers: RawWebsiteConfig['controllers'] = {
   '': (res, req, website, requestInfo) => {
     const html = website.getContentHtml('homepage')({
-      gitHash,
+      ...navContext(),
       blogposts: publishedBlogposts,
     })
     res.end(html)
@@ -39,8 +47,7 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
 
     if (!blogpost || !hasBlogTemplate(website.rootPath, shortname)) {
       const html = website.getContentHtml('404', 'blog')({
-        gitHash,
-        blogposts: publishedBlogposts,
+        ...navContext(),
       })
       res.statusCode = 404
       res.writeHead(404, { 'Content-Type': 'text/html' })
@@ -49,9 +56,9 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
     }
 
     const html = website.getContentHtml(shortname, 'blog')({
-      gitHash,
+      ...navContext(),
+      blogpost,
       typescript: `/js/${shortname}.js`,
-      blogposts: publishedBlogposts,
     })
     res.end(html)
   },
