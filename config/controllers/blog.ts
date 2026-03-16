@@ -16,21 +16,22 @@ const hasBlogTemplate = (websiteRootPath: string, shortname: string) => {
   )
 }
 
-export const publishedBlogposts = blogposts.filter((post) => post.published)
-export const genuaryBlogposts = publishedBlogposts.filter((post) => post.category === 'Genuary 2025')
-export const nonGenuaryBlogposts = publishedBlogposts.filter((post) => post.category !== 'Genuary 2025')
+export const publishedBlogposts = () => blogposts.filter((post) => post.published)
 
-const navContext = () => ({
-  gitHash,
-  blogposts: nonGenuaryBlogposts,
-  genuaryBlogposts,
-})
+const navContext = () => {
+  const published = publishedBlogposts()
+  return {
+    gitHash,
+    blogposts: published.filter((post) => post.category !== 'Genuary 2025'),
+    genuaryBlogposts: published.filter((post) => post.category === 'Genuary 2025'),
+  }
+}
 
 export const blogControllers: RawWebsiteConfig['controllers'] = {
   '': (res, req, website, requestInfo) => {
     const html = website.getContentHtml('homepage')({
       ...navContext(),
-      blogposts: publishedBlogposts,
+      blogposts: publishedBlogposts(),
     })
     res.end(html)
   },
@@ -57,7 +58,7 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
       return
     }
 
-    const blogpost = publishedBlogposts.find((post) => post.shortname === shortname)
+    const blogpost = publishedBlogposts().find((post) => post.shortname === shortname)
 
     if (!blogpost || !hasBlogTemplate(website.rootPath, shortname)) {
       const html = website.getContentHtml('404', 'blog')({

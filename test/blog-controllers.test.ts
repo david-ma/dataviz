@@ -18,19 +18,21 @@ const CONTENT_DIR = path.resolve(
 )
 
 describe('publishedBlogposts', () => {
+  const PUBLISHED = publishedBlogposts()
+
   test('only includes posts with published: true', () => {
-    expect(publishedBlogposts.every((p) => p.published)).toBe(true)
+    expect(PUBLISHED.every((p) => p.published)).toBe(true)
   })
 
   test('is a subset of all blogposts', () => {
     const allShortnames = new Set(blogposts.map((p) => p.shortname))
-    publishedBlogposts.forEach((p) => {
+    PUBLISHED.forEach((p) => {
       expect(allShortnames.has(p.shortname)).toBe(true)
     })
   })
 
   test('every published post has a shortname, title, and image', () => {
-    publishedBlogposts.forEach((p) => {
+    PUBLISHED.forEach((p) => {
       expect(p.shortname).toBeTruthy()
       expect(p.title).toBeTruthy()
       expect(p.image).toBeTruthy()
@@ -43,7 +45,7 @@ describe('template coverage for published posts', () => {
     const fs = await import('fs')
     const missing: string[] = []
 
-    for (const post of publishedBlogposts) {
+    for (const post of publishedBlogposts()) {
       const hasTemplate = ['.hbs', '.mustache'].some((ext) =>
         fs.existsSync(path.resolve(CONTENT_DIR, `${post.shortname}${ext}`)),
       )
