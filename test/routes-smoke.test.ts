@@ -31,4 +31,8 @@ describe('Key route smoke tests', () => {
     const status = await getStatus('/blog/nonexistent-route-that-does-not-exist')
     expect([200, 404]).toContain(status)
   }, 10000)
+
+  test('/viz returns HTTP 200', async () => {
+    expect(await getStatus('/viz')).toBe(200)
+  }, 10000)
 })

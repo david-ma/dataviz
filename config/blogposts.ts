@@ -199,6 +199,7 @@ export const blogposts = [
     publish_date: '2025-01-01',
     published: true,
     featured: true,
+    noJs: true,
   },
 ]
 const config: any = {}
