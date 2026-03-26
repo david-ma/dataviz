@@ -21,7 +21,10 @@
 {{> nav}}
 
       <div class="col-xs-12 col-sm-9">
-        {{> content }}
+        {{~> content~}}
+        {{#if @partial-block }}
+          {{~> @partial-block~}}
+        {{/if}}
       </div>
     </div>
   </div>

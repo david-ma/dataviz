@@ -80,13 +80,30 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
     const blogpost = publishedBlogposts().find((post) => post.shortname === shortname)
 
     if (!blogpost || !hasBlogTemplate(website.rootPath, shortname)) {
-      const html = website.getContentHtml('404', 'blog')({
-        ...navContext(),
-      })
-      res.statusCode = 404
-      res.writeHead(404, { 'Content-Type': 'text/html' })
-      res.end(html)
-      return
+      // If <shortname>.ts exists in /src/js, we can serve example.hbs
+      if (fs.existsSync(path.resolve(website.rootPath, 'src', 'js', `${shortname}.ts`))) {
+        const html = website.getContentHtml('example', 'blog')({
+          ...navContext(),
+          typescript: `/js/${shortname}.js`,
+          blogpost: {
+            shortname,
+            title: shortname,
+            summary: 'Example blog post',
+            publish_date: new Date(),
+            published: true,
+          },
+        })
+        res.end(html)
+        return
+      } else {
+        const html = website.getContentHtml('404', 'blog')({
+          ...navContext(),
+        })
+        res.statusCode = 404
+        res.writeHead(404, { 'Content-Type': 'text/html' })
+        res.end(html)
+        return
+      }
     }
 
     const html = website.getContentHtml(shortname, 'blog')({
