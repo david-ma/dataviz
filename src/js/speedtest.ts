@@ -94,9 +94,9 @@ type SpeedtestData = {
   network_name?: string | null;
   is_wireless: boolean | null;
   interface_mac: string | null;
-  local_ipv4: string;
-  local_ipv6: string;
-  external_ipv4: string;
+  local_ipv4: string | null;
+  local_ipv6: string | null;
+  external_ipv4: string | null;
   external_ipv6: string | null;
   dns: {
     hostname: string;
@@ -130,6 +130,8 @@ type SpeedtestData = {
 
 type SpeedtestPoint = {
   ts: Date;
+  /** Public / WAN identity for colouring (not LAN subnet). */
+  external_ip: string;
   download_mbps: number;
   upload_mbps: number;
   idle_latency_mean_ms: number | null;
@@ -156,12 +158,35 @@ function formatMs(v: number | null): string {
   return `${v.toFixed(0)} ms`
 }
 
+function getExternalIp(run: SpeedtestData): string {
+  const fromComparison = run.ip_comparison?.external_ip?.trim()
+  if (fromComparison) return fromComparison
+  const v4 = run.external_ipv4?.trim()
+  if (v4) return v4
+  const v6 = run.external_ipv6?.trim()
+  if (v6) return v6
+  const clientIp = run.meta?.clientIp?.trim()
+  if (clientIp) return clientIp
+  const top = typeof run.ip === 'string' ? run.ip.trim() : ''
+  if (top) return top
+  return 'unknown'
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
 function toPoint(run: SpeedtestData, file?: string): SpeedtestPoint | null {
   const ts = new Date(run.timestamp_utc)
   if (Number.isNaN(ts.getTime())) return null
 
   return {
     ts,
+    external_ip: getExternalIp(run),
     download_mbps: run.download?.mbps ?? 0,
     upload_mbps: run.upload?.mbps ?? 0,
     idle_latency_mean_ms: safeNumber(run.idle_latency?.mean_ms),
@@ -203,6 +228,7 @@ function renderTable(points: SpeedtestPoint[], container: HTMLElement): void {
         <thead>
           <tr>
             <th>Time</th>
+            <th>External IP</th>
             <th>Download</th>
             <th>Upload</th>
             <th>Idle latency (mean)</th>
@@ -215,6 +241,7 @@ function renderTable(points: SpeedtestPoint[], container: HTMLElement): void {
             .map((p) => {
               return `<tr>
                 <td>${fmt(p.ts)}</td>
+                <td><code>${escapeHtml(p.external_ip)}</code></td>
                 <td>${formatMbps(p.download_mbps)}</td>
                 <td>${formatMbps(p.upload_mbps)}</td>
                 <td>${formatMs(p.idle_latency_mean_ms)}</td>
@@ -230,6 +257,22 @@ function renderTable(points: SpeedtestPoint[], container: HTMLElement): void {
 
   container.innerHTML = html
 }
+
+const IP_LINE_PALETTE = [
+  '#1b9e77',
+  '#d95f02',
+  '#7570b3',
+  '#e7298a',
+  '#66a61e',
+  '#e6ab02',
+  '#a6761d',
+  '#666666',
+  '#9edae5',
+  '#c7c7c7',
+  '#ff9896',
+  '#c5b0d5',
+  '#dbdb8d',
+]
 
 function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
   const data = points
@@ -259,6 +302,12 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
   const maxY = d3.max(data, (d) => Math.max(d.download_mbps, d.upload_mbps)) ?? 1
   y.domain([0, maxY * 1.1])
 
+  const externalIps = Array.from(new Set(data.map((d) => d.external_ip))).sort()
+  const ipColor = d3
+    .scaleOrdinal<string, string>()
+    .domain(externalIps)
+    .range([...IP_LINE_PALETTE, ...d3.schemeTableau10])
+
   const dl = d3
     .line<SpeedtestPoint>()
     .x((d) => x(d.ts))
@@ -270,23 +319,50 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
     .y((d) => y(d.upload_mbps))
 
   chart.ready((c) => {
-    c.plot
-      .append('path')
-      .datum(data)
-      .attr('class', 'line')
-      .attr('fill', 'none')
-      .attr('stroke', '#1b9e77')
-      .attr('stroke-width', 2)
-      .attr('d', dl)
+    const byIp = d3.group(data, (d) => d.external_ip)
 
-    c.plot
-      .append('path')
-      .datum(data)
-      .attr('class', 'line')
-      .attr('fill', 'none')
-      .attr('stroke', '#d95f02')
-      .attr('stroke-width', 2)
-      .attr('d', ul)
+    for (const ip of externalIps) {
+      const col = ipColor(ip)
+      const series = (byIp.get(ip) ?? []).slice().sort((a, b) => a.ts.getTime() - b.ts.getTime())
+      if (series.length >= 2) {
+        c.plot
+          .append('path')
+          .datum(series)
+          .attr('class', 'line')
+          .attr('fill', 'none')
+          .attr('stroke', col)
+          .attr('stroke-width', 2)
+          .attr('d', dl)
+
+        c.plot
+          .append('path')
+          .datum(series)
+          .attr('class', 'line')
+          .attr('fill', 'none')
+          .attr('stroke', col)
+          .attr('stroke-width', 2)
+          .attr('stroke-dasharray', '6 4')
+          .attr('d', ul)
+      } else if (series.length === 1) {
+        const p = series[0]
+        c.plot
+          .append('circle')
+          .attr('cx', x(p.ts))
+          .attr('cy', y(p.download_mbps))
+          .attr('r', 4)
+          .attr('fill', col)
+          .attr('stroke', '#fff')
+          .attr('stroke-width', 1)
+        c.plot
+          .append('circle')
+          .attr('cx', x(p.ts))
+          .attr('cy', y(p.upload_mbps))
+          .attr('r', 4)
+          .attr('fill', 'none')
+          .attr('stroke', col)
+          .attr('stroke-width', 2)
+      }
+    }
 
     c.plot
       .append('g')
@@ -299,31 +375,49 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
       .attr('class', 'axis')
       .call(d3.axisLeft(y).ticks(6))
 
+    const legendPad = 10
+    const rowH = 18
+    const legendW = Math.min(c.innerWidth - 20, 320)
+    const legendH = legendPad * 2 + 14 + externalIps.length * rowH
+
     const legend = c.plot.append('g').attr('transform', 'translate(10,10)')
     legend
       .append('rect')
       .attr('x', 0)
       .attr('y', 0)
-      .attr('width', 210)
-      .attr('height', 44)
-      .attr('fill', 'rgba(255,255,255,0.8)')
+      .attr('width', legendW)
+      .attr('height', legendH)
+      .attr('fill', 'rgba(255,255,255,0.92)')
       .attr('stroke', 'rgba(0,0,0,0.1)')
 
     legend
       .append('text')
-      .attr('x', 10)
-      .attr('y', 16)
-      .attr('fill', '#1b9e77')
-      .style('font-weight', '700')
-      .text('Download')
+      .attr('x', legendPad)
+      .attr('y', 22)
+      .attr('fill', '#333')
+      .style('font-size', '12px')
+      .style('font-weight', '600')
+      .text('Colour = external IP · solid = download · dashed = upload')
 
-    legend
-      .append('text')
-      .attr('x', 110)
-      .attr('y', 16)
-      .attr('fill', '#d95f02')
-      .style('font-weight', '700')
-      .text('Upload')
+    externalIps.forEach((ip, i) => {
+      const y0 = 32 + i * rowH
+      const col = ipColor(ip)
+      legend
+        .append('line')
+        .attr('x1', legendPad)
+        .attr('x2', legendPad + 28)
+        .attr('y1', y0)
+        .attr('y2', y0)
+        .attr('stroke', col)
+        .attr('stroke-width', 3)
+      legend
+        .append('text')
+        .attr('x', legendPad + 36)
+        .attr('y', y0 + 4)
+        .attr('fill', '#333')
+        .style('font-size', '11px')
+        .text(ip.length > 36 ? `${ip.slice(0, 34)}…` : ip)
+    })
   })
 }
 

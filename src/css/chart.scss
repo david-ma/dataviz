@@ -58,21 +58,21 @@
 
   .line {
     fill: none;
-    stroke: steelblue;
+//    stroke: steelblue;
     stroke-width: 2px;
   }
 
   /* Axes */
-  path {
+  // path {
     // Why would I hide the stroke here..?
     // stroke: none;
-  }
+  // }
   .y.axis text {
     font-size: 14px;
   }
-  .y.axis line {
+  // .y.axis line {
     //display: none;
-  }
+  // }
   .x.axis text {
     font-size: 12px;
     fill: #333333;
