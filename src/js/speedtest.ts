@@ -274,6 +274,18 @@ const IP_LINE_PALETTE = [
   '#dbdb8d',
 ]
 
+/** Nearest run by timestamp (data must be sorted ascending by `ts`). */
+function nearestPointByTime(sorted: SpeedtestPoint[], t: Date): SpeedtestPoint {
+  if (sorted.length === 0) throw new Error('nearestPointByTime: empty')
+  const bisect = d3.bisector<SpeedtestPoint, Date>((d) => d.ts).left
+  const i = bisect(sorted, t, 1, sorted.length - 1)
+  const d0 = sorted[i - 1]
+  const d1 = sorted[i]
+  if (!d0) return d1
+  if (!d1) return d0
+  return t.getTime() - d0.ts.getTime() > d1.ts.getTime() - t.getTime() ? d1 : d0
+}
+
 function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
   const data = points
     .filter((p) => Number.isFinite(p.download_mbps) && Number.isFinite(p.upload_mbps))
@@ -418,6 +430,104 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
         .style('font-size', '11px')
         .text(ip.length > 36 ? `${ip.slice(0, 34)}…` : ip)
     })
+
+    // Hover: nearest run by time + tooltip (see also chart crosshair / focus pattern).
+    const fmtTipTime = d3.timeFormat('%Y-%m-%d %H:%M:%S')
+    const focus = c.plot
+      .append('g')
+      .attr('class', 'speedtest-focus')
+      .style('pointer-events', 'none')
+      .style('display', 'none')
+
+    const focusLine = focus
+      .append('line')
+      .attr('class', 'speedtest-focus-line')
+      .attr('y1', 0)
+      .attr('y2', c.innerHeight)
+      .attr('stroke', 'rgba(0,0,0,0.35)')
+      .attr('stroke-width', 1)
+      .attr('stroke-dasharray', '4 3')
+
+    const focusDl = focus
+      .append('circle')
+      .attr('r', 5)
+      .attr('fill', '#fff')
+      .attr('stroke-width', 2)
+
+    const focusUl = focus
+      .append('circle')
+      .attr('r', 5)
+      .attr('fill', 'rgba(255,255,255,0.85)')
+      .attr('stroke-width', 2)
+
+    const tip = focus.append('g').attr('class', 'speedtest-tooltip')
+    const tipBg = tip
+      .append('rect')
+      .attr('rx', 4)
+      .attr('ry', 4)
+      .attr('fill', 'rgba(255,255,255,0.96)')
+      .attr('stroke', 'rgba(0,0,0,0.12)')
+
+    const tipLines = tip.append('g').attr('transform', 'translate(8, 18)')
+
+    const updateFocus = (d: SpeedtestPoint, mx: number, my: number) => {
+      const col = ipColor(d.external_ip)
+      const xd = x(d.ts)
+      focusLine.attr('x1', xd).attr('x2', xd)
+      focusDl.attr('cx', xd).attr('cy', y(d.download_mbps)).attr('stroke', col)
+      focusUl.attr('cx', xd).attr('cy', y(d.upload_mbps)).attr('stroke', col)
+
+      const lines: string[] = [
+        fmtTipTime(d.ts),
+        `External ${d.external_ip}`,
+        `Download ${formatMbps(d.download_mbps)}`,
+        `Upload ${formatMbps(d.upload_mbps)}`,
+      ]
+      if (d.file) lines.push(d.file)
+
+      tipLines.selectAll('text').remove()
+      lines.forEach((line, i) => {
+        tipLines
+          .append('text')
+          .attr('y', i * 15)
+          .attr('fill', '#212529')
+          .style('font-size', '11px')
+          .style('font-family', 'system-ui, sans-serif')
+          .text(line)
+      })
+
+      const lineH = 15
+      const pad = 8
+      const boxW = 240
+      const boxH = pad * 2 + lines.length * lineH
+      tipBg.attr('width', boxW).attr('height', boxH)
+
+      let tx = mx + 14
+      let ty = my - boxH - 10
+      if (tx + boxW > c.innerWidth - 4) tx = mx - boxW - 14
+      if (ty < 4) ty = my + 14
+      if (ty + boxH > c.innerHeight - 4) ty = c.innerHeight - boxH - 4
+      if (tx < 4) tx = 4
+      tip.attr('transform', `translate(${tx}, ${ty})`)
+    }
+
+    c.plot
+      .append('rect')
+      .attr('class', 'speedtest-plot-overlay')
+      .attr('width', c.innerWidth)
+      .attr('height', c.innerHeight)
+      .attr('fill', 'transparent')
+      .style('cursor', 'crosshair')
+      .on('mousemove', function (event: MouseEvent) {
+        const [mx, my] = d3.pointer(event, c.plot.node())
+        const t = x.invert(mx)
+        const d = nearestPointByTime(data, t)
+        focus.style('display', null)
+        updateFocus(d, mx, my)
+      })
+      .on('mouseleave', () => {
+        focus.style('display', 'none')
+      })
   })
 }
 
