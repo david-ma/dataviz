@@ -184,11 +184,17 @@ function toPoint(run: SpeedtestData, file?: string): SpeedtestPoint | null {
   const ts = new Date(run.timestamp_utc)
   if (Number.isNaN(ts.getTime())) return null
 
+  const download_mbps = run.download?.mbps ?? 0
+  const upload_mbps = run.upload?.mbps ?? 0
+  if (!Number.isFinite(download_mbps) || !Number.isFinite(upload_mbps)) return null
+  // Drop bogus runs (e.g. 0 Mbps upload) that blow up log₂ axes.
+  if (download_mbps <= 0 || upload_mbps <= 0) return null
+
   return {
     ts,
     external_ip: getExternalIp(run),
-    download_mbps: run.download?.mbps ?? 0,
-    upload_mbps: run.upload?.mbps ?? 0,
+    download_mbps,
+    upload_mbps,
     idle_latency_mean_ms: safeNumber(run.idle_latency?.mean_ms),
     loaded_latency_download_mean_ms: safeNumber(run.loaded_latency_download?.mean_ms),
     loaded_latency_upload_mean_ms: safeNumber(run.loaded_latency_upload?.mean_ms),
@@ -286,9 +292,70 @@ function nearestPointByTime(sorted: SpeedtestPoint[], t: Date): SpeedtestPoint {
   return t.getTime() - d0.ts.getTime() > d1.ts.getTime() - t.getTime() ? d1 : d0
 }
 
+/** Chart Y-axis: speeds below this are drawn at this value; hover shows measured. */
+const CHART_Y_THRESHOLD_MBPS = 1
+
+function yPlotMbps(v: number): number {
+  return Math.max(CHART_Y_THRESHOLD_MBPS, v)
+}
+
+function tooltipSpeedLine(which: 'Download' | 'Upload', mbps: number): string {
+  if (mbps < CHART_Y_THRESHOLD_MBPS) {
+    return `${which} less than ${CHART_Y_THRESHOLD_MBPS} Mbps (${formatMbps(mbps)} measured)`
+  }
+  return `${which} ${formatMbps(mbps)}`
+}
+
+/** Tick positions at 2^n Mbps between domain bounds (for log₂ Y axis). */
+function ticksLog2Mbps(lo: number, hi: number): number[] {
+  if (!(lo > 0 && hi > lo)) return [lo]
+  const n0 = Math.ceil(Math.log2(lo))
+  const n1 = Math.floor(Math.log2(hi))
+  const out: number[] = []
+  for (let n = n0; n <= n1; n++) {
+    const t = Math.pow(2, n)
+    if (t >= lo - 1e-12 && t <= hi + 1e-12) out.push(t)
+  }
+  if (out.length === 0) {
+    out.push(lo)
+    if (hi > lo) out.push(hi)
+  }
+  return out
+}
+
+/** Do not connect line segments across gaps longer than this (same external IP). */
+const MAX_LINE_GAP_MS = 8 * 60 * 60 * 1000 // 8 hours
+
+/**
+ * Split a time-ordered series so paths are not drawn across long gaps.
+ * Points must be sorted ascending by `ts`.
+ */
+function splitSeriesByGap(sorted: SpeedtestPoint[], maxGapMs: number): SpeedtestPoint[][] {
+  if (sorted.length === 0) return []
+  const chunks: SpeedtestPoint[][] = []
+  let cur: SpeedtestPoint[] = [sorted[0]]
+  for (let i = 1; i < sorted.length; i++) {
+    const gap = sorted[i].ts.getTime() - sorted[i - 1].ts.getTime()
+    if (gap > maxGapMs) {
+      chunks.push(cur)
+      cur = [sorted[i]]
+    } else {
+      cur.push(sorted[i])
+    }
+  }
+  chunks.push(cur)
+  return chunks
+}
+
 function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
   const data = points
-    .filter((p) => Number.isFinite(p.download_mbps) && Number.isFinite(p.upload_mbps))
+    .filter(
+      (p) =>
+        Number.isFinite(p.download_mbps) &&
+        Number.isFinite(p.upload_mbps) &&
+        p.download_mbps > 0 &&
+        p.upload_mbps > 0,
+    )
     .slice()
     .sort((a, b) => a.ts.getTime() - b.ts.getTime())
 
@@ -308,11 +375,17 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
   }
 
   const x = d3.scaleTime().range([0, chart.innerWidth])
-  const y = d3.scaleLinear().range([chart.innerHeight, 0])
+  const y = d3.scaleLog().base(2).range([chart.innerHeight, 0])
 
   x.domain(d3.extent(data, (d) => d.ts) as [Date, Date])
   const maxY = d3.max(data, (d) => Math.max(d.download_mbps, d.upload_mbps)) ?? 1
-  y.domain([0, maxY * 1.1])
+  const lo = CHART_Y_THRESHOLD_MBPS
+  let hi = Math.max(maxY * 1.1, lo * 2)
+  if (hi <= lo) hi = lo * 2
+  hi = Math.pow(2, Math.ceil(Math.log2(hi)))
+  y.domain([lo, hi])
+
+  const yTickValues = ticksLog2Mbps(lo, hi)
 
   const externalIps = Array.from(new Set(data.map((d) => d.external_ip))).sort()
   const ipColor = d3
@@ -323,12 +396,12 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
   const dl = d3
     .line<SpeedtestPoint>()
     .x((d) => x(d.ts))
-    .y((d) => y(d.download_mbps))
+    .y((d) => y(yPlotMbps(d.download_mbps)))
 
   const ul = d3
     .line<SpeedtestPoint>()
     .x((d) => x(d.ts))
-    .y((d) => y(d.upload_mbps))
+    .y((d) => y(yPlotMbps(d.upload_mbps)))
 
   chart.ready((c) => {
     const byIp = d3.group(data, (d) => d.external_ip)
@@ -336,43 +409,47 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
     for (const ip of externalIps) {
       const col = ipColor(ip)
       const series = (byIp.get(ip) ?? []).slice().sort((a, b) => a.ts.getTime() - b.ts.getTime())
-      if (series.length >= 2) {
-        c.plot
-          .append('path')
-          .datum(series)
-          .attr('class', 'line')
-          .attr('fill', 'none')
-          .attr('stroke', col)
-          .attr('stroke-width', 2)
-          .attr('d', dl)
+      const segments = splitSeriesByGap(series, MAX_LINE_GAP_MS)
 
-        c.plot
-          .append('path')
-          .datum(series)
-          .attr('class', 'line')
-          .attr('fill', 'none')
-          .attr('stroke', col)
-          .attr('stroke-width', 2)
-          .attr('stroke-dasharray', '6 4')
-          .attr('d', ul)
-      } else if (series.length === 1) {
-        const p = series[0]
-        c.plot
-          .append('circle')
-          .attr('cx', x(p.ts))
-          .attr('cy', y(p.download_mbps))
-          .attr('r', 4)
-          .attr('fill', col)
-          .attr('stroke', '#fff')
-          .attr('stroke-width', 1)
-        c.plot
-          .append('circle')
-          .attr('cx', x(p.ts))
-          .attr('cy', y(p.upload_mbps))
-          .attr('r', 4)
-          .attr('fill', 'none')
-          .attr('stroke', col)
-          .attr('stroke-width', 2)
+      for (const seg of segments) {
+        if (seg.length >= 2) {
+          c.plot
+            .append('path')
+            .datum(seg)
+            .attr('class', 'line')
+            .attr('fill', 'none')
+            .attr('stroke', col)
+            .attr('stroke-width', 2)
+            .attr('d', dl)
+
+          c.plot
+            .append('path')
+            .datum(seg)
+            .attr('class', 'line')
+            .attr('fill', 'none')
+            .attr('stroke', col)
+            .attr('stroke-width', 2)
+            .attr('stroke-dasharray', '6 4')
+            .attr('d', ul)
+        } else if (seg.length === 1) {
+          const p = seg[0]
+          c.plot
+            .append('circle')
+            .attr('cx', x(p.ts))
+            .attr('cy', y(yPlotMbps(p.download_mbps)))
+            .attr('r', 4)
+            .attr('fill', col)
+            .attr('stroke', '#fff')
+            .attr('stroke-width', 1)
+          c.plot
+            .append('circle')
+            .attr('cx', x(p.ts))
+            .attr('cy', y(yPlotMbps(p.upload_mbps)))
+            .attr('r', 4)
+            .attr('fill', 'none')
+            .attr('stroke', col)
+            .attr('stroke-width', 2)
+        }
       }
     }
 
@@ -385,12 +462,17 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
     c.plot
       .append('g')
       .attr('class', 'axis')
-      .call(d3.axisLeft(y).ticks(6))
+      .call(
+        d3
+          .axisLeft(y)
+          .tickValues(yTickValues)
+          .tickFormat((v) => (typeof v === 'number' ? d3.format('.3~s')(v) : String(v))),
+      )
 
     const legendPad = 10
     const rowH = 18
     const legendW = Math.min(c.innerWidth - 20, 320)
-    const legendH = legendPad * 2 + 14 + externalIps.length * rowH
+    const legendH = legendPad * 2 + 14 + 28 + externalIps.length * rowH
 
     const legend = c.plot.append('g').attr('transform', 'translate(10,10)')
     legend
@@ -411,8 +493,18 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
       .style('font-weight', '600')
       .text('Colour = external IP · solid = download · dashed = upload')
 
+    legend
+      .append('text')
+      .attr('x', legendPad)
+      .attr('y', 40)
+      .attr('fill', '#555')
+      .style('font-size', '10px')
+      .text(
+        `Below ${CHART_Y_THRESHOLD_MBPS} Mbps drawn at ${CHART_Y_THRESHOLD_MBPS} Mbps · hover for measured`,
+      )
+
     externalIps.forEach((ip, i) => {
-      const y0 = 32 + i * rowH
+      const y0 = 50 + i * rowH
       const col = ipColor(ip)
       legend
         .append('line')
@@ -474,14 +566,14 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
       const col = ipColor(d.external_ip)
       const xd = x(d.ts)
       focusLine.attr('x1', xd).attr('x2', xd)
-      focusDl.attr('cx', xd).attr('cy', y(d.download_mbps)).attr('stroke', col)
-      focusUl.attr('cx', xd).attr('cy', y(d.upload_mbps)).attr('stroke', col)
+      focusDl.attr('cx', xd).attr('cy', y(yPlotMbps(d.download_mbps))).attr('stroke', col)
+      focusUl.attr('cx', xd).attr('cy', y(yPlotMbps(d.upload_mbps))).attr('stroke', col)
 
       const lines: string[] = [
         fmtTipTime(d.ts),
         `External ${d.external_ip}`,
-        `Download ${formatMbps(d.download_mbps)}`,
-        `Upload ${formatMbps(d.upload_mbps)}`,
+        tooltipSpeedLine('Download', d.download_mbps),
+        tooltipSpeedLine('Upload', d.upload_mbps),
       ]
       if (d.file) lines.push(d.file)
 
@@ -542,7 +634,7 @@ $.when($.ready).then(async function () {
 
   const chart = new Chart({
     element: 'chart',
-    title: 'Internet speed over time (Mbps)',
+    title: 'Internet speed over time (Mbps, log₂ scale)',
     width: 960,
     height: 500,
     margin: { top: 70, right: 40, bottom: 50, left: 60 },
