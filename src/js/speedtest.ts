@@ -249,6 +249,31 @@ function ensureElementAfterChart(id: string): HTMLElement {
   return el
 }
 
+function ensureSpeedtestLayout(): { legendEl: HTMLElement } {
+  const chartEl = document.getElementById('chart')
+  if (!chartEl) {
+    return { legendEl: ensureElementAfterChart('speedtest_legend') }
+  }
+
+  if (chartEl.parentElement?.classList.contains('speedtest-layout')) {
+    const existing = document.getElementById('speedtest_legend')
+    return { legendEl: existing ?? ensureElementAfterChart('speedtest_legend') }
+  }
+
+  const wrapper = document.createElement('div')
+  wrapper.className = 'speedtest-layout'
+
+  const legend = document.createElement('div')
+  legend.id = 'speedtest_legend'
+  legend.className = 'speedtest-legend'
+
+  chartEl.insertAdjacentElement('beforebegin', wrapper)
+  wrapper.appendChild(chartEl)
+  wrapper.appendChild(legend)
+
+  return { legendEl: legend }
+}
+
 function renderTable(points: SpeedtestPoint[], container: HTMLElement): void {
   const rows = points
     .slice()
@@ -329,6 +354,52 @@ function yPlotMbps(v: number): number {
   return Math.max(CHART_Y_THRESHOLD_MBPS, v)
 }
 
+function quantileSorted(valuesAscending: number[], p: number): number | null {
+  if (valuesAscending.length === 0) return null
+  const v = d3.quantileSorted(valuesAscending, p)
+  return typeof v === 'number' && Number.isFinite(v) ? v : null
+}
+
+function renderLegendTable(
+  externalIps: string[],
+  ipColor: (ip: string) => string,
+  legendEl: HTMLElement,
+): void {
+  const rows = externalIps
+    .map((ip) => ({ ip, col: ipColor(ip) }))
+    .map(({ ip, col }) => {
+      const ipLabel = ip.length > 46 ? `${ip.slice(0, 44)}…` : ip
+      return `
+        <tr>
+          <td style="width: 54px;">
+            <div class="speedtest-swatch" style="--speedtest-colour:${escapeHtml(col)}">
+              <div class="speedtest-swatch-dl"></div>
+              <div class="speedtest-swatch-ul"></div>
+            </div>
+          </td>
+          <td><code title="${escapeHtml(ip)}">${escapeHtml(ipLabel)}</code></td>
+        </tr>
+      `
+    })
+    .join('')
+
+  legendEl.innerHTML = `
+    <div class="speedtest-legend-card">
+      <div class="speedtest-legend-title">Legend</div>
+      <div class="speedtest-legend-sub">Colour = external IP</div>
+      <div class="speedtest-legend-sub">Solid = download · dashed = upload</div>
+      <div class="speedtest-legend-note">Below ${CHART_Y_THRESHOLD_MBPS} Mbps drawn at ${CHART_Y_THRESHOLD_MBPS} Mbps · hover for measured</div>
+      <div class="table-responsive">
+        <table class="table table-condensed table-striped speedtest-legend-table">
+          <tbody>
+            ${rows || `<tr><td colspan="2" class="text-muted">No series</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `
+}
+
 function tooltipSpeedLine(which: 'Download' | 'Upload', mbps: number): string {
   if (mbps < CHART_Y_THRESHOLD_MBPS) {
     return `${which} less than ${CHART_Y_THRESHOLD_MBPS} Mbps (${formatMbps(mbps)} measured)`
@@ -377,7 +448,7 @@ function splitSeriesByGap(sorted: SpeedtestPoint[], maxGapMs: number): Speedtest
   return chunks
 }
 
-function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
+function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendEl: HTMLElement): void {
   const data = points
     .filter(
       (p) =>
@@ -408,9 +479,20 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
   const y = d3.scaleLog().base(2).range([chart.innerHeight, 0])
 
   x.domain(d3.extent(data, (d) => d.ts) as [Date, Date])
-  const maxY = d3.max(data, (d) => Math.max(d.download_mbps, d.upload_mbps)) ?? 1
   const lo = CHART_Y_THRESHOLD_MBPS
-  let hi = Math.max(maxY * 1.1, lo * 2)
+
+  const yValues = data
+    .flatMap((d) => [d.download_mbps, d.upload_mbps])
+    .filter((v) => Number.isFinite(v) && v > 0)
+    .slice()
+    .sort((a, b) => a - b)
+
+  const maxY = d3.max(yValues) ?? 1
+  const q95 = quantileSorted(yValues, 0.95)
+
+  // Ignore the highest 5% tail for axis scaling so outliers don't dominate the chart.
+  const scaleMax = q95 ?? maxY
+  let hi = Math.max(scaleMax * 1.1, lo * 2)
   if (hi <= lo) hi = lo * 2
   hi = Math.pow(2, Math.ceil(Math.log2(hi)))
   y.domain([lo, hi])
@@ -422,6 +504,8 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
     .scaleOrdinal<string, string>()
     .domain(externalIps)
     .range([...IP_LINE_PALETTE, ...d3.schemeTableau10])
+
+  renderLegendTable(externalIps, (ip) => ipColor(ip), legendEl)
 
   const dl = d3
     .line<SpeedtestPoint>()
@@ -498,60 +582,6 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
           .tickValues(yTickValues)
           .tickFormat((v) => (typeof v === 'number' ? d3.format('.3~s')(v) : String(v))),
       )
-
-    const legendPad = 10
-    const rowH = 18
-    const legendW = Math.min(c.innerWidth - 20, 320)
-    const legendH = legendPad * 2 + 14 + 28 + externalIps.length * rowH
-
-    const legend = c.plot.append('g').attr('transform', 'translate(10,10)')
-    legend
-      .append('rect')
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr('width', legendW)
-      .attr('height', legendH)
-      .attr('fill', 'rgba(255,255,255,0.92)')
-      .attr('stroke', 'rgba(0,0,0,0.1)')
-
-    legend
-      .append('text')
-      .attr('x', legendPad)
-      .attr('y', 22)
-      .attr('fill', '#333')
-      .style('font-size', '12px')
-      .style('font-weight', '600')
-      .text('Colour = external IP · solid = download · dashed = upload')
-
-    legend
-      .append('text')
-      .attr('x', legendPad)
-      .attr('y', 40)
-      .attr('fill', '#555')
-      .style('font-size', '10px')
-      .text(
-        `Below ${CHART_Y_THRESHOLD_MBPS} Mbps drawn at ${CHART_Y_THRESHOLD_MBPS} Mbps · hover for measured`,
-      )
-
-    externalIps.forEach((ip, i) => {
-      const y0 = 50 + i * rowH
-      const col = ipColor(ip)
-      legend
-        .append('line')
-        .attr('x1', legendPad)
-        .attr('x2', legendPad + 28)
-        .attr('y1', y0)
-        .attr('y2', y0)
-        .attr('stroke', col)
-        .attr('stroke-width', 3)
-      legend
-        .append('text')
-        .attr('x', legendPad + 36)
-        .attr('y', y0 + 4)
-        .attr('fill', '#333')
-        .style('font-size', '11px')
-        .text(ip.length > 36 ? `${ip.slice(0, 34)}…` : ip)
-    })
 
     // Hover: nearest run by time + tooltip (see also chart crosshair / focus pattern).
     const fmtTipTime = d3.timeFormat('%Y-%m-%d %H:%M:%S')
@@ -666,6 +696,8 @@ $.when($.ready).then(async function () {
     `
   }
 
+  const { legendEl } = ensureSpeedtestLayout()
+
   const chart = new Chart({
     element: 'chart',
     title: 'Internet speed over time (Mbps, log₂ scale)',
@@ -700,7 +732,7 @@ $.when($.ready).then(async function () {
       .map(({ run, file }) => toPoint(run, file))
       .filter((p): p is SpeedtestPoint => !!p)
 
-    drawTimeseries(chart, points)
+    drawTimeseries(chart, points, legendEl)
 
     const tableEl = ensureElementAfterChart('speedtest_table')
     renderTable(points, tableEl)
