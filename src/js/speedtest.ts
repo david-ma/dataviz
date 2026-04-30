@@ -249,29 +249,19 @@ function ensureElementAfterChart(id: string): HTMLElement {
   return el
 }
 
-function ensureSpeedtestLayout(): { legendEl: HTMLElement } {
-  const chartEl = document.getElementById('chart')
-  if (!chartEl) {
-    return { legendEl: ensureElementAfterChart('speedtest_legend') }
-  }
+function getSpeedtestLegendRowsEl(): HTMLElement {
+  const rows = document.getElementById('speedtest_legend_rows')
+  if (rows) return rows
 
-  if (chartEl.parentElement?.classList.contains('speedtest-layout')) {
-    const existing = document.getElementById('speedtest_legend')
-    return { legendEl: existing ?? ensureElementAfterChart('speedtest_legend') }
-  }
-
-  const wrapper = document.createElement('div')
-  wrapper.className = 'speedtest-layout'
-
-  const legend = document.createElement('div')
-  legend.id = 'speedtest_legend'
-  legend.className = 'speedtest-legend'
-
-  chartEl.insertAdjacentElement('beforebegin', wrapper)
-  wrapper.appendChild(chartEl)
-  wrapper.appendChild(legend)
-
-  return { legendEl: legend }
+  // Back-compat: if the dedicated template isn't present, fall back to creating a legend container.
+  const fallbackLegend = ensureElementAfterChart('speedtest_legend')
+  const tbody = document.createElement('tbody')
+  tbody.id = 'speedtest_legend_rows'
+  const table = document.createElement('table')
+  table.className = 'table table-condensed table-striped speedtest-legend-table'
+  table.appendChild(tbody)
+  fallbackLegend.appendChild(table)
+  return tbody
 }
 
 function renderTable(points: SpeedtestPoint[], container: HTMLElement): void {
@@ -363,7 +353,7 @@ function quantileSorted(valuesAscending: number[], p: number): number | null {
 function renderLegendTable(
   externalIps: string[],
   ipColor: (ip: string) => string,
-  legendEl: HTMLElement,
+  legendRowsEl: HTMLElement,
 ): void {
   const rows = externalIps
     .map((ip) => ({ ip, col: ipColor(ip) }))
@@ -371,7 +361,7 @@ function renderLegendTable(
       const ipLabel = ip.length > 46 ? `${ip.slice(0, 44)}…` : ip
       return `
         <tr>
-          <td style="width: 54px;">
+          <td style="width: 84px;">
             <div class="speedtest-swatch" style="--speedtest-colour:${escapeHtml(col)}">
               <div class="speedtest-swatch-dl"></div>
               <div class="speedtest-swatch-ul"></div>
@@ -383,21 +373,7 @@ function renderLegendTable(
     })
     .join('')
 
-  legendEl.innerHTML = `
-    <div class="speedtest-legend-card">
-      <div class="speedtest-legend-title">Legend</div>
-      <div class="speedtest-legend-sub">Colour = external IP</div>
-      <div class="speedtest-legend-sub">Solid = download · dashed = upload</div>
-      <div class="speedtest-legend-note">Below ${CHART_Y_THRESHOLD_MBPS} Mbps drawn at ${CHART_Y_THRESHOLD_MBPS} Mbps · hover for measured</div>
-      <div class="table-responsive">
-        <table class="table table-condensed table-striped speedtest-legend-table">
-          <tbody>
-            ${rows || `<tr><td colspan="2" class="text-muted">No series</td></tr>`}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `
+  legendRowsEl.innerHTML = rows || `<tr><td colspan="2" class="text-muted">No series</td></tr>`
 }
 
 function tooltipSpeedLine(which: 'Download' | 'Upload', mbps: number): string {
@@ -448,7 +424,7 @@ function splitSeriesByGap(sorted: SpeedtestPoint[], maxGapMs: number): Speedtest
   return chunks
 }
 
-function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendEl: HTMLElement): void {
+function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HTMLElement): void {
   const data = points
     .filter(
       (p) =>
@@ -505,67 +481,37 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendEl: HTMLEl
     .domain(externalIps)
     .range([...IP_LINE_PALETTE, ...d3.schemeTableau10])
 
-  renderLegendTable(externalIps, (ip) => ipColor(ip), legendEl)
-
-  const dl = d3
-    .line<SpeedtestPoint>()
-    .x((d) => x(d.ts))
-    .y((d) => y(yPlotMbps(d.download_mbps)))
-
-  const ul = d3
-    .line<SpeedtestPoint>()
-    .x((d) => x(d.ts))
-    .y((d) => y(yPlotMbps(d.upload_mbps)))
+  renderLegendTable(externalIps, (ip) => ipColor(ip), legendRowsEl)
 
   chart.ready((c) => {
-    const byIp = d3.group(data, (d) => d.external_ip)
+    // Scatter plot: points only (no connecting lines).
+    // Filled circle = download, ring = upload.
+    const dlDots = c.plot.append('g').attr('class', 'speedtest-dots speedtest-dots-dl')
+    const ulDots = c.plot.append('g').attr('class', 'speedtest-dots speedtest-dots-ul')
 
-    for (const ip of externalIps) {
-      const col = ipColor(ip)
-      const series = (byIp.get(ip) ?? []).slice().sort((a, b) => a.ts.getTime() - b.ts.getTime())
-      const segments = splitSeriesByGap(series, MAX_LINE_GAP_MS)
+    dlDots
+      .selectAll('circle')
+      .data(data)
+      .join('circle')
+      .attr('cx', (d) => x(d.ts))
+      .attr('cy', (d) => y(yPlotMbps(d.download_mbps)))
+      .attr('r', 3.5)
+      .attr('fill', (d) => ipColor(d.external_ip))
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 0.8)
+      .attr('opacity', 0.9)
 
-      for (const seg of segments) {
-        if (seg.length >= 2) {
-          c.plot
-            .append('path')
-            .datum(seg)
-            .attr('class', 'line')
-            .attr('fill', 'none')
-            .attr('stroke', col)
-            .attr('stroke-width', 2)
-            .attr('d', dl)
-
-          c.plot
-            .append('path')
-            .datum(seg)
-            .attr('class', 'line')
-            .attr('fill', 'none')
-            .attr('stroke', col)
-            .attr('stroke-width', 2)
-            .attr('stroke-dasharray', '6 4')
-            .attr('d', ul)
-        } else if (seg.length === 1) {
-          const p = seg[0]
-          c.plot
-            .append('circle')
-            .attr('cx', x(p.ts))
-            .attr('cy', y(yPlotMbps(p.download_mbps)))
-            .attr('r', 4)
-            .attr('fill', col)
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 1)
-          c.plot
-            .append('circle')
-            .attr('cx', x(p.ts))
-            .attr('cy', y(yPlotMbps(p.upload_mbps)))
-            .attr('r', 4)
-            .attr('fill', 'none')
-            .attr('stroke', col)
-            .attr('stroke-width', 2)
-        }
-      }
-    }
+    ulDots
+      .selectAll('circle')
+      .data(data)
+      .join('circle')
+      .attr('cx', (d) => x(d.ts))
+      .attr('cy', (d) => y(yPlotMbps(d.upload_mbps)))
+      .attr('r', 3.5)
+      .attr('fill', 'transparent')
+      .attr('stroke', (d) => ipColor(d.external_ip))
+      .attr('stroke-width', 1.6)
+      .attr('opacity', 0.95)
 
     c.plot
       .append('g')
@@ -696,7 +642,7 @@ $.when($.ready).then(async function () {
     `
   }
 
-  const { legendEl } = ensureSpeedtestLayout()
+  const legendRowsEl = getSpeedtestLegendRowsEl()
 
   const chart = new Chart({
     element: 'chart',
@@ -732,7 +678,7 @@ $.when($.ready).then(async function () {
       .map(({ run, file }) => toPoint(run, file))
       .filter((p): p is SpeedtestPoint => !!p)
 
-    drawTimeseries(chart, points, legendEl)
+    drawTimeseries(chart, points, legendRowsEl)
 
     const tableEl = ensureElementAfterChart('speedtest_table')
     renderTable(points, tableEl)

@@ -1,0 +1,110 @@
+<section class="blogpost speedtest-post">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-lg-10">
+      <div id="description"></div>
+
+      <div class="speedtest-layout">
+        <div id="chart" class="chart"></div>
+
+        <aside id="speedtest_legend" class="speedtest-legend" aria-label="Legend">
+          <div class="speedtest-legend-card">
+            <div class="speedtest-legend-title">Legend</div>
+            <div class="speedtest-legend-sub">Colour = external IP</div>
+            <div class="speedtest-legend-sub">Filled = download · Ring = upload</div>
+            <div class="speedtest-legend-note">
+              Below 1 Mbps drawn at 1 Mbps · hover for measured
+            </div>
+            <div class="table-responsive">
+              <table class="table table-condensed table-striped speedtest-legend-table">
+                <tbody id="speedtest_legend_rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {{> showSource }}
+    </div>
+  </div>
+</section>
+
+<style>
+  .speedtest-layout {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .speedtest-layout > #chart {
+    flex: 1 1 720px;
+    min-width: 320px;
+  }
+
+  .speedtest-legend {
+    flex: 0 0 320px;
+    max-width: 380px;
+  }
+
+  .speedtest-legend-card {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 10px 10px 0 10px;
+  }
+
+  .speedtest-legend-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 4px;
+  }
+
+  .speedtest-legend-sub {
+    font-size: 11px;
+    color: #495057;
+    line-height: 1.25;
+  }
+
+  .speedtest-legend-note {
+    font-size: 10px;
+    color: #6c757d;
+    margin-top: 6px;
+    margin-bottom: 8px;
+  }
+
+  .speedtest-legend-table {
+    margin-bottom: 0;
+  }
+
+  .speedtest-legend-table code {
+    font-size: 11px;
+  }
+
+  .speedtest-swatch {
+    --speedtest-colour: #000;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 64px;
+    padding-top: 2px;
+  }
+
+  .speedtest-swatch-dl {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--speedtest-colour);
+    border: 2px solid var(--speedtest-colour);
+  }
+
+  .speedtest-swatch-ul {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: transparent;
+    border: 2px solid var(--speedtest-colour);
+  }
+</style>
+
+{{> require }}
