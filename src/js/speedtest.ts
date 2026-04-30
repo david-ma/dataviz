@@ -132,6 +132,10 @@ type SpeedtestPoint = {
   ts: Date;
   /** Public / WAN identity for colouring (not LAN subnet). */
   external_ip: string;
+  /** Local / bound address (`--source`, `local_ipv4` / `local_ipv6`, or `ip_comparison.local_ip`). */
+  source_ip: string;
+  /** From CLI JSON when present (`--interface`, SSID); often null in exports. */
+  interface_label: string | null;
   download_mbps: number;
   upload_mbps: number;
   idle_latency_mean_ms: number | null;
@@ -172,6 +176,28 @@ function getExternalIp(run: SpeedtestData): string {
   return 'unknown'
 }
 
+function getSourceIp(run: SpeedtestData): string {
+  const fromComparison = run.ip_comparison?.local_ip?.trim()
+  if (fromComparison) return fromComparison
+  const v4 = run.local_ipv4?.trim()
+  const v6 = run.local_ipv6?.trim()
+  if (v4 && v6) return `${v4} · ${v6}`
+  if (v4) return v4
+  if (v6) return v6
+  return 'unknown'
+}
+
+function getInterfaceLabel(run: SpeedtestData): string | null {
+  const iface = run.interface_name?.trim()
+  const net = run.network_name?.trim()
+  if (iface && net && net !== iface) return `${iface} (${net})`
+  if (iface) return iface
+  if (net) return net
+  if (run.is_wireless === true) return 'Wi‑Fi (interface not reported)'
+  if (run.is_wireless === false) return 'Ethernet (interface not reported)'
+  return null
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -193,6 +219,8 @@ function toPoint(run: SpeedtestData, file?: string): SpeedtestPoint | null {
   return {
     ts,
     external_ip: getExternalIp(run),
+    source_ip: getSourceIp(run),
+    interface_label: getInterfaceLabel(run),
     download_mbps,
     upload_mbps,
     idle_latency_mean_ms: safeNumber(run.idle_latency?.mean_ms),
@@ -235,6 +263,7 @@ function renderTable(points: SpeedtestPoint[], container: HTMLElement): void {
           <tr>
             <th>Time</th>
             <th>External IP</th>
+            <th>Source IP</th>
             <th>Download</th>
             <th>Upload</th>
             <th>Idle latency (mean)</th>
@@ -248,6 +277,7 @@ function renderTable(points: SpeedtestPoint[], container: HTMLElement): void {
               return `<tr>
                 <td>${fmt(p.ts)}</td>
                 <td><code>${escapeHtml(p.external_ip)}</code></td>
+                <td><code>${escapeHtml(p.source_ip)}</code></td>
                 <td>${formatMbps(p.download_mbps)}</td>
                 <td>${formatMbps(p.upload_mbps)}</td>
                 <td>${formatMs(p.idle_latency_mean_ms)}</td>
@@ -572,9 +602,13 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[]): void {
       const lines: string[] = [
         fmtTipTime(d.ts),
         `External ${d.external_ip}`,
+        `Source ${d.source_ip}`,
+      ]
+      if (d.interface_label) lines.push(`Interface ${d.interface_label}`)
+      lines.push(
         tooltipSpeedLine('Download', d.download_mbps),
         tooltipSpeedLine('Upload', d.upload_mbps),
-      ]
+      )
       if (d.file) lines.push(d.file)
 
       tipLines.selectAll('text').remove()
