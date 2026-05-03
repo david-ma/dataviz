@@ -400,28 +400,13 @@ function ticksLog2Mbps(lo: number, hi: number): number[] {
   return out
 }
 
-/** Do not connect line segments across gaps longer than this (same external IP). */
-const MAX_LINE_GAP_MS = 8 * 60 * 60 * 1000 // 8 hours
-
-/**
- * Split a time-ordered series so paths are not drawn across long gaps.
- * Points must be sorted ascending by `ts`.
- */
-function splitSeriesByGap(sorted: SpeedtestPoint[], maxGapMs: number): SpeedtestPoint[][] {
-  if (sorted.length === 0) return []
-  const chunks: SpeedtestPoint[][] = []
-  let cur: SpeedtestPoint[] = [sorted[0]]
-  for (let i = 1; i < sorted.length; i++) {
-    const gap = sorted[i].ts.getTime() - sorted[i - 1].ts.getTime()
-    if (gap > maxGapMs) {
-      chunks.push(cur)
-      cur = [sorted[i]]
-    } else {
-      cur.push(sorted[i])
-    }
-  }
-  chunks.push(cur)
-  return chunks
+function clampDate(d: Date, lo: Date, hi: Date): Date {
+  const t = d.getTime()
+  const t0 = lo.getTime()
+  const t1 = hi.getTime()
+  if (t < t0) return new Date(t0)
+  if (t > t1) return new Date(t1)
+  return d
 }
 
 function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HTMLElement): void {
@@ -451,11 +436,42 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
     return
   }
 
-  const x = d3.scaleTime().range([0, chart.innerWidth])
-  const y = d3.scaleLog().base(2).range([chart.innerHeight, 0])
-
-  x.domain(d3.extent(data, (d) => d.ts) as [Date, Date])
   const lo = CHART_Y_THRESHOLD_MBPS
+
+  const [tMin, tMax] = d3.extent(data, (d) => d.ts) as [Date, Date]
+  const span = Math.max(1, tMax.getTime() - tMin.getTime())
+  const padMs = Math.min(span * 0.02, 24 * 60 * 60 * 1000)
+  const fullDomain: [Date, Date] = [new Date(tMin.getTime() - padMs), new Date(tMax.getTime() + padMs)]
+
+  /** Fixed reference scale (full time range) — used for brush + zoom rescaleX. */
+  const x2 = d3.scaleTime().domain(fullDomain).range([0, chart.innerWidth])
+  /** Focus X scale (visible window). */
+  const x = x2.copy()
+
+  const CONTEXT_H = 48
+  /** Space below the focus x-axis line so tick labels do not overlap the context strip. */
+  const CONTEXT_AXIS_GAP = 28
+  const CONTEXT_GAP = 8
+  const focusInnerH = chart.innerHeight - CONTEXT_H - CONTEXT_GAP - CONTEXT_AXIS_GAP
+  const y = d3.scaleLog().base(2).range([focusInnerH, 0])
+
+  const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+  const spanMs = tMax.getTime() - tMin.getTime()
+  const MIN_INIT_MS = 60 * 1000
+  let initialD0: Date
+  let initialD1: Date = tMax
+  if (spanMs <= SEVEN_DAYS_MS) {
+    initialD0 = tMin
+  } else {
+    initialD0 = new Date(tMax.getTime() - SEVEN_DAYS_MS)
+  }
+  initialD0 = clampDate(initialD0, fullDomain[0], fullDomain[1])
+  initialD1 = clampDate(initialD1, fullDomain[0], fullDomain[1])
+  if (initialD1.getTime() - initialD0.getTime() < MIN_INIT_MS) {
+    initialD0 = fullDomain[0]
+    initialD1 = fullDomain[1]
+  }
+  x.domain([initialD0, initialD1])
 
   const yValues = data
     .flatMap((d) => [d.download_mbps, d.upload_mbps])
@@ -484,10 +500,36 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
   renderLegendTable(externalIps, (ip) => ipColor(ip), legendRowsEl)
 
   chart.ready((c) => {
+    const w = c.innerWidth
+    const MIN_VISIBLE_MS = 60 * 1000
+
+    const clipId = `speedtest-focus-clip-${Math.random().toString(36).slice(2)}`
+    c.plot
+      .append('defs')
+      .append('clipPath')
+      .attr('id', clipId)
+      .append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', w)
+      .attr('height', focusInnerH)
+
+    c.plot
+      .append('g')
+      .attr('class', 'axis')
+      .call(
+        d3
+          .axisLeft(y)
+          .tickValues(yTickValues)
+          .tickFormat((v) => (typeof v === 'number' ? d3.format('.3~s')(v) : String(v))),
+      )
+
+    const clipRoot = c.plot.append('g').attr('clip-path', `url(#${clipId})`)
+
     // Scatter plot: points only (no connecting lines).
     // Filled circle = download, ring = upload.
-    const dlDots = c.plot.append('g').attr('class', 'speedtest-dots speedtest-dots-dl')
-    const ulDots = c.plot.append('g').attr('class', 'speedtest-dots speedtest-dots-ul')
+    const dlDots = clipRoot.append('g').attr('class', 'speedtest-dots speedtest-dots-dl')
+    const ulDots = clipRoot.append('g').attr('class', 'speedtest-dots speedtest-dots-ul')
 
     dlDots
       .selectAll('circle')
@@ -499,7 +541,7 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
       .attr('fill', (d) => ipColor(d.external_ip))
       .attr('stroke', '#fff')
       .attr('stroke-width', 0.8)
-      .attr('opacity', 0.9)
+      .attr('opacity', 0.4)
 
     ulDots
       .selectAll('circle')
@@ -511,23 +553,38 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
       .attr('fill', 'transparent')
       .attr('stroke', (d) => ipColor(d.external_ip))
       .attr('stroke-width', 1.6)
-      .attr('opacity', 0.95)
+      .attr('opacity', 0.6)
 
-    c.plot
+    const xAxisG = c.plot
       .append('g')
-      .attr('class', 'axis')
-      .attr('transform', `translate(0,${c.innerHeight})`)
-      .call(d3.axisBottom(x).ticks(6))
+      .attr('class', 'axis speedtest-axis-x-focus')
+      .attr('transform', `translate(0,${focusInnerH})`)
 
-    c.plot
+    const contextG = c.plot
       .append('g')
-      .attr('class', 'axis')
-      .call(
-        d3
-          .axisLeft(y)
-          .tickValues(yTickValues)
-          .tickFormat((v) => (typeof v === 'number' ? d3.format('.3~s')(v) : String(v))),
-      )
+      .attr('class', 'speedtest-context')
+      .attr('transform', `translate(0,${focusInnerH + CONTEXT_AXIS_GAP + CONTEXT_GAP})`)
+
+    contextG.append('rect').attr('x', 0).attr('y', 0).attr('width', w).attr('height', CONTEXT_H).attr('fill', '#f1f3f5')
+
+    const yCtx = CONTEXT_H / 2
+    contextG
+      .append('g')
+      .attr('class', 'speedtest-context-dots')
+      .selectAll('circle')
+      .data(data)
+      .join('circle')
+      .attr('cx', (d) => x2(d.ts))
+      .attr('cy', yCtx)
+      .attr('r', 1.5)
+      .attr('fill', (d) => ipColor(d.external_ip))
+      .attr('opacity', 0.35)
+
+    const updateScatterX = () => {
+      dlDots.selectAll('circle').attr('cx', (d) => x((d as SpeedtestPoint).ts))
+      ulDots.selectAll('circle').attr('cx', (d) => x((d as SpeedtestPoint).ts))
+      xAxisG.call(d3.axisBottom(x).ticks(6))
+    }
 
     // Hover: nearest run by time + tooltip (see also chart crosshair / focus pattern).
     const fmtTipTime = d3.timeFormat('%Y-%m-%d %H:%M:%S')
@@ -541,7 +598,7 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
       .append('line')
       .attr('class', 'speedtest-focus-line')
       .attr('y1', 0)
-      .attr('y2', c.innerHeight)
+      .attr('y2', focusInnerH)
       .attr('stroke', 'rgba(0,0,0,0.35)')
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', '4 3')
@@ -606,20 +663,120 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
 
       let tx = mx + 14
       let ty = my - boxH - 10
-      if (tx + boxW > c.innerWidth - 4) tx = mx - boxW - 14
+      if (tx + boxW > w - 4) tx = mx - boxW - 14
       if (ty < 4) ty = my + 14
-      if (ty + boxH > c.innerHeight - 4) ty = c.innerHeight - boxH - 4
+      if (ty + boxH > focusInnerH - 4) ty = focusInnerH - boxH - 4
       if (tx < 4) tx = 4
       tip.attr('transform', `translate(${tx}, ${ty})`)
     }
 
-    c.plot
+    let brushFromZoom = false
+    let ignoreNextZoom = false
+
+    const brushG = contextG.append('g').attr('class', 'brush speedtest-brush')
+
+    let overlay!: d3.Selection<SVGRectElement, unknown, SVGGElement, unknown>
+
+    const brush = d3
+      .brushX()
+      .extent([
+        [0, 0],
+        [w, CONTEXT_H],
+      ])
+      .on('end', brushed)
+
+    function brushed(event: d3.D3BrushEvent<SVGGElement>) {
+      if (brushFromZoom) {
+        brushFromZoom = false
+        return
+      }
+      const raw = event.selection as [number, number] | null
+      if (!raw) {
+        x.domain(fullDomain)
+        updateScatterX()
+        ignoreNextZoom = true
+        overlay.call(zoom.transform, d3.zoomIdentity)
+        brushFromZoom = true
+        brushG.call(brush.move as never, [0, w])
+        return
+      }
+      let s0 = raw[0]
+      let s1 = raw[1]
+      if (s1 - s0 < 4) return
+      let d0 = clampDate(x2.invert(s0), fullDomain[0], fullDomain[1])
+      let d1 = clampDate(x2.invert(s1), fullDomain[0], fullDomain[1])
+      if (d1.getTime() - d0.getTime() < MIN_VISIBLE_MS) {
+        const mid = (d0.getTime() + d1.getTime()) / 2
+        d0 = new Date(mid - MIN_VISIBLE_MS / 2)
+        d1 = new Date(mid + MIN_VISIBLE_MS / 2)
+        s0 = x2(d0)
+        s1 = x2(d1)
+        brushFromZoom = true
+        brushG.call(brush.move as never, [s0, s1])
+      }
+      if (d1 <= d0) return
+      x.domain([d0, d1])
+      updateScatterX()
+      const selW = s1 - s0
+      const fullSel = selW >= w - 0.5
+      if (!fullSel) {
+        ignoreNextZoom = true
+        overlay.call(zoom.transform, d3.zoomIdentity.scale(w / selW).translate(-s0, 0))
+      }
+    }
+
+    function zoomed(event: d3.D3ZoomEvent<SVGRectElement>) {
+      if (ignoreNextZoom) {
+        ignoreNextZoom = false
+        return
+      }
+      const xz = event.transform.rescaleX(x2)
+      let d0 = xz.domain()[0] as Date
+      let d1 = xz.domain()[1] as Date
+      d0 = clampDate(new Date(d0), fullDomain[0], fullDomain[1])
+      d1 = clampDate(new Date(d1), fullDomain[0], fullDomain[1])
+      if (d1.getTime() - d0.getTime() < MIN_VISIBLE_MS) return
+      x.domain([d0, d1])
+      updateScatterX()
+      const z0 = x2(d0)
+      const z1 = x2(d1)
+      brushFromZoom = true
+      brushG.call(brush.move as never, [z0, z1])
+    }
+
+    const zoom = d3
+      .zoom<SVGRectElement, unknown>()
+      .scaleExtent([0.08, 128])
+      .extent([
+        [0, 0],
+        [w, focusInnerH],
+      ])
+      .translateExtent([
+        [-w, 0],
+        [2 * w, focusInnerH],
+      ])
+      .on('zoom', zoomed)
+
+    overlay = c.plot
       .append('rect')
       .attr('class', 'speedtest-plot-overlay')
-      .attr('width', c.innerWidth)
-      .attr('height', c.innerHeight)
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', w)
+      .attr('height', focusInnerH)
       .attr('fill', 'transparent')
       .style('cursor', 'crosshair')
+      .call(zoom)
+      .on('dblclick.zoom', null)
+      .on('dblclick', (event: MouseEvent) => {
+        event.preventDefault()
+        x.domain(fullDomain)
+        updateScatterX()
+        ignoreNextZoom = true
+        overlay.call(zoom.transform, d3.zoomIdentity)
+        brushFromZoom = true
+        brushG.call(brush.move as never, [0, w])
+      })
       .on('mousemove', function (event: MouseEvent) {
         const [mx, my] = d3.pointer(event, c.plot.node())
         const t = x.invert(mx)
@@ -630,6 +787,18 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
       .on('mouseleave', () => {
         focus.style('display', 'none')
       })
+
+    brushG.call(brush)
+    requestAnimationFrame(() => {
+      const s0 = x2(initialD0)
+      const s1 = x2(initialD1)
+      brushFromZoom = true
+      brushG.call(brush.move as never, [s0, s1])
+      ignoreNextZoom = true
+      overlay.call(zoom.transform, d3.zoomIdentity.scale(w / (s1 - s0)).translate(-s0, 0))
+    })
+
+    updateScatterX()
   })
 }
 
@@ -639,6 +808,9 @@ $.when($.ready).then(async function () {
     description.innerHTML = `
       <h2>Cloudflare Speed Test</h2>
       <p>Runs are gathered by cron and loaded from <code>/cloudflare-speedtest-runs/</code>.</p>
+      <p class="text-muted" style="font-size:12px;margin-top:8px">
+        The chart opens on the latest 7 days of runs. Brush the grey strip below to pick a time window. Scroll on the chart to zoom, drag to pan, double‑click the chart to reset to the full range.
+      </p>
     `
   }
 
