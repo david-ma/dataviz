@@ -249,6 +249,25 @@ function ensureElementAfterChart(id: string): HTMLElement {
   return el
 }
 
+/** Runs table: insert after legend when present so legend stays above it. */
+function ensureSpeedtestTable(): HTMLElement {
+  const existing = document.getElementById('speedtest_table')
+  if (existing) return existing
+
+  const anchor = document.getElementById('speedtest_legend') ?? document.getElementById('chart')
+  if (!anchor) {
+    const fallback = document.createElement('div')
+    fallback.id = 'speedtest_table'
+    document.body.appendChild(fallback)
+    return fallback
+  }
+
+  const el = document.createElement('div')
+  el.id = 'speedtest_table'
+  anchor.insertAdjacentElement('afterend', el)
+  return el
+}
+
 function getSpeedtestLegendRowsEl(): HTMLElement {
   const rows = document.getElementById('speedtest_legend_rows')
   if (rows) return rows
@@ -350,30 +369,111 @@ function quantileSorted(valuesAscending: number[], p: number): number | null {
   return typeof v === 'number' && Number.isFinite(v) ? v : null
 }
 
+const LEGEND_LABEL_STORAGE_PREFIX = 'speedtest:ip-label:'
+
+function getStoredIpLabel(ip: string): string {
+  try {
+    return localStorage.getItem(LEGEND_LABEL_STORAGE_PREFIX + encodeURIComponent(ip)) ?? ''
+  } catch {
+    return ''
+  }
+}
+
+function setStoredIpLabel(ip: string, value: string): void {
+  try {
+    localStorage.setItem(LEGEND_LABEL_STORAGE_PREFIX + encodeURIComponent(ip), value)
+  } catch {
+    /* private mode / quota */
+  }
+}
+
+function bindLegendLabelStorage(legendHost: HTMLElement | null): void {
+  if (!legendHost || legendHost.dataset.legendInputBound === '1') return
+  legendHost.dataset.legendInputBound = '1'
+  legendHost.addEventListener('input', (e) => {
+    const t = e.target
+    if (!(t instanceof HTMLTextAreaElement)) return
+    if (!t.classList.contains('speedtest-legend-label')) return
+    const enc = t.getAttribute('data-ip-enc')
+    if (!enc) return
+    let ip = ''
+    try {
+      ip = decodeURIComponent(enc)
+    } catch {
+      return
+    }
+    setStoredIpLabel(ip, t.value)
+  })
+}
+
+type LegendRow = {
+  ip: string
+  col: string
+  count: number
+  avgDownload: number
+  avgUpload: number
+}
+
 function renderLegendTable(
-  externalIps: string[],
+  data: SpeedtestPoint[],
   ipColor: (ip: string) => string,
   legendRowsEl: HTMLElement,
 ): void {
-  const rows = externalIps
-    .map((ip) => ({ ip, col: ipColor(ip) }))
-    .map(({ ip, col }) => {
-      const ipLabel = ip.length > 46 ? `${ip.slice(0, 44)}…` : ip
-      return `
+  const byIp = d3.group(data, (d) => d.external_ip)
+  const rows: LegendRow[] = Array.from(byIp, ([ip, pts]) => {
+    const avgDownload = d3.mean(pts, (p) => p.download_mbps) ?? 0
+    const avgUpload = d3.mean(pts, (p) => p.upload_mbps) ?? 0
+    return {
+      ip,
+      col: ipColor(ip),
+      count: pts.length,
+      avgDownload,
+      avgUpload,
+    }
+  }).sort((a, b) => b.count - a.count)
+
+  const html =
+    rows.length === 0
+      ? `<tr><td colspan="6" class="text-muted">No series</td></tr>`
+      : rows
+          .map(({ ip, col, count, avgDownload, avgUpload }) => {
+            const ipLabel = ip.length > 56 ? `${ip.slice(0, 54)}…` : ip
+            const enc = encodeURIComponent(ip)
+            // `col` comes only from the D3 ordinal scale (palette), not user input.
+            return `
         <tr>
-          <td style="width: 84px;">
-            <div class="speedtest-swatch" style="--speedtest-colour:${escapeHtml(col)}">
-              <div class="speedtest-swatch-dl"></div>
-              <div class="speedtest-swatch-ul"></div>
-            </div>
+          <td class="speedtest-legend-colour">
+            <span class="speedtest-swatch" aria-hidden="true">
+              <span class="speedtest-swatch-dl" style="background-color:${col};border:2px solid ${col};"></span>
+              <span class="speedtest-swatch-ul" style="border:2px solid ${col};"></span>
+            </span>
           </td>
           <td><code title="${escapeHtml(ip)}">${escapeHtml(ipLabel)}</code></td>
+          <td>${count}</td>
+          <td>${formatMbps(avgUpload)}</td>
+          <td>${formatMbps(avgDownload)}</td>
+          <td>
+            <textarea class="form-control speedtest-legend-label input-sm" rows="2" data-ip-enc="${escapeHtml(enc)}" placeholder="Notes for this IP…"></textarea>
+          </td>
         </tr>
       `
-    })
-    .join('')
+          })
+          .join('')
 
-  legendRowsEl.innerHTML = rows || `<tr><td colspan="2" class="text-muted">No series</td></tr>`
+  legendRowsEl.innerHTML = html
+
+  const legendHost :HTMLElement = legendRowsEl.closest('#speedtest_legend') ?? document.getElementById('speedtest_legend')
+  bindLegendLabelStorage(legendHost)
+
+  legendRowsEl.querySelectorAll<HTMLTextAreaElement>('textarea.speedtest-legend-label').forEach((ta) => {
+    const enc = ta.getAttribute('data-ip-enc')
+    if (!enc) return
+    try {
+      ta.value = getStoredIpLabel(decodeURIComponent(enc))
+    } catch {
+      ta.value = ''
+    }
+  })
 }
 
 function tooltipSpeedLine(which: 'Download' | 'Upload', mbps: number): string {
@@ -497,7 +597,7 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
     .domain(externalIps)
     .range([...IP_LINE_PALETTE, ...d3.schemeTableau10])
 
-  renderLegendTable(externalIps, (ip) => ipColor(ip), legendRowsEl)
+  renderLegendTable(data, (ip) => ipColor(ip), legendRowsEl)
 
   chart.ready((c) => {
     const w = c.innerWidth
@@ -565,20 +665,89 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
       .attr('class', 'speedtest-context')
       .attr('transform', `translate(0,${focusInnerH + CONTEXT_AXIS_GAP + CONTEXT_GAP})`)
 
-    contextG.append('rect').attr('x', 0).attr('y', 0).attr('width', w).attr('height', CONTEXT_H).attr('fill', '#f1f3f5')
+    /** Navigator strip: inset plot area (brush + mini scatter share this x range). */
+    const ctxPadY = 5
+    const ctxAxisW = 36
+    const ctxPadR = 6
+    const ctxXL = ctxAxisW
+    const ctxXR = w - ctxPadR
+    const ctxPlotW = ctxXR - ctxXL
+    const xMini = d3.scaleTime().domain(fullDomain).range([ctxXL, ctxXR])
 
-    const yCtx = CONTEXT_H / 2
+    const yMini = d3
+      .scaleLog()
+      .base(2)
+      .domain(y.domain() as [number, number])
+      .range([CONTEXT_H - ctxPadY, ctxPadY])
+
+    const yMiniTicks = ticksLog2Mbps(lo, hi).filter((_, i, a) => i === 0 || i === a.length - 1 || i === Math.floor(a.length / 2))
+
+    contextG.append('rect').attr('x', 0).attr('y', 0).attr('width', w).attr('height', CONTEXT_H).attr('fill', '#e9ecef')
+
     contextG
-      .append('g')
-      .attr('class', 'speedtest-context-dots')
+      .append('rect')
+      .attr('x', ctxXL)
+      .attr('y', ctxPadY)
+      .attr('width', ctxPlotW)
+      .attr('height', CONTEXT_H - 2 * ctxPadY)
+      .attr('fill', '#fff')
+      .attr('stroke', 'rgba(0,0,0,0.12)')
+      .attr('rx', 2)
+      .attr('ry', 2)
+
+    const ctxClipId = `speedtest-ctx-clip-${Math.random().toString(36).slice(2)}`
+    contextG
+      .append('defs')
+      .append('clipPath')
+      .attr('id', ctxClipId)
+      .append('rect')
+      .attr('x', ctxXL)
+      .attr('y', ctxPadY)
+      .attr('width', ctxPlotW)
+      .attr('height', CONTEXT_H - 2 * ctxPadY)
+
+    const ctxClipG = contextG.append('g').attr('clip-path', `url(#${ctxClipId})`)
+
+    const ctxDl = ctxClipG.append('g').attr('class', 'speedtest-context-dl')
+    const ctxUl = ctxClipG.append('g').attr('class', 'speedtest-context-ul')
+
+    ctxDl
       .selectAll('circle')
       .data(data)
       .join('circle')
-      .attr('cx', (d) => x2(d.ts))
-      .attr('cy', yCtx)
-      .attr('r', 1.5)
+      .attr('cx', (d) => xMini(d.ts))
+      .attr('cy', (d) => yMini(yPlotMbps(d.download_mbps)))
+      .attr('r', 1.35)
       .attr('fill', (d) => ipColor(d.external_ip))
-      .attr('opacity', 0.35)
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 0.35)
+      .attr('opacity', 0.55)
+
+    ctxUl
+      .selectAll('circle')
+      .data(data)
+      .join('circle')
+      .attr('cx', (d) => xMini(d.ts))
+      .attr('cy', (d) => yMini(yPlotMbps(d.upload_mbps)))
+      .attr('r', 1.2)
+      .attr('fill', 'transparent')
+      .attr('stroke', (d) => ipColor(d.external_ip))
+      .attr('stroke-width', 0.9)
+      .attr('opacity', 0.65)
+
+    contextG
+      .append('g')
+      .attr('class', 'axis speedtest-axis-y-context')
+      .attr('transform', `translate(${ctxXL},0)`)
+      .call(
+        d3
+          .axisLeft(yMini)
+          .tickValues(yMiniTicks.length ? yMiniTicks : [lo, hi])
+          .tickFormat((v) => (typeof v === 'number' ? d3.format('.3~s')(v) : String(v)))
+          .tickSize(3),
+      )
+      .call((g) => g.select('.domain').attr('stroke', 'rgba(0,0,0,0.25)'))
+      .call((g) => g.selectAll('.tick text').attr('font-size', '8px').attr('fill', '#495057'))
 
     const updateScatterX = () => {
       dlDots.selectAll('circle').attr('cx', (d) => x((d as SpeedtestPoint).ts))
@@ -678,54 +847,69 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
     let overlay!: d3.Selection<SVGRectElement, unknown, SVGGElement, unknown>
 
     const brush = d3
-      .brushX()
+      .brushX<SVGGElement>()
       .extent([
-        [0, 0],
-        [w, CONTEXT_H],
+        [ctxXL, 1],
+        [ctxXR, CONTEXT_H - 1],
       ])
-      .on('end', brushed)
 
-    function brushed(event: d3.D3BrushEvent<SVGGElement>) {
-      if (brushFromZoom) {
-        brushFromZoom = false
-        return
-      }
-      const raw = event.selection as [number, number] | null
-      if (!raw) {
-        x.domain(fullDomain)
-        updateScatterX()
-        ignoreNextZoom = true
-        overlay.call(zoom.transform, d3.zoomIdentity)
-        brushFromZoom = true
-        brushG.call(brush.move as never, [0, w])
-        return
-      }
+    function applyBrushSelection(raw: [number, number]) {
       let s0 = raw[0]
       let s1 = raw[1]
       if (s1 - s0 < 4) return
-      let d0 = clampDate(x2.invert(s0), fullDomain[0], fullDomain[1])
-      let d1 = clampDate(x2.invert(s1), fullDomain[0], fullDomain[1])
+      let d0 = clampDate(xMini.invert(s0), fullDomain[0], fullDomain[1])
+      let d1 = clampDate(xMini.invert(s1), fullDomain[0], fullDomain[1])
       if (d1.getTime() - d0.getTime() < MIN_VISIBLE_MS) {
         const mid = (d0.getTime() + d1.getTime()) / 2
         d0 = new Date(mid - MIN_VISIBLE_MS / 2)
         d1 = new Date(mid + MIN_VISIBLE_MS / 2)
-        s0 = x2(d0)
-        s1 = x2(d1)
+        s0 = xMini(d0)
+        s1 = xMini(d1)
         brushFromZoom = true
         brushG.call(brush.move as never, [s0, s1])
       }
       if (d1 <= d0) return
       x.domain([d0, d1])
       updateScatterX()
-      const selW = s1 - s0
-      const fullSel = selW >= w - 0.5
-      if (!fullSel) {
-        ignoreNextZoom = true
-        overlay.call(zoom.transform, d3.zoomIdentity.scale(w / selW).translate(-s0, 0))
+      const px0 = x2(d0)
+      const px1 = x2(d1)
+      const spanPx = px1 - px0
+      const fullWin = spanPx >= w - 0.5
+      ignoreNextZoom = true
+      if (fullWin || spanPx < 1e-6) {
+        overlay.call(zoom.transform, d3.zoomIdentity)
+      } else {
+        overlay.call(zoom.transform, d3.zoomIdentity.scale(w / spanPx).translate(-px0, 0))
       }
     }
 
-    function zoomed(event: d3.D3ZoomEvent<SVGRectElement>) {
+    function onBrush(event: d3.D3BrushEvent<SVGGElement>) {
+      if (brushFromZoom) {
+        brushFromZoom = false
+        return
+      }
+      const raw = event.selection as [number, number] | null
+      if (!raw) return
+      applyBrushSelection(raw)
+    }
+
+    function onBrushEnd(event: d3.D3BrushEvent<SVGGElement>) {
+      if (brushFromZoom) {
+        brushFromZoom = false
+        return
+      }
+      if (event.selection) return
+      x.domain(fullDomain)
+      updateScatterX()
+      ignoreNextZoom = true
+      overlay.call(zoom.transform, d3.zoomIdentity)
+      brushFromZoom = true
+      brushG.call(brush.move as never, [ctxXL, ctxXR])
+    }
+
+    brush.on('brush', onBrush).on('end', onBrushEnd)
+
+    function zoomed(event: d3.D3ZoomEvent<SVGRectElement, any>) {
       if (ignoreNextZoom) {
         ignoreNextZoom = false
         return
@@ -738,10 +922,8 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
       if (d1.getTime() - d0.getTime() < MIN_VISIBLE_MS) return
       x.domain([d0, d1])
       updateScatterX()
-      const z0 = x2(d0)
-      const z1 = x2(d1)
       brushFromZoom = true
-      brushG.call(brush.move as never, [z0, z1])
+      brushG.call(brush.move as never, [xMini(d0), xMini(d1)])
     }
 
     const zoom = d3
@@ -775,7 +957,7 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
         ignoreNextZoom = true
         overlay.call(zoom.transform, d3.zoomIdentity)
         brushFromZoom = true
-        brushG.call(brush.move as never, [0, w])
+        brushG.call(brush.move as never, [ctxXL, ctxXR])
       })
       .on('mousemove', function (event: MouseEvent) {
         const [mx, my] = d3.pointer(event, c.plot.node())
@@ -790,12 +972,19 @@ function drawTimeseries(chart: Chart, points: SpeedtestPoint[], legendRowsEl: HT
 
     brushG.call(brush)
     requestAnimationFrame(() => {
-      const s0 = x2(initialD0)
-      const s1 = x2(initialD1)
+      const s0 = xMini(initialD0)
+      const s1 = xMini(initialD1)
+      const px0 = x2(initialD0)
+      const px1 = x2(initialD1)
       brushFromZoom = true
       brushG.call(brush.move as never, [s0, s1])
       ignoreNextZoom = true
-      overlay.call(zoom.transform, d3.zoomIdentity.scale(w / (s1 - s0)).translate(-s0, 0))
+      const spanPx = px1 - px0
+      if (spanPx < 1e-6) {
+        overlay.call(zoom.transform, d3.zoomIdentity)
+      } else {
+        overlay.call(zoom.transform, d3.zoomIdentity.scale(w / spanPx).translate(-px0, 0))
+      }
     })
 
     updateScatterX()
@@ -809,7 +998,7 @@ $.when($.ready).then(async function () {
       <h2>Cloudflare Speed Test</h2>
       <p>Runs are gathered by cron and loaded from <code>/cloudflare-speedtest-runs/</code>.</p>
       <p class="text-muted" style="font-size:12px;margin-top:8px">
-        The chart opens on the latest 7 days of runs. Brush the grey strip below to pick a time window. Scroll on the chart to zoom, drag to pan, double‑click the chart to reset to the full range.
+        The chart opens on the latest 7 days of runs. Drag the overview strip below to move the window (the main chart updates as you drag). Scroll on the chart to zoom, drag to pan, double‑click the chart to reset to the full range.
       </p>
     `
   }
@@ -852,7 +1041,7 @@ $.when($.ready).then(async function () {
 
     drawTimeseries(chart, points, legendRowsEl)
 
-    const tableEl = ensureElementAfterChart('speedtest_table')
+    const tableEl = ensureSpeedtestTable()
     renderTable(points, tableEl)
   } catch (e) {
     chart.ready((c) => {
