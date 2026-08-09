@@ -1,1 +1,0 @@
-export const __webpack_id__=7416;export const __webpack_ids__=[7416];export const __webpack_modules__={6488:()=>{}};import _ from"./chart.js";import*as o from"./budget.js";_.C(o),_(_.s=6488);

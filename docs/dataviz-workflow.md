@@ -29,6 +29,8 @@ New posts: **scratchpad first**. Upstream into `chart.ts` only when a second pos
 ```bash
 bun run typecheck
 bun run test
-bunx webpack --mode development --config webpack.config.js
+bun run build:dev   # → dist/js (gitignored)
+bun run preview     # production node_env so Thalia serves dist JS
 # spot-check /blog/georgia /blog/earthquake /blog/winamp /blog/matrix /blog/breathe /blog/war + one genuary
+# Rapier: /blog/genuary-25-06 — see docs/2026-08-10_bun-build.md
 ```
