@@ -4,7 +4,7 @@
  * exported from config/controllers/blog.ts.
  */
 
-import { describe, expect, test } from '@jest/globals'
+import { describe, expect, test } from 'bun:test'
 import path from 'path'
 import { publishedBlogposts } from '../config/controllers/blog'
 import { blogposts } from '../config/blogposts'

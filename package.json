@@ -16,7 +16,8 @@
     "blog": "bash scripts/newBlogpost.sh",
     "start": "thalia",
     "dev": "thalia-develop",
-    "typecheck": "bunx tsc --noEmit -p tsconfig.json"
+    "typecheck": "bunx tsc --noEmit -p tsconfig.json",
+    "test": "bun test test/ tests/"
   },
   "dependencies": {
     "@dimforge/rapier2d-compat": "^0.14.0",

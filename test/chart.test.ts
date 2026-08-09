@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { describe, expect, test } from '@jest/globals'
+import { describe, expect, test } from 'bun:test'
 
 import { camelize } from '../src/js/utils'
 import {
