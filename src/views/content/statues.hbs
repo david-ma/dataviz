@@ -1,102 +1,153 @@
-<section>
+<section class="statues-page">
   <h1>Statues of Women and Goats in the UK</h1>
-  
-  <p>In 2021, an audit of London's public monuments revealed a striking statistic: there are more statues of animals than there are of named women. Out of approximately 1,500 monuments in the capital, only about 50 (4%) are dedicated to named women, while nearly 100 (8%) depict animals.</p>
-  
-  <p>This visualization maps public statues across the UK that feature either women or goats. The data comes from the Public Statues and Sculpture Association (PSSA) database and Art UK, documenting the representation of women in public spaces.</p>
-  
-  <p>According to the PSSA, there are 176 statues of women across the UK, with 149 depicting named non-royal women and 27 representing generic female figures. In contrast, a study found that out of 4,912 statues analyzed, only 351 depicted women, with just 128 of these being named women. Remarkably, there are 82 statues dedicated to men named "John" – nearly as many as all named women combined.</p>
-  
-  <p>Goat statues, while less common overall, can be found scattered across the UK in various forms: from public art installations like Kenny Hunter's "I Goat" in Spitalfields, London, to sculptures celebrating local wildlife like the Kashmir Goat at Great Orme in Wales, and various goat-themed artworks in museums and collections.</p>
-  
-  <p>This map shows the geographic distribution of these statues. Red markers indicate statues of women, blue markers indicate statues of goats. Hover over the markers to see details about each statue.</p>
-  
+
+  <p>
+    A London monuments audit popularised a wry fact: the capital has more statues of animals than of named women.
+    This page maps <strong>women</strong> (and a few collectives) against <strong>goats</strong> — freestanding sculptures,
+    woman-with-goat groups, and a short curated set of heraldic and architectural goats.
+  </p>
+
+  <p class="statues-live-summary">
+    Dataset now: <strong id="live-total-count">…</strong> pins ·
+    <strong id="live-women-count">…</strong> women ·
+    <strong id="live-goats-count">…</strong> goats
+    (counts update when the CSV loads). Aiming toward PSSA-scale coverage of named non-royal women (~180+ on their live list);
+    many coordinates are still approximate — click a pin for the source link.
+  </p>
+
+  <p>
+    Filter the map, zoom with the scroll wheel (or trackpad), click a marker for details, and use the nearby list when London pins pile up.
+    Red family = women; blue/green/purple family = goat forms.
+  </p>
+
   <div id="map"></div>
-  
-  <h2>Key Findings</h2>
+
+  <h2>How to read this</h2>
   <ul>
-    <li><strong>London dominance:</strong> Many statues of women are concentrated in London, particularly in Westminster and Bloomsbury areas.</li>
-    <li><strong>Regional diversity:</strong> Statues of women can be found across the UK, from Manchester to Plymouth, Glasgow to Canterbury.</li>
-    <li><strong>Goat distribution:</strong> Goat statues tend to be more scattered, often located in rural areas, parks, or museum collections.</li>
-    <li><strong>Underrepresentation:</strong> The overall number of statues of women remains disproportionately low compared to statues of men.</li>
+    <li><strong>Women</strong> mostly follow the PSSA spirit: named people in public sculpture. Royals and allegory (Queen Victoria, Boudicca, Diana fountain) are included but tagged in notes.</li>
+    <li><strong>Goats</strong> are intentionally broad: public art goats, a goatherd group in Regent’s Park, an NHM relief, and one heraldic sample — not every coat of arms in Britain.</li>
+    <li><strong>Access</strong> varies: street, campus, museum, rooftop, or indoor (e.g. Old Bailey tours).</li>
   </ul>
-  
-  <h2>Notable Statues</h2>
-  <p>Some of the most prominent statues of women include:</p>
+
+  <h2>Notable pins</h2>
   <ul>
-    <li><strong>Millicent Fawcett</strong> - Parliament Square, London (the first statue of a woman in Parliament Square)</li>
-    <li><strong>Emmeline Pankhurst</strong> - St Peter's Square, Manchester (suffragette leader)</li>
-    <li><strong>Mary Seacole</strong> - St Thomas' Hospital, London (Crimean War nurse)</li>
-    <li><strong>Boudicca</strong> - Westminster Bridge, London (ancient British queen)</li>
-    <li><strong>Amy Winehouse</strong> - Camden Market, London (singer-songwriter)</li>
+    <li><strong>Millicent Fawcett</strong> — Parliament Square (first statue of a woman there)</li>
+    <li><strong>Florence Nightingale</strong> — Waterloo Place</li>
+    <li><strong>Edith Cavell</strong> — St Martin’s Place</li>
+    <li><strong>Betty Campbell</strong> — Cardiff</li>
+    <li><strong>Johann</strong> — Cushendun goat, Deborah Brown</li>
+    <li><strong>I Goat</strong> — Spitalfields, Kenny Hunter</li>
   </ul>
-  
-  <p>Notable goat statues include:</p>
+
+  <h2>Data</h2>
   <ul>
-    <li><strong>I Goat</strong> - Spitalfields, London (contemporary public art)</li>
-    <li><strong>Kashmir Goat</strong> - Great Orme, Llandudno (celebrating local wildlife)</li>
-    <li><strong>Goats series</strong> - Gateshead Riverside Park (public art installation)</li>
-    <li><strong>Redesdale Goat</strong> - Carter Bar, Northumberland (rural sculpture)</li>
+    <li><a href="https://pssauk.org/women/">Public Statues and Sculpture Association (PSSA)</a></li>
+    <li><a href="https://artuk.org/">Art UK</a></li>
+    <li><a href="https://womenstatuesuk.com/">WomenstatuesUK</a></li>
+    <li>CSV: <a href="/dataviz/statues.csv">/dataviz/statues.csv</a> — rebuild from <code>bun scripts/build-statues-csv.ts</code></li>
   </ul>
-  
-  <h2>Data Sources</h2>
-  <p>This visualization uses data from:</p>
-  <ul>
-    <li><a href="https://pssauk.org/women/">Public Statues and Sculpture Association (PSSA)</a> - Database of statues of women in the UK</li>
-    <li><a href="https://artuk.org/">Art UK</a> - Public art database</li>
-    <li>Various local authority and museum records</li>
-  </ul>
-  
-  <p><em>Note: This map shows a sample of publicly accessible statues. Some statues in private collections or museums may not be included. Coordinates are approximate and based on location descriptions.</em></p>
-  
+
+  <p><em>Pins with access=approx need field verification. Contributions welcome via the usual dataviz PR path.</em></p>
+
   {{> showSource}}
 </section>
 
 {{> require }}
 
 <style>
-  #map {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin: 20px 0;
-    background: #f9f9f9;
-  }
-  
-  section {
-    max-width: 1200px;
+  .statues-page {
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 1rem 1.25rem 2rem;
   }
-  
-  h1 {
-    color: #333;
-    margin-bottom: 20px;
+
+  .statues-page h1 {
+    margin-bottom: 0.75rem;
+    color: #222;
   }
-  
-  h2 {
+
+  .statues-live-summary {
+    padding: 0.6rem 0.8rem;
+    background: #f4f6f8;
+    border-left: 3px solid #c0392b;
+  }
+
+  #map {
+    border: 1px solid #ccd2d8;
+    margin: 0.75rem 0 1.25rem;
+    background: #f7f8fa;
+    width: 100%;
+    max-width: 800px;
+    overflow: hidden;
+  }
+
+  #map svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .statues-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+  }
+
+  .statues-count {
     color: #555;
-    margin-top: 30px;
-    margin-bottom: 15px;
   }
-  
-  ul {
-    line-height: 1.8;
+
+  .statues-panel,
+  .statues-nearby {
+    max-width: 800px;
+    margin: 0.5rem 0;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid #ccd2d8;
+    background: #fff;
+    font-size: 0.92rem;
+    line-height: 1.45;
   }
-  
-  li {
-    margin-bottom: 8px;
+
+  .statues-panel .muted,
+  .statues-nearby .muted {
+    color: #666;
+    font-size: 0.85rem;
   }
-  
-  a {
-    color: #3498db;
-    text-decoration: none;
+
+  .statues-panel a {
+    color: #246;
   }
-  
-  a:hover {
-    text-decoration: underline;
+
+  .statues-nearby .nearby-title {
+    font-weight: 600;
+    margin-bottom: 0.35rem;
   }
-  
-  strong {
-    color: #333;
+
+  .statues-nearby .nearby-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 0.2rem 0;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid #e2e6ea;
+    background: #fafbfc;
+    cursor: pointer;
+  }
+
+  .statues-nearby .nearby-item:hover {
+    background: #eef3f8;
+  }
+
+  #statues-panel-close,
+  #statues-reset-zoom {
+    margin-top: 0.4rem;
+    margin-left: 0.35rem;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid #bbb;
+    background: #f5f5f5;
+    cursor: pointer;
   }
 </style>
