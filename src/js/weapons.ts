@@ -33,7 +33,6 @@ const chart = new Chart({
       zoom: 200,
       projection: d3.geoEquirectangular(),
       // projection: d3.geoEqualEarth(),
-      calculate: () => {},
       markers: [
         {
           longitude: 0,

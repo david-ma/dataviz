@@ -14,8 +14,9 @@
     "deploy:quick": "sh config/scripts/quick_update.sh",
     "wiki": "node scripts/wiki.js",
     "blog": "bash scripts/newBlogpost.sh",
-    "start": "echo 'todo, write a start script'",
-    "test": "jest"
+    "start": "thalia",
+    "dev": "thalia-develop",
+    "typecheck": "bunx tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@dimforge/rapier2d-compat": "^0.14.0",

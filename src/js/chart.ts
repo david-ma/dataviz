@@ -23,6 +23,8 @@ import _ from 'lodash'
 import { camelize } from './utils'
 import { decorateTable, type DataTableConfig, type DataTableDataset } from './datatable'
 
+export type { DataTableConfig, DataTableDataset }
+
 /** Options for the Chart constructor. */
 export type ChartOptions = {
   element?: string
@@ -1625,7 +1627,7 @@ class Chart {
     aus?: string
     zoom?: number
     markers?: Coordinates[]
-    calculate: Function
+    calculate?: (chart: Chart, marker: Coordinates) => Coordinates[]
     projection?: d3.GeoProjection
   }) {
     let chart: Chart = this
