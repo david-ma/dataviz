@@ -1,8 +1,8 @@
 console.log('Hello world')
 
+import { ExtrasChart as Chart } from './chart-extras'
 import {
   d3,
-  Chart,
   decorateTable,
   classifyName,
   DataTableDataset,

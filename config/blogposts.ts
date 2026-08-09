@@ -1,4 +1,6 @@
-export const blogposts = [
+import type { Blogpost } from './blogpost-types.js'
+
+export const blogposts: Blogpost[] = [
   {
     shortname: 'georgia',
     featured: true,
@@ -8,7 +10,8 @@ export const blogposts = [
       'A simple interactive map to show which Georgia you are closest to',
     image: 'images/georgia.png',
     publish_date: '2024-04-17',
-    published: true,
+    status: 'published',
+    tier: 'core',
   },
   {
     shortname: 'war',
@@ -18,7 +21,8 @@ export const blogposts = [
       'Nearly a quarter of Americans have never experienced the U.S. in a time of peace according to the Washington Post.',
     image: 'images/war.jpg',
     publish_date: '2020-02-01',
-    published: true,
+    status: 'published',
+    tier: 'core',
   },
   {
     shortname: 'wealth',
@@ -27,7 +31,7 @@ export const blogposts = [
     summary: "All of the world's wealth, according to the Credit Suisse report",
     image: 'images/wealth.png',
     publish_date: '2020-02-17',
-    published: true,
+    status: 'published',
   },
   {
     shortname: 'breathe',
@@ -37,7 +41,8 @@ export const blogposts = [
     summary: 'D3.js & maths practice by drawing breathing polygons',
     image: 'images/breathe.png',
     publish_date: '2020-11-07',
-    published: true,
+    status: 'published',
+    tier: 'core',
   },
   {
     shortname: 'AusIncome',
@@ -46,7 +51,7 @@ export const blogposts = [
     summary: 'Graphs from ATO income stats 2018',
     image: 'images/ausIncome.png',
     publish_date: '2021-08-30',
-    published: false,
+    status: 'archived',
   },
   {
     shortname: 'matrix',
@@ -56,16 +61,18 @@ export const blogposts = [
     summary: 'The raining code from the movie The Matrix (1999)',
     image: 'images/matrix.jpg',
     publish_date: '2021-09-12',
-    published: true,
+    status: 'published',
+    tier: 'core',
   },
   {
     shortname: 'winamp',
     title: 'Winamp Animation',
-    category: 'sandbox',
+    category: 'animation',
     summary: 'A simple animation, reminiscent of the old winamp visualisations',
     image: 'images/winamp.jpg',
     publish_date: '2021-09-15',
-    published: false,
+    status: 'published',
+    tier: 'core',
   },
   {
     shortname: 'earthquake',
@@ -76,7 +83,8 @@ export const blogposts = [
       'A visualisation of the twitter activity when Melbourne had an earthquake',
     image: 'images/earthquake.jpg',
     publish_date: '2021-09-23',
-    published: true,
+    status: 'published',
+    tier: 'core',
   },
   {
     shortname: 'sixseven',
@@ -86,7 +94,7 @@ export const blogposts = [
       "Testing Benford's law on anonymised Twitter follower, friend and status counts: do first digits follow the classic pattern?",
     image: 'images/sixseven.png',
     publish_date: '2025-02-21',
-    published: false,
+    status: 'archived',
   },
   {
     shortname: 'statues',
@@ -96,7 +104,7 @@ export const blogposts = [
       'Mapping the geographic distribution of public statues featuring women and goats across the UK, highlighting the underrepresentation of women in public monuments',
     image: 'images/statues.png',
     publish_date: '2025-12-03',
-    published: true,
+    status: 'published',
   },
   {
     shortname: 'genuary-25-01',
@@ -106,7 +114,8 @@ export const blogposts = [
       'An exploration of strict geometry using only vertical and horizontal lines for the first Genuary 2025 prompt.',
     image: 'images/genuary-25-01.png',
     publish_date: '2025-01-01',
-    published: true,
+    status: 'published',
+    tier: 'standard',
   },
   {
     shortname: 'genuary-25-02',
@@ -116,7 +125,8 @@ export const blogposts = [
       'Stacked generative layers build up depth and texture in response to the second Genuary 2025 prompt.',
     image: 'images/genuary-25-02.png',
     publish_date: '2025-01-02',
-    published: true,
+    status: 'published',
+    tier: 'standard',
   },
   {
     shortname: 'genuary-25-03',
@@ -126,7 +136,8 @@ export const blogposts = [
       'A constrained generative sketch written in exactly forty‑two lines of code for the third Genuary 2025 prompt.',
     image: 'images/genuary-25-03.png',
     publish_date: '2025-01-03',
-    published: true,
+    status: 'published',
+    tier: 'standard',
   },
   {
     shortname: 'genuary-25-04',
@@ -136,7 +147,8 @@ export const blogposts = [
       'Low‑contrast textures and light play explore the “black on black” Genuary 2025 prompt.',
     image: 'images/genuary-25-04.png',
     publish_date: '2025-01-04',
-    published: true,
+    status: 'published',
+    tier: 'standard',
   },
   {
     shortname: 'genuary-25-05',
@@ -146,7 +158,8 @@ export const blogposts = [
       'An isometric generative scene built without vanishing points for the fifth Genuary 2025 prompt.',
     image: 'images/genuary-25-05.png',
     publish_date: '2025-01-05',
-    published: true,
+    status: 'published',
+    tier: 'standard',
   },
   {
     shortname: 'genuary-25-06',
@@ -156,7 +169,8 @@ export const blogposts = [
       'Minimalist landscapes assembled solely from primitive shapes for the sixth Genuary 2025 prompt.',
     image: 'images/genuary-25-06.png',
     publish_date: '2025-01-06',
-    published: true,
+    status: 'published',
+    tier: 'standard',
   },
   {
     shortname: 'genuary-25-07',
@@ -166,7 +180,8 @@ export const blogposts = [
       'A physics‑driven sketch inspired by the “use software that is not intended to create art or images” prompt.',
     image: 'images/genuary-25-07.png',
     publish_date: '2025-01-07',
-    published: true,
+    status: 'published',
+    tier: 'standard',
   },
   {
     shortname: 'genuary-25-17',
@@ -176,7 +191,8 @@ export const blogposts = [
       'An exploration of circles, squares and approximations of π through the lens of the “pi equals four” prompt.',
     image: 'images/genuary-25-17.png',
     publish_date: '2025-01-17',
-    published: true,
+    status: 'published',
+    tier: 'standard',
   },
   {
     shortname: 'theseus-wiki',
@@ -188,7 +204,7 @@ export const blogposts = [
     image_url: 'https://photos.smugmug.com/Test-album/i-QBJ9Rpn/0/L22T8CRmm3XdMZBsfrJhsgz3CgwkhhTSr6QcX4bgg/X5/theseus-X5.png',
     image: 'images/theseus-wiki.png',
     publish_date: '2024-12-03',
-    published: true,
+    status: 'published',
   },
   {
     shortname: 'genuary',
@@ -197,7 +213,8 @@ export const blogposts = [
     summary: 'Eight generative art pieces made for Genuary 2025 — one prompt per day.',
     image: 'images/genuary-25-01.png',
     publish_date: '2025-01-01',
-    published: true,
+    status: 'published',
+    tier: 'standard',
     featured: true,
     noJs: true,
   },

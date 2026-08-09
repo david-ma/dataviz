@@ -1,4 +1,5 @@
-import { Chart, _, d3 } from './chart'
+import { ExtrasChart as Chart } from './chart-extras'
+import { _, d3 } from './chart'
 import 'datatables.net'
 
 console.log('Australian Income stuff')

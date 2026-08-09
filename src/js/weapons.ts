@@ -11,16 +11,16 @@ $("#description").html(md.makeHtml(description))
 
 
 
-import { Chart, d3 } from './chart'
+import { MapChart, d3 } from './chart-map'
 
 
-const chart = new Chart({
+const chart = new MapChart({
     element: 'chart',
     margin: 20,
     width: 1200,
     height: 600,
     nav: false,
-  }).initMap().then((chart: Chart) => {
+  }).initMap().then((chart: MapChart) => {
 
     chart.loadingAnimation.stop({goto: [0, 0]})
     // console.log("loadingAnimation", chart.loadingAnimation)

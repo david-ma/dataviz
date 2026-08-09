@@ -23,7 +23,7 @@ const projectRoot = path.resolve(import.meta.dirname, '..')
 const runIntegration = process.env.SKIP_SITE_INTEGRATION !== '1'
 const describeIntegration = runIntegration ? describe : describe.skip
 
-const PUBLISHED_POSTS = blogposts.filter((post) => post.published)
+const PUBLISHED_POSTS = blogposts.filter((post) => post.status === 'published')
 
 describeIntegration('Dataviz site HTTP', () => {
   let port: number

@@ -1,6 +1,7 @@
 console.log('AGRF Monthly data usage')
 
-import { d3, Chart, decorateTable, DataTableDataset, _ } from './chart'
+import { ExtrasChart as Chart } from './chart-extras'
+import { d3, decorateTable, DataTableDataset, _ } from './chart'
 
 const important_columns = [
   // "contract_sent",

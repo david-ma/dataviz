@@ -1,13 +1,8 @@
-/**
- * Unit tests for blog controller logic.
- * These run without a server — they test the pure functions and data
- * exported from config/controllers/blog.ts.
- */
-
 import { describe, expect, test } from 'bun:test'
 import path from 'path'
 import { publishedBlogposts } from '../config/controllers/blog'
 import { blogposts } from '../config/blogposts'
+import { CORE_SHORTNAMES, isCore, isListed } from '../config/blogpost-types'
 
 const CONTENT_DIR = path.resolve(
   import.meta.dir,
@@ -20,8 +15,9 @@ const CONTENT_DIR = path.resolve(
 describe('publishedBlogposts', () => {
   const PUBLISHED = publishedBlogposts()
 
-  test('only includes posts with published: true', () => {
-    expect(PUBLISHED.every((p) => p.published)).toBe(true)
+  test('only includes posts with status published', () => {
+    expect(PUBLISHED.every((p) => p.status === 'published')).toBe(true)
+    expect(PUBLISHED.every(isListed)).toBe(true)
   })
 
   test('is a subset of all blogposts', () => {
@@ -37,6 +33,15 @@ describe('publishedBlogposts', () => {
       expect(p.title).toBeTruthy()
       expect(p.image).toBeTruthy()
     })
+  })
+
+  test('core six are published with tier core', () => {
+    for (const shortname of CORE_SHORTNAMES) {
+      const post = blogposts.find((p) => p.shortname === shortname)
+      expect(post).toBeTruthy()
+      expect(post!.status).toBe('published')
+      expect(isCore(post!)).toBe(true)
+    }
   })
 })
 

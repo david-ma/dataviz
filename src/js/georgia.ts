@@ -1,4 +1,4 @@
-import { Chart, mapDistance, d3, Geoip, Coordinates } from './chart'
+import { MapChart, mapDistance, d3, type Geoip, type Coordinates } from './chart-map'
 
 const georgias: Coordinates[] = [
   {
@@ -37,14 +37,14 @@ const extraGeorgias: Coordinates[] = [
 // Ingest data
 Promise.all([
   d3.json('https://monetiseyourwebsite.com/geoip'),
-  new Chart({
+  new MapChart({
     element: 'georgiaChart',
     margin: 20,
     width: 800,
     height: 600,
     nav: false,
   }).initMap(),
-]).then(([geoip, chart]: [Geoip, Chart]) => {
+]).then(([geoip, chart]: [Geoip, MapChart]) => {
   // Init chart
 
   chart.drawMap({
@@ -75,7 +75,7 @@ Promise.all([
   }
 })
 
-function calculate(chart: Chart, yourCoordinates: Coordinates) {
+function calculate(chart: MapChart, yourCoordinates: Coordinates) {
   const you: Coordinates = {
     ...yourCoordinates,
     label: 'You are here',

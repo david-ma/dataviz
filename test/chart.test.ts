@@ -8,12 +8,11 @@ import { camelize } from '../src/js/utils'
 import {
   Chart,
   classifyName,
-  mapDistance,
-  type Coordinates,
   _,
   $,
   d3,
 } from '../src/js/chart'
+import { mapDistance, type Coordinates } from '../src/js/chart-map'
 
 const testCases = [
   {

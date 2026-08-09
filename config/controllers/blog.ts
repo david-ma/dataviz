@@ -3,6 +3,7 @@ import fs from 'fs'
 import type { RawWebsiteConfig } from 'thalia'
 
 import { blogposts } from '../blogposts.js'
+import { isListed, type Blogpost } from '../blogpost-types.js'
 import { gitHash } from '../utilities.js'
 
 const contentDirSegments = ['src', 'views', 'content'] as const
@@ -16,7 +17,8 @@ const hasBlogTemplate = (websiteRootPath: string, shortname: string) => {
   )
 }
 
-export const publishedBlogposts = () => blogposts.filter((post) => post.published)
+/** Public listing set (`status === 'published'`). */
+export const publishedBlogposts = (): Blogpost[] => blogposts.filter(isListed)
 
 const navContext = () => {
   const published = publishedBlogposts()
@@ -89,8 +91,8 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
             shortname,
             title: shortname,
             summary: 'Example blog post',
-            publish_date: new Date(),
-            published: true,
+            publish_date: new Date().toISOString().slice(0, 10),
+            status: 'hold' as const,
           },
         })
         res.end(html)
