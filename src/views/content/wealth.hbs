@@ -1,92 +1,206 @@
-<style>
-    #dataset {
-        border: solid 1px grey;
-        padding: 5px;
-    }
+<section class="wealth-page">
+  <h1>World Wealth</h1>
 
-    #dataset table {
-        border: solid 1px grey;
-        margin: 5px 0;
-    }
+  <p>
+    Household wealth by country from the
+    <a href="https://www.credit-suisse.com/about-us/en/reports-research/global-wealth-report.html" target="_blank" rel="noopener">
+      2019 Credit Suisse Global Wealth Report
+    </a>
+    (MakeoverMonday). Area is proportional to wealth in billions of US dollars.
+  </p>
 
-    #dataset td {
-        border: solid 1px lightgrey;
-    }
+  <p id="wealth-summary" class="wealth-summary">Loading…</p>
 
-    #wealth th {
-        padding: 3px;
-    }
+  <p class="wealth-controls">
+    <span id="wealth-zoom-label">All regions</span>
+    <button type="button" id="wealth-reset" hidden>Show all regions</button>
+  </p>
 
-    #wealth tr {
-        line-height: 1em;
-        filter: brightness(1.15);
-    }
+  <div id="wealth-legend" class="wealth-legend" aria-label="Regions"></div>
 
-    #wealth table {
-        width: 100% !important;
-    }
+  <div class="wealth-layout">
+    <div id="chart" class="wealth-chart"></div>
+    <aside id="dataset" class="wealth-table">
+      <table></table>
+      <p class="download_csv_link">
+        <a href="/blogposts/WorldWealth.csv?raw=true" target="_blank" rel="noopener">Download CSV</a>
+      </p>
+    </aside>
+  </div>
 
-    #wealth .paginate_button {
-        padding: 3px 6px;
-        flex: auto;
-    }
+  <h2>How to use</h2>
+  <ul>
+    <li>Hover a country tile or table row to highlight the pair.</li>
+    <li>Click a country (or a legend region) to zoom that region and filter the table.</li>
+    <li>Click empty chart space or <em>Show all regions</em> to reset.</li>
+  </ul>
 
-    #wealth .dataTables_paginate {
-        display: flex;
-        width: 100%;
-    }
-
-    #wealth .dataTables_paginate .ellipsis {
-        padding: 0;
-    }
-
-    .country.highlight {
-        stroke-width: 5;
-    }
-
-    #wealth tr.highlight {
-        filter: brightness(1);
-    }
-
-    #wealth tr.highlight td {
-        border-top: solid 3px black;
-        border-bottom: solid 3px black;
-    }
-
-    #wealth tr.highlight td:first-child {
-        border-left: solid 3px black;
-    }
-
-    #wealth tr.highlight td:last-child {
-        border-right: solid 3px black;
-    }
-</style>
-
-<section class="blogpost">
-
-    <div class="row" id="wealth">
-
-        <div class="col-sm-8" id="chart">
-            <h1>World Wealth</h1>
-            <div id="explain"></div>
-        </div>
-
-        <div class="col-sm-4" id="dataset">
-            <table></table>
-            <div class="download_csv_link"><a target="_blank" href="/wealth/WorldWealth.csv">Download CSV</a></div>
-        </div>
-    </div>
-    {{> showSource}}
+  {{> showSource}}
 </section>
 
 {{> require}}
 
-<script>
+<style>
+  .wealth-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 12px 32px;
+  }
 
-    var md = new showdown.Converter({ openLinksInNewWindow: true });
+  .wealth-page h1 {
+    margin: 0 0 0.4em;
+    font-size: 1.75rem;
+  }
 
-    $("#explain").html(md.makeHtml(`
-Data taken from the [2019 Credit Suisse Research Institute wealth report](https://www.credit-suisse.com/about-us/en/reports-research/global-wealth-report.html).
-`));
+  .wealth-page > p {
+    max-width: 52rem;
+    line-height: 1.45;
+  }
 
-</script>
+  .wealth-summary {
+    margin: 0.75rem 0;
+  }
+
+  .wealth-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.5rem 0 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  #wealth-reset {
+    border: 1px solid #444;
+    background: #f5f5f5;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  #wealth-reset:hover {
+    background: #eee;
+  }
+
+  .wealth-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.75rem;
+    margin: 0 0 1rem;
+  }
+
+  .wealth-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .wealth-legend-item .swatch {
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1px solid #333;
+    flex: none;
+  }
+
+  .wealth-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .wealth-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .wealth-chart {
+    min-height: 320px;
+  }
+
+  .wealth-chart .chart {
+    margin: 0;
+  }
+
+  .wealth-table {
+    border: 1px solid #bbb;
+    padding: 8px;
+    background: #fafafa;
+  }
+
+  .wealth-table table {
+    width: 100% !important;
+    border-collapse: collapse;
+  }
+
+  .wealth-table th,
+  .wealth-table td {
+    border: 1px solid #ddd;
+    padding: 3px 6px;
+    font-size: 0.85rem;
+  }
+
+  .wealth-table tr {
+    line-height: 1.15;
+    filter: brightness(1.12);
+  }
+
+  .wealth-table .paginate_button {
+    padding: 3px 6px;
+  }
+
+  .wealth-table .dataTables_paginate {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 2px;
+  }
+
+  .wealth-table .download_csv_link {
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
+  }
+
+  .country.highlight {
+    stroke-width: 3;
+    stroke: #000;
+  }
+
+  #wealth .wealth-table tr.highlight,
+  .wealth-table tr.highlight {
+    filter: brightness(1);
+  }
+
+  .wealth-table tr.highlight td {
+    border-top: solid 2px #111;
+    border-bottom: solid 2px #111;
+  }
+
+  .wealth-table tr.highlight td:first-child {
+    border-left: solid 2px #111;
+  }
+
+  .wealth-table tr.highlight td:last-child {
+    border-right: solid 2px #111;
+  }
+
+  .wealth-label-name {
+    font-size: 13px;
+    font-weight: 700;
+    fill: #111;
+  }
+
+  .wealth-label-value {
+    font-size: 11px;
+    fill: #222;
+  }
+</style>

@@ -41,24 +41,28 @@ export function decorateTable(
   newOptions?: DataTableConfig,
 ): DataTables.Api<any> {
   const element = newOptions ? newOptions.element : '#dataset table'
+  const rows = Array.isArray(dataset) ? dataset : []
 
-  const columns = (
-    newOptions?.titles ||
-    dataset.columns ||
-    Object.keys(dataset[0])
-  ).map((d: any) => {
-    return {
+  let columns: DataTables.ConfigColumns[]
+  if (newOptions?.columns?.length) {
+    columns = newOptions.columns.map((col) => ({ ...col }))
+  } else {
+    const keys =
+      newOptions?.titles ||
+      dataset.columns ||
+      (rows[0] && typeof rows[0] === 'object' ? Object.keys(rows[0]) : [])
+    columns = keys.map((d: string) => ({
       title: d,
       data: d,
-    }
-  })
+    }))
+  }
 
   const options: DataTableConfig = {
     info: false,
     paging: false,
     search: false,
     searching: false,
-    data: dataset,
+    data: rows,
     pageLength: 25,
     order: [[0, 'desc']],
     columns,
@@ -72,6 +76,7 @@ export function decorateTable(
 
   if (newOptions) {
     Object.keys(newOptions).forEach((key) => {
+      if (key === 'columns') return // already applied above
       ;(options as any)[key] = (newOptions as any)[key]
     })
     if (newOptions.titles) {
