@@ -6,7 +6,7 @@ import {
   mergers,
   metricConfig,
   streamingRows,
-} from './data/streaming'
+} from './film/streaming'
 
 type RenderState = {
   metric: MetricKey
