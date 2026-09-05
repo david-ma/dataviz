@@ -1,21 +1,10 @@
-<div id="featuredPreviews" class="row">
-  {{#featuredBlogposts}}
-  <div class="preview featured col-xl-2 col-lg-3 col-md-4 col-xs-12">
-    <h2>{{title}}</h2>
-    <span class="subtitle">{{category}}</span>
-    <p>{{summary}}</p>
-    <a href="/blog/{{shortname}}"><img src="{{#image_url}}{{{image_url}}}{{/image_url}}{{^image_url}}{{image}}{{/image_url}}" alt="{{title}}"></a>
-  </div>
-  {{/featuredBlogposts}}
-</div>
-
 <div id="vizPreviews" class="row">
   {{#blogposts}}
-  <div class="preview col-xl-3 col-lg-4 col-md-6 col-xs-12">
+  <div class="preview col-xl-2 col-lg-3 col-md-4 col-sm-6 col-xs-12">
     <h2>{{title}}</h2>
     <span class="subtitle">{{category}} {{publish_date}}</span>
     <p>{{summary}}</p>
-    <a href="/blog/{{shortname}}"><img src="{{#image_url}}{{{image_url}}}{{/image_url}}{{^image_url}}{{image}}{{/image_url}}" alt="{{title}}"></a>
+    <a href="/blog/{{shortname}}"><img src="{{#image_url}}{{{image_url}}}{{/image_url}}{{^image_url}}/{{image}}{{/image_url}}" alt="{{title}}"></a>
   </div>
   {{/blogposts}}
 </div>

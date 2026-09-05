@@ -20,7 +20,8 @@
     "dev": "thalia-develop",
     "typecheck": "bunx tsc --noEmit -p tsconfig.json",
     "test": "bun test test/ tests/",
-    "statues:csv": "bun scripts/build-statues-csv.ts"
+    "statues:csv": "bun scripts/build-statues-csv.ts",
+    "preview:png": "bun scripts/capture-preview.ts"
   },
   "dependencies": {
     "@dimforge/rapier2d-compat": "^0.14.0",

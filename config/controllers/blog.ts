@@ -3,7 +3,11 @@ import fs from 'fs'
 import type { RawWebsiteConfig } from 'thalia/types'
 
 import { blogposts } from '../blogposts.js'
-import { isListed, type Blogpost } from '../blogpost-types.js'
+import {
+  byPublishDateDesc,
+  isListed,
+  type Blogpost,
+} from '../blogpost-types.js'
 import { gitHash } from '../utilities.js'
 
 const contentDirSegments = ['src', 'views', 'content'] as const
@@ -17,35 +21,24 @@ const hasBlogTemplate = (websiteRootPath: string, shortname: string) => {
   )
 }
 
-/** Public listing set (`status === 'published'`). */
-export const publishedBlogposts = (): Blogpost[] => blogposts.filter(isListed)
+/** Homepage / nav / sitemap /viz — `status === 'published'` only. */
+export const publishedBlogposts = (): Blogpost[] =>
+  blogposts.filter(isListed).sort(byPublishDateDesc)
 
-const navContext = () => {
-  const published = publishedBlogposts()
-  const genuary = published
-    .filter((post) => post.category === 'Genuary 2025')
-    .map((post) => ({
-      ...post,
-      shortTitle: post.title.replace(/^Genuary 2025 – Day \d+: /, ''),
-    }))
-  return {
-    gitHash,
-    blogposts: published
-      .filter((post) => post.category !== 'Genuary 2025')
-      .sort((a, b) => b.publish_date.localeCompare(a.publish_date)),
-    genuaryBlogposts: genuary,
-  }
-}
+/** Any catalogue entry (for direct URL resolution). */
+export const findBlogpost = (shortname: string): Blogpost | undefined =>
+  blogposts.find((post) => post.shortname === shortname)
+
+const navContext = () => ({
+  gitHash,
+  blogposts: publishedBlogposts(),
+})
 
 export const blogControllers: RawWebsiteConfig['controllers'] = {
   '': (res, req, website, requestInfo) => {
-    const published = publishedBlogposts()
     const html = website.getContentHtml('homepage')({
       ...navContext(),
-      featuredBlogposts: published.filter((post) => (post as any).featured),
-      blogposts: published
-        .filter((post) => !(post as any).featured && post.category !== 'Genuary 2025')
-        .sort((a, b) => b.publish_date.localeCompare(a.publish_date)),
+      blogposts: publishedBlogposts(),
     })
     res.end(html)
   },
@@ -66,7 +59,7 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
   viz: (res, req, website, requestInfo) => {
     const html = website.getContentHtml('viz', 'blog')({
       ...navContext(),
-      blogposts: publishedBlogposts().sort((a, b) => b.publish_date.localeCompare(a.publish_date)),
+      blogposts: publishedBlogposts(),
     })
     res.end(html)
   },
@@ -79,7 +72,7 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
       return
     }
 
-    const blogpost = publishedBlogposts().find((post) => post.shortname === shortname)
+    const blogpost = findBlogpost(shortname)
 
     if (!blogpost || !hasBlogTemplate(website.rootPath, shortname)) {
       // If <shortname>.ts exists in /src/js, we can serve example.hbs
@@ -116,4 +109,3 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
     res.end(html)
   },
 }
-

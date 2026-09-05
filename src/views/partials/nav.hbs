@@ -8,19 +8,18 @@
         padding-left: 6px;
     }
 
-    #genuaryList {
-        list-style: decimal;
-        padding-left: 6px;
-    }
-
     div.sidebar bold {
         line-height: 2em;
         font-weight: 900;
     }
 
     #aboutMe {
-        background: lavender;
         padding: 2px;
+    }
+
+    .sidebar .theme-toggle {
+        margin: 0.75em 0 1em;
+        width: 100%;
     }
 </style>
 
@@ -42,6 +41,8 @@
         <i class="fas fa-times fa-2x"></i>
     </div>
 
+    {{> theme-toggle binary=true className="theme-toggle--sidebar" }}
+
     <ul>
         <li>
             <a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
@@ -54,12 +55,6 @@
             {{#blogposts}}
             <li><a href="/blog/{{shortname}}">{{title}}</a></li>
             {{/blogposts}}
-        </ul>
-        <bold>Genuary 2025:</bold>
-        <ul id="genuaryList">
-            {{#genuaryBlogposts}}
-            <li><a href="/blog/{{shortname}}">{{shortTitle}}</a></li>
-            {{/genuaryBlogposts}}
         </ul>
     </ul>
 </div>

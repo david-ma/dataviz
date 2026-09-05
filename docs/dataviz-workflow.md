@@ -4,14 +4,49 @@ Idea → sandbox → publish → lessons → upstream Chart → re-check publish
 
 ## Status (`config/blogpost-types.ts`)
 
-| status | Listed on `/viz` | Public `/blog/:id` | CI smoke |
-|--------|------------------|--------------------|----------|
+| status | Homepage / nav / sitemap /viz | Public `/blog/:id` | CI smoke |
+|--------|-------------------------------|--------------------|----------|
 | `published` | yes | yes | yes |
-| `hold` | no | WIP / soft | skip strict |
-| `private` | no | unlisted | skip |
-| `archived` | no | may 404 | skip |
+| `hold` | no | yes (if template exists) | skip strict |
+| `private` | no | yes (if template exists) | skip |
+| `archived` | no | yes (if template exists) | skip Chart regression |
+
+Only `status === 'published'` is listed. Any other status is omitted from listing surfaces.
 
 `tier: 'core'` marks Chart regression priorities (georgia, earthquake, winamp, matrix, breathe, war).
+
+Canonical catalogue: `config/blogposts.ts`.
+
+## Homepage grid
+
+Single flat card grid (no featured row, no category hubs). Breakpoints (BS3 + BootstrapXL):
+
+| Viewport | Cards/row |
+|----------|-----------|
+| ≥1600px (`col-xl-2`) | 6 |
+| ≥1200px (`col-lg-3`) | 4 |
+| ≥992px (`col-md-4`) | 3 |
+| ≥768px (`col-sm-6`) | 2 |
+| \<768px (`col-xs-12`) | 1 |
+
+## Themes
+
+Thalia binary light/dark: `theme-boot` + `theme-toggle binary=true` in wrappers/nav. CSS: `/css/thalia-themes.css` plus chrome tokens in `thalia.scss` / `dataviz.scss`.
+
+## Preview PNGs
+
+```bash
+# Operator installs once:
+bun add -d playwright
+bunx playwright install chromium
+
+# Site must be running, then:
+bun run preview:png georgia
+bun run preview:png --missing
+bun run preview:png --all
+```
+
+Writes `public/images/<file>` matching each post’s `image` field. Backfill existing production thumbs with curl if needed (see `docs/2026-09-05_homepage-grid-themes.md`).
 
 ## Chart modules (upstream-oriented)
 

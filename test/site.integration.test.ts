@@ -84,6 +84,29 @@ describeIntegration('Dataviz site HTTP', () => {
     expect(failing.length).toBe(0)
   }, 30_000)
 
+  test('hold posts are reachable by direct URL but not listed helpers', async () => {
+    const hold = blogposts.find((p) => p.shortname === 'statues')
+    expect(hold?.status).toBe('hold')
+    expect(publishedBlogposts().some((p) => p.shortname === 'statues')).toBe(false)
+
+    const response = await fetchFromServer('/blog/statues', port)
+    expect(response.status).toBe(200)
+
+    const home = await fetchFromServer('/', port)
+    const homeHtml = await home.text()
+    expect(homeHtml.includes('/blog/statues')).toBe(false)
+    expect(homeHtml.includes('featuredPreviews')).toBe(false)
+  })
+
+  test('homepage lists published posts including genuary days and wordle', async () => {
+    const home = await fetchFromServer('/', port)
+    const html = await home.text()
+    expect(html).toContain('/blog/wordle')
+    expect(html).toContain('/blog/theseus-wiki')
+    expect(html).toContain('/blog/genuary-25-01')
+    expect(html).not.toContain('id="featuredPreviews"')
+  })
+
   test('each published blogpost JS bundle returns HTTP 200', async () => {
     const posts = publishedBlogposts().filter((post) => !(post as { noJs?: boolean }).noJs)
     const results = await Promise.all(

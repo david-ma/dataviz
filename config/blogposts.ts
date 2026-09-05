@@ -1,9 +1,13 @@
 import type { Blogpost } from './blogpost-types.js'
 
+/**
+ * Canonical catalogue of dataviz posts.
+ * `status: 'published'` → homepage / nav / sitemap /viz.
+ * Any other status → omitted from those surfaces; `/blog/:shortname` still works.
+ */
 export const blogposts: Blogpost[] = [
   {
     shortname: 'georgia',
-    featured: true,
     title: 'Which Georgia are you closest to?',
     category: 'interactive',
     summary:
@@ -35,7 +39,6 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'breathe',
-    featured: true,
     title: 'Breathing Polygons',
     category: 'animation',
     summary: 'D3.js & maths practice by drawing breathing polygons',
@@ -55,7 +58,6 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'matrix',
-    featured: true,
     title: 'Matrix Raining Code',
     category: 'animation',
     summary: 'The raining code from the movie The Matrix (1999)',
@@ -76,7 +78,6 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'earthquake',
-    featured: true,
     title: 'Melbourne Earthquake',
     category: 'animation',
     summary:
@@ -104,11 +105,11 @@ export const blogposts: Blogpost[] = [
       'Mapping the geographic distribution of public statues featuring women and goats across the UK, highlighting the underrepresentation of women in public monuments',
     image: 'images/statues.png',
     publish_date: '2025-12-03',
-    status: 'published',
+    status: 'hold',
   },
   {
     shortname: 'genuary-25-01',
-    title: 'Genuary 2025 – Day 1: Vertical or horizontal lines only',
+    title: 'Vertical or horizontal lines only',
     category: 'Genuary 2025',
     summary:
       'An exploration of strict geometry using only vertical and horizontal lines for the first Genuary 2025 prompt.',
@@ -119,7 +120,7 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'genuary-25-02',
-    title: 'Genuary 2025 – Day 2: Layers upon layers upon layers',
+    title: 'Layers upon layers upon layers',
     category: 'Genuary 2025',
     summary:
       'Stacked generative layers build up depth and texture in response to the second Genuary 2025 prompt.',
@@ -130,7 +131,7 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'genuary-25-03',
-    title: 'Genuary 2025 – Day 3: Exactly 42 lines of code',
+    title: 'Exactly 42 lines of code',
     category: 'Genuary 2025',
     summary:
       'A constrained generative sketch written in exactly forty‑two lines of code for the third Genuary 2025 prompt.',
@@ -141,7 +142,7 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'genuary-25-04',
-    title: 'Genuary 2025 – Day 4: Black on black',
+    title: 'Black on black',
     category: 'Genuary 2025',
     summary:
       'Low‑contrast textures and light play explore the “black on black” Genuary 2025 prompt.',
@@ -152,7 +153,7 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'genuary-25-05',
-    title: 'Genuary 2025 – Day 5: Isometric art (no vanishing points)',
+    title: 'Isometric art (no vanishing points)',
     category: 'Genuary 2025',
     summary:
       'An isometric generative scene built without vanishing points for the fifth Genuary 2025 prompt.',
@@ -163,7 +164,7 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'genuary-25-06',
-    title: 'Genuary 2025 – Day 6: Landscapes from primitive shapes',
+    title: 'Landscapes from primitive shapes',
     category: 'Genuary 2025',
     summary:
       'Minimalist landscapes assembled solely from primitive shapes for the sixth Genuary 2025 prompt.',
@@ -174,7 +175,7 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'genuary-25-07',
-    title: 'Genuary 2025 – Day 7: Use software not intended for art',
+    title: 'Use software not intended for art',
     category: 'Genuary 2025',
     summary:
       'A physics‑driven sketch inspired by the “use software that is not intended to create art or images” prompt.',
@@ -185,7 +186,7 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'genuary-25-17',
-    title: 'Genuary 2025 – Day 17: What happens if π = 4?',
+    title: 'What happens if π = 4?',
     category: 'Genuary 2025',
     summary:
       'An exploration of circles, squares and approximations of π through the lens of the “pi equals four” prompt.',
@@ -196,14 +197,21 @@ export const blogposts: Blogpost[] = [
   },
   {
     shortname: 'theseus-wiki',
-    featured: true,
     title: 'Theseus Wiki',
     category: 'interactive',
     summary:
       'An interactive visualisation of the Ship of Theseus thought experiment, exploring identity and change through Wikipedia edit histories.',
-    image_url: 'https://photos.smugmug.com/Test-album/i-QBJ9Rpn/0/L22T8CRmm3XdMZBsfrJhsgz3CgwkhhTSr6QcX4bgg/X5/theseus-X5.png',
-    image: 'images/theseus-wiki.png',
+    image: 'images/theseus.png',
     publish_date: '2024-12-03',
+    status: 'published',
+  },
+  {
+    shortname: 'wordle',
+    title: 'Wordle solver',
+    category: 'interactive',
+    summary: 'A tool for helping you beat Wordle by tracking guesses and letter feedback.',
+    image: 'images/wordle.png',
+    publish_date: '2022-02-01',
     status: 'published',
   },
   {
@@ -213,11 +221,10 @@ export const blogposts: Blogpost[] = [
     summary: 'Eight generative art pieces made for Genuary 2025 — one prompt per day.',
     image: 'images/genuary-25-01.png',
     publish_date: '2025-01-01',
-    status: 'published',
-    tier: 'standard',
-    featured: true,
+    status: 'hold',
     noJs: true,
   },
 ]
+
 const config: any = {}
 export { config }
