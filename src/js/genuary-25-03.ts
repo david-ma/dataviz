@@ -1,6 +1,5 @@
 import { Chart, d3 } from './chart'
 import RAPIER from '@dimforge/rapier2d-compat'
-
 await RAPIER.init()
 
 new Chart({
@@ -38,7 +37,6 @@ new Chart({
       })
       requestAnimationFrame(render)
     }
-
     setInterval(spawnBlock, 1000)
     requestAnimationFrame(render)
   })
