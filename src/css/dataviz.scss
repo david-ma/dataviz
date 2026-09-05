@@ -1,3 +1,10 @@
+#dataviz_homepage {
+  // Full bleed like /viz until ultra-wide; then centred gutters.
+  max-width: 2100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 #dataviz_homepage,
 #dataviz_blog {
   z-index: 100;

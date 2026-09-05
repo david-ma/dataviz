@@ -2,7 +2,12 @@
   "apps": [
     {
       "name": "dataviz",
-      "script": "dist/server/cli.js",
+      "script": "bun",
+      "args": "thalia",
+      "cwd": "/usr/local/dev/Thalia",
+      "error_file": "websites/dataviz/data/logs/pm2-error.log",
+      "out_file": "websites/dataviz/data/logs/pm2-out.log",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss",
       "env": {
         "NODE_ENV": "production",
         "PORT": 2002,

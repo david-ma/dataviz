@@ -171,3 +171,9 @@ bun add -d playwright
 bunx playwright install chromium
 bun run preview:png --missing
 ```
+
+## Homepage width (2026-09-06)
+
+- Homepage was `.container` (Bootstrap fixed max-widths → early side gutters); `/viz` was `.container-fluid` (same grid, full width).
+- Changed `wrapper.hbs` to `container-fluid` and capped `#dataviz_homepage` at **2100px** centred.
+- `/viz` remains a near-duplicate listing under `blog.hbs`; candidate to redirect to `/` later.
