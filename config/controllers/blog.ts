@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs'
-import type { RawWebsiteConfig } from 'thalia'
+import type { RawWebsiteConfig } from 'thalia/types'
 
 import { blogposts } from '../blogposts.js'
 import { isListed, type Blogpost } from '../blogpost-types.js'

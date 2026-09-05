@@ -1,5 +1,5 @@
-import type { RawWebsiteConfig } from 'thalia'
-import { recursiveObjectMerge } from '../node_modules/thalia/server/website.js'
+import type { RawWebsiteConfig } from 'thalia/types'
+import { recursiveObjectMerge } from 'thalia/website'
 import { config as blogpostConfig } from './blogposts.js'
 import { blogControllers } from './controllers/blog.js'
 import { fridgeImagesController } from './controllers/fridge_images.js'
