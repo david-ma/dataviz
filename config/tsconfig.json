@@ -16,14 +16,6 @@
       "@dataviz/datatable": ["../src/js/datatable"]
     }
   },
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node"
-  },
-  // "include": [
-  //   "config/**/*",
-  //   "models/**/*"
-  // ],
   "exclude": [
     "node_modules",
     "dist",
