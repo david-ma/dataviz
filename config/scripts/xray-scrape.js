@@ -6,7 +6,7 @@ try {
     AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto;
 }
 catch (err) {
-    console.warn('[xray_test] db_bootstrap not available; AwesomePhoto operations will be no-ops');
+    console.warn('[xray-scrape] db_bootstrap not available; AwesomePhoto operations will be no-ops');
     AwesomePhoto = {
         findOne: () => Promise.resolve(null),
         create: () => Promise.resolve(),
@@ -84,4 +84,4 @@ export function xray(html) {
         });
     });
 }
-//# sourceMappingURL=xray_test.js.map
+//# sourceMappingURL=xray-scrape.js.map

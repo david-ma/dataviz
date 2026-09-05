@@ -1,5 +1,5 @@
 var request = require('request')
-var xray = require('./xray_test').xray
+var xray = require('./xray-scrape').xray
 
 console.log('Scraping stuff from awesome foundation')
 

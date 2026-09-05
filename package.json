@@ -39,15 +39,18 @@
     "three": "^0.185.1"
   },
   "resolutions": {
-    "css-what": "5.0.1"
+    "css-what": "5.0.1",
+    "jquery": "3.7.1"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
     "@types/d3-sankey": "^0.12.5",
     "@types/jquery": "^3.5.34",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^22.19.21",
     "@types/three": "^0.185.4",
     "csv": "^6.6.3",
+    "jsdom": "^26.1.0",
     "sass": "^1.103.1",
     "typescript": "7.0.2",
     "x-ray": "^2.3.4"

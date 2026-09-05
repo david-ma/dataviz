@@ -7,7 +7,7 @@ try {
   AwesomePhoto = require('../db_bootstrap').seq.AwesomePhoto
 } catch (err) {
   console.warn(
-    '[xray_test] db_bootstrap not available; AwesomePhoto operations will be no-ops',
+    '[xray-scrape] db_bootstrap not available; AwesomePhoto operations will be no-ops',
   )
   AwesomePhoto = {
     findOne: () => Promise.resolve(null),

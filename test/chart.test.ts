@@ -1,17 +1,11 @@
 /**
- * @jest-environment jsdom
+ * Chart unit tests. Import chart only after a DOM exists — DataTables' nested
+ * jQuery throws if loaded without `window.document`.
  */
-
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, test, beforeAll } from 'bun:test'
+import { JSDOM } from 'jsdom'
 
 import { camelize } from '../src/js/utils'
-import {
-  Chart,
-  classifyName,
-  _,
-  $,
-  d3,
-} from '../src/js/chart'
 import { mapDistance, type Coordinates } from '../src/js/chart-map'
 
 const testCases = [
@@ -34,7 +28,7 @@ const testCases = [
   {
     input: 'Apples and Grapes (1879–1880).jpg',
     expected: 'applesAndGrapes18791880Jpg',
-  }
+  },
 ]
 
 describe('Test camelize', () => {
@@ -42,17 +36,6 @@ describe('Test camelize', () => {
     test(`camelize(${input})`, () => {
       expect(camelize(input)).toBe(expected)
     })
-  })
-})
-
-describe('classifyName', () => {
-  test('replaces slashes, brackets, spaces, ampersand with hyphens', () => {
-    expect(classifyName('a/b\\c')).toBe('a-b-c')
-    expect(classifyName('Georgia, USA')).toBe('Georgia,-USA') // comma not in regex
-  })
-  test('produces id-safe strings (no spaces, parens, dots)', () => {
-    expect(classifyName('World (region)')).toBe('World--region-')
-    expect(classifyName('Apples & Grapes')).toBe('Apples---Grapes')
   })
 })
 
@@ -71,6 +54,51 @@ describe('mapDistance', () => {
 })
 
 describe('Chart', () => {
+  let Chart: typeof import('../src/js/chart').Chart
+  let classifyName: typeof import('../src/js/chart').classifyName
+  let _: typeof import('../src/js/chart')._
+  let $: typeof import('../src/js/chart').$
+  let d3: typeof import('../src/js/chart').d3
+
+  beforeAll(async () => {
+    const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>', {
+      url: 'http://localhost/',
+    })
+    const w = dom.window
+    Object.defineProperty(globalThis, 'window', { value: w, configurable: true })
+    Object.defineProperty(globalThis, 'document', {
+      value: w.document,
+      configurable: true,
+    })
+    Object.defineProperty(globalThis, 'HTMLElement', {
+      value: w.HTMLElement,
+      configurable: true,
+    })
+    Object.defineProperty(globalThis, 'Node', { value: w.Node, configurable: true })
+    Object.defineProperty(globalThis, 'navigator', {
+      value: w.navigator,
+      configurable: true,
+    })
+
+    const chartMod = await import('../src/js/chart')
+    Chart = chartMod.Chart
+    classifyName = chartMod.classifyName
+    _ = chartMod._
+    $ = chartMod.$
+    d3 = chartMod.d3
+  })
+
+  describe('classifyName', () => {
+    test('replaces slashes, brackets, spaces, ampersand with hyphens', () => {
+      expect(classifyName('a/b\\c')).toBe('a-b-c')
+      expect(classifyName('Georgia, USA')).toBe('Georgia,-USA') // comma not in regex
+    })
+    test('produces id-safe strings (no spaces, parens, dots)', () => {
+      expect(classifyName('World (region)')).toBe('World--region-')
+      expect(classifyName('Apples & Grapes')).toBe('Apples---Grapes')
+    })
+  })
+
   test('Chart exports', () => {
     expect(Chart).toBeTruthy()
     expect(_).toBeTruthy()
@@ -84,10 +112,6 @@ describe('Chart', () => {
   })
 
   test('Chart constructor', () => {
-    if (typeof document === 'undefined') {
-      return
-    }
-
     document.body.innerHTML = '<div id="war_chart"></div>'
 
     const chart = new Chart({
@@ -102,10 +126,6 @@ describe('Chart', () => {
   })
 
   test('loading: true shows skeleton and ready() replaces it', () => {
-    if (typeof document === 'undefined') {
-      return
-    }
-
     document.body.innerHTML = '<div id="loading_chart"></div>'
 
     const chart = new Chart({
@@ -117,7 +137,9 @@ describe('Chart', () => {
 
     const container = document.getElementById('loading_chart')
     expect(container?.querySelector('.chart-loading')).toBeTruthy()
-    expect(container?.querySelector('.chart-title')?.textContent).toBe('Test chart')
+    expect(container?.querySelector('.chart-title')?.textContent).toBe(
+      'Test chart',
+    )
 
     chart.ready((c) => {
       c.plot.append('circle').attr('r', 5).attr('cx', 10).attr('cy', 10)
