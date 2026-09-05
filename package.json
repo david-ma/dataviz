@@ -21,6 +21,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test test/ tests/",
     "statues:csv": "bun scripts/build-statues-csv.ts",
+    "earthquake:avatars": "bun scripts/cache-earthquake-avatars.ts",
     "preview:png": "bun scripts/capture-preview.ts"
   },
   "dependencies": {

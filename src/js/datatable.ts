@@ -1,8 +1,11 @@
 import $ from 'jquery'
-import 'datatables.net'
-import * as DataTables from 'datatables.net'
+import DataTable from 'datatables.net'
+import type { Api, Config, ConfigColumns } from 'datatables.net'
 
-export type DataTableConfig = DataTables.Config & {
+// Bun/ESM can resolve two different jQuery copies; bind DataTables to ours.
+DataTable.use($)
+
+export type DataTableConfig = Config & {
   element?: string
   titles?: string[]
   render?: any
@@ -12,7 +15,7 @@ export type DataTableConfig = DataTables.Config & {
   customRenderers?: {
     [key: string]: any
   }
-  columns?: DataTables.ConfigColumns[]
+  columns?: ConfigColumns[]
 }
 
 export type DataTableDataset = Array<any> & {
@@ -39,11 +42,11 @@ export type DataTableDataset = Array<any> & {
 export function decorateTable(
   dataset: DataTableDataset,
   newOptions?: DataTableConfig,
-): DataTables.Api<any> {
-  const element = newOptions ? newOptions.element : '#dataset table'
+): Api<any> {
+  const element = newOptions?.element ?? '#dataset table'
   const rows = Array.isArray(dataset) ? dataset : []
 
-  let columns: DataTables.ConfigColumns[]
+  let columns: ConfigColumns[]
   if (newOptions?.columns?.length) {
     columns = newOptions.columns.map((col) => ({ ...col }))
   } else {
@@ -109,6 +112,5 @@ export function decorateTable(
     }
   }
 
-  return $(element).DataTable(options)
+  return new DataTable(element, options)
 }
-

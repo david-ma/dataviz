@@ -22,7 +22,7 @@
       width: 80%;
       max-width: 300px;
       height: 100vh;
-      background: white;
+      background: var(--thalia-paper, var(--bgCol, #fff));
       z-index: 1002;
       transition: left 0.3s ease;
       overflow-y: auto;
@@ -378,7 +378,7 @@
     <div class="col-xs-8" id="content-main">
       <div id="header">
         <h1>Ship of Theseus</h1>
-        <div id="controls" style="margin-bottom: 20px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+        <div id="controls" style="margin-bottom: 20px; padding: 10px; border-radius: 4px;">
           <div id="controls-row-1" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
             <button id="btn-back" style="padding: 8px 16px; cursor: pointer; flex-shrink: 0;">← Back</button>
             <div id="date-revision-group" style="display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0;">
@@ -386,7 +386,7 @@
                 <span style="white-space: nowrap;">Jump to date:</span>
                 <input type="datetime-local" id="date-input" style="padding: 4px 8px; flex-shrink: 0;" />
               </label>
-              <span id="revision-info" style="font-size: 0.9em; color: #666; flex-shrink: 0; white-space: nowrap;"></span>
+              <span id="revision-info" style="font-size: 0.9em; flex-shrink: 0; white-space: nowrap;"></span>
             </div>
             <button id="btn-forward" style="padding: 8px 16px; cursor: pointer; flex-shrink: 0;">Forward →</button>
           </div>

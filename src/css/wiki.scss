@@ -5,35 +5,40 @@ footer {
 }
 
 div.words {
-  border: solid 1px black;
+  border: solid 1px var(--thalia-line, #a2a9b1);
   padding: 2px;
 }
 
 span.add,
 span.diff-added {
-  background-color: #90EE90;
+  background-color: #90ee90;
+  color: #121213;
 }
 
 span.del,
 span.diff-removed {
-  background-color: #FF6347;
+  background-color: #ff6347;
+  color: #121213;
 }
 
 span.none {
-  background-color: #FFFFFF;
+  background-color: transparent;
 }
 
 span.replace {
-  background-color: #87CEFA;
+  background-color: #87cefa;
+  color: #121213;
 }
 
 body,
-#dataviz_blog {
-  background: #f8f9fa;
+#dataviz_blog,
+#example.blogpost {
+  background: var(--thalia-canvas, var(--bgCol, #f8f9fa));
+  color: var(--thalia-ink, var(--textCol, inherit));
 }
 
 #contentBox {
-  background: #ffffff;
+  background: var(--thalia-paper, var(--bgCol, #ffffff));
 }
 
 html,
@@ -53,7 +58,7 @@ h6 {
 div#header,
 div#slider {
   padding-bottom: 2px;
-  border-bottom: solid 1px #a2a9b1;
+  border-bottom: solid 1px var(--thalia-line, #a2a9b1);
 }
 
 div#slider svg {
@@ -61,9 +66,25 @@ div#slider svg {
 }
 
 div#header {
-  background: white;
+  background: var(--thalia-paper, var(--bgCol, #ffffff));
   position: sticky;
   top: 0;
+  z-index: 2;
+}
+
+#controls {
+  background: var(--thalia-surface, var(--grey, #f8f9fa)) !important;
+  color: inherit;
+  border: 1px solid var(--thalia-line, transparent);
+}
+
+#revision-info {
+  color: var(--thalia-muted, #666) !important;
+}
+
+#theseus-sidebar {
+  background: var(--thalia-paper, var(--bgCol, #ffffff));
+  color: inherit;
 }
 
 div#logo-replacement {
@@ -73,8 +94,7 @@ div#logo-replacement {
   margin-top: 15px;
 
   a {
-    color: black;
-
+    color: var(--thalia-ink, var(--textCol, inherit));
 
     img {
       padding: 5px;
@@ -97,14 +117,37 @@ div#logo-replacement {
       }
     }
   }
+}
 
+#main pre.theseus-raw {
+  white-space: pre-wrap;
+  background: var(--thalia-inset, var(--thalia-surface, #f5f5f5));
+  color: var(--thalia-ink, var(--textCol, inherit));
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 0.9em;
+  border: 1px solid var(--thalia-line, transparent);
 }
 
 figure {
   float: right;
   display: table;
-  background-color: #f8f9fa;
-  border: 1px solid #c8ccd1;
+  background-color: var(--thalia-surface, #f8f9fa);
+  border: 1px solid var(--thalia-line, #c8ccd1);
   margin: 0.5em 0 1.3em 1.4em;
   padding: 0.25em;
+  color: inherit;
+}
+
+:root[data-theme='dark'] #theseus-sidebar,
+:root[data-color-scheme='dark'] #theseus-sidebar,
+:root[data-theme='thalia-dark'] #theseus-sidebar,
+:root[data-theme='solarized-dark'] #theseus-sidebar,
+:root[data-theme='dracula'] #theseus-sidebar,
+:root[data-theme='monokai'] #theseus-sidebar,
+:root[data-theme='rose-pine'] #theseus-sidebar,
+:root[data-theme='rose-pine-moon'] #theseus-sidebar {
+  background: var(--thalia-paper, var(--bgCol, #17050e));
 }
