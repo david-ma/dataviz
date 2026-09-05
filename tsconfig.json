@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "baseUrl": "src",
     "outDir": "dist",
     "declaration": true,
     "declarationMap": false,
@@ -11,9 +10,9 @@
     // "target": "ES2015",
     "target": "ES2021",
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "paths": {
-      "chart": ["js/chart.ts"]
+      "chart": ["./src/js/chart.ts"]
     },
     // "allowUmdGlobalAccess": true,
     // "allowSyntheticDefaultImports": true,

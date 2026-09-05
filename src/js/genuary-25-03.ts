@@ -10,7 +10,7 @@ new Chart({
   .clear_canvas()
   .scratchpad((chart) => {
     const scale = 50
-    const blocks = []
+    const blocks: RAPIER.RigidBody[] = []
     const gravity = new RAPIER.Vector2(0.0, -9.81)
     let world = new RAPIER.World(gravity)
     let groundColliderDesc = RAPIER.ColliderDesc.cuboid(chart.width / scale / 2, 0.1)
