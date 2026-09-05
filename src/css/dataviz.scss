@@ -16,6 +16,14 @@
     div#description {
       margin-top: 15px;
     }
+
+    // Not .hljs-ln
+    table:not(.hljs-ln) {
+      th, td {
+        border: 1px solid lightgrey;
+        padding: 4px 8px;
+      }
+    }
   }
 
   .preview {
@@ -27,15 +35,18 @@
       }
     }
 
-    height: 400px;
-    border: dashed 1px lightgrey;
+    position: relative;
+    min-height: 400px;
+    border: dashed 1px var(--thalia-line, lightgrey);
     padding: 15px;
+    color: var(--thalia-ink, inherit);
     h2 {
       margin-top: 0;
       margin-bottom: 0;
     }
     span.subtitle {
       font-size: 12px;
+      color: var(--thalia-muted, inherit);
     }
     p {
       overflow: hidden;
@@ -52,7 +63,7 @@
       transform: translate(-50%, 0);
       max-width: 100%;
       max-width: calc(100% - 30px);
-      border: solid 1px grey;
+      border: solid 1px var(--thalia-line, grey);
     }
   }
 }
@@ -101,11 +112,20 @@
 
 .sidebar {
   min-height: calc(100vh - 100px - 50px);
-  border-right: dashed 1px lightgrey;
+  border-right: dashed 1px var(--thalia-line, lightgrey);
+  color: var(--thalia-ink, inherit);
+  a {
+    color: var(--thalia-accent, #337ab7);
+  }
   ul {
     list-style: none;
     padding: 0;
   }
+}
+
+#aboutMe {
+  background: var(--thalia-surface-soft, lavender);
+  color: var(--thalia-ink, inherit);
 }
 
 header.hidden-xs {

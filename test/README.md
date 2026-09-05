@@ -1,7 +1,14 @@
 # Dataviz tests
 
-- **`test/`** – Jest + jsdom. Use for chart.ts (DOM-dependent) and utils. Run: `pnpm test`.
-- **`tests/`** – Bun. Use for pure data/TS modules (e.g. `tests/streaming.test.ts`). Run: `bun test tests/`.
+- **`test/`** – Bun unit + site HTTP integration. Run: `bun test` (or `bun run test`).
+- **`tests/`** – Extra Bun suites (e.g. `tests/streaming.test.ts`).
+
+## Site HTTP integration
+
+`test/site.integration.test.ts` starts a fresh Thalia server on a random port
+(`get-port-please` via `thalia/testing`). It does **not** need MySQL.
+
+Skip with `SKIP_SITE_INTEGRATION=1` when you cannot bind a port.
 
 ## chart.ts: what to test
 

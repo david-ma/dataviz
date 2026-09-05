@@ -2,18 +2,16 @@ import { d3 } from './chart'
 
 console.log('hello wordle')
 
-var words = []
+var words: string[] = []
 var bannedLetters = ''.split('')
-var knownLetters = []
+var knownLetters: string[] = []
 var imperfectLetters = ['', '', '', '', '']
 var perfectLetters = ['', '', '', '', '']
 var submittedWords: string[] = []
 
-document
-  .getElementById('wordForm')
-  .addEventListener('submit', function (event) {
-    event.preventDefault()
-  })
+document.getElementById('wordForm')?.addEventListener('submit', function (event) {
+  event.preventDefault()
+})
 
 function submitWord() {
   var word = document.getElementById('word') as HTMLInputElement
@@ -37,7 +35,7 @@ function resetWords() {
   submittedWords = []
 
   d3.select('#attempts table tbody').selectAll('tr').remove()
-  d3.text('/words2.txt').then(function (data) {
+  d3.text('/wordle_dictionary.txt').then(function (data) {
     words = data.split('\n').map((word) => word.toLowerCase())
     d3.select('#attempts table tbody')
       .selectAll('tr')
@@ -106,8 +104,11 @@ function addWord(word: string) {
 }
 
 function calculateBestWords() {
-  d3.text('/words.txt').then(function (data) {
-    words = data.split('\n').map((word) => word.toLowerCase())
+  d3.text('/wordle_dictionary.txt').then(function (data) {
+    words = data
+      .split('\n')
+      .map((word) => word.toLowerCase().trim())
+      .filter((word) => word.length === 5)
     var index = indexWords(words)
 
     console.log('words', words)

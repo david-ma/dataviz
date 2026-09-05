@@ -1,6 +1,5 @@
 import { Chart, d3 } from './chart'
 import RAPIER from '@dimforge/rapier2d-compat'
-
 await RAPIER.init()
 
 new Chart({
@@ -11,7 +10,7 @@ new Chart({
   .clear_canvas()
   .scratchpad((chart) => {
     const scale = 50
-    const blocks = []
+    const blocks: RAPIER.RigidBody[] = []
     const gravity = new RAPIER.Vector2(0.0, -9.81)
     let world = new RAPIER.World(gravity)
     let groundColliderDesc = RAPIER.ColliderDesc.cuboid(chart.width / scale / 2, 0.1)
@@ -38,7 +37,6 @@ new Chart({
       })
       requestAnimationFrame(render)
     }
-
     setInterval(spawnBlock, 1000)
     requestAnimationFrame(render)
   })

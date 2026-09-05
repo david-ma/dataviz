@@ -1,5 +1,5 @@
 var request = require('request');
-var xray = require('./xray_test').xray;
+var xray = require('./xray-scrape').xray;
 console.log('Scraping stuff from awesome foundation');
 const base = 'https://www.awesomefoundation.org/en/chapters/11/projects', target = '?page=1';
 const Cookie = require('../config.json').Cookie;

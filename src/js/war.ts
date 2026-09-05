@@ -20,7 +20,7 @@ type war = {
   length: number
 }
 
-d3.csv('/blogposts/AmericanWars.csv', <any>function (d: war) {
+d3.csv('/blogposts/AmericanWars.csv?raw=true', <any>function (d: war) {
   d.start = parseInt(d.start as string)
   d.end = parseInt(d.end as string) || ''
   d.length = ((d.end as any) || currentYear) - d.start

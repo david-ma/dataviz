@@ -1,449 +1,345 @@
-// @ts-nocheck
+/**
+ * World Wealth — Credit Suisse 2019 global wealth by country (MakeoverMonday).
+ * Nested treemap: world → region → country. Click a country to zoom its region;
+ * click the chart background (or Reset) to return.
+ */
+import { Chart, decorateTable, classifyName, d3 } from './chart'
+import type { Api as DataTablesApi } from 'datatables.net'
 
-import { Chart, decorateTable, $, d3 } from './chart'
-
-console.log('Running wealth.ts')
-
-let dataset = null
-
-const treemapData = {
-  children: [],
-  wealth: 0,
-  name: 'World',
-}
-
-type rawCountry = {
-  country: string
-  region: string
-  wealth_b: string // eslint-disable-line
-}
 type Country = {
   rank: number
   name: string
   region: string
   wealth: number
 }
-type Region = {
+
+type RegionNode = {
   name: string
   wealth: number
   children: Country[]
-  countries: Country[]
 }
-let color: d3.ScaleOrdinal<string, unknown>
 
-let rank: number = 1
+type WorldNode = {
+  name: string
+  children: RegionNode[]
+}
 
-const regions: {
-  [name: string]: Region
-} = {}
+type HierarchyDatum = WorldNode | RegionNode | Country
 
-console.log('Calling csv stuff')
-d3.csv('/blogposts/WorldWealth.csv', function (country: rawCountry) {
-  if (!country.wealth_b) country.wealth_b = '0'
+const CSV_URL = '/blogposts/WorldWealth.csv?raw=true'
+const REGION_COLOURS = [
+  '#4e79a7',
+  '#f28e2b',
+  '#e15759',
+  '#76b7b2',
+  '#59a14f',
+  '#edc948',
+]
 
-  if (country.region) {
-    const result: Country = {
+const wealthFormat = d3.format('$,.0f')
+const ZOOM_MS = 750
+
+function isCountry(d: HierarchyDatum): d is Country {
+  return 'wealth' in d && !('children' in d)
+}
+
+function loadCountries(rows: Array<d3.DSVRowString<string>>): Country[] {
+  let rank = 1
+  const out: Country[] = []
+  for (const row of rows) {
+    const country = row.country?.trim()
+    const region = row.region?.trim()
+    if (!country || !region) continue
+    const wealth = Number.parseInt(String(row.wealth_b ?? '0').replace(/,/g, ''), 10)
+    if (!Number.isFinite(wealth)) continue
+    out.push({
       rank: rank++,
-      name: country.country,
-      region: country.region,
-      wealth: parseInt(country.wealth_b),
-    }
-
-    regions[country.region] = regions[country.region] || {
-      name: country.region,
-      wealth: 0,
-      children: [],
-      countries: [],
-    }
-
-    regions[country.region].wealth += result.wealth
-    regions[country.region].countries.push(result)
-    // treemapData.wealth += result.wealth;
-
-    return result
-  } else {
-    return null
+      name: country,
+      region,
+      wealth,
+    })
   }
-}).then(function (data) {
-  dataset = data
-  globalThis.data = data
+  return out
+}
 
-  treemapData.children = Object.keys(regions)
-    .map((d) => regions[d])
-    .sort((a, b) => b.wealth - a.wealth)
-
-  console.log(Object.keys(regions))
-  // prepare a color scale
-  color = d3
-    .scaleOrdinal()
-    .domain(Object.keys(regions))
-    .range([
-      '#7fc97f',
-      '#beaed4',
-      '#fdc086',
-      '#ffff99',
-      '#386cb0',
-      '#f0027f',
-      '#bf5b17',
-    ])
-
-  // Table options:
-  const tableOptions = {
-    element: '#dataset table',
-    paging: true,
-    search: true,
-    searching: true,
-    language: {
-      searchPlaceholder: 'Search',
-      sLengthMenu: 'Show _MENU_',
-    },
-    oLanguage: {
-      sSearch: '',
-    },
-    pageLength: 10,
-    order: [3, 'desc'],
-    columns: [
-      {
-        data: 'rank',
-        title: 'Rank',
-      },
-      {
-        data: 'name',
-        title: 'Country',
-      },
-      {
-        data: 'region',
-        title: 'Region',
-      },
-      {
-        data: 'wealth',
-        title: 'Wealth (Billions USD)',
-        render: function (d) {
-          return d3.format('$,')(d)
-        },
-      },
-    ],
-    rowCallback: function (row, data) {
-      d3.select(row)
-        .attr('id', `row-${classifyName(data.name)}`)
-        .style('background', color(data.region) as string)
-        .on('mouseenter', function () {
-          d3.select(`#${classifyName(data.name)}`).classed('highlight', true)
-        })
-        .on('mouseout', function () {
-          d3.select(`#${classifyName(data.name)}`).classed('highlight', false)
-        })
-    },
+function buildWorld(countries: Country[]): WorldNode {
+  const byRegion = new Map<string, RegionNode>()
+  for (const country of countries) {
+    let region = byRegion.get(country.region)
+    if (!region) {
+      region = { name: country.region, wealth: 0, children: [] }
+      byRegion.set(country.region, region)
+    }
+    region.wealth += country.wealth
+    region.children.push(country)
   }
-  const datatable: DataTables.Api = decorateTable(dataset, tableOptions)
-  globalThis.datatable = datatable
+  for (const region of byRegion.values()) {
+    region.children.sort((a, b) => b.wealth - a.wealth)
+  }
+  return {
+    name: 'World',
+    children: [...byRegion.values()].sort((a, b) => b.wealth - a.wealth),
+  }
+}
 
-  drawTreemap(dataset, datatable)
-})
+function updateSummary(countries: Country[], error?: string) {
+  const el = document.getElementById('wealth-summary')
+  if (!el) return
+  if (error) {
+    el.textContent = error
+    return
+  }
+  const total = d3.sum(countries, (d) => d.wealth)
+  const regions = new Set(countries.map((d) => d.region)).size
+  el.innerHTML =
+    `<strong>${countries.length}</strong> countries · ` +
+    `<strong>${regions}</strong> regions · ` +
+    `total <strong>${wealthFormat(total)}</strong> billion USD (2019)`
+}
 
-function drawTreemap(data, datatable: DataTables.Api) {
+function setZoomLabel(text: string) {
+  const el = document.getElementById('wealth-zoom-label')
+  if (el) el.textContent = text
+}
+
+let countries: Country[] = []
+try {
+  const raw = await d3.csv(CSV_URL)
+  countries = loadCountries(raw)
+} catch (err) {
+  console.error('Failed to load WorldWealth.csv', err)
+  updateSummary([], `Could not load ${CSV_URL}. Is the file under public/blogposts/?`)
+}
+
+if (!countries.length) {
+  updateSummary([], `No rows parsed from ${CSV_URL}.`)
+} else {
+  updateSummary(countries)
+}
+
+const world = buildWorld(countries)
+const color = d3
+  .scaleOrdinal<string, string>()
+  .domain(world.children.map((d) => d.name))
+  .range(REGION_COLOURS)
+
+const datatable = decorateTable(countries, {
+  element: '#dataset table',
+  paging: true,
+  searching: true,
+  pageLength: 12,
+  order: [[3, 'desc']],
+  language: {
+    searchPlaceholder: 'Filter countries…',
+    search: '',
+  },
+  columns: [
+    { data: 'rank', title: 'Rank' },
+    { data: 'name', title: 'Country' },
+    { data: 'region', title: 'Region' },
+    {
+      data: 'wealth',
+      title: 'Wealth (US$ bn)',
+      render: (d: number) => wealthFormat(d),
+    },
+  ],
+  rowCallback(row, data) {
+    const country = data as Country
+    d3.select(row)
+      .attr('id', `row-${classifyName(country.name)}`)
+      .style('background', color(country.region))
+      .on('mouseenter', () => {
+        d3.select(`#country-${classifyName(country.name)}`).classed('highlight', true)
+      })
+      .on('mouseleave', () => {
+        d3.select(`#country-${classifyName(country.name)}`).classed('highlight', false)
+      })
+  },
+}) as DataTablesApi<Country>
+
+if (!countries.length) {
+  // Still draw an empty chart shell message rather than treemap of nothing useful.
+  const host = document.getElementById('chart')
+  if (host) {
+    host.innerHTML = `<p class="wealth-empty">No wealth data to plot.</p>`
+  }
+} else {
+  const host = document.getElementById('chart')
+  const chartWidth = Math.max(640, Math.min(1000, (host?.clientWidth || 800) - 8))
+
   new Chart({
     element: 'chart',
-    data: treemapData,
-    width: 1000,
-    height: 700,
+    width: chartWidth,
+    height: Math.round(chartWidth * 0.68),
+    margin: { top: 8, right: 8, bottom: 8, left: 8 },
     nav: false,
-    title: 'World Wealth 2019, Billions of $USD',
-  }).scratchpad(function (c) {
-    globalThis.c = c
-    const svg = c.plot
-    const width = c.innerWidth
-    const height = c.innerHeight
+    title: '',
+  }).scratchpad((chart) => {
+  const svg = chart.plot
+  const width = chart.innerWidth
+  const height = chart.innerHeight
 
-    console.log('treemapData', treemapData)
-    // Here the size of each leave is given in the 'value' field in input data
-    const root = d3.hierarchy(treemapData).sum((d: any) => d.wealth)
+  const treemap = d3.treemap<HierarchyDatum>().size([width, height]).paddingInner(2).paddingOuter(2).round(true)
 
-    console.log('root', root)
+  const countryOpacity = d3.scaleLinear<number, number>().range([0.55, 1])
 
-    const tree = d3.treemap().size([width, height]).padding(2)(root)
+  let zoomedRegion: string | null = null
 
-    console.log(Math.max(...treemapData.children.map((d) => d.wealth)))
-    // And a opacity scale
-    const opacity = d3
-      .scaleLinear()
-      .domain([10, Math.max(...treemapData.children.map((d) => d.wealth))])
-      .range([0.5, 1])
+  const layers = {
+    cells: svg.append('g').attr('class', 'wealth-cells'),
+    labels: svg.append('g').attr('class', 'wealth-labels').style('pointer-events', 'none'),
+  }
 
-    globalThis.tree = tree
+  const resetBtn = document.getElementById('wealth-reset')
+  resetBtn?.addEventListener('click', () => {
+    if (zoomedRegion) resetView()
+  })
 
-    // use this information to add rectangles:
-    svg
-      .selectAll('rect.region')
-      .data(tree.leaves())
+  function highlightRow(name: string, on: boolean) {
+    d3.select(`#row-${classifyName(name)}`).classed('highlight', on)
+  }
+
+  function fitLabel(selection: d3.Selection<SVGTextElement, unknown, null, undefined>, maxWidth: number) {
+    const node = selection.node()
+    if (node && node.getBBox().width > maxWidth - 6) selection.remove()
+  }
+
+  function hierarchyForView(): d3.HierarchyNode<HierarchyDatum> {
+    if (!zoomedRegion) {
+      return d3.hierarchy<HierarchyDatum>(world).sum((d) => (isCountry(d) ? d.wealth : 0))
+    }
+    const region = world.children.find((r) => r.name === zoomedRegion)
+    if (!region) {
+      zoomedRegion = null
+      return d3.hierarchy<HierarchyDatum>(world).sum((d) => (isCountry(d) ? d.wealth : 0))
+    }
+    return d3.hierarchy<HierarchyDatum>(region).sum((d) => (isCountry(d) ? d.wealth : 0))
+  }
+
+  function regionNameOf(leaf: d3.HierarchyRectangularNode<HierarchyDatum>): string {
+    const data = leaf.data
+    if (isCountry(data)) return data.region
+    if (leaf.parent && 'name' in leaf.parent.data) return String(leaf.parent.data.name)
+    return zoomedRegion || 'World'
+  }
+
+  function render(animate: boolean) {
+    const root = treemap(hierarchyForView())
+    const leaves = root.leaves() as d3.HierarchyRectangularNode<HierarchyDatum>[]
+    const values = leaves.map((d) => d.value || 0)
+    countryOpacity.domain([d3.min(values) || 0, d3.max(values) || 1])
+
+    const cell = layers.cells.selectAll('rect.country').data(
+      leaves,
+      (d: d3.HierarchyRectangularNode<HierarchyDatum>) =>
+        isCountry(d.data) ? d.data.name : String(d.data.name),
+    )
+
+    cell.exit().remove()
+
+    const cellEnter = cell
       .enter()
       .append('rect')
-      .classed('region', true)
-      .attr('x', function (d) {
-        return d.x0
+      .classed('country', true)
+      .attr('x', (d) => d.x0)
+      .attr('y', (d) => d.y0)
+      .attr('width', 0)
+      .attr('height', 0)
+
+    const cellMerge = cellEnter.merge(cell)
+
+    cellMerge
+      .attr('id', (d) => (isCountry(d.data) ? `country-${classifyName(d.data.name)}` : `node-${classifyName(String(d.data.name))}`))
+      .attr('fill', (d) => color(regionNameOf(d)))
+      .attr('fill-opacity', (d) => countryOpacity(d.value || 0))
+      .attr('stroke', '#1a1a1a')
+      .attr('stroke-width', 1)
+      .on('mouseenter', (_event, d) => {
+        if (isCountry(d.data)) highlightRow(d.data.name, true)
       })
-      .attr('y', function (d) {
-        return d.y0
+      .on('mouseleave', (_event, d) => {
+        if (isCountry(d.data)) highlightRow(d.data.name, false)
       })
-      .attr('width', function (d) {
-        return d.x1 - d.x0
-      })
-      .attr('height', function (d) {
-        return d.y1 - d.y0
-      })
-      .style('stroke', 'black')
-      .style('fill', function (d) {
-        return color(d.data.name)
-      })
-      .style('opacity', function (d: any) {
-        return d.parent ? opacity.domain([10, d.parent.total])(d.data.value) : 1
-      })
-      .each(function (d) {
-        console.log(d)
-
-        const rWidth = d.x1 - d.x0
-        const rHeight = d.y1 - d.y0
-
-        const regionRoot = d3
-          .hierarchy({
-            name: d.data.name,
-            children: d.data.countries,
-            wealth: 0,
-          })
-          .sum((d: any) => d.wealth)
-
-        const myTreemap = d3.treemap().size([rWidth, rHeight]).padding(2)
-        const regionTree = myTreemap(regionRoot)
-
-        const regionGroupTranslate = `translate(${d.x0},${d.y0})`
-
-        const regionGroup = svg
-          .append('g')
-          .attr('id', `${classifyName(d.data.name)}`)
-          .attr('transform', regionGroupTranslate)
-
-        regionGroup
-          .selectAll('rect.country')
-          .data(regionTree.leaves())
-          .enter()
-          .append('rect')
-          .classed('country', true)
-          .attr('id', (d) => classifyName(d.data.name))
-          .attr('x', function (d) {
-            return d.x0
-          })
-          .attr('y', function (d) {
-            return d.y0
-          })
-          .attr('width', function (d) {
-            return d.x1 - d.x0
-          })
-          .attr('height', function (d) {
-            return d.y1 - d.y0
-          })
-          .style('stroke', 'black')
-          .style('fill', color(d.data.name))
-          .style('opacity', function (d: any) {
-            return d.parent
-              ? opacity.domain([10, d.parent.total])(d.data.value)
-              : 1
-          })
-          .on('mouseover', function (d) {
-            d3.select(`#row-${classifyName(d.data.name)}`).classed(
-              'highlight',
-              true,
-            )
-          })
-          .on('mouseout', function (d) {
-            d3.select(`#row-${classifyName(d.data.name)}`).classed(
-              'highlight',
-              false,
-            )
-          })
-          .on('click', function (d) {
-            console.log('Zoom in!')
-
-            $('.plot').append($(`#${classifyName(d.data.region)}`).detach())
-            datatable.search(d.data.region).draw()
-
-            const zoomedTreemap = d3.treemap().size([width, height]).padding(2)
-            const zoomedRegionTree = zoomedTreemap(regionRoot)
-
-            const speed = 1000
-            let done = false
-
-            regionGroup
-              .transition()
-              .duration(speed)
-              .attr('transform', 'translate(0,0)')
-            regionGroup
-              .selectAll('rect.country')
-              .data(zoomedRegionTree.leaves())
-              .transition()
-              .duration(speed)
-              .attr('x', function (d) {
-                return d.x0
-              })
-              .attr('y', function (d) {
-                return d.y0
-              })
-              .attr('width', function (d) {
-                return d.x1 - d.x0
-              })
-              .attr('height', function (d) {
-                return d.y1 - d.y0
-              })
-              .on('end', function () {
-                if (!done) {
-                  done = true
-                  console.log('Finished zooming in')
-
-                  // and to add the text labels
-                  regionGroup
-                    .selectAll('text')
-                    .data(zoomedRegionTree.leaves())
-                    .enter()
-                    .append('text')
-                    .classed('tempText', true)
-                    .attr('x', function (d) {
-                      return d.x0 + 5
-                    }) // +10 to adjust position (more right)
-                    .attr('y', function (d) {
-                      return d.y0 + 20
-                    }) // +20 to adjust position (lower)
-                    .text(function (d) {
-                      return d.data.name
-                    })
-                    .attr('font-size', '19px')
-                    .attr('font-weight', '700')
-                    .attr('fill', 'black')
-                    .each(function (d) {
-                      const width = d.x1 - d.x0
-                      const node = d3.select(this).node()
-                      if (node != null && width < node.getBBox().width) {
-                        d3.select(this).remove()
-                      }
-                    })
-
-                  // and to add the text labels
-                  regionGroup
-                    .selectAll('.countryVals')
-                    .data(zoomedRegionTree.leaves())
-                    .enter()
-                    .append('text')
-                    .classed('tempText', true)
-                    .attr('x', function (d) {
-                      return d.x0 + 5
-                    }) // +10 to adjust position (more right)
-                    .attr('y', function (d) {
-                      return d.y0 + 35
-                    }) // +20 to adjust position (lower)
-                    .text(function (d) {
-                      return `${d3.format('$,')(d.data.wealth)} billion`
-                    })
-                    .attr('font-size', '11px')
-                    .attr('fill', 'black')
-                    .each(function (d) {
-                      const width = d.x1 - d.x0
-                      const node = d3.select(this).node()
-                      if (node != null && width < node.getBBox().width) {
-                        d3.select(this).remove()
-                      }
-                    })
-
-                  svg
-                    .append('rect')
-                    .attr('id', 'blocker')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', width)
-                    .attr('height', height)
-                    .attr('fill', 'rgba(0,0,0,0)')
-                    .on('click', function () {
-                      console.log('Reverse time!!!')
-                      d3.selectAll('.tempText').remove()
-                      datatable.search('').draw()
-
-                      const myTreemap = d3
-                        .treemap()
-                        .size([rWidth, rHeight])
-                        .padding(2)
-                      const regionTree = myTreemap(regionRoot)
-
-                      regionGroup
-                        .transition()
-                        .duration(speed)
-                        .attr('transform', regionGroupTranslate)
-                      regionGroup
-                        .selectAll('rect.country')
-                        .data(regionTree.leaves())
-                        .transition()
-                        .duration(speed)
-                        .attr('x', function (d) {
-                          return d.x0
-                        })
-                        .attr('y', function (d) {
-                          return d.y0
-                        })
-                        .attr('width', function (d) {
-                          return d.x1 - d.x0
-                        })
-                        .attr('height', function (d) {
-                          return d.y1 - d.y0
-                        })
-
-                      d3.select('#blocker').remove()
-                    })
-                }
-              })
-          })
-      })
-      .on('click', function (d) {
-        console.log(d)
-        datatable.search(d.data.name).draw()
-
-        // console.log(regionTree);
+      .on('click', (event, d) => {
+        event.stopPropagation()
+        if (!isCountry(d.data)) return
+        const region = d.data.region
+        datatable.search(region).draw()
+        if (zoomedRegion === region) return
+        zoomedRegion = region
+        setZoomLabel(`Region: ${region}`)
+        resetBtn?.removeAttribute('hidden')
+        render(true)
       })
 
-    // and to add the text labels
-    svg
-      .selectAll('text')
-      .data(root.leaves())
-      .enter()
-      .append('text')
-      .attr('x', function (d) {
-        return d.x0 + 5
-      }) // +10 to adjust position (more right)
-      .attr('y', function (d) {
-        return d.y0 + 20
-      }) // +20 to adjust position (lower)
-      .text(function (d) {
-        return d.data.name
-      })
-      .attr('font-size', '19px')
-      .attr('font-weight', '700')
-      .attr('fill', 'black')
+    const transition = animate ? cellMerge.transition().duration(ZOOM_MS) : cellMerge
+    transition
+      .attr('x', (d) => d.x0)
+      .attr('y', (d) => d.y0)
+      .attr('width', (d) => Math.max(0, d.x1 - d.x0))
+      .attr('height', (d) => Math.max(0, d.y1 - d.y0))
 
-    // and to add the text labels
-    svg
-      .selectAll('vals')
-      .data(root.leaves())
-      .enter()
-      .append('text')
-      .attr('x', function (d) {
-        return d.x0 + 5
-      }) // +10 to adjust position (more right)
-      .attr('y', function (d) {
-        return d.y0 + 35
-      }) // +20 to adjust position (lower)
-      .text(function (d) {
-        return `${d3.format('$,')(d.data.wealth)} billion`
-      })
-      .attr('font-size', '11px')
-      .attr('fill', 'black')
+    layers.labels.selectAll('*').remove()
+
+    for (const leaf of leaves) {
+      if (!isCountry(leaf.data)) continue
+      const w = leaf.x1 - leaf.x0
+      const h = leaf.y1 - leaf.y0
+      if (w < 36 || h < 28) continue
+
+      const nameText = layers.labels
+        .append('text')
+        .attr('class', 'wealth-label-name')
+        .attr('x', leaf.x0 + 4)
+        .attr('y', leaf.y0 + 16)
+        .text(leaf.data.name)
+      fitLabel(nameText, w)
+
+      if (h >= 42) {
+        const valueText = layers.labels
+          .append('text')
+          .attr('class', 'wealth-label-value')
+          .attr('x', leaf.x0 + 4)
+          .attr('y', leaf.y0 + 30)
+          .text(`${wealthFormat(leaf.data.wealth)} bn`)
+        fitLabel(valueText, w)
+      }
+    }
+  }
+
+  function resetView() {
+    zoomedRegion = null
+    datatable.search('').draw()
+    setZoomLabel('All regions')
+    resetBtn?.setAttribute('hidden', '')
+    render(true)
+  }
+
+  svg.on('click', () => {
+    if (zoomedRegion) resetView()
   })
-}
 
-function classifyName(name: string): string {
-  return name.replace(/[ \(\)\.\']/gi, '-') // eslint-disable-line
+  // Legend
+  const legendHost = document.getElementById('wealth-legend')
+  if (legendHost) {
+    legendHost.replaceChildren()
+    for (const region of world.children) {
+      const item = document.createElement('button')
+      item.type = 'button'
+      item.className = 'wealth-legend-item'
+      item.innerHTML = `<span class="swatch" style="background:${color(region.name)}"></span>${region.name}`
+      item.addEventListener('click', () => {
+        datatable.search(region.name).draw()
+        zoomedRegion = region.name
+        setZoomLabel(`Region: ${region.name}`)
+        resetBtn?.removeAttribute('hidden')
+        render(true)
+      })
+      legendHost.appendChild(item)
+    }
+  }
+
+  setZoomLabel('All regions')
+  render(false)
+  })
 }

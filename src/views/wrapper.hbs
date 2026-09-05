@@ -5,8 +5,10 @@
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>#MakeoverMonday</title>
+  <title>David's Dataviz</title>
+  <meta name="description" content="Data visualisations by David Ma — interactive charts, generative art, and experiments." />
 
+  {{> theme-boot defaultTheme="light" }}
   {{> assets}}
   {{> styles }}
   {{> scripts }}
@@ -19,8 +21,12 @@
     <div class="row equal">
 {{> nav}}
 
-      <div class="col-xs-12 col-sm-9">
-        {{> content }}
+      <div class="col-xs-12 col-sm-9 col-md-10">
+        {{#if @partial-block }}
+          {{~> @partial-block~}}
+        {{else}}
+          {{~> content~}}
+        {{/if}}
       </div>
     </div>
   </div>

@@ -1,6 +1,6 @@
 import { d3 } from './chart'
 import * as d3sankey from 'd3-sankey'
-import { filmMergers, SankeyData } from './data/film-mergers'
+import { filmMergers, SankeyData } from './film/film-mergers'
 
 console.log("Running film-sankey.ts");
 

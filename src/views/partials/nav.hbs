@@ -8,19 +8,18 @@
         padding-left: 6px;
     }
 
-    #genuaryList {
-        list-style: decimal;
-        padding-left: 6px;
-    }
-
     div.sidebar bold {
         line-height: 2em;
         font-weight: 900;
     }
 
     #aboutMe {
-        background: lavender;
         padding: 2px;
+    }
+
+    .sidebar .theme-toggle {
+        margin: 0.75em 0 1em;
+        width: 100%;
     }
 </style>
 
@@ -33,7 +32,7 @@
         <input class="blogSearch" placeholder="Search">
         <i class="fas fa-search fa-2x"></i>
     </div> --}}
-    <div id="hamburger" onclick=" $('#mobile_nav').toggleClass('hidden-xs'); $('#sidebar').toggleClass('hidden-xs')">
+    <div id="hamburger" onclick=" $('#mobile_nav').toggleClass('hidden-xs'); $('#sidebar').toggleClass('hidden-xs')" aria-label="Toggle navigation">
         <i class="fas fa-bars fa-2x"></i>
     </div>
 </div>
@@ -42,29 +41,20 @@
         <i class="fas fa-times fa-2x"></i>
     </div>
 
+    {{> theme-toggle binary=true className="theme-toggle--sidebar" }}
+
     <ul>
         <li>
             <a onclick="$('#aboutMe').toggleClass('hidden')" href="#aboutMe">About Me</a>
             <div id="aboutMe" class='hidden'></div>
         </li>
+        <li><a href="/viz">All Visualisations</a></li>
         {{! <li id="desktopSearch"><input class="blogSearch" placeholder="Search"></li> }}
         <bold>Blogposts:</bold>
         <ul id="blogpostList">
             {{#blogposts}}
             <li><a href="/blog/{{shortname}}">{{title}}</a></li>
             {{/blogposts}}
-        </ul>
-        <bold>Genuary 2025:</bold>
-        <ul id="genuaryList">
-            <li><a href="/blog/genuary-25-01">Vertical or horizontal lines only</a></li>
-            <li><a href="/blog/genuary-25-02">Layers upon layers upon layers</a></li>
-            <li><a href="/blog/genuary-25-03">Exactly 42 lines of code</a></li>
-            <li><a href="/blog/genuary-25-04">Black on black</a></li>
-            <li><a href="/blog/genuary-25-05">Isometric Art (No vanishing points)</a></li>
-            <li><a href="/blog/genuary-25-06">Make a landscape using only primitive shapes.</a></li>
-            <li><a href="/blog/genuary-25-07">Use software that is not intended to create art or images.</a></li>
-            <li><a href="/blog/genuary-25-17">What happens if pi=4?</a></li>
-
         </ul>
     </ul>
 </div>

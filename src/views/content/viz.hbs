@@ -1,0 +1,17 @@
+<section id="viz" class="blogpost">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>All Visualisations</h1>
+    </div>
+  </div>
+  <div id="vizPreviews" class="row">
+    {{#blogposts}}
+    <div class="preview col-xl-2 col-lg-3 col-md-4 col-sm-6 col-xs-12">
+      <h2>{{title}}</h2>
+      <span class="subtitle">{{category}} {{publish_date}}</span>
+      <p>{{summary}}</p>
+      <a href="/blog/{{shortname}}"><img src="{{#image_url}}{{{image_url}}}{{/image_url}}{{^image_url}}/{{image}}{{/image_url}}" alt="{{title}}"></a>
+    </div>
+    {{/blogposts}}
+  </div>
+</section>

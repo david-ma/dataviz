@@ -5,8 +5,8 @@ import RAPIER from '@dimforge/rapier3d-compat'
 await RAPIER.init()
 
 // OBJLoader is not a part of the main three.js library, so we need to import it separately
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js'
 
 export class PaperclipLoader {
   private static instance: PaperclipLoader

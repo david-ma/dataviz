@@ -12,21 +12,20 @@
   <meta name="twitter:creator"    content="@frostickle" />
   <meta name="twitter:title"      content="{{title}}" />
   <meta name="twitter:description" content="{{summary}}" />
-  <meta name="twitter:image"      content="https://dataviz.david-ma.net/{{{image}}}" />
+  <meta name="twitter:image"      content="{{#image_url}}{{{image_url}}}{{/image_url}}{{^image_url}}https://dataviz.david-ma.net/{{{image}}}{{/image_url}}" />
 
   <meta property="og:url"         content="https://dataviz.david-ma.net/blog/{{shortname}}/" />
   <meta property="og:type"        content="article" />
   <meta property="og:title"       content="{{title}}" />
   <meta property="og:description" content="{{summary}}" />
-  <meta property="og:image"       content="https://dataviz.david-ma.net/{{{image}}}" />
-  <meta property="og:image:width"  content="1212px" />
-  <meta property="og:image:height" content="830px" />
+  <meta property="og:image"       content="{{#image_url}}{{{image_url}}}{{/image_url}}{{^image_url}}https://dataviz.david-ma.net/{{{image}}}{{/image_url}}" />
   <meta property="fb:app_id"   content="793893040633491" />
 
   <meta name="author"             content="David Ma" />
   <meta property="article:author" content="http://www.facebook.com/frostickle" />
   {{/blogpost}}
 
+  {{> theme-boot defaultTheme="light" }}
 {{> assets}}
 {{> styles }}
 </head>
@@ -39,6 +38,7 @@
 
       <div id="content_reactive_wrapper" class="col-xs-12 col-sm-9 col-md-10" style="margin: 0 auto;">
       <div class="visible-xs-block" style="height:50px;"></div>
+      {{#blogpost}}<p style="margin-bottom:0"><a href="/">&larr; All visualisations</a></p>{{/blogpost}}
 {{> content }}
       </div>
     </div>

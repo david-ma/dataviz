@@ -1,6 +1,7 @@
 console.log('files.ts')
 
-import { d3, Chart, classifyName } from './chart'
+import { ExtrasChart as Chart } from './chart-extras'
+import { d3, classifyName } from './chart'
 
 type Filestatus = 'keep' | 'delete' | 'mixed'
 

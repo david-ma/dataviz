@@ -1,6 +1,7 @@
 console.log('hey, preflight.ts')
 
-import { d3, Chart, decorateTable } from './chart'
+import { ExtrasChart as Chart } from './chart-extras'
+import { d3, decorateTable } from './chart'
 
 type FileInfo = [
   name: string,

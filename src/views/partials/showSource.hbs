@@ -1,6 +1,8 @@
+{{!-- Wassup: {{{typescript}}} --}}
+
 <h3>Source Code:</h3>
 <pre id="codeDisplay" class="language-typescript">
-  {{{typescript}}}
+  <a href="{{{typescript}}}" target="_blank">{{{typescript}}}</a>
 </pre>
 
 <style>
@@ -50,7 +52,7 @@
 <script>
   hljs.initLineNumbersOnLoad();
 
-  fetch("/source/{{typescript}}")
+  fetch("/source{{{typescript}}}")
     .then(response => response.text())
     .then(code => {
       document.getElementById('codeDisplay').textContent = code;

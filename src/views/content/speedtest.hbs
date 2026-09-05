@@ -1,0 +1,129 @@
+<section class="blogpost speedtest-post">
+  <div class="row" id="contentBox">
+    <div class="col-xs-12 col-lg-10">
+      <div id="description"></div>
+
+      <div class="speedtest-layout">
+        <div id="chart" class="chart"></div>
+      </div>
+
+      <aside id="speedtest_legend" class="speedtest-legend" aria-label="Legend">
+        <div class="speedtest-legend-card">
+          <div class="speedtest-legend-title">Legend</div>
+          <div class="speedtest-legend-sub">Colour = external IP · filled = download · ring = upload</div>
+          <div class="speedtest-legend-note">
+            Below 1 Mbps drawn at 1 Mbps · hover for measured
+          </div>
+          <div class="table-responsive">
+            <table class="table table-condensed table-striped speedtest-legend-table">
+              <thead>
+                <tr>
+                  <th>Colour</th>
+                  <th>IP address</th>
+                  <th>Runs</th>
+                  <th>Avg upload</th>
+                  <th>Avg download</th>
+                  <th>Label</th>
+                </tr>
+              </thead>
+              <tbody id="speedtest_legend_rows"></tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+
+      {{> showSource }}
+    </div>
+  </div>
+</section>
+
+<style>
+  .speedtest-layout {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .speedtest-layout > #chart {
+    flex: 1 1 720px;
+    min-width: 320px;
+    width: 100%;
+  }
+
+  .speedtest-legend {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 16px;
+  }
+
+  .speedtest-legend-card {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    padding: 10px 10px 0 10px;
+  }
+
+  .speedtest-legend-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 4px;
+  }
+
+  .speedtest-legend-sub {
+    font-size: 11px;
+    color: #495057;
+    line-height: 1.25;
+  }
+
+  .speedtest-legend-note {
+    font-size: 10px;
+    color: #6c757d;
+    margin-top: 6px;
+    margin-bottom: 8px;
+  }
+
+  .speedtest-legend-table {
+    margin-bottom: 0;
+    width: 100%;
+  }
+
+  .speedtest-legend-table th,
+  .speedtest-legend-table td {
+    vertical-align: middle;
+  }
+
+  .speedtest-legend-table code {
+    font-size: 11px;
+  }
+
+  .speedtest-legend-colour {
+    width: 88px;
+    white-space: nowrap;
+  }
+
+  .speedtest-swatch {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .speedtest-swatch-dl,
+  .speedtest-swatch-ul {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  .speedtest-legend-label {
+    width: 100%;
+    min-height: 44px;
+    font-size: 12px;
+    resize: vertical;
+  }
+</style>
+
+{{> require }}

@@ -5,7 +5,7 @@ import {
   MetricKey,
   StreamingRow,
   MergerEvent,
-} from '../src/js/data/streaming'
+} from '../src/js/film/streaming'
 
 test('applyMergers combines acquiree into acquirer from merger year', () => {
   const rows: StreamingRow[] = [

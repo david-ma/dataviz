@@ -132,17 +132,21 @@
         height: 30px;
         width: 30px;
         border-collapse: collapse;
-        border: 1px solid black;
+        border: 1px solid var(--thalia-line, #121213);
+        color: var(--thalia-ink, var(--textCol, inherit));
         padding: 2px;
         text-align: center;
         text-transform: uppercase;
+        font-weight: 700;
 
         &[data-status="1"] {
-          background-color: yellow;
+          background-color: #c9b458;
+          color: #121213;
         }
 
         &[data-status="2"] {
-          background-color: green;
+          background-color: #6aaa64;
+          color: #121213;
         }
       }
     }
