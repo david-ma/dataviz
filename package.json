@@ -13,7 +13,7 @@
     "develop:client": "bun scripts/build-client.ts --watch",
     "preview": "bun run build:dev && NODE_ENV=production thalia",
     "scrape": "node config/scripts/scrape_awesome.js",
-    "deploy": "ssh yoshi 'ANSIBLE_PATH=/usr/bin /usr/local/dev/scripts/homelab_cluster/scripts/run-playbook.sh deploy-dataviz.yml aang'",
+    "deploy": "ssh yoshi 'source ~/.config/homelab/cron.env && /usr/local/dev/scripts/homelab_cluster/scripts/run-playbook.sh deploy-dataviz.yml aang'",
     "wiki": "node scripts/wiki.js",
     "blog": "bash scripts/newBlogpost.sh",
     "start": "thalia",

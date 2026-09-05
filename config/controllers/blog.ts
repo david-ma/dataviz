@@ -56,13 +56,6 @@ export const blogControllers: RawWebsiteConfig['controllers'] = {
       res.end('404')
     }
   },
-  viz: (res, req, website, requestInfo) => {
-    const html = website.getContentHtml('viz', 'blog')({
-      ...navContext(),
-      blogposts: publishedBlogposts(),
-    })
-    res.end(html)
-  },
   blog: (res, req, website, requestInfo) => {
     const shortname = requestInfo.action
     if (!shortname) {
