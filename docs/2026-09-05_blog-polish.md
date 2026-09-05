@@ -8,16 +8,15 @@ Date: 2026-09-05
 
 **Cause:** Bun ESM pulled two jQuery copies; `datatables.net` patched one, `decorateTable` called the other.
 
-**Fix:** `src/js/datatable.ts` now does `DataTable.use($)` and `new DataTable(element, options)`.
+**Fix:** `src/js/datatable.ts` — `DataTable.use($)` *and* re-register `$.fn.DataTable` on our jQuery (use alone is not enough under Bun ESM dual-jQuery). Then `new DataTable(element, options)`.
 
-**Operator:** rebuild client bundles so `dist/js` picks this up:
+**Operator:** rebuild / hard-refresh. If using `dist/`:
 
 ```bash
 bun run build:dev
-# or: bun run develop:client
 ```
 
-Then hard-refresh `/blog/breathe`, `/blog/wealth`, `/blog/war`, `/blog/genuary-25-17`.
+If using `thalia-develop` on-demand compile, hard-refresh is enough after the source change.
 
 ### 2) Theseus wiki dark mode
 

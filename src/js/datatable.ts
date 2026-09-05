@@ -2,8 +2,25 @@ import $ from 'jquery'
 import DataTable from 'datatables.net'
 import type { Api, Config, ConfigColumns } from 'datatables.net'
 
-// Bun/ESM can resolve two different jQuery copies; bind DataTables to ours.
+/**
+ * Bun/ESM can load two jQuery copies. DataTables registers `$.fn.DataTable` on
+ * the copy it imported at module init; `DataTable.use($)` only swaps the
+ * internal `$` used later — it does *not* re-attach the plugin. So after use(),
+ * re-register on our jQuery instance.
+ */
 DataTable.use($)
+if (typeof ($.fn as any).DataTable !== 'function') {
+  ;($ as any).fn.dataTable = DataTable
+  DataTable.$ = $
+  ;($ as any).fn.dataTableSettings = DataTable.settings
+  ;($ as any).fn.dataTableExt = DataTable.ext
+  ;($ as any).fn.DataTable = function (opts: Config) {
+    return ($(this) as any).dataTable(opts).api()
+  }
+  Object.keys(DataTable).forEach((prop) => {
+    ;($ as any).fn.DataTable[prop] = (DataTable as any)[prop]
+  })
+}
 
 export type DataTableConfig = Config & {
   element?: string
