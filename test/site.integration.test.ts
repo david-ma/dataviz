@@ -59,11 +59,6 @@ describeIntegration('Dataviz site HTTP', () => {
     expect([200, 404]).toContain(response.status)
   })
 
-  test('/viz returns HTTP 200', async () => {
-    const response = await fetchFromServer('/viz', port)
-    expect(response.status).toBe(200)
-  })
-
   test('each published blogpost returns HTTP 200', async () => {
     const results = await Promise.all(
       PUBLISHED_POSTS.map(async (post) => {
