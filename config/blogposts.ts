@@ -196,6 +196,17 @@ export const blogposts: Blogpost[] = [
     tier: 'standard',
   },
   {
+    shortname: 'datasaurus-dozen',
+    title: 'The Datasaurus Dozen',
+    category: 'interactive',
+    summary:
+      'Thirteen datasets with matching summary statistics — and wildly different scatter plots, including a dinosaur.',
+    image: 'images/datasaurus-dozen.png',
+    publish_date: '2026-09-06',
+    status: 'published',
+    tier: 'standard',
+  },
+  {
     shortname: 'theseus-wiki',
     title: 'Theseus Wiki',
     category: 'interactive',

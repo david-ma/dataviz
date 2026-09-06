@@ -1,0 +1,114 @@
+<section class="datasaurus-page">
+  <h1>The Datasaurus Dozen</h1>
+
+  <p>
+    Summary statistics can look reassuringly “normal” while the underlying points
+    tell a completely different story. Alberto Cairo’s
+    <em>Datasaurus</em> made that point with a scatter plot that is literally a
+    dinosaur. Justin Matejka and George Fitzmaurice (Autodesk Research) then built
+    twelve more shapes that keep the same means, standard deviations, and
+    correlation — the
+    <a href="https://www.autodesk.com/research/publications/same-stats-different-graphs" target="_blank" rel="noopener">
+      Datasaurus Dozen
+    </a>.
+  </p>
+
+  <p>
+    Below, each panel is the same 142 points rearranged into a different picture.
+    The table of summary stats (to two decimal places) barely moves; the charts do.
+  </p>
+
+  <p id="datasaurus-summary" class="datasaurus-summary">Loading…</p>
+
+  <div id="datasaurus-stats" class="datasaurus-stats" aria-live="polite"></div>
+
+  <div id="datasaurus-grid" class="datasaurus-grid"></div>
+
+  <h2>Why this matters</h2>
+  <ul>
+    <li>Never stop at mean / sd / correlation — plot the data.</li>
+    <li>Anscombe’s Quartet made the same point with four datasets; this is that idea turned up to eleven (plus a dinosaur).</li>
+    <li>Identical summary stats do <em>not</em> imply identical structure.</li>
+  </ul>
+
+  {{> datasetAndSourceTabs filepath="/dataviz/datasaurus-dozen.csv" title="Datasaurus Dozen (CSV)" format="csv" typescript=typescript}}
+</section>
+
+{{> require}}
+
+<style>
+  .datasaurus-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 12px 32px;
+  }
+
+  .datasaurus-page h1 {
+    margin: 0 0 0.4em;
+    font-size: 1.75rem;
+  }
+
+  .datasaurus-page > p,
+  .datasaurus-page > ul {
+    max-width: 52rem;
+    line-height: 1.45;
+  }
+
+  .datasaurus-summary {
+    margin: 0.75rem 0 1rem;
+  }
+
+  .datasaurus-stats {
+    overflow-x: auto;
+    margin: 0 0 1.5rem;
+  }
+
+  .datasaurus-stats table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .datasaurus-stats th,
+  .datasaurus-stats td {
+    border: 1px solid #ccc;
+    padding: 4px 8px;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .datasaurus-stats th:first-child,
+  .datasaurus-stats td:first-child {
+    text-align: left;
+  }
+
+  .datasaurus-stats thead th {
+    background: #f0f0f0;
+  }
+
+  .datasaurus-stats tr.is-dino td {
+    font-weight: 600;
+    background: #fff8e7;
+  }
+
+  .datasaurus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .datasaurus-grid .chart {
+    margin: 0;
+  }
+
+  .datasaurus-grid .chart svg {
+    background: transparent !important;
+  }
+
+  .datasaurus-panel {
+    border: 1px solid #ccc;
+    background: #fafafa;
+    padding: 4px;
+  }
+</style>
