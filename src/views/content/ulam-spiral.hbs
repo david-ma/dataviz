@@ -1,0 +1,134 @@
+<section class="ulam-page">
+  <h1>The Ulam Spiral</h1>
+
+  <p>
+    In 1963, mathematician
+    <a href="https://en.wikipedia.org/wiki/Stanis%C5%82aw_Ulam" target="_blank" rel="noopener">Stanisław Ulam</a>
+    was sitting through a dull talk and started doodling: write the natural numbers in a
+    square spiral, then circle the primes. Unexpectedly, the primes lined up along
+    diagonals and other striking patterns — a picture now called the
+    <a href="https://en.wikipedia.org/wiki/Ulam_spiral" target="_blank" rel="noopener">Ulam spiral</a>.
+  </p>
+
+  <p>
+    Below, every cell is an integer from 1 (centre) outward. Primes glow; composites
+    stay quiet. Crank the side length up and the diagonals keep reappearing — a reminder
+    that “random-looking” primes still have geometric structure when you lay them out
+    this way.
+  </p>
+
+  <div class="ulam-controls" role="group" aria-label="Spiral options">
+    <label class="ulam-control">
+      <span>Side length <strong id="ulam-side-value">101</strong> (max <span id="ulam-max-value">10201</span>)</span>
+      <input id="ulam-side" type="range" min="5" max="301" step="2" value="101" />
+    </label>
+
+    <label class="ulam-control">
+      <span>Colour</span>
+      <select id="ulam-colour">
+        <option value="primes" selected>Primes only</option>
+        <option value="rainbow">Rainbow by value</option>
+        <option value="factors">By divisor count</option>
+      </select>
+    </label>
+
+    <label class="ulam-control ulam-checkbox">
+      <input id="ulam-composites" type="checkbox" checked />
+      <span>Show composites</span>
+    </label>
+  </div>
+
+  <p id="ulam-stats" class="ulam-stats">Building spiral…</p>
+  <p id="ulam-hover" class="ulam-hover" aria-live="polite">Hover a cell to see its number.</p>
+
+  <div id="ulam-chart" class="ulam-chart"></div>
+
+  <h2>What you’re seeing</h2>
+  <ul>
+    <li>Start at 1 in the centre, step right to 2, up to 3, left, left, down, down, right, right… doubling the run length every two turns.</li>
+    <li>Many primes fall on lines like <em>4n² − 2n + 1</em> — Euler’s polynomial <em>n² − n + 41</em> is a famous related curiosity.</li>
+    <li>The spiral doesn’t prove a deep theorem by itself; it’s a striking way to <em>see</em> structure in the primes.</li>
+  </ul>
+
+  {{> showSource }}
+</section>
+
+{{> require}}
+
+<style>
+  .ulam-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 12px 32px;
+  }
+
+  .ulam-page h1 {
+    margin: 0 0 0.4em;
+    font-size: 1.75rem;
+  }
+
+  .ulam-page > p,
+  .ulam-page > ul {
+    max-width: 52rem;
+    line-height: 1.45;
+  }
+
+  .ulam-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    align-items: flex-end;
+    margin: 1rem 0 0.75rem;
+  }
+
+  .ulam-control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.95rem;
+    min-width: 160px;
+  }
+
+  .ulam-control input[type='range'] {
+    width: min(280px, 100%);
+  }
+
+  .ulam-control select {
+    max-width: 200px;
+    padding: 4px 6px;
+  }
+
+  .ulam-checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: auto;
+    padding-bottom: 4px;
+  }
+
+  .ulam-stats,
+  .ulam-hover {
+    margin: 0.35rem 0;
+    font-size: 0.95rem;
+  }
+
+  .ulam-hover {
+    color: #555;
+    min-height: 1.4em;
+  }
+
+  .ulam-chart {
+    margin: 0.75rem 0 1.5rem;
+  }
+
+  .ulam-chart.chart,
+  .ulam-chart .chart {
+    margin: 0;
+  }
+
+  .ulam-chart canvas {
+    width: 100%;
+    height: auto;
+    border-radius: 2px;
+  }
+</style>

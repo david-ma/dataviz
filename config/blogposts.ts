@@ -207,6 +207,17 @@ export const blogposts: Blogpost[] = [
     tier: 'standard',
   },
   {
+    shortname: 'ulam-spiral',
+    title: 'The Ulam Spiral',
+    category: 'interactive',
+    summary:
+      'Natural numbers on a square spiral with primes highlighted — Ulam’s doodle that made prime diagonals visible.',
+    image: 'images/ulam-spiral.png',
+    publish_date: '2026-09-19',
+    status: 'hold',
+    tier: 'standard',
+  },
+  {
     shortname: 'theseus-wiki',
     title: 'Theseus Wiki',
     category: 'interactive',
