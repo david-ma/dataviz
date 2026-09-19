@@ -38,6 +38,8 @@ bun run preview:png ulam-spiral
 # Then flip status to published in config/blogposts.ts
 ```
 
-## Known gotcha
+## Status
 
-Restart `bun dev` after `blogposts.ts` changes — catalogue is loaded once at process start.
+Implemented on branch `cursor/ulam-spiral-ccca`. PR draft. Catalogue `hold` until preview PNG.
+
+Verified locally: `bun test test/ulam-spiral.test.ts`, `bun run typecheck`, `/blog/ulam-spiral` HTTP 200 with canvas spiral + controls.
